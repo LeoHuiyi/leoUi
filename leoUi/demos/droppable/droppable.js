@@ -1,154 +1,115 @@
-
 $.config({
 
-        level:6,
+    level: 6,
 
-        baseUrl:'leoUi/',
+    baseUrl: 'leoUi/',
 
-        alias : {
+    alias: {
 
-            leoCss : '../../css/leo.css',
+        leoCss: '../../css/leo.css',
 
-            jqueryMousewheel:'../jquery/jquery-mousewheel'
+        jqueryMousewheel: '../jquery/jquery-mousewheel'
 
-        },
+    },
 
-        shim: {
+    shim: {
 
-            jquery: {
+        jquery: {
 
-                src: '../jquery/jquery-1.9.1.js',
+            src: '../jquery/jquery-1.9.1.js',
 
-                exports: "$"
+            exports: "$"
 
-            }　
+        }　
 
-        }
+    }
 
 }).require('leoUi-droppable,leoCss,ready', function($) {
 
     $('.portlet').leoDraggable({
-     bClone:true,
-     revert:false,
-     revertAnimate:true,
-     bCloneAnimate:true,
-     dragBoxReturnToTarget:true,
-     useDroppable:true,
-     // cursorAt:{top:10,left:10},
+        bClone: true,
+        revert: false,
+        revertAnimate: true,
+        bCloneAnimate: true,
+        dragBoxReturnToTarget: true,
+        useDroppable: true,
+        // cursorAt:{top:10,left:10},
 
-     stopMouseWheel:false,
+        stopMouseWheel: false,
 
-     proxy: function(source) { //source
+        proxy: function(source) { //source
 
-       return $(source).clone().css({'z-index':1,width:$(source).width(),position:'fixed'}).insertAfter(source);
+            return $(source).clone().css({
+                'z-index': 1,
+                width: $(source).width(),
+                position: 'fixed'
+            }).insertAfter(source);
 
-     },
+        },
 
-     onStartDrag:function(e,darg){
+        onStartDrag: function(e, darg) {
 
-       $(this).css({'opacity':'0.5'})
+            $(this).css({
+                'opacity': '0.5'
+            })
 
 
-     },
-     onStopDrag:function(){
+        },
+        onStopDrag: function() {
 
-       $(this).css('opacity','1');
+            $(this).css('opacity', '1');
 
-       // $('.portlet').leoRizeBox('destroy');
+            // $('.portlet').leoRizeBox('destroy');
 
-       // $('.portlet').leoDroppable('destroy')
+            // $('.portlet').leoDroppable('destroy')
 
-     }
+        }
     })
 
     $('.portlet').leoDroppable({
 
-     // accept:'#leo',
+        // accept:'#leo',
 
-     onDragEnter:function(e,source,dargBox){
+        onDragEnter: function(e, source, dargBox) {
 
-       if(source !== this){
+            if (source !== this) {
 
-         if($(this).parent()[0] !== $(source).parent()[0] || $(this).index() < $(source).index()){
+                if ($(this).parent()[0] !== $(source).parent()[0] || $(this).index() < $(source).index()) {
 
-           $(source).insertBefore(this);
+                    $(source).insertBefore(this);
 
-         }else {
+                } else {
 
-           $(source).insertAfter(this);
+                    $(source).insertAfter(this);
 
-         }
+                }
 
-       }
+            }
 
-     },onDrop:function(){
+        },
+        onDrop: function() {
 
-       // console.log(this)
+            // console.log(this)
 
-       // return false;
+            // return false;
 
-     }
+        }
 
     })
     $('.column').leoDroppable({
 
-     // accept:'#leo',
+        // accept:'#leo',
 
-     onDragEnter:function(e,source,dargBox){
+        onDragEnter: function(e, source, dargBox) {
 
-       if(!$.contains( this, source )){
+            if (!$.contains(this, source)) {
 
-         $(source).appendTo(this);
+                $(source).appendTo(this);
 
-       }
+            }
 
-     }
+        }
 
-    });
-
-    $('.connectedSortable>li').leoDraggable({
-     bClone:true,
-     revert:false,
-     revertAnimate:true, 
-     bCloneAnimate:true,
-     bCloneAnimateDargBox:true,
-     onStartDrag:function(e,darg){
-
-       $(this).css({'opacity':'0.5'})
-       $(darg).css({'z-index':1})
-       $('#sortable>li').leoDraggable({disabled:true});
-     },
-     onStopDrag:function(){
-
-       $(this).css('opacity','1')
-
-       $('#sortable>li').leoDraggable({disabled:false});
-
-     }
-    }).leoDroppable({
-
-     onDragEnter:function(e,source,dargBox){
-
-       if($(this).index() <$(source).index()){
-
-         $(source).insertBefore(this);
-
-       }else{
-
-         $(source).insertAfter(this);
-
-       }
-
-     }
-    });
-
-    $('#sortable2').leoDroppable({
-
-     onDragOver:function(e,source,dargBox){
-
-       console.log(1)
-
-     }
     });
 
 

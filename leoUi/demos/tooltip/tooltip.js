@@ -87,13 +87,15 @@ $.config({
 
     $("#botton_2").click(function(event) {
 
+        // a.option({'arrow':true})
+
         if(b.tooltipState() ==="close"){
 
             arr=['asdfsdfads','adfafd','aadsf','adfads','adfasfd'];
 
             str = ran(arr,$.leoTools.random);
 
-            b.option({'content':str,"position.toCenterOffset":"-25%"});
+            b.option({'content':str,"position.toCenterOffset":"-50%"});
 
             b.setOfTraget( $("#botton_2") );
 

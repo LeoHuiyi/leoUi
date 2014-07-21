@@ -358,7 +358,11 @@
 
         _destroyArrow:function(){
 
-            !!this.$arrow && ( this.$arrow.remove() );
+            this.$target.css( 'margin', '' );
+
+            !!this.$arrow && this.$arrow.remove();
+
+            delete this.$arrow;
 
         },
 

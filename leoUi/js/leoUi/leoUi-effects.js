@@ -9,6 +9,8 @@
  * http://api.jqueryui.com/category/effects-core/
  *
  * Explode,Clip特效:leoUi:修复没有加上margin的bug；
+ *
+ * Explode：没有加上zIndex的bug；
  */
 ;(function(factory) {
 
@@ -1654,7 +1656,7 @@
 	 *
 	 * http://api.jqueryui.com/explode-effect/
 	 *
-	 * leoUi:修复没有加上margin的bug；
+	 * leoUi:修复没有加上margin和没有加上zIndex的bug；
 	 *
 	 */
 
@@ -1676,6 +1678,7 @@
 			pieces = [],
 			marginLeft = parseFloat(el.css('marginLeft')),
 			marginTop = parseFloat(el.css('marginTop')),
+			zIndex = el.css('zIndex'),
 
 			// loop
 			i, j, left, top, mx, my;
@@ -1721,6 +1724,7 @@
 						height: height,
 						left: left-marginLeft + (show ? mx * width : 0),
 						top: top-marginTop + (show ? my * height : 0),
+						zIndex:zIndex>0?zIndex:0,
 						opacity: show ? 0 : 1
 					}).animate({
 						left: left-marginLeft + (show ? 0 : mx * width),

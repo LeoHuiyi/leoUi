@@ -8,1496 +8,1496 @@
 */
 ;(function(factory) {
 
-	if (typeof define === "function" && define.amd) {
+    if (typeof define === "function" && define.amd) {
 
-		// AMD. Register as an anonymous module.
-		define(["jquery"], factory);
+        // AMD. Register as an anonymous module.
+        define(["jquery"], factory);
 
-	} else {
+    } else {
 
-		// Browser globals
-		factory(jQuery);
+        // Browser globals
+        factory(jQuery);
 
-	}
+    }
 
 }(function($) {
 
-	var ap = Array.prototype,aslice = ap.slice,expandoId,oproto = Object.prototype,ohasOwn = oproto.hasOwnProperty;
+    var ap = Array.prototype,aslice = ap.slice,expandoId,oproto = Object.prototype,ohasOwn = oproto.hasOwnProperty;
 
-	$.leoTools = {};
+    $.leoTools = {};
 
-	$.leoTools.version = '1.0.0';
+    $.leoTools.version = '1.0.0';
 
-	$.leoTools.uuid = 0;
+    $.leoTools.uuid = 0;
 
-	$.leoTools.getUuid = function(){
+    $.leoTools.getUuid = function(){
 
-		return $.leoTools.uuid++;
+        return $.leoTools.uuid++;
 
-	};
+    };
 
-	$.leoTools.getId = function(name) {
+    $.leoTools.getId = function(name) {
 
-		return "Leo"  + (name === undefined ? '_' : '_' + name+'_') + Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+        return "Leo"  + (name === undefined ? '_' : '_' + name+'_') + Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
 
-	};
+    };
 
-	$.leoTools.expando = $.leoTools.getId('leoTools');
+    $.leoTools.expando = $.leoTools.getId('leoTools');
 
-	expandoId = $.leoTools.expando.replace(/^Leo_leoTools/g, "");
+    expandoId = $.leoTools.expando.replace(/^Leo_leoTools/g, "");
 
-	$.leoTools.rword = /[^, ]+/g;
+    $.leoTools.rword = /[^, ]+/g;
 
-	$.leoTools.getExpando = function(name) {
+    $.leoTools.getExpando = function(name) {
 
-		return 'Leo' + (name === undefined ? '' : '_' + name) + expandoId;
+        return 'Leo' + (name === undefined ? '' : '_' + name) + expandoId;
 
-	};
+    };
 
-	// 返回min<=mun<=max
-	$.leoTools.range = function( mun, min, max ) {
+    // 返回min<=mun<=max
+    $.leoTools.range = function( mun, min, max ) {
 
-		if( max === 'max' && min === 'min' ){
+        if( max === 'max' && min === 'min' ){
 
-			return mun;
+            return mun;
 
-		}else if( max === 'max' ){
+        }else if( max === 'max' ){
 
-			return mun > min ? mun : min;
+            return mun > min ? mun : min;
 
-		}else if ( min === 'min' ){
+        }else if ( min === 'min' ){
 
-			return mun < max ? mun : max;
+            return mun < max ? mun : max;
 
-		}else{
+        }else{
 
-			return ( mun > min ? mun : min ) < max ? ( mun > min ? mun : min ) : max;
+            return ( mun > min ? mun : min ) < max ? ( mun > min ? mun : min ) : max;
 
-		}
+        }
 
-	};
+    };
 
-	// 返回随机数
-	$.leoTools.random = function( min, max ) {
+    // 返回随机数
+    $.leoTools.random = function( min, max ) {
 
-		if ( max === undefined ) {
+        if ( max === undefined ) {
 
-			max = min;
+            max = min;
 
-			min = 0;
+            min = 0;
 
-		}
+        }
 
-		return min + Math.floor( Math.random() * ( max - min + 1 ) );
+        return min + Math.floor( Math.random() * ( max - min + 1 ) );
 
-	};
+    };
 
-	$.leoTools.has = function( obj, key ) {
+    $.leoTools.has = function( obj, key ) {
 
-		return hasOwnProperty.call( obj, key );
+        return hasOwnProperty.call( obj, key );
 
-	};
+    };
 
-	//获取object对象所有的属性名称。
-	$.leoTools.keys = function(obj) {
+    //获取object对象所有的属性名称。
+    $.leoTools.keys = function(obj) {
 
-		if (!(obj === Object(obj))) return [];
+        if (!(obj === Object(obj))) return [];
 
-		if (Object.keys) return Object.keys(obj);
+        if (Object.keys) return Object.keys(obj);
 
-		var keys = [];
+        var keys = [];
 
-		for (var key in obj) if ($.leoTools.has(obj, key)) keys.push(key);
+        for (var key in obj) if ($.leoTools.has(obj, key)) keys.push(key);
 
-		return keys;
+        return keys;
 
-	};
+    };
 
-	//返回object对象所有的属性值。
-	$.leoTools.values = function(obj) {
+    //返回object对象所有的属性值。
+    $.leoTools.values = function(obj) {
 
-		var keys = $.leoTools.keys(obj);
+        var keys = $.leoTools.keys(obj);
 
-		var length = keys.length;
+        var length = keys.length;
 
-		var values = new Array(length);
+        var values = new Array(length);
 
-		for (var i = 0; i < length; i++) {
+        for (var i = 0; i < length; i++) {
 
-			values[i] = obj[keys[i]];
+            values[i] = obj[keys[i]];
 
-		}
+        }
 
-		return values;
+        return values;
 
-	};
+    };
 
-	//返回一个随机乱序的 obj 副本
-	$.leoTools.shuffle = function(obj) {
+    //返回一个随机乱序的 obj 副本
+    $.leoTools.shuffle = function(obj) {
 
-		var rand,shuffled = [];
+        var rand,shuffled = [];
 
-		$.each(obj, function(key,value) {
+        $.each(obj, function(key,value) {
 
-			rand = $.leoTools.random(key++);
+            rand = $.leoTools.random(key++);
 
-			shuffled[key - 1] = shuffled[rand];
+            shuffled[key - 1] = shuffled[rand];
 
-			shuffled[rand] = value;
+            shuffled[rand] = value;
 
-		});
+        });
 
-		return shuffled;
+        return shuffled;
 
-	};
+    };
 
-	//从obj中产生一个随机样本。传递一个数字表示从list中返回n个随机元素。否则将返回一个单一的随机项。
-	$.leoTools.sample = function(obj, n, guard) {
+    //从obj中产生一个随机样本。传递一个数字表示从list中返回n个随机元素。否则将返回一个单一的随机项。
+    $.leoTools.sample = function(obj, n, guard) {
 
-		if (n == null || guard) {
+        if (n == null || guard) {
 
-		if (obj.length !== +obj.length) obj = $.leoTools.values(obj);
+        if (obj.length !== +obj.length) obj = $.leoTools.values(obj);
 
-			return obj[$.leoTools.random(obj.length - 1)];
+            return obj[$.leoTools.random(obj.length - 1)];
 
-		}
+        }
 
-		return $.leoTools.shuffle(obj).slice(0, Math.max(0, n));
+        return $.leoTools.shuffle(obj).slice(0, Math.max(0, n));
 
-	};
+    };
 
-	//返回最里层子类
-	$.leoTools.findInnerMostChildren = function($box,selector,childrenArray){
+    //返回最里层子类
+    $.leoTools.findInnerMostChildren = function($box,selector,childrenArray){
 
-		var childrenArray = childrenArray || [],selector = selector || '*';
+        var childrenArray = childrenArray || [],selector = selector || '*';
 
-		$box.each(function(i,el){
+        $box.each(function(i,el){
 
-			 if($(el)[0].childNodes.length === 1&&!!$(el).filter(selector)[0]&&($(el).filter(selector)[0].nodeType === 1)){
+             if($(el)[0].childNodes.length === 1&&!!$(el).filter(selector)[0]&&($(el).filter(selector)[0].nodeType === 1)){
 
-				childrenArray[childrenArray.length] = $(el);
+                childrenArray[childrenArray.length] = $(el);
 
-			 }else{
+             }else{
 
-				$.leoTools.findInnerMostChildren($(el).children(),selector,childrenArray);
+                $.leoTools.findInnerMostChildren($(el).children(),selector,childrenArray);
 
-			 }
+             }
 
-		})
+        })
 
-		return childrenArray;
+        return childrenArray;
 
-	};
+    };
 
-	// 返回box范围默认屏幕可见范围
-	$.leoTools.boxArea = function(position){
+    // 返回box范围默认屏幕可见范围
+    $.leoTools.boxArea = function(position){
 
-		var $win = $(window),$doc = $(document);
+        var $win = $(window),$doc = $(document);
 
-		if (position === 'absolute') {
+        if (position === 'absolute') {
 
-			areaMaxX = $doc.width();
+            areaMaxX = $doc.width();
 
-			areaMaxY = $doc.height();
+            areaMaxY = $doc.height();
 
-		} else if (position === 'fixed') {
+        } else if (position === 'fixed') {
 
-			areaMaxX = $win.width();
+            areaMaxX = $win.width();
 
-			areaMaxY = $win.height();
+            areaMaxY = $win.height();
 
 
-		} else {
-			return;
-		}
+        } else {
+            return;
+        }
 
-		return {
+        return {
 
-			areaMaxX: areaMaxX,
+            areaMaxX: areaMaxX,
 
-			areaMaxY: areaMaxY
+            areaMaxY: areaMaxY
 
-		}
+        }
 
-	}
+    }
 
-	// 返回拖拽范围默认屏幕可见范围
-	$.leoTools.dragArea = function($box, position, areaMinX, areaMinY, areaMaxX, areaMaxY) {
+    // 返回拖拽范围默认屏幕可见范围
+    $.leoTools.dragArea = function($box, position, areaMinX, areaMinY, areaMaxX, areaMaxY) {
 
-		var $win = $(window),winW = $win.width(),winH = $win.height(),
+        var $win = $(window),winW = $win.width(),winH = $win.height(),
 
-		boxOuterW = $box.outerWidth(),boxOuterH = $box.outerHeight();
+        boxOuterW = $box.outerWidth(),boxOuterH = $box.outerHeight();
 
-		if (position === 'absolute') {
+        if (position === 'absolute') {
 
-			var winSleft = $win.scrollLeft(),winStop = $win.scrollTop();
+            var winSleft = $win.scrollLeft(),winStop = $win.scrollTop();
 
-			typeof areaMinX === 'number' ? areaMinX = winSleft + areaMinX : areaMinX = winSleft;
+            typeof areaMinX === 'number' ? areaMinX = winSleft + areaMinX : areaMinX = winSleft;
 
-			typeof areaMinY === 'number' ? areaMinY = winStop + areaMinY : areaMinY = winStop;
+            typeof areaMinY === 'number' ? areaMinY = winStop + areaMinY : areaMinY = winStop;
 
-			typeof areaMaxX === 'number' ? areaMaxX = areaMaxX + winSleft : areaMaxX = winW + winSleft - boxOuterW;
+            typeof areaMaxX === 'number' ? areaMaxX = areaMaxX + winSleft : areaMaxX = winW + winSleft - boxOuterW;
 
-			typeof areaMaxY === 'number' ? areaMaxY = areaMaxY + winStop : areaMaxY = winH + winStop - boxOuterH;
+            typeof areaMaxY === 'number' ? areaMaxY = areaMaxY + winStop : areaMaxY = winH + winStop - boxOuterH;
 
-		} else if (position === 'fixed') {
+        } else if (position === 'fixed') {
 
-			typeof areaMinX === 'number' ? areaMinX = areaMinX : areaMinX = 0;
+            typeof areaMinX === 'number' ? areaMinX = areaMinX : areaMinX = 0;
 
-			typeof areaMinY === 'number' ? areaMinY = areaMinY : areaMinY = 0;
+            typeof areaMinY === 'number' ? areaMinY = areaMinY : areaMinY = 0;
 
-			typeof areaMaxX === 'number' ? areaMaxX = areaMaxX : areaMaxX = winW - boxOuterW;
+            typeof areaMaxX === 'number' ? areaMaxX = areaMaxX : areaMaxX = winW - boxOuterW;
 
-			typeof areaMaxY === 'number' ? areaMaxY = areaMaxY : areaMaxY = winH - boxOuterH;
+            typeof areaMaxY === 'number' ? areaMaxY = areaMaxY : areaMaxY = winH - boxOuterH;
 
 
-		} else {
-			return false
-		}
+        } else {
+            return false
+        }
 
-		boxOuterH > winH && (areaMaxY = areaMinY);
+        boxOuterH > winH && (areaMaxY = areaMinY);
 
-		boxOuterW > winW && (areaMaxX = areaMinX);
+        boxOuterW > winW && (areaMaxX = areaMinX);
 
-		return {
+        return {
 
-			areaMinX: areaMinX,
+            areaMinX: areaMinX,
 
-			areaMinY: areaMinY,
+            areaMinY: areaMinY,
 
-			areaMaxX: areaMaxX,
+            areaMaxX: areaMaxX,
 
-			areaMaxY: areaMaxY
+            areaMaxY: areaMaxY
 
-		}
+        }
 
-	};
+    };
 
-	//返回btn：top、left、bottom、right
-	$.leoTools.btnFollow = function($btn, position) {
+    //返回btn：top、left、bottom、right
+    $.leoTools.btnFollow = function($btn, position) {
 
-		var offset = $btn.offset(),
-			width = $btn.outerWidth(),
-			height = $btn.outerHeight(),
+        var offset = $btn.offset(),
+            width = $btn.outerWidth(),
+            height = $btn.outerHeight(),
 
-			top = offset.top,
-			left = offset.left,
-			bottom = top + height,
-			right = left + width;
+            top = offset.top,
+            left = offset.left,
+            bottom = top + height,
+            right = left + width;
 
-		return {
+        return {
 
-			top: top,
+            top: top,
 
-			left: left,
+            left: left,
 
-			bottom: bottom,
+            bottom: bottom,
 
-			right: right
+            right: right
 
-		};
+        };
 
-	};
+    };
 
-	//返回btn：top、left、bottom、right的可视范围
-	$.leoTools.btnFollowArea = function($btn) {
+    //返回btn：top、left、bottom、right的可视范围
+    $.leoTools.btnFollowArea = function($btn) {
 
-		var $win = $(window),
-			offset = $btn.offset(),
-			width = $btn.outerWidth(),
-			height = $btn.outerHeight(),
+        var $win = $(window),
+            offset = $btn.offset(),
+            width = $btn.outerWidth(),
+            height = $btn.outerHeight(),
 
-			winScrollTop = $win.scrollTop(),
-			winScrollLeft = $win.scrollLeft(),
+            winScrollTop = $win.scrollTop(),
+            winScrollLeft = $win.scrollLeft(),
 
-			top = offset.top - winScrollTop,
-			left = offset.left - winScrollLeft,
+            top = offset.top - winScrollTop,
+            left = offset.left - winScrollLeft,
 
-			bottom = winScrollTop + $win.height() - offset.top - height,
-			right = winScrollLeft + $win.width() - left - width;
+            bottom = winScrollTop + $win.height() - offset.top - height,
+            right = winScrollLeft + $win.width() - left - width;
 
-		return {
+        return {
 
-			top: top,
+            top: top,
 
-			left: left,
+            left: left,
 
-			bottom: bottom,
+            bottom: bottom,
 
-			right: right
+            right: right
 
-		}
+        }
 
-	};
+    };
 
-	$.leoTools.parseCss = function( element, property ) {
+    $.leoTools.parseCss = function( element, property ) {
 
-		return parseFloat( $.css( element, property ), 10 ) || 0;
+        return parseFloat( $.css( element, property ), 10 ) || 0;
 
-	}
+    }
 
-	//box在屏幕中出现的位置data：[{'PER':0.25},{'PER':0.5}]||[{'PX':100},{'PX':100}],BOX出现位置第一个为TOP第二个为LEFT,PER为百分比,PX为像素
-	$.leoTools.boxPosition = function($box, position, data) {
+    //box在屏幕中出现的位置data：[{'PER':0.25},{'PER':0.5}]||[{'PX':100},{'PX':100}],BOX出现位置第一个为TOP第二个为LEFT,PER为百分比,PX为像素
+    $.leoTools.boxPosition = function($box, position, data) {
 
-		var Distance = {}, $win = $(window),
+        var Distance = {}, $win = $(window),
 
-			iBoxWidth = $box.outerWidth(),
+            iBoxWidth = $box.outerWidth(),
 
-			iBoxHeight = $box.outerHeight(),
+            iBoxHeight = $box.outerHeight(),
 
-			iWindowWidth = $win.width(),
+            iWindowWidth = $win.width(),
 
-			iWindowHeight = $win.height(),
+            iWindowHeight = $win.height(),
 
-			iBoxMaxTop, iBoxMaxLeft, iBoxTop, iBoxLeft;
+            iBoxMaxTop, iBoxMaxLeft, iBoxTop, iBoxLeft;
 
-		if (position === 'absolute') {
+        if (position === 'absolute') {
 
-			var $doc = $(document),
-				iWindowScrollTop = $win.scrollTop(),
+            var $doc = $(document),
+                iWindowScrollTop = $win.scrollTop(),
 
-				iWinwdowScrollLeft = $win.scrollLeft();
+                iWinwdowScrollLeft = $win.scrollLeft();
 
-			iBoxMaxTop = $doc.height() - iBoxHeight;
+            iBoxMaxTop = $doc.height() - iBoxHeight;
 
-			iBoxMaxLeft = $doc.width() - iBoxWidth;
+            iBoxMaxLeft = $doc.width() - iBoxWidth;
 
-			if (data[0].PER !== undefined) {
+            if (data[0].PER !== undefined) {
 
-				iBoxTop = iWindowScrollTop + (iWindowHeight - iBoxHeight) * data[0].PER;
+                iBoxTop = iWindowScrollTop + (iWindowHeight - iBoxHeight) * data[0].PER;
 
-			} else if (data[0].PX !== undefined) {
+            } else if (data[0].PX !== undefined) {
 
-				iBoxTop = iWindowScrollTop + data[0].PX;
+                iBoxTop = iWindowScrollTop + data[0].PX;
 
-			}
+            }
 
-			if (data[1].PER !== undefined) {
+            if (data[1].PER !== undefined) {
 
-				iBoxLeft = iWinwdowScrollLeft + (iWindowWidth - iBoxWidth) * data[1].PER;
+                iBoxLeft = iWinwdowScrollLeft + (iWindowWidth - iBoxWidth) * data[1].PER;
 
-			} else if (data[1].PX !== undefined) {
+            } else if (data[1].PX !== undefined) {
 
-				iBoxLeft = iWinwdowScrollLeft + data[1].PX;
+                iBoxLeft = iWinwdowScrollLeft + data[1].PX;
 
-			}
+            }
 
-			if (iBoxTop < iWindowScrollTop) {
+            if (iBoxTop < iWindowScrollTop) {
 
-				iBoxTop = iWindowScrollTop;
+                iBoxTop = iWindowScrollTop;
 
-			};
+            };
 
-			if (iBoxLeft < iWinwdowScrollLeft) {
+            if (iBoxLeft < iWinwdowScrollLeft) {
 
-				iBoxLeft = iWinwdowScrollLeft;
+                iBoxLeft = iWinwdowScrollLeft;
 
-			};
+            };
 
-		} else if (position === 'fixed') {
+        } else if (position === 'fixed') {
 
-			iBoxMaxTop = iWindowHeight - iBoxHeight;
+            iBoxMaxTop = iWindowHeight - iBoxHeight;
 
-			iBoxMaxLeft = iWindowWidth - iBoxWidth;
+            iBoxMaxLeft = iWindowWidth - iBoxWidth;
 
-			if (data[0].PER !== undefined) {
+            if (data[0].PER !== undefined) {
 
-				iBoxTop = (iWindowHeight - iBoxHeight) * data[0].PER;
+                iBoxTop = (iWindowHeight - iBoxHeight) * data[0].PER;
 
-			} else if (data[0].PX !== undefined) {
+            } else if (data[0].PX !== undefined) {
 
-				iBoxTop = data[0].PX;
+                iBoxTop = data[0].PX;
 
-			}
+            }
 
-			if (data[1].PER !== undefined) {
+            if (data[1].PER !== undefined) {
 
-				iBoxLeft = (iWindowWidth - iBoxWidth) * data[1].PER;
+                iBoxLeft = (iWindowWidth - iBoxWidth) * data[1].PER;
 
-			} else if (data[1].PX !== undefined) {
+            } else if (data[1].PX !== undefined) {
 
-				iBoxLeft = data[1].PX;
+                iBoxLeft = data[1].PX;
 
-			}
+            }
 
-		}
+        }
 
-		iBoxTop = $.leoTools.range(iBoxTop, 0, iBoxMaxTop);
+        iBoxTop = $.leoTools.range(iBoxTop, 0, iBoxMaxTop);
 
-		iBoxLeft = $.leoTools.range(iBoxLeft, 0, iBoxMaxLeft);
+        iBoxLeft = $.leoTools.range(iBoxLeft, 0, iBoxMaxLeft);
 
-		return Distance = {
+        return Distance = {
 
-			top: iBoxTop,
+            top: iBoxTop,
 
-			left: iBoxLeft
+            left: iBoxLeft
 
-		};
+        };
 
-	};
+    };
 
-	//判断一个元素是否在视图窗口中
-	$.leoTools.isInViewport = function(element) {
+    //判断一个元素是否在视图窗口中
+    $.leoTools.isInViewport = function(element) {
 
-		var rect = element.getBoundingClientRect();
+        var rect = element.getBoundingClientRect();
 
-		var html = document.documentElement;
+        var html = document.documentElement;
 
-		return (
+        return (
 
-			rect.top >= 0 && rect.left >= 0 && rect.bottom <= (window.innerHeight || html.clientHeight) && rect.right <= (window.innerWidth || html.clientWidth)
+            rect.top >= 0 && rect.left >= 0 && rect.bottom <= (window.innerHeight || html.clientHeight) && rect.right <= (window.innerWidth || html.clientWidth)
 
-		);
+        );
 
-	};
+    };
 
-	//返回所有滚动的父集合
-	$.leoTools.scrollParents = function( $box, all ){
+    //返回所有滚动的父集合
+    $.leoTools.scrollParents = function( $box, all ){
 
-		var scrollParent,i=0,position = $box.css( "position" ),
+        var scrollParent,i=0,position = $box.css( "position" ),
 
-		excludeStaticParent = position === "absolute",doc =  $box[ 0 ].ownerDocument || document;
+        excludeStaticParent = position === "absolute",doc =  $box[ 0 ].ownerDocument || document;
 
-		if( ( /fixed/ ).test( $box.css( "position" ) ) && !all ){
+        if( ( /fixed/ ).test( $box.css( "position" ) ) && !all ){
 
-			return 'boxFixed';
+            return 'boxFixed';
 
-		} else {
+        } else {
 
-			scrollParent = $box.parents().filter(function() {
+            scrollParent = $box.parents().filter(function() {
 
-				var parent = $( this ),flag;
+                var parent = $( this ),flag;
 
-				if ( excludeStaticParent && parent.css( "position" ) === "static" ) {
+                if ( excludeStaticParent && parent.css( "position" ) === "static" ) {
 
-					return false;
+                    return false;
 
-				}
+                }
 
-				if( !all ){
+                if( !all ){
 
-					( i > 0 ) ? flag = false : flag = ( /(auto|scroll)/ ).test( parent.css( "overflow" ) + parent.css( "overflow-y" ) + parent.css( "overflow-x" ) );
+                    ( i > 0 ) ? flag = false : flag = ( /(auto|scroll)/ ).test( parent.css( "overflow" ) + parent.css( "overflow-y" ) + parent.css( "overflow-x" ) );
 
-					( /fixed/ ).test( $.css( this, "position" ) ) && ( i++ );
+                    ( /fixed/ ).test( $.css( this, "position" ) ) && ( i++ );
 
-					return flag;
+                    return flag;
 
-				}else{
+                }else{
 
-					return ( /(auto|scroll)/ ).test( parent.css( "overflow" ) + parent.css( "overflow-y" ) + parent.css( "overflow-x" ) );
+                    return ( /(auto|scroll)/ ).test( parent.css( "overflow" ) + parent.css( "overflow-y" ) + parent.css( "overflow-x" ) );
 
-				}
+                }
 
-			});
+            });
 
-		}
+        }
 
-		return i === 0 ? scrollParent.add( doc ) : scrollParent;
+        return i === 0 ? scrollParent.add( doc ) : scrollParent;
 
-	}
+    }
 
-	//返回所有滚动的父集合的Top
-	$.leoTools.getScrollParentsTop = function(scrollParents){
+    //返回所有滚动的父集合的Top
+    $.leoTools.getScrollParentsTop = function(scrollParents){
 
-		var top = 0,i = scrollParents.length;
+        var top = 0,i = scrollParents.length;
 
-		if( scrollParents === 'boxFixed' || i===0 ){
+        if( scrollParents === 'boxFixed' || i===0 ){
 
-			return top;
+            return top;
 
-		}else if( i === 1 ){
+        }else if( i === 1 ){
 
-			return $( scrollParents[0] ).scrollTop();
+            return $( scrollParents[0] ).scrollTop();
 
-		}else{
+        }else{
 
-			while(i--){
+            while(i--){
 
-				top = top + $( scrollParents[i] ).scrollTop();
+                top = top + $( scrollParents[i] ).scrollTop();
 
-			}
+            }
 
-			return top;
+            return top;
 
-		}
+        }
 
-	}
+    }
 
-	//返回所有滚动的父集合的Left
-	$.leoTools.getScrollParentsLeft = function(scrollParents){
+    //返回所有滚动的父集合的Left
+    $.leoTools.getScrollParentsLeft = function(scrollParents){
 
-		var left = 0,i = scrollParents.length;
+        var left = 0,i = scrollParents.length;
 
-		if( scrollParents === 'boxFixed' || i === 0){
+        if( scrollParents === 'boxFixed' || i === 0){
 
-			return left;
+            return left;
 
-		}else if(i === 1){
+        }else if(i === 1){
 
-			return $( scrollParents[0] ).scrollLeft();
+            return $( scrollParents[0] ).scrollLeft();
 
-		}else{
+        }else{
 
-			while(i--){
+            while(i--){
 
-				left = left + $( scrollParents[i] ).scrollLeft();
+                left = left + $( scrollParents[i] ).scrollLeft();
 
-			}
+            }
 
-			return left;
+            return left;
 
-		}
+        }
 
-	}
+    }
 
-	//得到OFFSET相对的css
-	$.leoTools.getOffset = function( elem, offsets ) {
+    //得到OFFSET相对的css
+    $.leoTools.getOffset = function( elem, offsets ) {
 
-		var position = jQuery.css( elem, "position" );
+        var position = jQuery.css( elem, "position" );
 
-		if ( position === "static" ) {
-			elem.style.position = "relative";
-		}
+        if ( position === "static" ) {
+            elem.style.position = "relative";
+        }
 
-		var curElem = jQuery( elem ),
-			curOffset = curElem.offset(),
-			curCSSTop = jQuery.css( elem, "top" ),
-			curCSSLeft = jQuery.css( elem, "left" ),
-			calculatePosition = ( position === "absolute" || position === "fixed" ) && jQuery.inArray("auto", [curCSSTop, curCSSLeft]) > -1,
-			props = {}, curPosition = {}, curTop, curLeft;
+        var curElem = jQuery( elem ),
+            curOffset = curElem.offset(),
+            curCSSTop = jQuery.css( elem, "top" ),
+            curCSSLeft = jQuery.css( elem, "left" ),
+            calculatePosition = ( position === "absolute" || position === "fixed" ) && jQuery.inArray("auto", [curCSSTop, curCSSLeft]) > -1,
+            props = {}, curPosition = {}, curTop, curLeft;
 
-		if ( calculatePosition ) {
-			curPosition = curElem.position();
-			curTop = curPosition.top;
-			curLeft = curPosition.left;
-		} else {
-			curTop = parseFloat( curCSSTop ) || 0;
-			curLeft = parseFloat( curCSSLeft ) || 0;
-		}
+        if ( calculatePosition ) {
+            curPosition = curElem.position();
+            curTop = curPosition.top;
+            curLeft = curPosition.left;
+        } else {
+            curTop = parseFloat( curCSSTop ) || 0;
+            curLeft = parseFloat( curCSSLeft ) || 0;
+        }
 
-		if ( offsets.top != null ) {
-			props.top = ( offsets.top - curOffset.top ) + curTop;
-		}
-		if ( offsets.left != null ) {
-			props.left = ( offsets.left - curOffset.left ) + curLeft;
-		}
+        if ( offsets.top != null ) {
+            props.top = ( offsets.top - curOffset.top ) + curTop;
+        }
+        if ( offsets.left != null ) {
+            props.left = ( offsets.left - curOffset.left ) + curLeft;
+        }
 
-		return props
+        return props
 
-	}
+    }
 
-	//box Resize时在屏幕中出现的位置data：[{'PER':0.25},{'PER':0.5}]||[{'PX':100},{'PX':100}],BOX出现位置第一个为TOP第二个为LEFT,PER为百分比,PX为像素，$.leoTools.boxResizePosition( $('#b'))卸载事件
-	$.leoTools.boxResizePosition = function( $box, positionType, positionData ) {
+    //box Resize时在屏幕中出现的位置data：[{'PER':0.25},{'PER':0.5}]||[{'PX':100},{'PX':100}],BOX出现位置第一个为TOP第二个为LEFT,PER为百分比,PX为像素，$.leoTools.boxResizePosition( $('#b'))卸载事件
+    $.leoTools.boxResizePosition = function( $box, positionType, positionData ) {
 
-		var $win = $(window),
-			dataId = $.leoTools.getExpando('boxResizePositionId');
+        var $win = $(window),
+            dataId = $.leoTools.getExpando('boxResizePositionId');
 
-		if (positionType !== undefined && positionData !== undefined) {
+        if (positionType !== undefined && positionData !== undefined) {
 
-			!! $box[0] && $box.each(function(index, el) {
+            !! $box[0] && $box.each(function(index, el) {
 
-				var lastTimer, id;
+                var lastTimer, id;
 
-				!$(el).data(dataId) ? (id = $.leoTools.getId('boxResizePosition') + index) && $(el).data(dataId, id) : id = $(el).data(dataId);
+                !$(el).data(dataId) ? (id = $.leoTools.getId('boxResizePosition') + index) && $(el).data(dataId, id) : id = $(el).data(dataId);
 
-				$win.off('resize.' + id).on('resize.' + id, function() {
+                $win.off('resize.' + id).on('resize.' + id, function() {
 
-					if (lastTimer) clearTimeout(lastTimer);
+                    if (lastTimer) clearTimeout(lastTimer);
 
-					lastTimer = setTimeout(fun, 200);
+                    lastTimer = setTimeout(fun, 200);
 
-					function fun() {
+                    function fun() {
 
-						setTimeout(function() {
+                        setTimeout(function() {
 
-							var position = $.leoTools.boxPosition($(el), positionType, positionData);
+                            var position = $.leoTools.boxPosition($(el), positionType, positionData);
 
-							$(el).stop(true, false).animate({
-								left: Math.ceil(position.left),
-								top: Math.ceil(position.top)
-							}, 500);
+                            $(el).stop(true, false).animate({
+                                left: Math.ceil(position.left),
+                                top: Math.ceil(position.top)
+                            }, 500);
 
-						}, 0)
+                        }, 0)
 
-					};
+                    };
 
-				});
+                });
 
-			});
+            });
 
 
-		} else {
+        } else {
 
-			!! $box[0] && $box.each(function(index, el) {
+            !! $box[0] && $box.each(function(index, el) {
 
-				var id = $(el).data(dataId);
+                var id = $(el).data(dataId);
 
-				!! id && $win.off('resize.' + id) && $(el).removeData(dataId);
+                !! id && $win.off('resize.' + id) && $(el).removeData(dataId);
 
-			})
+            })
 
-		}
+        }
 
-	};
+    };
 
-	//box Scroll时在屏幕中出现相对上次的位置,top,left设定位置，第一次传top，left，data：[{'PER':0.25},{'PER':0.5}]||[{'PX':100},{'PX':100}],BOX出现位置第一个为TOP第二个为LEFT,PER为百分比,PX为像素;stop是否在动画中停止,$.leoTools.boxScrollPosition( $('#a'))卸载事件
-	$.leoTools.boxScrollPosition = function( $box, positionData ) {
+    //box Scroll时在屏幕中出现相对上次的位置,top,left设定位置，第一次传top，left，data：[{'PER':0.25},{'PER':0.5}]||[{'PX':100},{'PX':100}],BOX出现位置第一个为TOP第二个为LEFT,PER为百分比,PX为像素;stop是否在动画中停止,$.leoTools.boxScrollPosition( $('#a'))卸载事件
+    $.leoTools.boxScrollPosition = function( $box, positionData ) {
 
-		var $win = $(window),
-			$doc = $(document),
-			dataId = $.leoTools.getExpando('boxScrollPositionId');
+        var $win = $(window),
+            $doc = $(document),
+            dataId = $.leoTools.getExpando('boxScrollPositionId');
 
-		if ($box.css("position") !== 'absolute') {
-			return;
-		}
+        if ($box.css("position") !== 'absolute') {
+            return;
+        }
 
-		if (positionData === undefined) {
+        if (positionData === undefined) {
 
-			!! $box[0] && $box.each(function(index, el) {
+            !! $box[0] && $box.each(function(index, el) {
 
-				var id = $(el).data(dataId);
+                var id = $(el).data(dataId);
 
-				!! id && $win.off('scroll.' + id) && $(el).removeData(dataId);
+                !! id && $win.off('scroll.' + id) && $(el).removeData(dataId);
 
-			});
+            });
 
-		} else {
+        } else {
 
-			!! $box[0] && $box.each(function(index, el) {
+            !! $box[0] && $box.each(function(index, el) {
 
-				var lastTimer, id, $box = $(el),
-					positionfixed, _top, _left,
+                var lastTimer, id, $box = $(el),
+                    positionfixed, _top, _left,
 
-					oldsTop = $win.scrollTop(),
-					oldsLeft = $win.scrollLeft(),
-					boxPositionData = positionData;
+                    oldsTop = $win.scrollTop(),
+                    oldsLeft = $win.scrollLeft(),
+                    boxPositionData = positionData;
 
-				!$box.data(dataId) ? (id = $.leoTools.getId('boxScrollPositionId') + index) && $box.data(dataId, id) : id = $box.data(dataId);
+                !$box.data(dataId) ? (id = $.leoTools.getId('boxScrollPositionId') + index) && $box.data(dataId, id) : id = $box.data(dataId);
 
-				if (boxPositionData) {
+                if (boxPositionData) {
 
-					positionfixed = $.leoTools.boxPosition($(el), 'fixed', boxPositionData);
+                    positionfixed = $.leoTools.boxPosition($(el), 'fixed', boxPositionData);
 
-					_top = Math.ceil(positionfixed.top);
+                    _top = Math.ceil(positionfixed.top);
 
-					_left = Math.ceil(positionfixed.left);
+                    _left = Math.ceil(positionfixed.left);
 
-				}
+                }
 
-				$win.off('scroll.' + id).on('scroll.' + id, function() {
+                $win.off('scroll.' + id).on('scroll.' + id, function() {
 
-					if (jQuery.queue($box[0], "fx").length > 0 && !boxPositionData) {
+                    if (jQuery.queue($box[0], "fx").length > 0 && !boxPositionData) {
 
-						$box.stop(true, false);
+                        $box.stop(true, false);
 
-						_top = $box[0].offsetTop - oldsTop;
+                        _top = $box[0].offsetTop - oldsTop;
 
-						_left = $box[0].offsetLeft - oldsLeft;
+                        _left = $box[0].offsetLeft - oldsLeft;
 
-					}
+                    }
 
-					if (lastTimer) clearTimeout(lastTimer);
+                    if (lastTimer) clearTimeout(lastTimer);
 
-					lastTimer = setTimeout(fun, 200);
+                    lastTimer = setTimeout(fun, 200);
 
-					function fun() {
+                    function fun() {
 
-						!boxPositionData && (_top = $box[0].offsetTop - oldsTop);
+                        !boxPositionData && (_top = $box[0].offsetTop - oldsTop);
 
-						!boxPositionData && (_left = $box[0].offsetLeft - oldsLeft);
+                        !boxPositionData && (_left = $box[0].offsetLeft - oldsLeft);
 
-						oldsTop = $win.scrollTop();
+                        oldsTop = $win.scrollTop();
 
-						oldsLeft = $win.scrollLeft();
+                        oldsLeft = $win.scrollLeft();
 
-						$box.stop(true, false).animate({
-							left: $.leoTools.range(oldsLeft + _left, oldsLeft, $doc.width() - $box.outerWidth()),
-							top: $.leoTools.range(oldsTop + _top, oldsTop, $doc.height() - $box.outerHeight())
-						}, {
-							duration: 500,
-							queue: id
-						}).dequeue(id);
+                        $box.stop(true, false).animate({
+                            left: $.leoTools.range(oldsLeft + _left, oldsLeft, $doc.width() - $box.outerWidth()),
+                            top: $.leoTools.range(oldsTop + _top, oldsTop, $doc.height() - $box.outerHeight())
+                        }, {
+                            duration: 500,
+                            queue: id
+                        }).dequeue(id);
 
-						!! boxPositionData && (boxPositionData = null);
+                        !! boxPositionData && (boxPositionData = null);
 
-					};
+                    };
 
-				}).triggerHandler('scroll.' + id);
+                }).triggerHandler('scroll.' + id);
 
-			})
+            })
 
-		};
+        };
 
-	};
+    };
 
-	$.leoTools.ie = !!/msie [\w.]+/.exec( navigator.userAgent.toLowerCase() );
+    $.leoTools.ie = !!/msie [\w.]+/.exec( navigator.userAgent.toLowerCase() );
 
-	$.leoTools.isSupport__proto__ = ({}).__proto__ == Object.prototype;
+    $.leoTools.isSupport__proto__ = ({}).__proto__ == Object.prototype;
 
-	$.leoTools.clone = function(obj){
+    $.leoTools.clone = function(obj){
 
-		var newObj,noop = function(){};
+        var newObj,noop = function(){};
 
-		if (Object.create) {
+        if (Object.create) {
 
-			newObj = Object.create(obj);
+            newObj = Object.create(obj);
 
-		} else {
+        } else {
 
-			noop.prototype = obj;
+            noop.prototype = obj;
 
-			newObj = new noop();
+            newObj = new noop();
 
-		}
+        }
 
-		return newObj;
+        return newObj;
 
-	};
+    };
 
-	$.leoTools.createPrototype = function(proto, constructor) {
+    $.leoTools.createPrototype = function(proto, constructor) {
 
-		var newProto = $.leoTools.clone(proto);
+        var newProto = $.leoTools.clone(proto);
 
-		newProto.constructor = constructor;
+        newProto.constructor = constructor;
 
-		return newProto;
+        return newProto;
 
-	}
+    }
 
-	$.leoTools.extend = function( target ) {
+    $.leoTools.extend = function( target ) {
 
-		var input = aslice.call( arguments, 1 ),inputIndex = 0,inputLength = input.length,key,value;
+        var input = aslice.call( arguments, 1 ),inputIndex = 0,inputLength = input.length,key,value;
 
-		for ( ; inputIndex < inputLength; inputIndex++ ) {
+        for ( ; inputIndex < inputLength; inputIndex++ ) {
 
-			for ( key in input[ inputIndex ] ) {
+            for ( key in input[ inputIndex ] ) {
 
-				value = input[ inputIndex ][ key ];
+                value = input[ inputIndex ][ key ];
 
-				if ( input[ inputIndex ].hasOwnProperty( key ) && value !== undefined ) {
+                if ( input[ inputIndex ].hasOwnProperty( key ) && value !== undefined ) {
 
-					if ( $.isPlainObject( value ) ) {
+                    if ( $.isPlainObject( value ) ) {
 
-						target[ key ] = $.isPlainObject( target[ key ] ) ? $.leoTools.extend( {}, target[ key ], value ) : $.leoTools.extend( {}, value );
+                        target[ key ] = $.isPlainObject( target[ key ] ) ? $.leoTools.extend( {}, target[ key ], value ) : $.leoTools.extend( {}, value );
 
-					} else {
+                    } else {
 
-						target[ key ] = value;
+                        target[ key ] = value;
 
-					}
+                    }
 
-				}
+                }
 
-			}
+            }
 
-		}
+        }
 
-		return target;
+        return target;
 
-	};
+    };
 
-	$.leoTools.bridge = function( name, isFn ) {
+    $.leoTools.bridge = function( name, isFn ) {
 
-		if(!isFn){
+        if(!isFn){
 
-			$[name] = function(options){
+            $[name] = function(options){
 
-				function returnFn( obj ){
+                function returnFn( obj ){
 
-					var instance = obj;
+                    var instance = obj;
 
-					function inFn( options ){
+                    function inFn( options ){
 
-						var isMethodCall = typeof options === "string",args = aslice.call( arguments, 1 ),
+                        var isMethodCall = typeof options === "string",args = aslice.call( arguments, 1 ),
 
-						returnValue = instance.$target;
+                        returnValue = instance.$target;
 
-						if (  !isMethodCall || !instance ) {
+                        if (  !isMethodCall || !instance ) {
 
-							return false;
+                            return false;
 
-						}
+                        }
 
-						if ( !$.isFunction( instance[options] ) || options.charAt( 0 ) === "_" ) {
+                        if ( !$.isFunction( instance[options] ) || options.charAt( 0 ) === "_" ) {
 
-							return false;
+                            return false;
 
-						}
+                        }
 
-						methodValue = instance[ options ].apply( instance, args );
+                        methodValue = instance[ options ].apply( instance, args );
 
-						if ( methodValue !== instance && methodValue !== undefined ) {
+                        if ( methodValue !== instance && methodValue !== undefined ) {
 
-							returnValue = methodValue && methodValue.jquery ? returnValue.pushStack( methodValue.get() ) : methodValue;
+                            returnValue = methodValue && methodValue.jquery ? returnValue.pushStack( methodValue.get() ) : methodValue;
 
-						}
+                        }
 
-						return returnValue;
+                        return returnValue;
 
-					}
+                    }
 
-					for (var key in obj ) {
+                    for (var key in obj ) {
 
-						if ( $.isFunction( obj[key] ) && key.charAt( 0 ) !== "_" && key !== 'constructor' ) {
+                        if ( $.isFunction( obj[key] ) && key.charAt( 0 ) !== "_" && key !== 'constructor' ) {
 
-							inFn[key] = function(key){
+                            inFn[key] = function(key){
 
-								return function(){
+                                return function(){
 
-									ap.unshift.call( arguments, key );
+                                    ap.unshift.call( arguments, key );
 
-									return inFn.apply( inFn,arguments );
+                                    return inFn.apply( inFn,arguments );
 
-								}
+                                }
 
-							}( key );
+                            }( key );
 
-						}
+                        }
 
-					}
+                    }
 
-					return inFn
+                    return inFn
 
-				}
+                }
 
-				return returnFn( new $.leoTools.plugIn[name]['prototype']( options, false, false ) );
+                return returnFn( new $.leoTools.plugIn[name]['prototype']( options, false, false ) );
 
-			}
+            }
 
 
-		}else{
+        }else{
 
-			var fullName = $.leoTools.getExpando( name + '_dataId' );
+            var fullName = $.leoTools.getExpando( name + '_dataId' );
 
-			$.fn[ name ] = function( options ) {
+            $.fn[ name ] = function( options ) {
 
-				var isMethodCall = typeof options === "string",args = aslice.call( arguments, 1 ),returnValue = this;
+                var isMethodCall = typeof options === "string",args = aslice.call( arguments, 1 ),returnValue = this;
 
-				options = !isMethodCall && args.length ? $.leoTools.extend.apply( null, [ options ].concat(args) ) : options;
+                options = !isMethodCall && args.length ? $.leoTools.extend.apply( null, [ options ].concat(args) ) : options;
 
-				if ( isMethodCall ) {
+                if ( isMethodCall ) {
 
-					this.each(function() {
+                    this.each(function() {
 
-						var methodValue,instance = $.data( this, fullName );
+                        var methodValue,instance = $.data( this, fullName );
 
-						if ( !instance ) {
+                        if ( !instance ) {
 
-							return false;
+                            return false;
 
-						}
+                        }
 
-						if ( !$.isFunction( instance[options] ) || options.charAt( 0 ) === "_" ) {
+                        if ( !$.isFunction( instance[options] ) || options.charAt( 0 ) === "_" ) {
 
-							return false;
+                            return false;
 
-						}
+                        }
 
-						methodValue = instance[ options ].apply( instance, args );
+                        methodValue = instance[ options ].apply( instance, args );
 
-						if ( methodValue !== instance && methodValue !== undefined ) {
+                        if ( methodValue !== instance && methodValue !== undefined ) {
 
-							returnValue = methodValue && methodValue.jquery ?returnValue.pushStack( methodValue.get() ) : methodValue;
+                            returnValue = methodValue && methodValue.jquery ?returnValue.pushStack( methodValue.get() ) : methodValue;
 
-							return false;
+                            return false;
 
-						}
+                        }
 
-					});
+                    });
 
-				} else {
+                } else {
 
-					this.each(function() {
+                    this.each(function() {
 
-						var instance = $.data( this, fullName );
+                        var instance = $.data( this, fullName );
 
-						if ( instance ) {
+                        if ( instance ) {
 
-							instance.option( options || {} );
+                            instance.option( options || {} );
 
-							if ( instance._init ) {
+                            if ( instance._init ) {
 
-								instance._init();
+                                instance._init();
 
-							}
+                            }
 
-						} else {
+                        } else {
 
-							new $.leoTools.plugIn[name]['prototype']( options, this, fullName );
+                            new $.leoTools.plugIn[name]['prototype']( options, this, fullName );
 
-						}
+                        }
 
-					});
+                    });
 
-				}
+                }
 
-				return returnValue;
+                return returnValue;
 
-			};
+            };
 
-		}
+        }
 
-	};
+    };
 
-	$.leoTools.plugIn = function( options, methods ){
+    $.leoTools.plugIn = function( options, methods ){
 
-		var defaults = {
+        var defaults = {
 
-			name:'leo',
+            name:'leo',
 
-			version:'1.0',
+            version:'1.0',
 
-			defaultsTarget:'target',
+            defaultsTarget:'target',
 
-			inherit:false,
+            inherit:false,
 
-			addJquery:false,
+            addJquery:false,
 
-			addJqueryFn:true,
+            addJqueryFn:true,
 
-			_init: $.noop,
+            _init: $.noop,
 
-			_destroy: $.noop,
+            _destroy: $.noop,
 
-			_setOption :$.noop
+            _setOption :$.noop
 
-		},li = $.extend( {}, defaults, options ),inherit;
+        },li = $.extend( {}, defaults, options ),inherit;
 
-		if( typeof li.name !== 'string' ){ return; }
+        if( typeof li.name !== 'string' ){ return; }
 
-		if( typeof li.inherit === 'string' && jQuery.isFunction( inherit = $.leoTools.plugIn[li.inherit]['prototype'] ) ){
+        if( !!$.leoTools.plugIn[li.inherit] && jQuery.isFunction( inherit = $.leoTools.plugIn[li.inherit]['prototype'] ) ){
 
-			function PlugIn( hash, target, dataId ){
+            function PlugIn( hash, target, dataId ){
 
-				inherit.apply( this, arguments );
+                inherit.apply( this, arguments );
 
-			}
+            }
 
-			if ( $.leoTools.isSupport__proto__ ) {
+            if ( $.leoTools.isSupport__proto__ ) {
 
-				PlugIn.prototype.__proto__ = inherit.prototype;
+                PlugIn.prototype.__proto__ = inherit.prototype;
 
-			} else {
+            } else {
 
-				PlugIn.prototype = $.leoTools.createPrototype( inherit.prototype, PlugIn );
+                PlugIn.prototype = $.leoTools.createPrototype( inherit.prototype, PlugIn );
 
-			}
+            }
 
-			li.defaults = $.extend( {}, $.leoTools.plugIn[li.inherit]['options'], li.defaults );
+            li.defaults = $.extend( {}, $.leoTools.plugIn[li.inherit]['options'], li.defaults );
 
-			$.extend( PlugIn.prototype, li );
+            $.extend( PlugIn.prototype, li );
 
-			PlugIn.prototype[li.inherit] = {};
+            PlugIn.prototype[li.inherit] = {};
 
-			$.each( PlugIn.prototype, function( prop, value ) {
+            $.each( PlugIn.prototype, function( prop, value ) {
 
-				if ( !$.isFunction( value ) || !!$.leoTools.plugIn.PlugInBasePrototypeKeys[prop] || !inherit.prototype[prop] ){
+                if ( !$.isFunction( value ) || !!$.leoTools.plugIn.PlugInBasePrototypeKeys[prop] || !inherit.prototype[prop] ){
 
-					return;
+                    return;
 
-				}
+                }
 
-				PlugIn.prototype[prop] = (function(){
+                PlugIn.prototype[prop] = (function(){
 
-					var _super = function(){
+                    var _super = function(){
 
-						return inherit.prototype[prop].apply( this, arguments );
+                        return inherit.prototype[prop].apply( this, arguments );
 
-					},
+                    },
 
-					_superApply = function( args ){
+                    _superApply = function( args ){
 
-						return inherit.prototype[prop].apply( this, args );
+                        return inherit.prototype[prop].apply( this, args );
 
-					};
+                    };
 
-					PlugIn.prototype[li.inherit][prop] = _super;
+                    PlugIn.prototype[li.inherit][prop] = _super;
 
-					return function(){
+                    return function(){
 
-						var __super = this._super, __superApply = this._superApply,returnValue;
+                        var __super = this._super, __superApply = this._superApply,returnValue;
 
-						this._super = _super;
+                        this._super = _super;
 
-						this._superApply = _superApply;
+                        this._superApply = _superApply;
 
-						returnValue = value.apply( this, arguments );
+                        returnValue = value.apply( this, arguments );
 
-						this._super = __super;
+                        this._super = __super;
 
-						this._superApply = __superApply;
+                        this._superApply = __superApply;
 
-						return returnValue;
+                        return returnValue;
 
-					};
+                    };
 
-				})();
+                })();
 
-			});
+            });
 
-		}else{
+        }else{
 
-			function PlugIn( hash, target, dataId ){
+            function PlugIn( hash, target, dataId ){
 
-				this.options = $.extend( true, {}, this.defaults, hash );
+                this.options = $.extend( true, {}, this.defaults, hash );
 
-				this.$target = $( target || this.options[this.defaultsTarget] );
+                this.$target = $( target || this.options[this.defaultsTarget] );
 
-				this.dataId = dataId;
+                this.dataId = dataId;
 
-				this.nameSpace = $.leoTools.getId( li.name + li.version + '_nameSpace' );
+                this.nameSpace = $.leoTools.getId( li.name + li.version + '_nameSpace' );
 
-				this.disableClassName = this.disableClassName || 'LeoPlugIn_' + li.name + '_disable';
+                this.disableClassName = this.disableClassName || 'LeoPlugIn_' + li.name + '_disable';
 
-				this.disableIdArr = [];
+                this.disableIdArr = [];
 
-				this.offArr = [];
+                this.offArr = [];
 
-				this._create();
+                this._create();
 
-			}
+            }
 
-			PlugIn.prototype = {
+            PlugIn.prototype = {
 
-				constructor: PlugIn,
+                constructor: PlugIn,
 
-				_create:function(){
+                _create:function(){
 
-					this.document = $( this.$target[0].style ?this.$target[0].ownerDocument :this.$target[0].document || this.$target[0] );
+                    this.document = $( this.$target[0].style ?this.$target[0].ownerDocument :this.$target[0].document || this.$target[0] );
 
-					this.window = $( this.document[0].defaultView || this.document[0].parentWindow );
+                    this.window = $( this.document[0].defaultView || this.document[0].parentWindow );
 
-					this._init();
+                    this._init();
 
-					this.dataId !== false && $.data( this.$target[0], this.dataId, this );
+                    this.dataId !== false && $.data( this.$target[0], this.dataId, this );
 
-				},
+                },
 
-				_delay: function( handler, delay ) {
+                _delay: function( handler, delay ) {
 
-					!!this._delayTime && clearTimeout( this._delayTime );
+                    !!this._delayTime && clearTimeout( this._delayTime );
 
-					var instance = this;
+                    var instance = this;
 
-					function handlerProxy() {
+                    function handlerProxy() {
 
-						return ( typeof handler === "string" ? instance[ handler ] : handler ).apply( instance, arguments );
+                        return ( typeof handler === "string" ? instance[ handler ] : handler ).apply( instance, arguments );
 
-					}
+                    }
 
-					return this._delayTime = setTimeout( handlerProxy, delay || 0 );
+                    return this._delayTime = setTimeout( handlerProxy, delay || 0 );
 
-				},
+                },
 
-				_on:function(){
+                _on:function(){
 
-					var arg = aslice.call( arguments, 2 ),sef = $( arguments[0] ),
+                    var arg = aslice.call( arguments, 2 ),sef = $( arguments[0] ),
 
-					events = arguments[1], eventStr = '',This = this;
+                    events = arguments[1], eventStr = '',This = this;
 
-					if( typeof events === 'string' && !!sef.length>0 ){
+                    if( typeof events === 'string' && !!sef.length>0 ){
 
-						events.replace( $.leoTools.rword, function(name) {
+                        events.replace( $.leoTools.rword, function(name) {
 
-							eventStr += name + '.' + This.nameSpace + ' ';
+                            eventStr += name + '.' + This.nameSpace + ' ';
 
-						});
+                        });
 
-						if( !!sef[0].parentNode && arg[arg.length-1] === 'supportDisabled' && arg.pop() ){
+                        if( !!sef[0].parentNode && arg[arg.length-1] === 'supportDisabled' && arg.pop() ){
 
-							var oldFn = arg[arg.length-1];
+                            var oldFn = arg[arg.length-1];
 
-							arg[arg.length-1] = function(event){
+                            arg[arg.length-1] = function(event){
 
-								if( !!$( event.target ).closest( "." + This.disableClassName )[0] ){
+                                if( !!$( event.target ).closest( "." + This.disableClassName )[0] ){
 
-									return;
+                                    return;
 
-								}
+                                }
 
-								oldFn.apply(sef,arguments);
+                                oldFn.apply(sef,arguments);
 
-							}
+                            }
 
-						}
+                        }
 
-						arg = [eventStr].concat(arg);
+                        arg = [eventStr].concat(arg);
 
-						sef.on.apply(sef,arg);
+                        sef.on.apply(sef,arg);
 
-						$.inArray( sef[0], this.offArr ) && this.offArr.push( sef[0] );
+                        $.inArray( sef[0], this.offArr ) && this.offArr.push( sef[0] );
 
-					}
+                    }
 
-				},
+                },
 
-				_off:function(){
+                _off:function(){
 
-					var arg = aslice.call( arguments, 2 ),sef = $( arguments[0] ),
+                    var arg = aslice.call( arguments, 2 ),sef = $( arguments[0] ),
 
-					events = arguments[1],eventStr = '',This = this;
+                    events = arguments[1],eventStr = '',This = this;
 
-					if( typeof events === 'string' ){
+                    if( typeof events === 'string' ){
 
-						events.replace($.leoTools.rword, function(name) {
+                        events.replace($.leoTools.rword, function(name) {
 
-							eventStr += name + '.' + This.nameSpace + ' ';
+                            eventStr += name + '.' + This.nameSpace + ' ';
 
-						});
+                        });
 
-						arg = [eventStr].concat(arg);
+                        arg = [eventStr].concat(arg);
 
-						sef.off.apply( sef, arg );
+                        sef.off.apply( sef, arg );
 
-					}else{
+                    }else{
 
-						arg = aslice.call( arguments, 1 );
+                        arg = aslice.call( arguments, 1 );
 
-						sef.off.apply( sef, ['.' + This.nameSpace].concat(arg) );
+                        sef.off.apply( sef, ['.' + This.nameSpace].concat(arg) );
 
-					}
+                    }
 
-				},
+                },
 
-				_hasPlugIn:function( $sef, name ){
+                _hasPlugIn:function( $sef, name ){
 
-					return !!$sef.data( $.leoTools.getExpando( name + '_dataId' ) );
+                    return !!$sef.data( $.leoTools.getExpando( name + '_dataId' ) );
 
-				},
+                },
 
-				_trigger:function( name, fn, context ){
+                _trigger:function( name, fn, context ){
 
-					if( !!name && !!fn && $.isFunction(fn) ){
+                    if( !!name && !!fn && $.isFunction(fn) ){
 
-						!!context ? this._on( this.$target , name, $.proxy( fn, context ) ) : this._on( this.$target, name, fn );
+                        !!context ? this._on( this.$target , name, $.proxy( fn, context ) ) : this._on( this.$target, name, fn );
 
-					}else if( !!name ) {
+                    }else if( !!name ) {
 
-						this.$target.trigger( name + '.' + this.nameSpace, fn );
+                        this.$target.trigger( name + '.' + this.nameSpace, fn );
 
-					}
+                    }
 
-				},
+                },
 
-				_disable:function( $box ){
+                _disable:function( $box ){
 
-					!$box.hasClass( this.disableClassName ) && ( $box.addClass( this.disableClassName ), this.disableIdArr.push( $box[0] ) );
+                    !$box.hasClass( this.disableClassName ) && ( $box.addClass( this.disableClassName ), this.disableIdArr.push( $box[0] ) );
 
-				},
+                },
 
-				_enable:function( $box ){
+                _enable:function( $box ){
 
-					$box.hasClass( this.disableClassName ) && this.disableIdArr.length > 0 && ( this.disableIdArr = $.grep( this.disableIdArr, function( val, index ) {
+                    $box.hasClass( this.disableClassName ) && this.disableIdArr.length > 0 && ( this.disableIdArr = $.grep( this.disableIdArr, function( val, index ) {
 
-						return val !== $box[0];
+                        return val !== $box[0];
 
-					} ), $box.removeClass( this.disableClassName ) );
+                    } ), $box.removeClass( this.disableClassName ) );
 
-				},
+                },
 
-				trigger :function( name, fn, context ){
+                trigger :function( name, fn, context ){
 
-					this._trigger( name, fn, context );
+                    this._trigger( name, fn, context );
 
-				},
+                },
 
-				destroy: function() {
+                destroy: function() {
 
-					this._deletData();
+                    this._deletData();
 
-					this.dataId !== false && this.$target.removeData(this.dataId);
+                    this.dataId !== false && this.$target.removeData(this.dataId);
 
-					this._destroy();
+                    this._destroy();
 
-				},
+                },
 
-				_deletData:function(){
+                _deletData:function(){
 
-					var This = this;
+                    var This = this;
 
-					!!this.disableIdArr && this.disableIdArr.length>0 && $.each(this.disableIdArr,function(index,val) {
+                    !!this.disableIdArr && this.disableIdArr.length>0 && $.each(this.disableIdArr,function(index,val) {
 
-						$(val).removeClass( This.disableClassName );
+                        $(val).removeClass( This.disableClassName );
 
-					});
+                    });
 
-					!!this.offArr && this.offArr.length>0 && $.each(this.offArr,function(index,val) {
+                    !!this.offArr && this.offArr.length>0 && $.each(this.offArr,function(index,val) {
 
-						$(val).off(  '.' + This.nameSpace );
+                        $(val).off(  '.' + This.nameSpace );
 
-					});
+                    });
 
-					delete this.disableIdArr;
+                    delete this.disableIdArr;
 
-					delete this.offArr;
+                    delete this.offArr;
 
-					return this;
+                    return this;
 
-				},
+                },
 
-				option: function( key, value ) {
+                option: function( key, value ) {
 
-					var options = key,parts,curOption,i,oldKey;
+                    var options = key,parts,curOption,i,oldKey;
 
-					if ( arguments.length === 0 ) {
+                    if ( arguments.length === 0 ) {
 
-						return $.leoTools.extend( {}, this.options );
+                        return $.leoTools.extend( {}, this.options );
 
-					}
+                    }
 
-					if ( typeof key === "string" ) {
+                    if ( typeof key === "string" ) {
 
-						options = {};
+                        options = {};
 
-						oldKey = key;
+                        oldKey = key;
 
-						parts = key.split( "." );
+                        parts = key.split( "." );
 
-						key = parts.shift();
+                        key = parts.shift();
 
-						if ( parts.length ) {
+                        if ( parts.length ) {
 
-							curOption = options[ key ] = $.leoTools.extend( {}, this.options[ key ] );
+                            curOption = options[ key ] = $.leoTools.extend( {}, this.options[ key ] );
 
-							for ( i = 0; i < parts.length - 1; i++ ) {
+                            for ( i = 0; i < parts.length - 1; i++ ) {
 
-								curOption[ parts[ i ] ] = curOption[ parts[ i ] ] || {};
+                                curOption[ parts[ i ] ] = curOption[ parts[ i ] ] || {};
 
-								curOption = curOption[ parts[ i ] ];
+                                curOption = curOption[ parts[ i ] ];
 
-							}
+                            }
 
-							key = parts.pop();
+                            key = parts.pop();
 
-							if ( arguments.length === 1 ) {
+                            if ( arguments.length === 1 ) {
 
-								return curOption[ key ] === undefined ? null : curOption[ key ];
+                                return curOption[ key ] === undefined ? null : curOption[ key ];
 
-							}
+                            }
 
-							curOption[ key ] = value;
+                            curOption[ key ] = value;
 
-							this.__setOption(  oldKey, value, true );
+                            this.__setOption(  oldKey, value, true );
 
-						} else {
+                        } else {
 
-							if ( arguments.length === 1 ) {
+                            if ( arguments.length === 1 ) {
 
-								return this.options[ key ] === undefined ? null : this.options[ key ];
+                                return this.options[ key ] === undefined ? null : this.options[ key ];
 
-							}
+                            }
 
-							options[ key ] = value;
+                            options[ key ] = value;
 
-							this.__setOptions( options );
+                            this.__setOptions( options );
 
-						}
+                        }
 
-					}else{
+                    }else{
 
-						this.__setOptions( options );
+                        this.__setOptions( options );
 
-					}
+                    }
 
-					return this;
+                    return this;
 
-				},
+                },
 
-				__setOptions: function( options ) {
+                __setOptions: function( options ) {
 
-					var key;
+                    var key;
 
-					for ( key in options ) {
+                    for ( key in options ) {
 
-						if( options.hasOwnProperty( key ) ){
+                        if( options.hasOwnProperty( key ) ){
 
-							if( key.indexOf('.') !== -1 ){
+                            if( key.indexOf('.') !== -1 ){
 
-								this.__setOption(  key, options[ key ], true );
+                                this.__setOption(  key, options[ key ], true );
 
-							}else{
+                            }else{
 
-								this.__setOption( key, options[ key ] );
+                                this.__setOption( key, options[ key ] );
 
-							}
+                            }
 
-						}
+                        }
 
-					}
+                    }
 
-					return this;
+                    return this;
 
-				},
+                },
 
-				__setOption: function( key, value, bParts ) {
+                __setOption: function( key, value, bParts ) {
 
-					if(bParts){
+                    if(bParts){
 
-						var parts = key.split( "." );
+                        var parts = key.split( "." );
 
-						( function f( options, parts, lastKey, value ){
+                        ( function f( options, parts, lastKey, value ){
 
-							var key, rKey = parts.shift();
+                            var key, rKey = parts.shift();
 
-							if( rKey === lastKey ){
+                            if( rKey === lastKey ){
 
-								options[lastKey] = value
+                                options[lastKey] = value
 
-								return options[lastKey] !== undefined;
+                                return options[lastKey] !== undefined;
 
-							}
+                            }
 
-							for ( key in options ) {
+                            for ( key in options ) {
 
-								if( options.hasOwnProperty( key ) ){
+                                if( options.hasOwnProperty( key ) ){
 
-									if( key === rKey ){
+                                    if( key === rKey ){
 
-										return f( options[key], parts,lastKey,value );
+                                        return f( options[key], parts,lastKey,value );
 
-									}
+                                    }
 
-								}
+                                }
 
-							}
+                            }
 
-						})( this.options, parts, parts[parts.length-1], value ) && this._setOption( key, value );
+                        })( this.options, parts, parts[parts.length-1], value ) && this._setOption( key, value );
 
-					}else{
+                    }else{
 
-						this.options[ key ] = value;
+                        this.options[ key ] = value;
 
-						this._setOption( key, value );
+                        this._setOption( key, value );
 
-					}
+                    }
 
-					return this;
+                    return this;
 
-				}
+                }
 
-			}
+            }
 
-			if( !$.leoTools.plugIn.PlugInBasePrototypeKeys ){
+            if( !$.leoTools.plugIn.PlugInBasePrototypeKeys ){
 
-				var key,val = PlugIn.prototype;
+                var key,val = PlugIn.prototype;
 
-				$.leoTools.plugIn.PlugInBasePrototypeKeys = {};
+                $.leoTools.plugIn.PlugInBasePrototypeKeys = {};
 
-				for ( key in val ) {
+                for ( key in val ) {
 
-					if( ohasOwn.call( val, key ) ){
+                    if( ohasOwn.call( val, key ) ){
 
-						!!key && ( key !== 'constructor' ) && ( $.leoTools.plugIn.PlugInBasePrototypeKeys[key] = true );
+                        !!key && ( key !== 'constructor' ) && ( $.leoTools.plugIn.PlugInBasePrototypeKeys[key] = true );
 
-					}
+                    }
 
-				};
+                };
 
-			}
+            }
 
-			$.extend( PlugIn.prototype, li );
+            $.extend( PlugIn.prototype, li );
 
-		}
+        }
 
-		function setMethods( name, methods, fn ){
+        function setMethods( name, methods, fn ){
 
-			var key;
+            var key;
 
-			for ( key in methods ) {
+            for ( key in methods ) {
 
-				if( ohasOwn.call( methods, key ) ){
+                if( ohasOwn.call( methods, key ) ){
 
-					if( key.charAt( 0 ) !== "_" ){
+                    if( key.charAt( 0 ) !== "_" ){
 
-						fn[key] = methods[key]
+                        fn[key] = methods[key]
 
-					}else{
+                    }else{
 
-						methods[key].call( PlugIn.prototype, fn );
+                        methods[key].call( PlugIn.prototype, fn );
 
-					}
+                    }
 
-				}
+                }
 
-			}
+            }
 
-		}
+        }
 
-		$.leoTools.plugIn[li.name] = { prototype: PlugIn, options: li.defaults};
+        $.leoTools.plugIn[li.name] = { prototype: PlugIn, options: li.defaults};
 
-		if( li.addJquery === true ){
+        if( li.addJquery === true ){
 
-			$.leoTools.bridge( li.name );
+            $.leoTools.bridge( li.name );
 
-			setMethods( li.name, methods, $[li.name] );
+            setMethods( li.name, methods, $[li.name] );
 
-		}
+        }
 
-		if( li.addJqueryFn === true ){
+        if( li.addJqueryFn === true ){
 
-			$.leoTools.bridge( li.name, true );
+            $.leoTools.bridge( li.name, true );
 
-			setMethods( li.name, methods, $.fn[li.name] );
+            setMethods( li.name, methods, $.fn[li.name] );
 
-		}
+        }
 
-	}
+    }
 
-	$.leoTools.plugIn({
+    $.leoTools.plugIn({
 
-		name:'delayScrollOrResize',
+        name:'delayScrollOrResize',
 
-		version:'1.0',
+        version:'1.0',
 
-		addJquery:false,
+        addJquery:false,
 
-		addJqueryFn:true,
+        addJqueryFn:true,
 
-		defaults:{
+        defaults:{
 
-			selector:window,
+            selector:window,
 
-			events:'scroll',
+            events:'scroll',
 
-			handler:$.noop(),
+            handler:$.noop(),
 
-			delay:100
+            delay:100
 
-		},
+        },
 
-		init:function(){
+        init:function(){
 
-			var time;
+            var time;
 
-			if( typeof options.delay === 'number' && options.delay >= 0 ){
+            if( typeof options.delay === 'number' && options.delay >= 0 ){
 
-				this._on( options.selector, options.events, function(){
+                this._on( options.selector, options.events, function(){
 
-					!!time && clearTimeout(time);
+                    !!time && clearTimeout(time);
 
-					time = setTimeout( function(){
+                    time = setTimeout( function(){
 
-						options.handler.apply( $box, arguments );
+                        options.handler.apply( $box, arguments );
 
-					}, options.delay );
+                    }, options.delay );
 
-				})
+                })
 
 
-			}else{
+            }else{
 
-				this._on( options.selector, options.events, function(){
+                this._on( options.selector, options.events, function(){
 
-					options.handler.apply( $box, arguments );
+                    options.handler.apply( $box, arguments );
 
-				})
+                })
 
-			}
+            }
 
-		}
+        }
 
-	});
+    });
 
-	return $;
+    return $;
 
 }));

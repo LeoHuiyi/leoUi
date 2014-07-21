@@ -44,10 +44,6 @@ $.config({
 
             stopMouseWheel: true
 
-            // minWidth:50,
-
-            //               minHeight:57
-
         },
 
         quickClose: false,
@@ -64,7 +60,7 @@ $.config({
 
         restore: false,
 
-        modal: false
+        modal: true
 
     });
 
@@ -100,13 +96,17 @@ $.config({
 
         resizableOption: {
 
-            containment: 'parent'
+            containment: 'parent',
+
+            iframeFix:true
 
         },
 
         draggableOption: {
 
-            containment: 'parent'
+            containment: 'parent',
+
+            iframeFix:true
 
         },
 

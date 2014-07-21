@@ -48,11 +48,11 @@
 
 			disabled:false,//如果设置为 true 将禁止selectable。
 
-			helperClassName:"leoUi-selectable-helper",//助手ClassName
+			helperClassName:"leoUi_selectable_helper",//助手ClassName
 
-			selectedClassName:"leoUi-selected",//选中的ClassName
+			selectedClassName:"leoUi_selected",//选中的ClassName
 
-			selectingClassName:"leoUi-selecting",//正在选择的ClassName
+			selectingClassName:"leoUi_selecting",//正在选择的ClassName
 
 			// callbacks
 			selected: $.noop,//此事件会在选择操作结束时，在添加到选择的每个元素上触发。
@@ -75,13 +75,13 @@
 
 			this.dragged = false;
 
-			this.dataName = "leoUi-selectee-" + this.dataId;
+			this.dataName = "leoUi_selectee_" + this.dataId;
 
 			this.refresh = function() {
 
 				selectees = $( options.filter, that.$target[0] );
 
-				selectees.addClass("leoUi-selectee");
+				selectees.addClass("leoUi_selectee");
 
 				selectees.each( function() {
 
@@ -107,7 +107,7 @@
 
 						selecting: $this.hasClass(options.selectingClassName),
 
-						unselecting: $this.hasClass("leoUi-unselecting")
+						unselecting: $this.hasClass("leoUi_unselecting")
 
 					});
 
@@ -117,7 +117,7 @@
 
 			this.refresh();
 
-			this.selectees = selectees.addClass("leoUi-selectee");
+			this.selectees = selectees.addClass("leoUi_selectee");
 
 			this.helper = $("<div class=' " + options.helperClassName + " '></div>");
 
@@ -127,7 +127,7 @@
 
         _destroy:function() {
 
-            this.selectees.removeClass("leoUi-selectee").removeData(this.dataName);
+            this.selectees.removeClass("leoUi_selectee").removeData(this.dataName);
 
         },
 
@@ -159,7 +159,7 @@
 
 			!!options.autoRefresh && this.refresh();
 
-			this.selectees.filter(".leoUi-selected").each(function() {
+			this.selectees.filter(".leoUi_selected").each(function() {
 
 				var selectee = $.data(this, that.dataName);
 
@@ -171,7 +171,7 @@
 
 					selectee.selected = false;
 
-					selectee.$element.addClass("leoUi-unselecting");
+					selectee.$element.addClass("leoUi_unselecting");
 
 					selectee.unselecting = true;
 
@@ -193,7 +193,7 @@
 
 					doSelect = (!event.metaKey && !event.ctrlKey) || !selectee.$element.hasClass(options.selectedClassName);
 
-					selectee.$element.removeClass(doSelect ? "leoUi-unselecting" : options.selectedClassName).addClass(doSelect ? options.selectingClassName : "leoUi-unselecting");
+					selectee.$element.removeClass(doSelect ? "leoUi_unselecting" : options.selectedClassName).addClass(doSelect ? options.selectingClassName : "leoUi_unselecting");
 
 					selectee.unselecting = !doSelect;
 
@@ -301,7 +301,7 @@
 
 					if (selectee.unselecting) {
 
-						selectee.$element.removeClass("leoUi-unselecting");
+						selectee.$element.removeClass("leoUi_unselecting");
 
 						selectee.unselecting = false;
 
@@ -343,7 +343,7 @@
 
 							if (selectee.startselected) {
 
-								selectee.$element.addClass("leoUi-unselecting");
+								selectee.$element.addClass("leoUi_unselecting");
 
 								selectee.unselecting = true;
 
@@ -366,7 +366,7 @@
 
 							selectee.selected = false;
 
-							selectee.$element.addClass("leoUi-unselecting");
+							selectee.$element.addClass("leoUi_unselecting");
 
 							selectee.unselecting = true;
 
@@ -393,11 +393,11 @@
 
 			this.dragged = false;
 
-			$(".leoUi-unselecting", this.$target[0]).each(function() {
+			$(".leoUi_unselecting", this.$target[0]).each(function() {
 
 				var selectee = $.data(this, that.dataName);
 
-				selectee.$element.removeClass("leoUi-unselecting");
+				selectee.$element.removeClass("leoUi_unselecting");
 
 				selectee.unselecting = false;
 
@@ -411,7 +411,7 @@
 
 			});
 
-			$(".leoUi-selecting", this.$target[0]).each(function() {
+			$(".leoUi_selecting", this.$target[0]).each(function() {
 
 				var selectee = $.data(this, that.dataName);
 

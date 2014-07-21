@@ -84,10 +84,10 @@ body{height: 1000px;width: 2000px;}
 #delete_image .send_off{position: absolute;left: 154px;top:0;height: 26px;width: 62px;line-height: 26px;border: none;cursor: pointer;background-color: #e1e1e1;color: #555555;}
 
 /*leoSelectable*/
-.ui-state-default{background: #e6e6e6;border: 1px solid #d3d3d3;color: #555555;font-weight: normal;}
-.leoUi-selecting{background: none repeat scroll 0 0 #feca40;}
-.leoUi-selected{background: none repeat scroll 0 0 #f39814;color: white;}
-.leoUi-selectable-helper {position: absolute;z-index: 100;border: 1px dotted black;}
+.ui_state_default{background: #e6e6e6;border: 1px solid #d3d3d3;color: #555555;font-weight: normal;}
+.leoUi_selecting{background: none repeat scroll 0 0 #feca40;}
+.leoUi_selected{background: none repeat scroll 0 0 #f39814;color: white;}
+.leoUi_selectable_helper {position: absolute;z-index: 100;border: 1px dotted black;}
 
 /*leoTooltip*/
 .leoTooltip{position: absolute;z-index: 99999;margin: 0;background: none repeat scroll 0 0 rgba(0, 0, 0, 0.8);background: none repeat scroll 0 0 rgb(0, 0, 0)\9;box-shadow: 0 0 8px #85b2cb;color: #fff;border-radius: 3px;}
@@ -99,6 +99,12 @@ body{height: 1000px;width: 2000px;}
 .leoTooltip_arrow_left{top:50%;right:-10px;border-bottom: 8px solid transparent;border-top: 8px solid transparent;border-left: 10px solid #000;margin-top: -8px;}
 .leoTooltip_arrow_top{left:50%;bottom:-10px;border-left: 8px solid transparent;border-right: 8px solid transparent;border-top: 10px solid #000;margin-left: -8px;}
 .leoTooltip_arrow_bottom{left:50%;top:-10px;border-left: 8px solid transparent;border-right: 8px solid transparent;border-bottom: 10px solid #000;margin-left: -8px;}
+
+/*leoTree*/
+.leoTree_list{float: left;padding: 0.5em;width: 100%;}
+.leoTree_list
+.leoTree_parent{clear: left;float: left;margin: 0;padding: 0;width: 100%;}
+.leoTree_parent
 
 
 /*创建需求*/

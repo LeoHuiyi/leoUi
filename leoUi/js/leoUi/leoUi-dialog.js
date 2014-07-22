@@ -192,7 +192,7 @@
 
                 var zIndex = $(target).css('zIndex');
 
-                zIndex > 1 && zIndex = zIndex -1;
+                zIndex > 1 && ( zIndex = zIndex -1 );
 
                 return $('<div class="a" style = "position: fixed;top: 0px; left: 0px;width:100%;height:100%;background-color:black;overflow:hidden;z-index: '+ zIndex +';"></div>').hide().appendTo('body');
 

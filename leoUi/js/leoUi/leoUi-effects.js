@@ -1724,7 +1724,7 @@
 						height: height,
 						left: left-marginLeft + (show ? mx * width : 0),
 						top: top-marginTop + (show ? my * height : 0),
-						zIndex:zIndex>0?zIndex:0,
+						zIndex:zIndex,
 						opacity: show ? 0 : 1
 					}).animate({
 						left: left-marginLeft + (show ? 0 : mx * width),

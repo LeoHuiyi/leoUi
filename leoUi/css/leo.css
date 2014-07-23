@@ -56,7 +56,7 @@ body{height: 1000px;width: 2000px;}
 /*leoDialog*/
 .leoDialog{padding:0;border-radius: 3px;overflow: hidden;position:absolute;border: 1px solid #A8A8A8;box-shadow: 0 5px 10px rgba(0, 0, 0, 0.8);background-color: #ffffff;color: #4F4F4F;font-family: Arial,sans-serif;font-size: 100%;}
 .leoDialog_inherit .leoDialog_titlebar{cursor: inherit !important}
-.leoDialog_titlebar{border-left: medium none;border-radius: 0;border-right: medium none;border-top: medium none;background: url("../img/leoUi-bg_highlight-soft_100_c0c0c0_1x100.png") repeat-x scroll center top #C0C0C0;position:relative;overflow: hidden;cursor: move;padding: 0.5em 1em 0.3em;text-align: right;text-shadow: 0 1px 0 rgba(255, 255, 255, 0.7);border-bottom: 1px solid #A8A8A8;text-shadow: 0 1px 0 rgba(255, 255, 255, 0.7);}
+.leoDialog_titlebar{border-left: medium none;border-radius: 0;border-right: medium none;border-top: medium none;background: url("../img/leoUi-bg_highlight-soft_100_c0c0c0_1x100.png") repeat-x scroll center top #C0C0C0;position:relative;overflow: hidden;cursor: move;padding: 0.5em 1em 0.3em;text-align: right;text-shadow: 0 1px 0 rgba(255, 255, 255, 0.7);border-bottom: 1px solid #A8A8A8;}
 .leoDialog_title{color: #333333;font-weight: bold;float: left;width: auto; margin: 0.1em 16px 0.2em 0;font-size: 18px}
 .leoDialog_titlebar_button{display: inline-block;height: 18px;outline: medium none;padding: 1px;text-align: left;width: 19px;border-radius: 3px;text-decoration: none;color: #4F4F4F;}
 .leoDialog_titlebar_button:hover{background: url("../img/leoUi-bg_highlight-soft_100_83b0ca_1x100.png") repeat-x scroll center top #83B0CA;box-shadow: 0 0 3px #85B2CB;border: 1px solid #8AB0C6;padding:0;}
@@ -102,10 +102,26 @@ body{height: 1000px;width: 2000px;}
 .leoTooltip_arrow_bottom{left:50%;top:-10px;border-left: 8px solid transparent;border-right: 8px solid transparent;border-bottom: 10px solid #000;margin-left: -8px;}
 
 /*leoTree*/
+.leoTree{width:360px;}
+.leoTree_child{margin-left: 32px}
+.leoTree_state_default, .leoTree_state_default a{ color: inherit; text-shadow: 0 1px 0 rgba(255, 255, 255, 0.8); }
+.leoTree_icon{width:16px;height: 16px;text-indent:-9999px;}
+.leoTree_icon_triangle{background-image: url("../img/leoUi-icons_38667f_256x240.png");cursor: pointer;}
+.leoTree_icon_triangle_open{background-position: -48px -16px;}
+.leoTree_icon_triangle_close{background-position: -32px -16px;}
+.leoTree_icon_folder{background-image: url("../img/leoUi-icons_38667f_256x240.png");}
+.leoTree_icon_folder_open{background-position: -16px -96px;}
+.leoTree_icon_folder_close{background-position: 0 -96px;}
+.leoTree_icon_document{background-image: url("../img/leoUi-icons_38667f_256x240.png");background-position: -32px -96px;}
 .leoTree_list{float: left;padding: 0.5em;width: 100%;}
-.leoTree_list
+.leoTree_list .leoTree_node{background: none repeat scroll 0 0 rgba(0, 0, 0, 0);border: 0 none;clear: both;display: block;float: left;font-weight: normal;margin: 0 20px 0 0;}
+.leoTree_list .leoTree_item{clear: left;display: inline;float: left;margin: 0 0 0 16px;padding: 0;width: 100%;}
 .leoTree_parent{clear: left;float: left;margin: 0;padding: 0;width: 100%;}
-
+.leoTree_parent span{float:left;}
+.leoTree_inner{border: 1px solid transparent;display: block;padding: 3px;vertical-align: middle; border-radius: 3px;}
+.leoTree_inner a{color: inherit;display: block;float: left;margin: 0 0.5em;outline: medium none;text-decoration: none;cursor: pointer;}
+.leoTree_active{background-color:rgb(131, 176, 202);background: linear-gradient(to bottom, rgba(131, 176, 202, 1) 0%, rgba(185, 224, 245, 1) 100%) repeat scroll 0 0;border: 1px solid #7096ab;color: #1c4257;box-shadow: 0 1px 0 rgba(255, 255, 255, 0.25) inset;}
+.leoTree_hover{background: url("../img/leoUi-bg_highlight-soft_100_83b0ca_1x100.png") repeat-x scroll center top #83b0ca;border: 1px solid #8ab0c6;box-shadow: 0 0 3px #85b2cb;color: #313131;font-weight: bold; font-weight: 400;}
 
 
 /*创建需求*/

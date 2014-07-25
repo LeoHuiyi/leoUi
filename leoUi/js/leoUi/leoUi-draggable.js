@@ -146,11 +146,7 @@
 
             if( key === 'selector'){
 
-                this._$target && ( this.$target = this._$target );
-
                 this._super( key,value );
-
-                delete this._$target;
 
             }
 
@@ -396,13 +392,7 @@
 
             }
 
-            if( this._mouseSelector ){
-
-                !this._$target && ( this._$target = this.$target );
-
-                this.$target = $( this._mouseSelector );
-
-            }
+            !!this._mouseSelector && ( this.$target = $( this._mouseSelector ) );
 
             this.$dragBox = this.$target;
 
@@ -717,10 +707,6 @@
 
             this._dragEndStop = false;
 
-            this.left = event.pageX - this.startLeft;
-
-            this.top = event.pageY - this.startTop;
-
             this._triggerLeoDroppable( event, 'leoDroppableEnd', this.top, this.left );
 
             this._unblockFrames();
@@ -793,7 +779,7 @@
 
                                 this.$dragBox.remove();
 
-                                this.$target.offset( { left: boxOffset.left, top: boxOffset.top } );
+                                !o.bCloneAnimate && this.$target.offset( { left: boxOffset.left, top: boxOffset.top } );
 
                                 this.hasClone = false;
 
@@ -819,7 +805,7 @@
 
                             }else{
 
-                                this.$target.offset( { left: this.left, top: this.top } );
+                                !o.bCloneAnimate && this.$target.offset( { left: this.left, top: this.top } );
 
                                 o.onStopDrag.call( this.$target[0], event );
 

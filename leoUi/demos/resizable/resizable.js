@@ -64,7 +64,7 @@ $.config({
     $('#botton_1').click(function(event) {
             $('body').leoResizable('option',{
 
-                selector:"#a"
+                selector:false
 
             });
     });

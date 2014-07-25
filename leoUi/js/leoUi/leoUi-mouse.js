@@ -87,9 +87,27 @@
 
             var that = this,selector = this.options.selector;
 
+            if(  !this._$target ){
+
+                this._$target = this.$target;
+
+            }else{
+
+                this.$target = this._$target;
+
+            }
+
             this._off( this.$target, 'mousedown.mouse' );
 
-            selector === false && ( selector = '' );
+            if( selector === false ){
+
+                selector = '';
+
+                delete this._$target;
+
+                delete this._mouseSelector ;
+
+            }
 
             this._on( this.$target, 'mousedown.mouse', selector, function(event) {
 

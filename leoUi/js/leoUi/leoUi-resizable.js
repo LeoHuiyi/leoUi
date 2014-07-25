@@ -260,7 +260,7 @@
 
             var This = this,$box = this.$target,boxCur = this.$target.css('cursor'),
 
-            selector = this.options.selector;
+            selector = this.options.selector,$selector;
 
             this.boxCur = boxCur;
 
@@ -290,9 +290,9 @@
 
                     event.preventDefault();
 
-                    !!This.options.mouseMoveCurOut && This.options.mouseMoveCurOut.call( $(this), boxCur );
+                    !!This.options.mouseMoveCurOut && This.options.mouseMoveCurOut.call( $selector = $(this), boxCur );
 
-                    $(this).css('cursor',boxCur);
+                    $selector.css('cursor',boxCur);
 
                     This.cur = '';
 
@@ -478,13 +478,7 @@
 
             var offset,o = this.options;
 
-            if( this._mouseSelector ){
-
-                !this._$target && ( this._$target = this.$target );
-
-                this.$target = $( this._mouseSelector );
-
-            }
+            !!this._mouseSelector && ( this.$target = $( this._mouseSelector ) );
 
             this.$dragBox = this.$target;
 
@@ -972,13 +966,9 @@
 
             if( key === 'selector'){
 
-                this._$target && ( this.$target = this._$target );
-
                 this._super( key,value );
 
                 this._boxEventBind();
-
-                delete this._$target;
 
             }
 

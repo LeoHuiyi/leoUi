@@ -37,9 +37,11 @@
 
             delay:0,//时间（以毫秒为单位），当鼠标按下后直到的互动（interactions）激活。此选项可用来阻止当点击一个元素时可能发生的非期望互动（interactions）行为。
 
-            distance:0,
+            distance:0,//距离在像素的mousedown鼠标交互应该开始之前必须移动。
 
-            isSetCapture:false
+            isSetCapture:false,//鼠标扑捉
+
+            selector:false//代理
 
         },
 
@@ -51,15 +53,7 @@
 
             this._lockDrag = false;
 
-            this._on( this.$target, 'mousedown', function(event) {
-
-                if( !that._lockDrag ){
-
-                    return that._mouseDown(event);
-
-                }
-
-            })
+            this._setMousedownEvent();
 
             this._on( this.$target, 'click', function(event) {
 
@@ -76,6 +70,40 @@
             })
 
             this.started = false;
+
+        },
+
+        _setOption:function( key, value ){
+
+            if( key === 'selector'){
+
+                this._setMousedownEvent();
+
+            }
+
+        },
+
+        _setMousedownEvent:function(){
+
+            var that = this,selector = this.options.selector;
+
+            this._off( this.$target, 'mousedown.mouse' );
+
+            selector === false && ( selector = '' );
+
+            this._on( this.$target, 'mousedown.mouse', selector, function(event) {
+
+                event.stopPropagation();
+
+                if( !that._lockDrag ){
+
+                    !!selector && ( that._mouseSelector = this );
+
+                    return that._mouseDown(event);
+
+                }
+
+            })
 
         },
 

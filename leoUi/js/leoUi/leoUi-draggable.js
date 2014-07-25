@@ -144,6 +144,16 @@
 
             }
 
+            if( key === 'selector'){
+
+                this._$target && ( this.$target = this._$target );
+
+                this._super( key,value );
+
+                delete this._$target;
+
+            }
+
         },
 
         _getHandle:function(event) {
@@ -253,6 +263,12 @@
                 this.$containment = this.window;
 
                 this._getBorderWidths(true);
+
+            }else if( this._mouseSelector || oc === 'parent' ){
+
+                this.$containment = $( this._mouseSelector ).parent();
+
+                this._getBorderWidths();
 
             }else{
 
@@ -377,6 +393,14 @@
             if( this.hasClone === true ){
 
                 return;
+
+            }
+
+            if( this._mouseSelector ){
+
+                !this._$target && ( this._$target = this.$target );
+
+                this.$target = $( this._mouseSelector );
 
             }
 

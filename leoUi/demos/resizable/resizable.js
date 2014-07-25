@@ -27,9 +27,11 @@ $.config({
 
 }).require('leoUi-resizable,leoCss,ready', function($) {
 
-    $('.a').leoResizable({
+    $('body').leoResizable({
 
-       disabled:false,//如果设置为true将禁止缩放。
+        selector:'.a',
+
+        disabled:false,//如果设置为true将禁止缩放。
 
         bClone:true,//克隆对象
 
@@ -58,6 +60,14 @@ $.config({
         aspectRatio:false//等比例缩放,为长与高之比
 
     })
+
+    $('#botton_1').click(function(event) {
+            $('body').leoResizable('option',{
+
+                selector:"#a"
+
+            });
+    });
 
 
 });

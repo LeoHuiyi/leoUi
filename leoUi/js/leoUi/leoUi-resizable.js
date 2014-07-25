@@ -112,6 +112,8 @@
 
             !! this.options.initCallback && this.options.initCallback.call(this.$target[0]);
 
+            this._super();
+
             this._boxEventBind();
 
         },
@@ -158,15 +160,15 @@
 
         },
 
-        _mouseCur:function(event){
+        _mouseCur:function( event, node ){
 
             if( this._getCursorChange() === true && this.options.disabled === false ){
 
                 event.preventDefault();
 
-                var offset = this.$target.offset(),top = offset.top,left = offset.left,
+                var $this = $(node),offset = $this.offset(),top = offset.top,left = offset.left,
 
-                outerW = this.$target.outerWidth(),outerH = this.$target.outerHeight();
+                outerW = $this.outerWidth(),outerH = $this.outerHeight();
 
                 if( event.pageY <= top + this.options.edge ){
 
@@ -208,17 +210,17 @@
 
                         this.cursor = this.boxCur;
 
-                        !!this.options.mouseMoveCurOut && this.options.mouseMoveCurOut.call( this.$target, this.cursor );
+                        !!this.options.mouseMoveCurOut && this.options.mouseMoveCurOut.call( $this, this.cursor );
 
                     }else{
 
                         this.cursor = this.cur+'-resize';
 
-                        !!this.options.mouseMoveCurIn && this.options.mouseMoveCurIn.call( this.$target, this.cursor );
+                        !!this.options.mouseMoveCurIn && this.options.mouseMoveCurIn.call( $this, this.cursor );
 
                     }
 
-                    this.$target.css('cursor',this.cursor);
+                    $this.css('cursor',this.cursor);
 
                 }
 
@@ -256,41 +258,47 @@
 
         _boxEventBind:function(){
 
-            var This = this,$box = this.$target,boxCur = this.$target.css('cursor');
+            var This = this,$box = this.$target,boxCur = this.$target.css('cursor'),
+
+            selector = this.options.selector;
 
             this.boxCur = boxCur;
 
-            this._on($box,'mouseenter',function(event){
+            selector === false && ( selector = '' );
 
-                This._mouseCur(event);
+            this._off( $box,'mouseenter.resize' );
+
+            this._off( $box,'mousemove.resize' );
+
+            this._off( $box,'mouseleave.resize' );
+
+            this._on( $box,'mouseenter.resize', selector, function(event){
+
+                This._mouseCur( event, this );
 
             })
 
-            this._on($box,'mousemove',function(event){
+            this._on( $box,'mousemove.resize', selector, function(event){
 
-                This._mouseCur(event);
+                This._mouseCur( event, this );
 
             });
 
-            this._on($box,'mouseleave',function(event){
+            this._on( $box,'mouseleave.resize', selector, function(event){
 
                 if( This._getCursorChange() === true && This.options.disabled === false ){
 
                     event.preventDefault();
 
-                    !!This.options.mouseMoveCurOut && This.options.mouseMoveCurOut.call( This.$target, boxCur );
+                    !!This.options.mouseMoveCurOut && This.options.mouseMoveCurOut.call( $(this), boxCur );
 
-                    $box.css('cursor',boxCur);
+                    $(this).css('cursor',boxCur);
 
                     This.cur = '';
 
                 }
 
             });
-
-            this.leoMouse.sdfsd
-
-            this[this.inherit]._init.call(this);
 
         },
 
@@ -353,6 +361,12 @@
                 this.$containment = this.window;
 
                 this._getBorderWidths(true);
+
+            }else if( this._mouseSelector || oc === 'parent' ){
+
+                this.$containment = $( this._mouseSelector ).parent();
+
+                this._getBorderWidths();
 
             }else{
 
@@ -464,9 +478,17 @@
 
             var offset,o = this.options;
 
+            if( this._mouseSelector ){
+
+                !this._$target && ( this._$target = this.$target );
+
+                this.$target = $( this._mouseSelector );
+
+            }
+
             this.$dragBox = this.$target;
 
-            isFixed = this.$dragBox.position()
+            isFixed = this.$dragBox.position();
 
             offset = this.$target.offset();
 
@@ -945,6 +967,18 @@
             if( key === 'maxWidth' || key === 'maxHeight' || key === 'minWidth' || key === 'minHeight'){
 
                 this._dragArea();
+
+            }
+
+            if( key === 'selector'){
+
+                this._$target && ( this.$target = this._$target );
+
+                this._super( key,value );
+
+                this._boxEventBind();
+
+                delete this._$target;
 
             }
 

@@ -44,6 +44,8 @@
 
             handle:false, //点击拖拽地区
 
+            notHandle:false,//点击不能拖拽地区
+
             cursor:'move',//拖动时的CSS指针。
 
             bClone:true, //是否使用克隆拖拽
@@ -51,6 +53,8 @@
             bCloneAnimate:true, //克隆拖拽是否动画
 
             dragBoxReturnToTarget:false,//是否回到target位置
+
+            refreshPositions:false,//dropBoxs是否时刻刷新（耗性能）
 
             duration:400,//动画时间
 
@@ -132,6 +136,12 @@
 
             }
 
+            if( key === 'notHandle' ){
+
+                this.options.notHandle = value;
+
+            }
+
             if( key === 'containment'){
 
                 this._getContainment();
@@ -155,6 +165,12 @@
         _getHandle:function(event) {
 
             return this.options.handle ? !!$( event.target ).closest( this.$target.find( this.options.handle ) ).length : true;
+
+        },
+
+        _getNotHandle:function(event) {
+
+            return this.options.notHandle ? !$( event.target ).closest( this.$target.find( this.options.notHandle ) ).length : true;
 
         },
 
@@ -188,7 +204,7 @@
 
         _mouseCapture:function(event){
 
-            if( this.options.disabled === true || this.options.onBeforeDrag.call( this.$target[0] ) === false || this._getHandle(event) === false ){
+            if( this.options.disabled === true || this.options.onBeforeDrag.call( this.$target[0] ) === false || this._getHandle(event) === false || this._getNotHandle(event) === false ){
 
                 return false;
 
@@ -259,12 +275,6 @@
                 this.$containment = this.window;
 
                 this._getBorderWidths(true);
-
-            }else if( this._mouseSelector || oc === 'parent' ){
-
-                this.$containment = $( this._mouseSelector ).parent();
-
-                this._getBorderWidths();
 
             }else{
 
@@ -392,8 +402,6 @@
 
             }
 
-            !!this._mouseSelector && ( this.$target = $( this._mouseSelector ) );
-
             this.$dragBox = this.$target;
 
             this.oldCur = this.$body.css('cursor');
@@ -444,9 +452,9 @@
 
             this.$body.css( 'cursor', o.cursor );
 
-            this._getDroppableBoxs();
+            this._setDropsProp(event);
 
-            this._triggerLeoDroppable( event, 'leoDroppableStar', this.top, this.left );
+            this._checkPosition( event, this.top, this.left, true );
 
         },
 
@@ -491,47 +499,71 @@
 
         },
 
-        _getDroppableBoxs:function(){
+        _setDropsProp:function(event){
 
-            if( !this.options.useDroppable ){
+            if( !this.options.useDroppable && !!$.fn[this.relevanceFnName.droppable] ){
 
                 return;
 
             }
 
-            this.droppableBox = !!$.fn[this.relevanceFnName.droppable] && $.fn[this.relevanceFnName.droppable].getElements( this.options.droppableScope );
-
-            this.droppableBoxLen = !!this.droppableBox && this.droppableBox.length || 0;
+            $.fn[this.relevanceFnName.droppable].setDropsProp( event, this.options.droppableScope, this.$target );
 
         },
 
-        _triggerLeoDroppable:function( event, name, top, left ){
+        _checkPosition:function( event, top, left, first ){
 
-            if( this.options.useDroppable && this.droppableBoxLen > 0 ){
+            if( !this.options.useDroppable && !!$.fn[this.relevanceFnName.droppable]  ){
 
-                for ( var i = 0; i < this.droppableBoxLen; i++ ) {
-
-                    $( this.droppableBox[i] ).leoDroppable( 'trigger', name,
-
-                    [{
-
-                        box : this.$target,
-
-                        dragBox :this.$dragBox,
-
-                        dragBoxTop : top,
-
-                        dragBoxLeft : left,
-
-                        pageX : event.pageX,
-
-                        pageY : event.pageY
-
-                    }] );
-
-                }
+                return;
 
             }
+
+            $.fn[this.relevanceFnName.droppable].checkPosition( event, {
+
+                scope: this.options.droppableScope,
+
+                box: this.$target,
+
+                dragBox: this.$dragBox,
+
+                dragBoxTop: top,
+
+                dragBoxLeft: left,
+
+                pageX: event.pageX,
+
+                pageY: event.pageY
+
+            }, first );
+
+        },
+
+        _drop:function( event, top, left ){
+
+            if( !this.options.useDroppable && !!$.fn[this.relevanceFnName.droppable] ){
+
+                return;
+
+            }
+
+            return $.fn[this.relevanceFnName.droppable].drop( event, {
+
+                scope: this.options.droppableScope,
+
+                box: this.$target,
+
+                dragBox: this.$dragBox,
+
+                dragBoxTop: top,
+
+                dragBoxLeft: left,
+
+                pageX: event.pageX,
+
+                pageY: event.pageY
+
+            });
 
         },
 
@@ -601,31 +633,7 @@
 
             }
 
-            if( this.droppableBoxLen > 0 && scrolled !== false ){
-
-                for (var i = 0; i < this.droppableBoxLen; i++) {
-
-                    $(this.droppableBox[i]).leoDroppable('trigger','leoDroppableOver',
-
-                    [{
-
-                        box : this.$target,
-
-                        dragBox :this.$dragBox,
-
-                        dragBoxTop : this.top,
-
-                        dragBoxLeft : this.left,
-
-                        pageX : event.pageX,
-
-                        pageY : event.pageY
-
-                    }]);
-
-                }
-
-            }
+            this._checkPosition( event, this.top, this.left );
 
         },
 
@@ -671,8 +679,6 @@
 
         _mouseDrag:function(event) {
 
-            var outerH = this.$dragBox.outerHeight(),outerW = this.$dragBox.outerWidth();
-
             this._dragScroll(event);
 
             this._getContainmentRange();
@@ -689,15 +695,17 @@
 
             this.top = $.leoTools.range( this.top, this.$dragMinY, this.$dragMaxY );
 
-            this.$dragBox.offset({left:this.left,top:this.top});
+            this.$dragBox.offset( { left:this.left, top:this.top } );
 
-            this._triggerLeoDroppable( event, 'leoDroppableOver', this.top, this.left );
+            this.options.refreshPositions === true && this._setDropsProp(event);
+
+            this._checkPosition( event, this.top, this.left );
 
         },
 
         _mouseStop:function(event) {
 
-            var This = this,boxOffset,o = this.options;
+            var This = this,boxOffset,o = this.options,droped;
 
             this.$body.css( 'cursor', this.oldCur );
 
@@ -705,13 +713,11 @@
 
             this._stopOffMouseWheel();
 
-            this._dragEndStop = false;
-
-            this._triggerLeoDroppable( event, 'leoDroppableEnd', this.top, this.left );
+            droped = this._drop( event, this.top, this.left );
 
             this._unblockFrames();
 
-            if( this._dragEndStop ){
+            if( droped === true ){
 
                 if( o.bClone ){
 
@@ -854,12 +860,6 @@
         _isMove:function( oldsLeft, oldTop, left, top ){
 
             return ( oldsLeft !== left || ( oldTop !== top ) );
-
-        },
-
-        setDragEndStop:function(flag){
-
-            this._dragEndStop = !!flag;
 
         },
 

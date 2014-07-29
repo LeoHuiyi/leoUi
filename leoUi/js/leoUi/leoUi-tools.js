@@ -1409,7 +1409,15 @@
 
                     if( key.charAt( 0 ) !== "_" ){
 
-                        fn[key] = methods[key]
+                        fn[key] = function( PlugInPrototype, fn, key ){
+
+                            return function(){
+
+                                return methods[key].apply( PlugInPrototype, arguments );
+
+                            }
+
+                        }( PlugIn.prototype, fn, key );
 
                     }else{
 

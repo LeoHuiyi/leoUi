@@ -28,12 +28,6 @@
 
         version:'1.0',
 
-        dependsFnName:{
-
-            draggable:'leoDraggable'
-
-        },//依赖函数名
-
         addJquery:false,
 
         addJqueryFn:true,
@@ -48,264 +42,160 @@
 
             disabled:false,//当设置为true时停止。
 
-            onDragEnter: $.noop, //e,source,dragBox ,dragBox - offset 当可拖动元素被拖入目标容器的时候触发，参数source是被拖动的DOM元素。
+            onDragEnter: false, //drop,e,dropprop,dragBoxprop 当可拖动元素被拖入目标容器的时候触发，参数source是被拖动的DOM元素。
 
-            onDragOver: $.noop,//e,source,dragBox,dragBox - offset  当可拖动元素被拖至某个元素之上的时候触发，参数source是被拖动的DOM元素。
+            onDragOver: false,//drop,e,dropprop,dragBoxprop 当可拖动元素被拖至某个元素之上的时候触发，参数source是被拖动的DOM元素。
 
-            onDragLeave: $.noop,//e,source,dragBox,dragBox - offset  当可拖动元素被拖离目标容器的时候触发，参数source是被拖动的DOM元素。
+            onDragLeave: false,//drop,e,dropprop,dragBoxprop 当可拖动元素被拖离目标容器的时候触发，参数source是被拖动的DOM元素。
 
-            onDrop: null//e,source,dragBox,dragBox - offset   当可拖动元素被拖入目标容器并放置的时候触发，参数source是被拖动的DOM元素。
+            onDrop: false//drop,e,dropprop,dragBoxprop  当可拖动元素被拖入目标容器并放置的时候触发，参数source是被拖动的DOM元素。
 
         },
 
         _init:function(){
 
-            var entered = false,This = this;
+            this.entered = false;
 
             this.scope = this.options.scope;
 
-            this._setElements( this.scope );
+            this._setArrays( this.scope );
 
-            this.options.accept === '*' ? this.accepts = '*' : this.accepts = $( this.options.accept );
+            this._setAccepted();
 
-            this._trigger( 'leoDroppableStar', function( event, draggable ){
+        },
 
-                if( This.options.disabled ){
+        _getDragSize:function(draggable){
 
-                    return;
+            var $box = draggable.dragBox,top = draggable.dragBoxTop,
 
-                }
+            left = draggable.dragBoxLeft;
 
-                This.source = draggable.box[0];
+            outerW = $box.outerWidth();
 
-                if( This.accepted = This._accept() ){
+            outerH = $box.outerHeight();
 
-                    var dragBox = draggable.dragBox[0],
+            return{
 
-                    intersected = dragBox !== this && intersect( boxSize( draggable.dragBox, draggable.dragBoxLeft, draggable.dragBoxTop, draggable.pageX, draggable.pageY ),boxSize( $(this) ), This.options.toleranceType );
+                box:draggable.box[0],
 
-                    if( intersected && !entered ){
+                dragBox:draggable.dragBox[0],
 
-                        entered = true;
+                width : outerW,
 
-                    }else if( !intersected && !!entered ){
+                height : outerH,
 
-                        entered = false;
+                top : top,
 
-                    }else if(intersected){
+                left : left,
 
-                        This.options.onDragOver.call( this, event, This.source, dragBox, {
+                bottom : top + outerH,
 
-                            left : draggable.dragBoxLeft,
+                right : left + outerW,
 
-                            top : draggable.dragBoxTop
+                pageX :draggable.pageX,
 
-                        })
-
-                    }
-
-                }
-
-            })
-
-            this._trigger('leoDroppableOver',function( event, draggable ){
-
-                This.source !== draggable.box[0] && This._reAccepted( draggable.box[0] );
-
-                if( This.accepted && This.options.disabled !== true ){
-
-                    var dragBox = draggable.dragBox[0],
-
-                    intersected = dragBox !== this && intersect( boxSize( draggable.dragBox, draggable.dragBoxLeft, draggable.dragBoxTop, draggable.pageX, draggable.pageY), boxSize( $(this) ), This.options.toleranceType);
-
-                    if( intersected && !entered ){
-
-                        This.options.onDragEnter.call( this,event, This.source, dragBox, {
-
-                            left : draggable.dragBoxLeft,
-
-                            top : draggable.dragBoxTop
-
-                        })
-
-                        entered = true;
-
-                    }else if( !intersected && !!entered ){
-
-                        This.options.onDragLeave.call( this, event, This.source, dragBox, {
-
-                            left : draggable.dragBoxLeft,
-
-                            top : draggable.dragBoxTop
-
-                        })
-
-                        entered = false;
-
-                    }else if(intersected){
-
-                        This.options.onDragOver.call( this, event, This.source, dragBox, {
-
-                            left : draggable.dragBoxLeft,
-
-                            top : draggable.dragBoxTop
-
-                        })
-
-                    }
-
-                }
-
-            })
-
-            this._trigger('leoDroppableEnd',function( event, draggable ){
-
-                This.source !== draggable.box[0] && This._reAccepted( draggable.box[0] );
-
-                if( This.options.onDrop !== null && This.accepted && This.options.disabled !== true ){
-
-                    if( draggable.dragBox[0] !== this && intersect( boxSize( draggable.dragBox, draggable.dragBoxLeft, draggable.dragBoxTop, draggable.pageX, draggable.pageY ),boxSize( $(this) ), This.options.toleranceType )){
-
-                        draggable.box[This.dependsFnName.draggable]( 'setDragEndStop', This.options.onDrop.call( this,event, draggable.box[0], draggable.dragBox[0], {
-
-                            left : draggable.dragBoxLeft,
-
-                            top : draggable.dragBoxTop
-
-                        }) === false );
-
-                        entered = false;
-
-                    }
-
-                }
-
-            });
-
-            function boxSize( $box, left, top, pageX, pageY ){
-
-                var outerW,outerH,top,left,offset;
-
-                if( !!left && !!top && !!pageX && !!pageY ){
-
-                    outerW = $box.outerWidth();
-
-                    outerH = $box.outerHeight();
-
-                    return{
-
-                        width : outerW,
-
-                        height : outerH,
-
-                        top : top,
-
-                        left : left,
-
-                        bottom : top + outerH,
-
-                        right : left + outerW,
-
-                        pageX :pageX,
-
-                        pageY : pageY
-
-                    }
-
-                }else{
-
-                    offset = $box.offset();
-
-                    top = offset.top;
-
-                    left = offset.left;
-
-                    outerW = $box.outerWidth();
-
-                    outerH = $box.outerHeight();
-
-                    return{
-
-                        width : outerW,
-
-                        height : outerH,
-
-                        top : top,
-
-                        left : left,
-
-                        bottom : top + outerH,
-
-                        right : left + outerW
-
-                    }
-
-                }
+                pageY : draggable.pageY
 
             }
 
-            function intersect( draggable, droppable, toleranceMode ) {
+        },
 
-                var pageX = draggable.pageX,pageY = draggable.pageY,
+        _intersect:function( draggable, droppable, toleranceMode ) {
 
-                x1 = draggable.left,y1 =draggable.top,
+            var pageX = draggable.pageX,pageY = draggable.pageY,
 
-                x2 = draggable.right,y2 = draggable.bottom,
+            x1 = draggable.left,y1 =draggable.top,
 
-                l = droppable.left,t = droppable.top,
+            x2 = draggable.right,y2 = draggable.bottom,
 
-                r = droppable.right,b = droppable.bottom;
+            l = droppable.left,t = droppable.top,
 
-                switch (toleranceMode) {
+            r = droppable.right,b = droppable.bottom;
 
-                    case "fit":
+            switch (toleranceMode) {
 
-                        return (l <= x1 && x2 <= r && t <= y1 && y2 <= b);
+                case "fit":
 
-                    case "intersect":
+                    return (l <= x1 && x2 <= r && t <= y1 && y2 <= b);
 
-                        return (l <= x1 + (draggable.width / 2) &&
-                            x2 - (draggable.width / 2) <= r &&
-                            t <= y1 + (draggable.height / 2) &&
-                            y2 - (draggable.height / 2) <= b );
+                case "intersect":
 
-                    case "pointer":
+                    return (l <= x1 + (draggable.width / 2) &&
+                        x2 - (draggable.width / 2) <= r &&
+                        t <= y1 + (draggable.height / 2) &&
+                        y2 - (draggable.height / 2) <= b );
 
-                        return  (l <= pageX && pageX <= r && t <= pageY && pageY <= b);
+                case "pointer":
 
-                    case "touch":
+                    return  (l <= pageX && pageX <= r && t <= pageY && pageY <= b);
 
-                        return (
-                            (y1 >= t && y1 <= b) ||
-                            (y2 >= t && y2 <= b) ||
-                            (y1 < t && y2 > b)
-                        ) && (
-                            (x1 >= l && x1 <= r) ||
-                            (x2 >= l && x2 <= r) ||
-                            (x1 < l && x2 > r)
-                        );
+                case "touch":
 
-                    default:
+                    return (
+                        (y1 >= t && y1 <= b) ||
+                        (y2 >= t && y2 <= b) ||
+                        (y1 < t && y2 > b)
+                    ) && (
+                        (x1 >= l && x1 <= r) ||
+                        (x2 >= l && x2 <= r) ||
+                        (x1 < l && x2 > r)
+                    );
 
-                        return false;
+                default:
 
-                    }
+                    return false;
+
+                }
+
+        },
+
+        _getDropsSize:function($box){
+
+            var outerW,outerH,top,left,offset;
+
+            offset = $box.offset();
+
+            top = offset.top;
+
+            left = offset.left;
+
+            outerW = $box.outerWidth();
+
+            outerH = $box.outerHeight();
+
+            return{
+
+                width : outerW,
+
+                height : outerH,
+
+                top : top,
+
+                left : left,
+
+                bottom : top + outerH,
+
+                right : left + outerW
+
+            }
+
+        },
+
+        _setAccepted:function(){
+
+            var accept = this.options.accept;
+
+            accept === '*' ? this.accepts = '*' : this.accepts = $.isFunction( accept )? accept : function( d ) {
+
+                return d.is( accept );
 
             };
 
         },
 
-        _reAccepted:function(source){
+        _accept:function($dargBox){
 
-            !!source && ( this.source = source );
-
-            this.accepted = this._accept();
-
-        },
-
-        _accept:function(){
-
-            return this.accepts === '*' ? true : $( this.source ).is( this.accepts );
+            return this.accepts === '*' ? true : this.accepts.call( this.$target[0], $dargBox );
 
         },
 
@@ -313,9 +203,9 @@
 
             if( key === 'scope') {
 
-                this._deletElements( this.scope );
+                this._deletArrays( this.scope );
 
-                this._setElements(value);
+                this._setArrays(value);
 
                 this.scope = value;
 
@@ -323,9 +213,7 @@
 
             if( key === 'accept') {
 
-                value === '*' ? this.accepts = '*' : this.accepts = $( value );
-
-                this._reAccepted();
+                this._setAccepted();
 
             }
 
@@ -333,51 +221,147 @@
 
         _destroy:function(){
 
-            this._deletElements( this.scope );
+            this._deletArrays( this.scope );
 
         }
 
     },{
 
-        _initElements:function(fn){
+        _privateArray:function(fn){
 
-            var _elements = {};
+            var _arrays = {};
 
-            fn.getElements = this._getElements = function(scope){
+            this._getArrays = function(scope){
 
-                return _elements[scope] || [];
-
-            }
-
-            this._setElements = function(scope){
-
-                _elements[scope] = _elements[scope] || [];
-
-                _elements[scope].push( this.$target[0] );
+                return _arrays[scope] || [];
 
             }
 
-            this._deletElements = function(scope){
+            this._setArrays = function(scope){
 
-                if( _elements[scope] === undefined ){
+                _arrays[scope] = _arrays[scope] || [];
+
+                _arrays[scope].push( this );
+
+            }
+
+            this._deletArrays = function(scope){
+
+                if( _arrays[scope] === undefined ){
 
                     return;
 
                 }
 
-                var elements = _elements[scope] ,length = elements.length,element = this.$target[0];
+                var arrays = _arrays[scope] ,length = arrays.length,arrays = this.$target[0];
 
                 for (var i = 0; i < length; i++) {
 
-                    if(elements[i] === element){
+                    if(arrays[i] === this){
 
-                        elements.splice(i,1);
+                        elements.splice( i, 1 );
 
                     }
 
                 };
 
             }
+
+        },
+
+        setDropsProp:function( event, scope, $target ){
+
+            var i,m = this._getArrays(scope) || [],length = m.length,
+
+            type = event ? event.type : null;
+
+            for ( i = 0; i < length; i++ ) {
+
+                m[ i ].proportions = null;
+
+                if ( m[ i ].options.disabled ||  !m[ i ]._accept($target) || !( m[ i ].visible = ( m[ i ].$target.is( ":visible" ) ) ) ) {
+
+                    continue;
+
+                }
+
+                m[ i ].proportions = this._getDropsSize( m[ i ].$target );
+
+            }
+
+        },
+
+        checkPosition:function( event, draggable, first ){
+
+            var dragProp = this._getDragSize(draggable),
+
+            proportions,intersected,drop,notFirst = !first;
+
+            $.each( this._getArrays( draggable.scope ) || [], function() {
+
+                if ( this.options.disabled || !( proportions = this.proportions ) ) {
+
+                    return;
+
+                }
+
+                drop = this.$target[0];
+
+                intersected = this._intersect( dragProp, proportions, this.options.toleranceType  );
+
+                if( intersected === true ){
+
+                    if( this.entered === false ){
+
+                        notFirst && !!this.options.onDragEnter && this.options.onDragEnter.call( drop, event, proportions, dragProp);
+
+                        this.entered = true;
+
+                    }else{
+
+                        !!this.options.onDragOver && this.options.onDragOver.call( drop, event, proportions, dragProp);
+
+                    }
+
+                }else if(  intersected === false  && this.entered === true ){
+
+                    notFirst && !!this.options.onDragLeave && this.options.onDragLeave.call( drop, event, proportions, dragProp);
+
+                    this.entered = false;
+
+                }
+
+            });
+
+        },
+
+        drop:function( event, draggable ){
+
+            var dragProp = this._getDragSize(draggable),
+
+            proportions,drop,droped;
+
+            $.each( this._getArrays( draggable.scope ) || [], function() {
+
+                if ( this.options.disabled || !( proportions = this.proportions ) ) {
+
+                    return;
+
+                }
+
+                drop = this.$target[0];
+
+                if( this._intersect( dragProp, proportions, this.options.toleranceType  ) === true ){
+
+                    !!this.options.onDrop && ( droped = this.options.onDrop.call( drop, event, proportions, dragProp) );
+
+                    this.entered = false;
+
+                }
+
+            });
+
+            return !!droped;
 
         }
 

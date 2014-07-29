@@ -362,12 +362,6 @@
 
                 this._getBorderWidths(true);
 
-            }else if( this._mouseSelector || oc === 'parent' ){
-
-                this.$containment = $( this._mouseSelector ).parent();
-
-                this._getBorderWidths();
-
             }else{
 
                 this._getBorderWidths();
@@ -477,8 +471,6 @@
         _mouseStart:function(event) {
 
             var offset,o = this.options;
-
-            !!this._mouseSelector && ( this.$target = $( this._mouseSelector ) );
 
             this.$dragBox = this.$target;
 

@@ -70,7 +70,9 @@ $.config({
 
         // accept:'#leo',
 
-        onDragEnter: function(e, source, dargBox) {
+        onDragEnter: function( e, drop, dargBox ) {
+
+            var source = dargBox.box;
 
             if (source !== this) {
 
@@ -100,7 +102,9 @@ $.config({
 
         // accept:'#leo',
 
-        onDragEnter: function(e, source, dargBox) {
+        onDragEnter: function( e, drop, dargBox ) {
+
+            var source = dargBox.box;
 
             if (!$.contains(this, source)) {
 

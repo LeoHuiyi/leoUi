@@ -58,7 +58,7 @@
 
             this.addEvent();
 
-            this.setDroppable();
+            // this.setDraggable();
 
         },
 
@@ -72,11 +72,17 @@
 
         },
 
-        setDroppable:function(){
+        setDraggable:function(){
+
+            var This = this;
 
             this.$tree.leoDraggable({
 
-                selector:'li',
+                selector:'span.leoTree_inner',
+
+                notHandle:'span.leoTree_icon_triangle',
+
+                distance:4,
 
                 bClone: true,
 
@@ -90,35 +96,26 @@
 
                 useDroppable: true,
 
-                cursorAt:{top:1,left:1},
+                cursorAt:{top:4,left:4},
 
                 stopMouseWheel: false,
 
-                proxy: function(source) { //source
+                proxy: function(source) {
 
-                    return $(source).clone().css({
-                        'z-index': 1,
-                        width: $(source).width(),
-                        position: 'fixed'
-                    }).insertAfter(source);
+                    This.treeNodeActive(source);
+
+                    return $(source).clone().css( { width: $(source).outerWidth(), position: 'absolute' } ).insertAfter(source);
 
                 },
 
-                onStartDrag: function(e, darg) {
+                onStartDrag: function( e, drag ) {
 
-                    $(this).css({
-                        'opacity': '0.5'
-                    })
-
+                   
 
                 },
+
                 onStopDrag: function() {
 
-                    $(this).css('opacity', '1');
-
-                    // $('.portlet').leoRizeBox('destroy');
-
-                    // $('.portlet').leoDroppable('destroy')
 
                 }
 
@@ -126,56 +123,31 @@
 
             })
 
-            // $('.portlet').leoDraggable({
-                
-            // })
+            this.setDroppable( This.$tree.find('li') );
 
-            // $('.portlet').leoDroppable({
+        },
 
-            //     // accept:'#leo',
+        setDroppable:function($dropTrees){
 
-            //     onDragEnter: function(e, source, dargBox) {
+            !!this.$dropTrees && this.$dropTrees.leoDroppable('destroy');
 
-            //         if (source !== this) {
+            this.$dropTrees = $dropTrees.leoDroppable({
 
-            //             if ($(this).parent()[0] !== $(source).parent()[0] || $(this).index() < $(source).index()) {
+                toleranceType:'pointer',
 
-            //                 $(source).insertBefore(this);
+                accept:'span',
 
-            //             } else {
+                onDragEnter: function( e, drop, darg ) {
 
-            //                 $(source).insertAfter(this);
+                    console.log(this)
 
-            //             }
+                },
+                onDrop: function( e, drop, darg ) {
 
-            //         }
+                    return true
+                }
 
-            //     },
-            //     onDrop: function() {
-
-            //         // console.log(this)
-
-            //         // return false;
-
-            //     }
-
-            // })
-            // $('.column').leoDroppable({
-
-            //     // accept:'#leo',
-
-            //     onDragEnter: function(e, source, dargBox) {
-
-            //         if (!$.contains(this, source)) {
-
-            //             $(source).appendTo(this);
-
-            //         }
-
-            //     }
-
-            // });
-
+            })
 
         },
 

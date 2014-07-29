@@ -105,8 +105,6 @@
 
                 delete this._$target;
 
-                delete this._mouseSelector ;
-
             }
 
             this._on( this.$target, 'mousedown.mouse', selector, function(event) {
@@ -115,7 +113,7 @@
 
                 if( !that._lockDrag ){
 
-                    !!selector && ( that._mouseSelector = this );
+                    !!selector && ( that.$target = $(this) );
 
                     return that._mouseDown(event);
 

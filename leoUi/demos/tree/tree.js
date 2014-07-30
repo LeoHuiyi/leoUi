@@ -138,7 +138,7 @@ $.config({
     $('#botton_1').click(function(event) {
             $("#tree").leoTree('option',{
 
-                hoverOpenClose:false,
+                hoverOpenClose:true,
 
                 autoCollapse:true
 

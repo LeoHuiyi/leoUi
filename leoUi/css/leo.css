@@ -121,7 +121,8 @@ body{height: 1000px;width: 2000px;}
 .leoTree_inner{border: 1px solid transparent;display: block;padding: 3px;vertical-align: middle; border-radius: 3px;}
 .leoTree_inner a{color: inherit;display: block;float: left;margin: 0 0.5em;outline: medium none;text-decoration: none;cursor: pointer;}
 .leoTree_active{background-color:rgb(131, 176, 202);background: linear-gradient(to bottom, rgba(131, 176, 202, 1) 0%, rgba(185, 224, 245, 1) 100%) repeat scroll 0 0;border: 1px solid #7096ab;color: #1c4257;box-shadow: 0 1px 0 rgba(255, 255, 255, 0.25) inset;}
-.leoTree_inner:hover{background: url("../img/leoUi-bg_highlight-soft_100_83b0ca_1x100.png") repeat-x scroll center top #83b0ca;border: 1px solid #8ab0c6;box-shadow: 0 0 3px #85b2cb;color: #313131;font-weight: bold; font-weight: 400;}
+.leoTree_hover:hover{background: url("../img/leoUi-bg_highlight-soft_100_83b0ca_1x100.png") repeat-x scroll center top #83b0ca;border: 1px solid #8ab0c6;box-shadow: 0 0 3px #85b2cb;color: #313131;font-weight: bold; font-weight: 400;}
+.leoTree_arrow{border: 1px solid red;background: none repeat scroll 0 0 transparent;box-shadow: none;padding: 0;margin:0;text-shadow: none;height: 4px}
 
 
 /*创建需求*/

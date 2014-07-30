@@ -404,7 +404,7 @@
 
             this.$dragBox = this.$target;
 
-            this.oldCur = this.$body.css('cursor');
+            this.options.cursor !== false && ( this.oldCur = this.$body.css('cursor') );
 
             this.revertBoxTop = $.leoTools.parseCss(this.$target[0],'top');
 
@@ -450,7 +450,7 @@
 
             o.onStartDrag.call( this.$target[0], event, this.$dragBox[0] );
 
-            this.$body.css( 'cursor', o.cursor );
+            !!this.oldCur && this.$body.css( 'cursor', o.cursor );
 
             this._setDropsProp(event);
 
@@ -707,7 +707,7 @@
 
             var This = this,boxOffset,o = this.options,droped;
 
-            this.$body.css( 'cursor', this.oldCur );
+            !!this.oldCur && this.$body.css( 'cursor', this.oldCur );
 
             o.onBeforeStopDrag.call( this.$target[0], event, this.$dragBox[0] );
 
@@ -865,7 +865,7 @@
 
         _destroy:function(){
 
-            this.$body.css( 'cursor', this.oldCur );
+            !!this.oldCur && this.$body.css( 'cursor', this.oldCur );
 
         }
 

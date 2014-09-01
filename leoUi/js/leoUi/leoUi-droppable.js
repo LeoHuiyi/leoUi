@@ -42,8 +42,6 @@
 
             disabled:false,//当设置为true时停止。
 
-            firstInOrOut:false,//是否计算第一次是否在接触范围
-
             onDragEnter: false, //drop,e,dropprop,dragBoxprop 当可拖动元素被拖入目标容器的时候触发，参数source是被拖动的DOM元素。
 
             onDragOver: false,//drop,e,dropprop,dragBoxprop 当可拖动元素被拖至某个元素之上的时候触发，参数source是被拖动的DOM元素。
@@ -201,18 +199,6 @@
 
         },
 
-        setEnter:function(){
-
-            this.endered = true;
-
-        },
-
-        setLeave:function(){
-
-            this.endered = false;
-
-        },
-
         _setOption:function( key, value ){
 
             if( key === 'scope') {
@@ -321,8 +307,6 @@
 
                 drop = this.$target[0];
 
-                this.options.firstInOrOut === true && ( notFirst = true );
-
                 intersected = this._intersect( dragProp, proportions, this.options.toleranceType  );
 
                 if( intersected === true ){
@@ -333,11 +317,13 @@
 
                         this.entered = true;
 
+                    }else{
+
+                        !!this.options.onDragOver && this.options.onDragOver.call( drop, event, proportions, dragProp);
+
                     }
 
-                    !!this.options.onDragOver && this.options.onDragOver.call( drop, event, proportions, dragProp);
-
-                }else if( intersected === false  && this.entered === true ){
+                }else if(  intersected === false  && this.entered === true ){
 
                     notFirst && !!this.options.onDragLeave && this.options.onDragLeave.call( drop, event, proportions, dragProp);
 

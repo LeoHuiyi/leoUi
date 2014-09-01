@@ -44,8 +44,6 @@
 
             handle:false, //点击拖拽地区
 
-            notHandle:false,//点击不能拖拽地区
-
             cursor:'move',//拖动时的CSS指针。
 
             bClone:true, //是否使用克隆拖拽
@@ -136,12 +134,6 @@
 
             }
 
-            if( key === 'notHandle' ){
-
-                this.options.notHandle = value;
-
-            }
-
             if( key === 'containment'){
 
                 this._getContainment();
@@ -165,12 +157,6 @@
         _getHandle:function(event) {
 
             return this.options.handle ? !!$( event.target ).closest( this.$target.find( this.options.handle ) ).length : true;
-
-        },
-
-        _getNotHandle:function(event) {
-
-            return this.options.notHandle ? !$( event.target ).closest( this.$target.find( this.options.notHandle ) ).length : true;
 
         },
 
@@ -204,7 +190,7 @@
 
         _mouseCapture:function(event){
 
-            if( this.options.disabled === true || this.options.onBeforeDrag.call( this.$target[0] ) === false || this._getHandle(event) === false || this._getNotHandle(event) === false ){
+            if( this.options.disabled === true || this.options.onBeforeDrag.call( this.$target[0] ) === false || this._getHandle(event) === false ){
 
                 return false;
 

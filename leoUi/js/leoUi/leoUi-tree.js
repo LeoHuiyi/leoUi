@@ -136,15 +136,13 @@
 
         _setDroppable:function( $dropDivs ){
 
-            var This = this,nameDiv = 'div',distance = 6,id,arrowTop,arrowLeft,dropId,inner;
+            var This = this,nameDiv = 'div',distance = 6,id,arrowTop,arrowLeft,dropId,inner,arrowBottom;
 
             !!this.$dropDivs && this.$dropDivs.leoDroppable('destroy');
 
             this.$dropDivs = $dropDivs.leoDroppable({
 
                 toleranceType:'pointer',
-
-                firstInOrOut:true,
 
                 onDragEnter: function( e, drop, drag ) {
 
@@ -208,44 +206,43 @@
 
         _treeDrop:function(dropId){
 
-            var dragId = this.dragId,dropLevel,dragLevel;
+            var dragId = this.dragId;
 
             if( dragId === dropId ){ return }
 
-            dropLevel = this._getLevel(dropId);
-
-            dragLevel = this._getLevel(dragId);
+            console.log(this.enterFlag)
 
             switch( this.enterFlag ){
 
-                case 1:{
+                case 1:
 
-                    
+                    this._treeNodeInsertBefore( dragId, dropId );
 
+                    break;
 
-                }
-
-                case 2:{
-
+                case 2:
 
 
+                    break;
 
-                }
-
-                case 3:{
+                case 3:
 
                     this._treeNodeAppendTo( dragId, dropId );
 
-                    
-                }
+                    break;
 
-                default:{
+                default:
 
                     return false;
 
-                }
 
             }
+
+        },
+
+        _treeNodeInsertBefore:function( dragId, dropId ){
+
+            console.log(222222)
 
         },
 
@@ -255,47 +252,98 @@
 
             if( Child ){
 
-                var dropLi = this._getTreeNode( dropId, 'li' ),
-
-                dragLi = this._getTreeNode( dragId, 'li' );
-
-                $(dragLi).appendTo(Child);
+                $( this._getTreeNode( dragId, 'li' ) ).appendTo(Child);
 
                 this._treeJsonAppendTo( dragId, dropId );
 
 
             }else{
 
-                
+                var dropLi = this._getTreeNode( dropId, 'li' ),
 
-                
+                dragLi = this._getTreeNode( dragId, 'li' );
+
+                this._treeLiToChild(dropId);
+
+                $(this.html).replaceAll(dropLi).children('ul').append(dragLi);
+
+                this._treeJsonAppendTo( dragId, dropId );
+
+                delete this.html;
+
             }
+
+        },
+
+        _treeLiToChild:function(dropId){
+
+            var liJson = this.treeJson[dropId],level = liJson.level;
+
+            liJson.switchId = this._setTreeNodeId( dropId, 'switch', level, true );
+
+            liJson.ulId = this._setTreeNodeId( dropId, 'ul', level, true );
+
+            liJson.open = false;
+
+            this.html = '';
+
+            this._createLiStr( true, liJson.liId );
+
+            this._createDivStr( true, liJson );
+
+            this._createUlStr( liJson.ulId, liJson.open );
+
+            this.html += '</ul></li>';
 
         },
 
         _treeJsonAppendTo:function( dragId, dropId ){
 
-            var parentId,oldLevel,newLevel;
+            var parentId,oldLevel,newLevel,parentJson;
 
             if(  ( parentId = this._getTreeNodeId( dragId, 'parent') ) !== dropId ){
 
-                console.log(this.treeJson)
-
-                oldLevel = this._getLevel( dragId );
-
                 newLevel = this._getLevel( dropId ) + 1;
+
+                parentJson = this.treeJson[parentId];
 
                 this._addLevesId( newLevel, dragId );
 
-                this._removeLevesId( oldLevel, dragId );
+                this._removeLevesId( this._getLevel( dragId ), dragId );
 
-                delete this.treeJson[parentId].children[dragId];
+                delete parentJson.children[dragId];
 
                 !this.treeJson[dropId].children && ( this.treeJson[dropId].children = {} );
 
                 this.treeJson[dragId].level = newLevel;
 
-                this.treeJson[dropId].children[dropId] = this.treeJson[dragId];
+                this.treeJson[dragId].parentId = dropId;
+
+                this.treeJson[dropId].children[dragId] = this.treeJson[dragId];
+
+                if( $.isEmptyObject( this.treeJson[parentId].children ) ){
+
+                    delete parentJson.children;
+
+                    delete parentJson.open;
+
+                    delete parentJson.UlId;
+
+                    delete parentJson.switchId;
+
+                    this.html = '';
+
+                    this._createLiStr( false, parentJson.liId );
+
+                    this._createDivStr( false, parentJson );
+
+                    this.html += '</li>';
+
+                    $( this.html ).replaceAll( this._getTreeNode( parentId, 'li' ) );
+
+                    delete this.html;
+
+                }
 
             }
 
@@ -353,9 +401,17 @@
 
         },
 
-        _setTreeNodeId:function( id, name, level ){
+        _setTreeNodeId:function( id, name, level, flag ){
 
-            return this.expando + '_id_' + id + '_' + name + '_level_' + level;
+            if( flag === true ){
+
+                return id + '_' + name + '_level_' + level;
+
+            }else{
+
+                return this.expando + '_id_' + id + '_' + name + '_level_' + level;
+
+            }
 
         },
 

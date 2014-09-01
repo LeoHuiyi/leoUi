@@ -487,7 +487,7 @@
 
         _setDropsProp:function(event){
 
-            if( !this.options.useDroppable && !!$.fn[this.relevanceFnName.droppable] ){
+            if( this.options.useDroppable === false && !$.fn[this.relevanceFnName.droppable] ){
 
                 return;
 
@@ -499,7 +499,7 @@
 
         _checkPosition:function( event, top, left, first ){
 
-            if( !this.options.useDroppable && !!$.fn[this.relevanceFnName.droppable]  ){
+            if( this.options.useDroppable === false && !$.fn[this.relevanceFnName.droppable]  ){
 
                 return;
 
@@ -527,7 +527,7 @@
 
         _drop:function( event, top, left ){
 
-            if( !this.options.useDroppable && !!$.fn[this.relevanceFnName.droppable] ){
+            if( this.options.useDroppable === false && !$.fn[this.relevanceFnName.droppable] ){
 
                 return;
 

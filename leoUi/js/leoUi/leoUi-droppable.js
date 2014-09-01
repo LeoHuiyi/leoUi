@@ -42,6 +42,8 @@
 
             disabled:false,//当设置为true时停止。
 
+            checkFirst:true,//是否检查第一次。
+
             onDragEnter: false, //drop,e,dropprop,dragBoxprop 当可拖动元素被拖入目标容器的时候触发，参数source是被拖动的DOM元素。
 
             onDragOver: false,//drop,e,dropprop,dragBoxprop 当可拖动元素被拖至某个元素之上的时候触发，参数source是被拖动的DOM元素。
@@ -309,6 +311,8 @@
 
                 intersected = this._intersect( dragProp, proportions, this.options.toleranceType  );
 
+                this.options.checkFirst === true && ( notFirst = true );
+
                 if( intersected === true ){
 
                     if( this.entered === false ){
@@ -317,11 +321,9 @@
 
                         this.entered = true;
 
-                    }else{
-
-                        !!this.options.onDragOver && this.options.onDragOver.call( drop, event, proportions, dragProp);
-
                     }
+
+                    !!this.options.onDragOver && this.options.onDragOver.call( drop, event, proportions, dragProp);
 
                 }else if(  intersected === false  && this.entered === true ){
 

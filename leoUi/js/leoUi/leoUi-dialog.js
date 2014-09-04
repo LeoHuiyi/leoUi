@@ -802,17 +802,21 @@
 
             this.$target.find('.leoDialog_titlebar_button_float').css( 'float', 'left' ).end().find('.leoDialog_titlebar_button_hide').hide();
 
+            var zIndex;
+
+            !this.$modal ? zIndex = this.options.zIndex : zIndex = this.$modal.css('zIndex') + 1;
+
             if( this.innerFrame ){
 
                 this.$target.hide();
 
-                this.$minimizeBar.css( 'zIndex', this.options.zIndex ).append( this.$uiDialogTitlebar.clone( true ) ).appendTo('body');
+                this.$minimizeBar.css( 'zIndex', zIndex ).append( this.$uiDialogTitlebar.clone( true ) ).appendTo('body');
 
             }else{
 
                 this.$content.hide();
 
-                this.$target.css( { width: 'auto', height: 'auto', position: 'static', float: 'left'} ).wrap( this.$minimizeBar.css( 'zIndex', this.options.zIndex ) );
+                this.$target.css( { width: 'auto', height: 'auto', position: 'static', float: 'left'} ).wrap( this.$minimizeBar.css( 'zIndex', zIndex ) );
 
             }
 

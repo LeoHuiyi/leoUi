@@ -210,8 +210,6 @@
 
             if( dragId === dropId ){ return }
 
-            console.log(this.enterFlag)
-
             switch( this.enterFlag ){
 
                 case 1:
@@ -222,6 +220,7 @@
 
                 case 2:
 
+                    this._treeNodeInsertAfter( dragId, dropId );
 
                     break;
 
@@ -240,9 +239,23 @@
 
         },
 
+        _treeNodeInsertAfter:function( dragId, dropId ){
+
+            var dropLi = this._getTreeNode( dropId, 'li' ),
+
+            dragLi = this._getTreeNode( dragId, 'li' );
+
+            $(dropLi).after(dragLi);
+
+        },
+
         _treeNodeInsertBefore:function( dragId, dropId ){
 
-            console.log(222222)
+            var dropLi = this._getTreeNode( dropId, 'li' ),
+
+            dragLi = this._getTreeNode( dragId, 'li' );
+
+            $(dropLi).before(dragLi);
 
         },
 
@@ -255,7 +268,6 @@
                 $( this._getTreeNode( dragId, 'li' ) ).appendTo(Child);
 
                 this._treeJsonAppendTo( dragId, dropId );
-
 
             }else{
 

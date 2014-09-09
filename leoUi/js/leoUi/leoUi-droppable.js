@@ -271,11 +271,9 @@
 
         },
 
-        setDropsProp:function( event, scope, $target ){
+        setDropsProp:function( scope, $target ){
 
-            var i,m = this._getArrays(scope) || [],length = m.length,
-
-            type = event ? event.type : null;
+            var i,m = this._getArrays(scope) || [],length = m.length;
 
             for ( i = 0; i < length; i++ ) {
 

@@ -438,7 +438,7 @@
 
             !!this.oldCur && this.$body.css( 'cursor', o.cursor );
 
-            this._setDropsProp(event);
+            this.setDropsProp();
 
             this._checkPosition( event, this.top, this.left, true );
 
@@ -485,7 +485,7 @@
 
         },
 
-        _setDropsProp:function(event){
+        setDropsProp:function(){
 
             if( this.options.useDroppable === false && !$.fn[this.relevanceFnName.droppable] ){
 
@@ -493,7 +493,7 @@
 
             }
 
-            $.fn[this.relevanceFnName.droppable].setDropsProp( event, this.options.droppableScope, this.$target );
+            $.fn[this.relevanceFnName.droppable].setDropsProp( this.options.droppableScope, this.$target );
 
         },
 
@@ -683,7 +683,7 @@
 
             this.$dragBox.offset( { left:this.left, top:this.top } );
 
-            this.options.refreshPositions === true && this._setDropsProp(event);
+            this.options.refreshPositions === true && this.setDropsProp();
 
             this._checkPosition( event, this.top, this.left );
 

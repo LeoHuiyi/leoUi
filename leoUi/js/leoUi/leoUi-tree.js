@@ -124,9 +124,9 @@
 
                     This._destroyArrow();
 
+                    This.innerHoverDisabled = false;
+
                 }
-
-
 
             })
 
@@ -136,7 +136,7 @@
 
         _setDroppable:function( $dropDivs ){
 
-            var This = this,nameDiv = 'div',distance = 6,id,arrowTop,arrowLeft,dropId,inner,arrowBottom;
+            var This = this,nameDiv = 'div',distance = 4,id,arrowTop,arrowLeft,dropId,inner,arrowBottom,isNotDropNode,ul,dropJson;
 
             !!this.$dropDivs && this.$dropDivs.leoDroppable('destroy');
 
@@ -156,13 +156,19 @@
 
                     dropId = This._getTreeId( id, nameDiv );
 
-                    inner = This._getTreeNode( id, nameDiv, 'inner' );
+                    inner = This._getTreeNode( dropId, 'inner' );
+
+                    ul = This._getTreeNode( dropId, 'ul' );
+
+                    dropJson = This.treeJson[dropId];
 
                 },
 
                 onDragOver: function( event, drop, drag ) {
 
-                    if( This._isNotDropNode( dropId, This.dragId ) === true ){ return };
+                    if(  ( isNotDropNode = This._isNotDropNode( dropId, This.dragId ) ) === true ){ return };
+
+                    !This.innerHoverDisabled && ( This.innerHoverDisabled = true );
 
                     This.$arrow.is( ':hidden' ) && This.$arrow.show();
 
@@ -172,11 +178,15 @@
 
                         This.enterFlag = 1;
 
+                        This._removeHoverClass(inner);
+
                     }else if( event.pageY >= arrowBottom - distance && This.enterFlag !== 2 ){
 
                         This.$arrow.css( { top: arrowBottom, left: arrowLeft } );
 
                         This.enterFlag = 2;
+
+                        This._removeHoverClass(inner);
 
                     }else if( event.pageY < arrowBottom - distance && event.pageY > arrowTop + distance  && This.enterFlag !== 3 ){
 
@@ -184,17 +194,33 @@
 
                         This.enterFlag = 3;
 
+                        if( !!dropJson.children && !dropJson.open ){
+
+                            This._treeNodeOpen( inner, ul, dropJson, function(){
+
+                                This.$tree.leoDraggable('setDropsProp');
+
+                            } );
+
+                        }
+
+                        This._addHoverClass(inner);
+
                     }
 
                 },
 
                 onDragLeave: function( e, drop, drag ) {
 
+                    This._removeHoverClass( This._getTreeNode( this.id, 'div', 'inner' ) );
+
                     This.$arrow.hide();
 
                 },
 
                 onDrop: function( e, drop, darg ) {
+
+                    if( isNotDropNode === true ){ return }
 
                     This._treeDrop(dropId);
 
@@ -223,6 +249,8 @@
                 parentId = this.treeJson[parentId].parentId;
 
             }
+
+            return false;
 
         },
 
@@ -695,6 +723,8 @@
 
                 event.stopPropagation();
 
+                if( This.innerHoverDisabled === true ){ return };
+
                 This._addHoverClass(this);
 
             });
@@ -702,6 +732,8 @@
             this._on( this.$tree, 'mouseleave.hover', 'span.leoTree_inner', function(event){
 
                 event.stopPropagation();
+
+                if( This.innerHoverDisabled === true ){ return };
 
                 This._removeHoverClass(this);
 
@@ -777,7 +809,7 @@
 
                 treeJson = This.treeJson[ This._getTreeId( id, 'inner' ) ];
 
-                treeJson.open === false && This.treeNodeOpen( this, document.getElementById( This._getTreeNodeId( id, 'inner', 'ul' ) ), treeJson );
+                treeJson.open === false && This._treeNodeOpen( this, document.getElementById( This._getTreeNodeId( id, 'inner', 'ul' ) ), treeJson );
 
             });
 
@@ -813,7 +845,7 @@
 
             }else{
 
-                this.treeNodeOpen( inner, ul, treeJson );
+                this._treeNodeOpen( inner, ul, treeJson );
 
                 this._autoCollapse( treeJson );
 
@@ -843,7 +875,7 @@
 
         },
 
-        treeNodeOpen:function( inner, ul, treeJson ){
+        _treeNodeOpen:function( inner, ul, treeJson, fun ){
 
             $(inner).removeClass( 'leoTree_inner_close' ).addClass( 'leoTree_inner_open' );
 
@@ -851,17 +883,21 @@
 
                 treeJson.open = true;
 
+                fun && fun();
+
             } );
 
         },
 
-        _treeNodeClose:function( inner, ul, treeJson ){
+        _treeNodeClose:function( inner, ul, treeJson, fun ){
 
             $(inner).removeClass( 'leoTree_inner_open' ).addClass( 'leoTree_inner_close' );
 
             $(ul).slideUp( 160, function(){
 
                 treeJson.open = false;
+
+                fun && fun();
 
             } );
 

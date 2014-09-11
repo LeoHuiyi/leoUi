@@ -1045,9 +1045,9 @@
 
                 this.dataId = dataId;
 
-                this.nameSpace = $.leoTools.getId( li.name + li.version + '_nameSpace' );
+                this.nameSpace = $.leoTools.getId( this.name + this.version + '_nameSpace' );
 
-                this.disableClassName = this.disableClassName || 'LeoPlugIn_' + li.name + '_disable';
+                this.disableClassName = this.disableClassName || 'LeoPlugIn_' + this.name + '_disable';
 
                 this.disableIdArr = [];
 
@@ -1125,7 +1125,7 @@
 
                         sef.on.apply(sef,arg);
 
-                        $.inArray( sef[0], this.offArr ) && this.offArr.push( sef[0] );
+                        $.inArray( sef[0], this.offArr ) === -1 && this.offArr.push( sef[0] );
 
                     }
 
@@ -1139,7 +1139,7 @@
 
                     if( typeof events === 'string' ){
 
-                        events.replace($.leoTools.rword, function(name) {
+                        events.replace( $.leoTools.rword, function(name) {
 
                             eventStr += name + '.' + This.nameSpace + ' ';
 
@@ -1220,6 +1220,8 @@
                         $(val).removeClass( This.disableClassName );
 
                     });
+
+                    console.log(this.offArr)
 
                     !!this.offArr && this.offArr.length>0 && $.each(this.offArr,function(index,val) {
 

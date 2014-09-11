@@ -46,7 +46,26 @@
 
             autoCollapse:false,//自动折叠的功能
 
-            isSimpleData:false,//是否启用简单的json数据
+            key:{
+
+                children:'children',
+
+                name:'name',
+
+                url:'url'
+
+            },//json的key
+
+            isSimpleData:{
+
+                enable: false,
+
+                idKey:'id',
+
+                pidKey:'pId'
+
+
+            },//是否启用简单的json数据
 
             dragAndDrop:true//是否能拖放
 
@@ -89,6 +108,8 @@
                 distance:4,
 
                 cursor:'pointer',
+
+                droppableScope:'tree',
 
                 bClone: true,
 
@@ -173,6 +194,8 @@
             this.$dropDivs = $dropDivs.leoDroppable({
 
                 toleranceType:'pointer',
+
+                scope:'tree',
 
                 onDragEnter: function( e, drop, drag ) {
 
@@ -556,7 +579,9 @@
 
         _markNodeTree:function( treeJson, isChild, level, parentId ){
 
-            var i = 0,length,child,id,treeId,rootId;
+            var i = 0,length,child,id,treeId,rootId,key = this.options.key,
+
+            children = key.children,name = key.name,url = key.url;
 
             if( !isChild ){
 
@@ -592,7 +617,7 @@
 
                 if( child = treeJson[i++] ){
 
-                    if( child.children ){
+                    if( child[children] ){
 
                         id = this.id++;
 
@@ -602,7 +627,9 @@
 
                         this.treeJson[treeId].id = treeId;
 
-                        this.treeJson[treeId].name = child.name;
+                        this.treeJson[treeId].name = child[name];
+
+                        this.treeJson[treeId].url = child[url];
 
                         this.treeJson[treeId].level = level;
 
@@ -632,7 +659,7 @@
 
                         this._createUlStr( this.treeJson[treeId].ulId, this.treeJson[treeId].open );
 
-                        this._markNodeTree( child.children, true, level, treeId );
+                        this._markNodeTree( child[children], true, level, treeId );
 
                         this.html += '</ul></li>';
 
@@ -646,7 +673,9 @@
 
                         this.treeJson[treeId].id = treeId;
 
-                        this.treeJson[treeId].name = child.name;
+                        this.treeJson[treeId].name = child[name];
+
+                        this.treeJson[treeId].url = child[url];
 
                         this.treeJson[treeId].level = level;
 
@@ -684,13 +713,15 @@
 
             var simpleDatas = this.options.treeJson,treeJson = [],
 
-            length = simpleDatas.length,i = 0,simpleData;
+            length = simpleDatas.length,i = 0,simpleData,
+
+            id = this.options.isSimpleData.idKey,pid = this.options.isSimpleData.pidKey;
 
             while( i < length ){
 
                 simpleData = simpleDatas[i++];
 
-                if( simpleData.pId === 0 ){
+                if( simpleData[pid] === 0 ){
 
                     treeJson.push( simpleData );
 
@@ -710,13 +741,13 @@
 
                     jsonData = json[i++];
 
-                    jsonId = jsonData.id;
+                    jsonId = jsonData[id];
 
                     while( j < dataLen ){
 
                         dataData = data[j++];
 
-                        if( dataData.pId === jsonId ){
+                        if( dataData[pid] === jsonId ){
 
                             !jsonData.children && ( jsonData.children = [] );
 
@@ -742,7 +773,7 @@
 
         _markTree:function(){
 
-            this._markNodeTree( this.options.isSimpleData === true && this._changeSimpleTreeJson() );
+            this._markNodeTree( this.options.isSimpleData.enable === true && this._changeSimpleTreeJson() );
 
             this.html += '</ul>';
 

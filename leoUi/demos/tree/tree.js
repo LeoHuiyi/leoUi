@@ -164,7 +164,17 @@ $.config({
 
         autoCollapse:false,
 
-        isSimpleData:true
+        isSimpleData:{
+
+            enable:true,
+
+            idKey:'id',
+
+            pidKey:'pId'
+
+        },
+
+        isIcon:true
 
     });
 

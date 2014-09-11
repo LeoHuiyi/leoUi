@@ -698,7 +698,7 @@
 
             }
 
-            return (function treeChild( json, data ){
+            return ( function treeChild( json, data ){
 
                 var i = 0,jsonLen = json.length,dataLen = data.length,
 
@@ -776,7 +776,7 @@
 
             url = child.url;
 
-            !notWrap ? this.html +='<div id="' + divId + '" class="leoTree_node">' : 
+            !notWrap ? this.html +='<div id="' + divId + '" class="leoTree_node">' :
 
             this.html = '';
 

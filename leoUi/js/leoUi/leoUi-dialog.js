@@ -830,7 +830,7 @@
 
                 this.$target.show();
 
-                this.$minimizeBar.empty().detach();
+                this.$minimizeBar.empty();
 
             }else{
 

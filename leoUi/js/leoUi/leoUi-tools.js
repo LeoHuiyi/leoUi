@@ -1075,8 +1075,6 @@
 
                 _delay: function( handler, delay ) {
 
-                    !!this._delayTime && clearTimeout( this._delayTime );
-
                     var instance = this;
 
                     function handlerProxy() {
@@ -1085,7 +1083,7 @@
 
                     }
 
-                    return this._delayTime = setTimeout( handlerProxy, delay || 0 );
+                    return setTimeout( handlerProxy, delay || 0 );
 
                 },
 

@@ -394,7 +394,9 @@
 
         _tooltipHideFn:function(){
 
-            this._delay(function(){
+            !!this.delayHideTime && clearTimeout( this.delayHideTime );
+
+            this.delayHideTime = this._delay(function(){
 
                 if( this.options.disabled ){ return; }
 
@@ -414,7 +416,9 @@
 
         _tooltipShowFn:function(){
 
-            this._delay(function(){
+            !!this.delayShowTime && clearTimeout( this.delayShowTime );
+
+            this.delayShowTime = this._delay(function(){
 
                 if( this.options.disabled ){ return; }
 

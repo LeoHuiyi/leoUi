@@ -250,6 +250,10 @@
 
             beforeShow:$.noop,
 
+            closeCallBack:$.noop,
+
+            quickCloseCallBack:$.noop,
+
             dialogShowCallback: function(oKOrCancelName){
 
                 // this.dialogHide();
@@ -595,6 +599,8 @@
                         event.preventDefault();
 
                         if( This._dialogState === 'open' ){
+
+                            name === 'close' && This.options.closeCallBack.call( This, this );
 
                             This[info.click]();
 
@@ -1541,7 +1547,7 @@
 
                 !!this.options.quickClose && this._on( this.$modal, 'click', function(){
 
-                    This.modalState === 'open' && This._dialogState === 'open' && This.modalDialogHide();
+                    This.modalState === 'open' && This._dialogState === 'open' && ( This.options.quickCloseCallBack.call( This, this ), This.modalDialogHide() );
 
                 } );
 

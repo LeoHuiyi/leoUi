@@ -438,6 +438,8 @@
 
 		basepath = !!initBaseUrl ? $.mergePath( initBaseUrl, window.location.href ) : url.slice( 0, url.lastIndexOf('/') + 1 );
 
+		$.config.level = 6;
+
 		$.config.shim = {
 
             _leoUi:{
@@ -461,8 +463,6 @@
 			loadJSCSS( initMod, basepath, false, true );
 
 		}
-
-		$.config.level = 7;
 
 		scripts = script = null;
 

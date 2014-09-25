@@ -100,9 +100,9 @@
 
             restore:false,//是否每次都回到初始值
 
-            okCallback:$.noop,
+            okCallBack:$.noop,
 
-            cancelCallback:$.noop,
+            cancelCallBack:$.noop,
 
             captionButtons:{
 
@@ -246,7 +246,7 @@
 
             },
 
-            initCallback: $.noop,
+            initCallBack: $.noop,
 
             beforeShow:$.noop,
 
@@ -254,19 +254,19 @@
 
             quickCloseCallBack:$.noop,
 
-            dialogShowCallback: function(oKOrCancelName){
+            dialogShowCallBack: function(clickCallBackName){
 
                 // this.dialogHide();
 
             },
 
-            dialogHideCallback: function(oKOrCancelName){
+            dialogHideCallBack: function(clickCallBackName){
 
                 // this.modalHide();
 
             },
 
-            modalDialogHideCallback:function(oKOrCancelName){
+            modalDialogHideCallBack:function(clickCallBackName){
 
                 // console.log(this)
 
@@ -326,7 +326,7 @@
 
             this._setElements( this.scope );
 
-            this.options.initCallback.call( this.$target );
+            this.options.initCallBack.call( this.$target );
 
         },
 
@@ -368,9 +368,9 @@
 
                 this._on( this.$ok.element, 'click.ok', function(event){
 
-                    This.oKOrCancelName = 'okCallback';
+                    This.options.okCallBack.call( this, event, This._bottunDisable( $(this) ) ,This._bottunEnable( $(this) ) );
 
-                    This.options.okCallback.call( this, event, This._bottunDisable( $(this) ) ,This._bottunEnable( $(this) ) );
+                    This.clickCallBackName = 'okCallBack';
 
                 }, 'supportDisabled' );
 
@@ -420,9 +420,9 @@
 
                 this._on( this.$cancel.element, 'click.cancel', function(event){
 
-                    This.oKOrCancelName = 'cancelCallback';
+                    This.options.cancelCallBack.call( this, event, This._bottunDisable( $(this) ) ,This._bottunEnable( $(this) ) );
 
-                    This.options.cancelCallback.call( this, event, This._bottunDisable( $(this) ) ,This._bottunEnable( $(this) ) );
+                    This.clickCallBackName = 'cancelCallBack';
 
                 }, 'supportDisabled' );
 
@@ -600,7 +600,7 @@
 
                         if( This._dialogState === 'open' ){
 
-                            name === 'close' && This.options.closeCallBack.call( This, this );
+                            name === 'close' && ( This.options.closeCallBack.call( This, this ), This.clickCallBackName = 'closeCallBack' );
 
                             This[info.click]();
 
@@ -1226,7 +1226,7 @@
 
             this._setResizableDisabled(false);
 
-            this.options.dialogShowCallback.call( this, this.oKOrCancelName );
+            this.options.dialogShowCallBack.call( this, this.clickCallBackName );
 
         },
 
@@ -1547,7 +1547,7 @@
 
                 !!this.options.quickClose && this._on( this.$modal, 'click', function(){
 
-                    This.modalState === 'open' && This._dialogState === 'open' && ( This.options.quickCloseCallBack.call( This, this ), This.modalDialogHide() );
+                    This.modalState === 'open' && This._dialogState === 'open' && ( This.options.quickCloseCallBack.call( This, this ), This.clickCallBackName = 'quickCloseCallBack', This.modalDialogHide() );
 
                 } );
 
@@ -1571,7 +1571,7 @@
 
         _dialogHideCallback:function(){
 
-            this.options.dialogHideCallback.call( this, this.oKOrCancelName );
+            this.options.dialogHideCallBack.call( this, this.clickCallBackName );
 
         },
 
@@ -1711,7 +1711,7 @@
 
             if( !this.$modal && this._dialogState === 'close' ){
 
-                this.options.modalDialogHideCallback.call( this, this.oKOrCancelName );
+                this.options.modalDialogHideCallBack.call( this, this.clickCallBackName );
 
             }
 

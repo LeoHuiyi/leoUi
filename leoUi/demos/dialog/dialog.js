@@ -131,7 +131,7 @@ $.config({
         }
 
 
-        a.option('okCallback', function(event, disabled, enable) {
+        a.option('okCallBack', function(event, disabled, enable) {
 
             a.option('captionButtons', {
 
@@ -173,7 +173,7 @@ $.config({
 
         })
 
-        a.option('cancelCallback', function(event, disabled, enable) {
+        a.option('cancelCallBack', function(event, disabled, enable) {
 
             a.destroy();
 

@@ -120,7 +120,7 @@
 
             this.hasClone = false;
 
-            this._getContainment();
+            this._getContainment(true);
 
             this._super();
 
@@ -136,7 +136,7 @@
 
             if( key === 'containment'){
 
-                this._getContainment();
+                this._getContainment(true);
 
             }
 
@@ -200,7 +200,9 @@
 
         },
 
-        _getContainment:function(){
+        _getContainment:function(init){
+
+            if( !( init === true || this.isDelegatSelector === true ) ){ return; }
 
             var oc = this.options.containment,el = this.$target,
 
@@ -219,6 +221,8 @@
             }
 
             this.$containment = $(ce);
+
+            this.initMouseDownSelector = true;
 
         },
 
@@ -419,6 +423,8 @@
             this.revertBoxTop = this.top;
 
             this.revertBoxLeft = this.left;
+
+            !!this.options.mouseDownSelector && this._getContainment();
 
             this._getContainmentInfo();
 

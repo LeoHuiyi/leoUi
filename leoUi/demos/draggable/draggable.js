@@ -29,7 +29,7 @@ $.config({
 
     $('body').leoDraggable({
 
-         selector:'.a',
+            mouseDownSelector:'.a',
 
             handle:false, //点击拖拽地区
 

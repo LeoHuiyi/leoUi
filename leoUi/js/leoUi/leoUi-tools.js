@@ -856,7 +856,7 @@
 
                     }
 
-                    return inFn
+                    return inFn;
 
                 }
 
@@ -950,6 +950,8 @@
             defaultsTarget:'target',
 
             inherit:false,
+
+            disabledEvent:false,
 
             addJquery:false,
 
@@ -1071,6 +1073,18 @@
 
                     this.dataId !== false && $.data( this.$target[0], this.dataId, this );
 
+                    this._publicEvent = function(plugIn){
+
+                        return function(eventName){
+
+                            if(typeof eventName !== 'string' || eventName.charAt( 0 ) === "_"){ return; }
+
+                            plugIn[eventName].apply(plugIn, aslice.call( arguments, 1 ) );
+
+                        }
+
+                    }(this);
+
                 },
 
                 _delay: function( handler, delay ) {
@@ -1089,11 +1103,13 @@
 
                 _on:function(){
 
-                    var arg = aslice.call( arguments, 2 ),sef = $( arguments[0] ),
+                    var arg = aslice.call( arguments, 2 ),
 
-                    events = arguments[1], eventStr = '',This = this;
+                    $self = $(arguments[0]),self = $self[0],leoUiGuid,
 
-                    if( typeof events === 'string' && !!sef.length>0 ){
+                    events = arguments[1], eventStr = '',This = this,oldFn,last;
+
+                    if( typeof events === 'string' && !!self ){
 
                         events.replace( $.leoTools.rword, function(name) {
 
@@ -1101,19 +1117,31 @@
 
                         });
 
-                        if( !!sef[0].parentNode && arg[arg.length-1] === 'supportDisabled' && arg.pop() ){
+                        if( !!self.parentNode && arg[arg.length-1] === 'supportDisabled' && arg.pop() ){
 
-                            var oldFn = arg[arg.length-1];
+                            if( $.isFunction( oldFn = arg[last = arg.length - 1]) ){
 
-                            arg[arg.length-1] = function(event){
+                                arg[last] = function(event){
 
-                                if( !!$( event.target ).closest( "." + This.disableClassName )[0] ){
+                                    if( !$( event.target ).closest( "." + This.disableClassName )[0] ){
 
-                                    return;
+                                        if( This.options.disabledEvent === true ){ return; }
+
+                                        oldFn.apply(this,arguments);
+
+                                    }
 
                                 }
 
-                                oldFn.apply(sef,arguments);
+                            }
+
+                        }else if( $.isFunction( oldFn = arg[last = arg.length - 1] ) ){
+
+                            arg[last] = function(event){
+
+                                if( This.options.disabledEvent === true ){ return; }
+
+                                oldFn.apply(this,arguments);
 
                             }
 
@@ -1121,9 +1149,11 @@
 
                         arg = [eventStr].concat(arg);
 
-                        sef.on.apply(sef,arg);
+                        $self.on.apply($self, arg);
 
-                        $.inArray( sef[0], this.offArr ) === -1 && this.offArr.push( sef[0] );
+                        !!oldFn && typeof ( leoUiGuid = arg[arg.length - 1].guid ) === 'number' && ( oldFn.leoUiGuid = leoUiGuid );
+
+                        $.inArray( self, this.offArr ) === -1 && this.offArr.push( self );
 
                     }
 
@@ -1131,11 +1161,13 @@
 
                 _off:function(){
 
-                    var arg = aslice.call( arguments, 2 ),sef = $( arguments[0] ),
+                    var arg = aslice.call( arguments, 2 ),
+
+                    $self = $(arguments[0]),originalFn,emptyFn,last,leoUiGuid,
 
                     events = arguments[1],eventStr = '',This = this;
 
-                    if( typeof events === 'string' ){
+                    if( typeof events === 'string' && !!$self[0] ){
 
                         events.replace( $.leoTools.rword, function(name) {
 
@@ -1143,23 +1175,35 @@
 
                         });
 
+                        if( $.isFunction(arg[last = arg.length - 1]) && !!( leoUiGuid = arg[last].leoUiGuid ) ){
+
+                            emptyFn = $.noop;
+
+                            emptyFn.guid = leoUiGuid
+
+                            arg[last] = emptyFn;
+
+                            emptyFn = null;
+
+                        }
+
                         arg = [eventStr].concat(arg);
 
-                        sef.off.apply( sef, arg );
+                        $self.off.apply( $self, arg );
 
                     }else{
 
                         arg = aslice.call( arguments, 1 );
 
-                        sef.off.apply( sef, ['.' + This.nameSpace].concat(arg) );
+                        $self.off.apply( $self, ['.' + This.nameSpace].concat(arg) );
 
                     }
 
                 },
 
-                _hasPlugIn:function( $sef, name ){
+                _hasPlugIn:function( $self, name ){
 
-                    return !!$sef.data( $.leoTools.getExpando( name + '_dataId' ) );
+                    return !!$self.data( $.leoTools.getExpando( name + '_dataId' ) );
 
                 },
 
@@ -1218,8 +1262,6 @@
                         $(val).removeClass( This.disableClassName );
 
                     });
-
-                    console.log(this.offArr)
 
                     !!this.offArr && this.offArr.length>0 && $.each(this.offArr,function(index,val) {
 

@@ -41,7 +41,7 @@
 
             isSetCapture:false,//鼠标扑捉
 
-            selector:false//代理
+            mouseDownSelector:false//代理
 
         },
 
@@ -53,7 +53,7 @@
 
             this._lockDrag = false;
 
-            this._setMousedownEvent();
+            this._setMouseDownEvent();
 
             this._on( this.$target, 'click', function(event) {
 
@@ -77,17 +77,17 @@
 
             if( key === 'selector'){
 
-                this._setMousedownEvent();
+                this._setMouseDownEvent(true);
 
             }
 
         },
 
-        _setMousedownEvent:function(){
+        _setMouseDownEvent:function(change){
 
-            var that = this,selector = this.options.selector;
+            var that = this,selector = this.options.mouseDownSelector;
 
-            if(  !this._$target ){
+            if( !this._$target ){
 
                 this._$target = this.$target;
 
@@ -97,7 +97,7 @@
 
             }
 
-            this._off( this.$target, 'mousedown.mouse' );
+            change === true && this._off( this.$target, 'mousedown.mouse' );
 
             if( selector === false ){
 
@@ -113,7 +113,7 @@
 
                 if( !that._lockDrag ){
 
-                    !!selector && ( that.$target = $(this) );
+                    event.delegateTarget !== this && ( that.$target = $(this), that.isDelegatSelector = true );
 
                     return that._mouseDown(event);
 

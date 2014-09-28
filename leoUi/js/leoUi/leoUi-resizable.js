@@ -104,7 +104,7 @@
 
             this._dragArea();
 
-            this._getContainment();
+            this._getContainment(true);
 
             this.bClone = false;
 
@@ -260,7 +260,7 @@
 
             var This = this,$box = this.$target,boxCur = this.$target.css('cursor'),
 
-            selector = this.options.selector,$selector;
+            selector = this.options.mouseDownSelector,$selector;
 
             this.boxCur = boxCur;
 
@@ -314,7 +314,9 @@
 
         },
 
-        _getContainment:function(){
+        _getContainment:function(init){
+
+            if( !( init === true || this.isDelegatSelector === true ) ){ return; }
 
             var oc = this.options.containment,el = this.$target,
 
@@ -499,6 +501,8 @@
             this.startWidth = this.width = this.$target.width();
 
             this.startHeight = this.height = this.$target.height();
+
+            this._getContainment();
 
             this._getContainmentInfo();
 
@@ -946,7 +950,7 @@
 
             if( key === 'containment'){
 
-                this._getContainment();
+                this._getContainment(true);
 
             }
 

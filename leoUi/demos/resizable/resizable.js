@@ -29,7 +29,7 @@ $.config({
 
     $('body').leoResizable({
 
-        selector:'.a',
+        mouseDownSelector:'.a',
 
         disabled:false,//如果设置为true将禁止缩放。
 

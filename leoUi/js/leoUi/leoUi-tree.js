@@ -101,7 +101,7 @@
 
             this.$tree.leoDraggable({
 
-                selector:'span.leoTree_inner',
+                mouseDownSelector:'span.leoTree_inner',
 
                 cancel:'span.leoTree_icon_triangle',
 

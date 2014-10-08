@@ -906,7 +906,7 @@
 
             if( this.bClone ){
 
-                jQuery.offset.setOffset( this.$target[0], { top: dragBoxOffset.top,left: dragBoxOffset.left, using: function(prop){
+                $.offset.setOffset( this.$target[0], { top: dragBoxOffset.top,left: dragBoxOffset.left, using: function(prop){
 
                     if( !o.bCloneAnimate ){
 

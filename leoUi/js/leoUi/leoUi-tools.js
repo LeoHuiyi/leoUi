@@ -1253,6 +1253,12 @@
 
                 },
 
+                widget: function(){
+
+                    return this.$target || null;
+
+                },
+
                 _deletData:function(){
 
                     var This = this;

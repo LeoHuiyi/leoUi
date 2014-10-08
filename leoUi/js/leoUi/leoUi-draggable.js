@@ -727,7 +727,7 @@
 
                         if( o.revertAnimate && this._isMove( this.revertBoxLeft, this.revertBoxTop, this.left, this.top ) ){
 
-                            jQuery.offset.setOffset( this.$dragBox[0], { top: this.revertBoxTop, left: this.revertBoxLeft, using: function(prop){
+                            $.offset.setOffset( this.$dragBox[0], { top: this.revertBoxTop, left: this.revertBoxLeft, using: function(prop){
 
                                 This.$dragBox.animate( { left: prop.left, top: prop.top }, { duration: o.duration, complete:function(){
 
@@ -759,7 +759,7 @@
 
                             if( o.bCloneAnimate && this._isMove( boxOffset.left, boxOffset.top, this.left, this.top ) ){
 
-                                jQuery.offset.setOffset( this.$dragBox[0], { top: boxOffset.top, left: boxOffset.left, using: function(prop){
+                                $.offset.setOffset( this.$dragBox[0], { top: boxOffset.top, left: boxOffset.left, using: function(prop){
 
                                     This.$dragBox.animate( { left: prop.left, top: prop.top }, { duration: o.duration, complete:function(){
 
@@ -791,7 +791,7 @@
 
                             if( o.bCloneAnimate && this._isMove( this.revertBoxLeft, this.revertBoxTop, this.left, this.top ) ){
 
-                                jQuery.offset.setOffset( this.$target[0], { top: this.top,left: this.left, using: function(prop){
+                                $.offset.setOffset( this.$target[0], { top: this.top,left: this.left, using: function(prop){
 
                                     This.$target.animate( { left: prop.left, top: prop.top}, { duration: o.duration, complete:function(){
 
@@ -821,7 +821,7 @@
 
                         if( o.revertAnimate && this._isMove( this.revertBoxLeft, this.revertBoxTop, this.left, this.top ) ){
 
-                            jQuery.offset.setOffset( this.$target[0], { top: this.revertBoxTop, left: this.revertBoxLeft, using: function(prop){
+                            $.offset.setOffset( this.$target[0], { top: this.revertBoxTop, left: this.revertBoxLeft, using: function(prop){
 
                                 This.$target.animate( { left: prop.left, top: prop.top }, { duration: o.duration, complete:function(){
 

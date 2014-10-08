@@ -22,7 +22,7 @@
 
 }(function($) {
 
-    var ap = Array.prototype,aslice = ap.slice,expandoId,oproto = Object.prototype,ohasOwn = oproto.hasOwnProperty;
+    var ap = Array.prototype,aslice = ap.slice,expandoId,oproto = Object.prototype,ohasOwn = oproto.hasOwnProperty,jQuery = $;
 
     $.leoTools = {};
 

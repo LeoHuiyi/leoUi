@@ -28,7 +28,7 @@
 
 }(function($) {
 
-	var dataSpace = "ui-effects-";
+	var dataSpace = "ui-effects-",jQuery = $;
 
 	$.effects = {
 		effect: {}

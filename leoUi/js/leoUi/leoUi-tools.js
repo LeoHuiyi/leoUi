@@ -1079,7 +1079,7 @@
 
                             if(typeof eventName !== 'string' || eventName.charAt( 0 ) === "_"){ return; }
 
-                            plugIn[eventName].apply(plugIn, aslice.call( arguments, 1 ) );
+                            return plugIn[eventName].apply(plugIn, aslice.call( arguments, 1 ) );
 
                         }
 

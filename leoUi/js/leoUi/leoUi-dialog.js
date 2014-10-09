@@ -90,6 +90,8 @@
 
             zIndex:1000,
 
+            isMoveToTop:false,//是否在最上面
+
             scope:'all',//用来设置leoDialog对象的集合
 
             getScope:'all',//用来取得leoDialog对象的集合
@@ -1577,7 +1579,9 @@
 
         _moveToTop:function() {
 
-            var arr = this._getElements( this.options.getScope ),arrLength = arr.length,
+            if( this.options.isMoveToTop === false ){ return; }
+
+            var arr = this._getElements( this.options.getScope, true ),arrLength = arr.length,
 
             zIndicies = [],zIndexMax,i;
 
@@ -1855,9 +1859,21 @@
 
             var _elements = {};
 
-            this._getElements = function(scope){
+            this._getElements = function( scope, isVisible ){
 
-                return _elements[scope] || [];
+                if( !_elements[scope] || !isVisible ){ return _elements[scope] || []; }
+
+                var arr = [],i = _elements[scope].length,el;
+
+                 while( i-- ){
+
+                    el = _elements[scope][i];
+
+                    $(el).is(':visible') === true && arr.push(el)
+
+                }
+
+                return arr;
 
             }
 

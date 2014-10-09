@@ -1547,7 +1547,7 @@
 		// Save
 		$.effects.save(el, props);
 
-		position === "top" ? offset = offset[position] - parseFloat(el.css('marginTop')) : offset = offset[position] - parseFloat(el.css('marginLeft'));
+		position === "top" ? offset = offset[position] - ( parseFloat(el.css('marginTop')) || 0 ) : offset = offset[position] - ( parseFloat(el.css('marginLeft')) || 0 );
 
 		// Create Wrapper
 		wrapper = $.effects.createWrapper(el).css({
@@ -1676,8 +1676,8 @@
 			width = Math.ceil(el.outerWidth(true) / cells),
 			height = Math.ceil(el.outerHeight(true) / rows),
 			pieces = [],
-			marginLeft = parseFloat(el.css('marginLeft')),
-			marginTop = parseFloat(el.css('marginTop')),
+			marginLeft = parseFloat(el.css('marginLeft')) || 0,
+			marginTop = parseFloat(el.css('marginTop')) || 0,
 			zIndex = el.css('zIndex'),
 
 			// loop

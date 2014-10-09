@@ -129,13 +129,13 @@
 
         },
 
-        _getSendAjaxPagerInfo:function( offset, length ){
+        _getSendAjaxPagerInfo:function( offset, length, isCurrentPage ){
 
             var op = this.options,ajax = $.extend( {}, op.ajax );
 
-            ajax.data[ajax.lengthKey] = length || op.rowNum;
+            ajax.data[ajax.lengthKey] = length;
 
-            ajax.data[ajax.offsetKey] = offset || op.currentPage;
+            ajax.data[ajax.offsetKey] = isCurrentPage === true ? offset * length : offset;
 
             return ajax;
 
@@ -147,9 +147,13 @@
 
             if(dataType === 'ajax'){
 
+                this._loading(true);
+
                 ajax = this._getSendAjaxPagerInfo( pagerInfo.fristItems, pagerInfo.perPages );
 
                 $.ajax(ajax).done(function(data){
+
+                    This._loading();
 
                     This.totalItems = data[ajax.teamsCountKey];
 
@@ -158,6 +162,10 @@
                     This._changePager( This._getPagerInfo( pagerInfo.currentPage ) );
 
                     This._boxIsAllCheck();
+
+                }).fail(function(data){
+
+                    console.log(data.statusText);
 
                 });
 
@@ -225,7 +233,6 @@
 
                     this.currentPage = + page;
 
-
             }
 
             if( this.currentPage < 1 ){
@@ -288,7 +295,7 @@
 
                 pagerInfo = this._getPagerInfo( op.currentPage, op.rowNum );
 
-                this._createBodyTable();
+                this._createBodyTable(pagerInfo);
 
                 this._initPager(pagerInfo);
 
@@ -308,9 +315,17 @@
 
             }else if( op.dataType === 'ajax' ){
 
-                ajax = this._getSendAjaxPagerInfo( op.currentPage, op.rowNum );
+                this._loading(true);
+
+                ajax = this._getSendAjaxPagerInfo( op.currentPage, op.rowNum, true );
+
+                this.$target.empty().append( This.$gridBox );
+
+                this.$gridBox.css( 'visibility', '' );
 
                 $.ajax(ajax).done(function(data){
+
+                    This._loading();
 
                     This.totalItems = data[ajax.teamsCountKey];
 
@@ -318,7 +333,7 @@
 
                     pagerInfo = This._getPagerInfo( op.currentPage, op.rowNum );
 
-                    This._createBodyTable();
+                    This._createBodyTable(pagerInfo);
 
                     This._initPager(pagerInfo);
 
@@ -326,15 +341,15 @@
 
                     This._addEvent();
 
-                    This.$target.empty().append( This.$gridBox );
-
                     This._setTableHeight();
 
                     This._tableWidthAuto();
 
-                    This.$gridBox.css( 'visibility', '' );
-
                     This.options.tableLoadCallback.call( null, this.$bodyTable );
+
+                }).fail(function(data){
+
+                    console.log(data.statusText);
 
                 });
 
@@ -361,8 +376,6 @@
         _changePager:function(pagerInfo){
 
             var fPageStyle,LPageStyle;
-
-            pagerInfo.init === true && ( pagerInfo = this._getPagerInfo( pagerInfo.fristItems ) );
 
             pagerInfo.isFristPage === true ? fPageStyle = 'default' : fPageStyle = 'pointer';
 
@@ -456,6 +469,14 @@
 
         },
 
+        _loading:function(show){
+
+            !this.$loading && ( this.$loading = this.$gridBox.find('#load_grid') );
+
+            show === true ? this.$loading.show() : this.$loading.hide();
+
+        },
+
         _setTableWidth:function(isRiseze){
 
             if( this.options.resizeWidth === false && isRiseze === true ){ return; }
@@ -524,17 +545,43 @@
 
                 this._boxIsAllCheck();
 
-                this.renderTable();
-
                 this._resizeTableWidth();
 
             }
 
         },
 
+        getSelectRowInfo:function(){
+
+            var arr = [],selectRowElArr = this.tableData.selectRowElArr,
+
+            i = selectRowElArr && selectRowElArr.length || 0;
+
+            if( i > 0 ){
+
+                while( i-- ){
+
+                    arr.push( $(selectRowElArr[i]).attr('trid') );
+
+                }
+
+            }
+
+            return arr;
+
+        },
+
+        getTrId:function(tr){
+
+            return $(tr).attr('trid');
+
+        },
+
         removeRow:function( tr, resizeRender ){
 
             $(tr).remove();
+
+            this.totalItems--;
 
             resizeRender === true && ( this._resizeTableWidth() );
 
@@ -698,7 +745,7 @@
 
             this._on( this.$thCheck = this.$thCheck || this.$headTable.find( '#' + this.tableOption.checkBoxId ), 'click', function(event){
 
-                This.options.disabledCheck === false && This._boxAllCheck(this);
+                This.boxAllCheck( this, true );
 
             } );
 
@@ -782,6 +829,13 @@
 
         },
 
+        _getInfo:function(){
+
+
+
+
+        },
+
         _boxCheckOn:function(tr){
 
             var checkBoxId = this.tableOption.checkBoxId,rowsLength,checkLength;
@@ -794,19 +848,31 @@
 
         },
 
-        _boxAllCheck:function(input){
+        boxAllCheck:function( input, notSetCheck ){
+
+            if( this.options.disabledCheck === true ){ return; }
 
             var checkBoxId = this.tableOption.checkBoxId,allChecked,This = this,
 
-            activeClass = this.options.activeClass;
+            activeClass = this.options.activeClass,checkBox;
 
             if( !checkBoxId ){ return; }
+
+            this.$thCheck = this.$thCheck || this.$headTable.find( '#' + checkBoxId );
+
+            checkBox = input || this.$thCheck[0];
+
+            if( !notSetCheck ){
+
+                checkBox.checked === true ? this.$thCheck.prop( 'checked', false ) : this.$thCheck.prop( 'checked', true );
+
+            }
 
             this.$bodyTable.find('tr').not('tr.jqgfirstrow').each(function(index, el) {
 
                 var $el = $(this),$input = $el.find('input[checkid="'+ checkBoxId +'"]');
 
-                if( input.checked ){
+                if( checkBox.checked === true ){
 
                     $el.addClass(activeClass);
 
@@ -826,6 +892,8 @@
 
             });
 
+            !notSetCheck && this._boxIsAllCheck();
+
         },
 
         _boxIsAllCheck:function(){
@@ -840,13 +908,11 @@
 
             }else if( length === this.$bodyTable[0].rows.length - 1 && length !== 0 ){
 
-
                 this.$thCheck.prop( {'indeterminate': false, 'checked': true } );
-
 
             }else{
 
-                this.$thCheck.prop( 'indeterminate', true );
+                this.$thCheck.prop( {'indeterminate': true, 'checked': false } );
 
             }
 
@@ -896,6 +962,8 @@
 
             $body.find('tbody').append( this._tableTbodyTrStr( data, this.tableOption.tableModel, $body[0].rows.length - 1 ) );
 
+            this.totalItems++;
+
             this._boxIsAllCheck();
 
             this._resizeTableWidth();
@@ -936,11 +1004,11 @@
 
         },
 
-        _createBodyTable:function(){
+        _createBodyTable:function(pagerInfo){
 
             var str = '<table class="ui-jqgrid-btable" cellspacing="0" cellpadding="0" border="0">';
 
-            str += this._bodyTableTbodyStr();
+            str += this._bodyTableTbodyStr(pagerInfo);
 
             str += '</table>';
 

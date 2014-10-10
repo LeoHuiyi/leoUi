@@ -1207,7 +1207,21 @@
 
                 },
 
-                _trigger:function( name, fn, context ){
+                _trigger:function( el, event, arg ){
+
+                    if( typeof event === 'string' && !!el ){
+
+                        $(el).trigger( event + '.' + this.nameSpace, arg );
+
+                    }else if( typeof event === 'object' ){
+
+                        $(el).trigger(event);
+
+                    }
+
+                },
+
+                _targetTrigger:function( name, fn, context ){
 
                     if( !!name && !!fn && $.isFunction(fn) ){
 
@@ -1237,9 +1251,9 @@
 
                 },
 
-                trigger :function( name, fn, context ){
+                trigger :function(){
 
-                    this._trigger( name, fn, context );
+                    this._trigger();
 
                 },
 

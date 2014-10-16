@@ -37,21 +37,23 @@
 
             disabled:false,//如果设置为true禁用grid
 
-            disabledEvent:false,//如果设置为true禁用grid的全部事件
-
             tableModel:null,//grid格式见例子
 
             trIdKey:'trid',//trIdKey
 
             disabledCheck:false,//禁用选择
 
-            evenClass:'ui-priority-secondary',//为表身的偶数行添加一个类名，以实现斑马线效果。
+            evenClass:'ui-priority-secondary',//为表身的偶数行添加一个类名，以实现斑马线效果。false 没有
 
             activeClass:'ui-state-highlight',//选中效果
+
+            boxCheckType:'multiple',//radio单选，multiple多选,false无
 
             tableModelDefault:{
 
                 width:100,//宽
+
+                type:'text',//类型
 
                 align:'center',//对齐方式
 
@@ -71,7 +73,11 @@
 
                 minWidth:10,//最小宽度
 
-                renderCell:null//为每一个单元格渲染内容
+                renderCell:null,//为每一个单元格渲染内容
+
+                edit:false,//是否可以编辑
+
+                selectValId:false
 
             },
 
@@ -113,7 +119,7 @@
 
             width:500,//设置表格的宽度(可用函数返回值)
 
-            resizeWidth:false,//是否在改变尺寸时调节高度
+            resizeWidth:false,//是否在改变尺寸时调节宽度
 
             setTableWidthCallback:$.noop,//设置表格的宽度默认与父级宽高
 
@@ -135,7 +141,7 @@
 
             ajax.data[ajax.lengthKey] = length;
 
-            ajax.data[ajax.offsetKey] = isCurrentPage === true ? offset * length : offset;
+            ajax.data[ajax.offsetKey] = isCurrentPage === true ? ( offset - 1 ) * length : offset;
 
             return ajax;
 
@@ -327,6 +333,8 @@
 
                     This._loading();
 
+                    console.log(data)
+
                     This.totalItems = data[ajax.teamsCountKey];
 
                     This.teams = data[ajax.teamsKey];
@@ -337,9 +345,9 @@
 
                     This._initPager(pagerInfo);
 
-                    This._setTableWidth();
-
                     This._addEvent();
+
+                    This._setTableWidth();
 
                     This._setTableHeight();
 
@@ -373,15 +381,17 @@
 
         },
 
-        _changePager:function(pagerInfo){
+        _changePager:function( pagerInfo, notAddBodyTable ){
 
             var fPageStyle,LPageStyle;
+
+            !pagerInfo && ( pagerInfo = this._getPagerInfo( 'now' ) );
 
             pagerInfo.isFristPage === true ? fPageStyle = 'default' : fPageStyle = 'pointer';
 
             pagerInfo.isLastPage === true ? LPageStyle = 'default' : LPageStyle = 'pointer';
 
-            this.$bodyTable.empty().append(this._bodyTableTbodyStr(pagerInfo));
+            !notAddBodyTable && this.$bodyTable.empty().append(this._bodyTableTbodyStr(pagerInfo));
 
             this.$firstPage.css( 'cursor', fPageStyle );
 
@@ -465,6 +475,8 @@
 
         	this._createHeadTable();
 
+            this._createBoxCheckFn();
+
             this._initData();
 
         },
@@ -474,6 +486,12 @@
             !this.$loading && ( this.$loading = this.$gridBox.find('#load_grid') );
 
             show === true ? this.$loading.show() : this.$loading.hide();
+
+        },
+
+        setDisabledEvent:function(flag){
+
+            this.$$disabledEvent = !!flag;
 
         },
 
@@ -537,17 +555,35 @@
 
                 while( i-- ){
 
-                    this.removeRow( selectRowElArr[0] );
-
-                    this._removeSelectRowArr( selectRowElArr[0] );
+                    $(selectRowElArr[i]).remove();
 
                 }
 
+                this._removeSelectAllRowArr();
+
                 this._boxIsAllCheck();
+
+                this._refreshEvenClass();
 
                 this._resizeTableWidth();
 
             }
+
+        },
+
+        _refreshEvenClass:function(){
+
+            var evenClass = this.options.evenClass;
+
+            if( typeof evenClass !== 'string' ){ return; }
+
+            this.$bodyTable.find('tr').not('tr.jqgfirstrow').each(function(index, el) {
+
+                $(el).removeClass(evenClass);
+
+                index % 2 === 1 && $(el).addClass(evenClass);
+
+            });
 
         },
 
@@ -557,13 +593,9 @@
 
             i = selectRowElArr && selectRowElArr.length || 0;
 
-            if( i > 0 ){
+            while( i-- ){
 
-                while( i-- ){
-
-                    arr.push( $(selectRowElArr[i]).attr('trid') );
-
-                }
+                arr.push( $(selectRowElArr[i]).attr('trid') );
 
             }
 
@@ -577,13 +609,118 @@
 
         },
 
-        removeRow:function( tr, resizeRender ){
+        getEditTdInfo:function( tr, typeOptionDoneCallBack, typeOptionFailCallBack ){
+
+            var tableModel = this.tableOption.tableModel,length = tableModel.length,
+
+            $tr = $(tr),child,prop,data = { trId: $tr.attr('trid') },arr = [],
+
+            fnArr = [],This = this,typeOptions = {},i = 0;
+
+            for( ;i < length; i++ ){
+
+                child = tableModel[i];
+
+                prop = {};
+
+                if( child.edit !== false ){
+
+                    if( child.type === 'text' ){
+
+                        prop.theadName = child.theadName;
+
+                        prop.id = child.id;
+
+                        prop.val = $tr.children('td[thid="'+ child.thId +'"]').text();
+
+                    }else if( child.type === 'select' ){
+
+                        prop.theadName = child.theadName;
+
+                        prop.id = child.id;
+
+                        prop.val = $tr.children('td[thid="'+ child.thId +'"]').text();
+
+                        prop.selectValKey = child.selectValId;
+
+                        prop.selectVal = $tr.children('td[thid="'+ child.thId +'"]').attr('selectval');
+
+                    }
+
+                    prop.edit = $.extend( {}, child.edit );
+
+                    if( typeof child.edit.typeOption === 'function' ){
+
+                        if( child.edit.typeOptionFnAsyn === true ){
+
+                            var dfd = $.Deferred();
+
+                            fnArr.push(dfd.done(child.edit.typeOption( dfd, prop.edit, 'typeOption' )));
+
+                        }else{
+
+                            prop.edit.typeOption = child.edit.typeOption();
+
+                        }
+
+                    }else{
+
+                        prop.edit.typeOption = child.edit.typeOption;
+
+                    }
+
+                    arr.push(prop);
+
+                }
+
+            }
+
+            if( fnArr.length === 0 ){
+
+                data.teams = arr;
+
+                return data;
+
+            }else{
+
+                this._loading(true);
+
+                $.when.apply(null,fnArr).done(function(datas){
+
+                    This._loading();
+
+                    data.teams = arr;
+
+                    typeOptionDoneCallBack && typeOptionDoneCallBack(data);
+
+                }).fail(function(failData){
+
+                    This._loading();
+
+                    typeOptionFailCallBack && typeOptionFailCallBack(failData);
+
+                })
+
+
+            }
+
+        },
+
+        removeRow:function(tr){
 
             $(tr).remove();
 
             this.totalItems--;
 
-            resizeRender === true && ( this._resizeTableWidth() );
+            this._changePager( false, true );
+
+            this._removeSelectRowArr(tr);
+
+            this._refreshEvenClass();
+
+            this._boxIsAllCheck();
+
+            this._resizeTableWidth();
 
         },
 
@@ -675,7 +812,7 @@
 
         _resizeTableIsScroll:function(){
 
-            return this.$uiJqgridBdiv.height() < this.$bodyTable.height();
+            return this.$uiJqgridBdiv.height() < this.$bodyTable.outerHeight();
 
         },
 
@@ -729,8 +866,6 @@
 
                 event.preventDefault();
 
-                if( $(this).hasClass('ui-state-hover') === true ){ return; }
-
                 $(this).addClass('ui-state-hover');
 
             } );
@@ -743,43 +878,9 @@
 
             } );
 
-            this._on( this.$thCheck = this.$thCheck || this.$headTable.find( '#' + this.tableOption.checkBoxId ), 'click', function(event){
-
-                This.boxAllCheck( this, true );
-
-            } );
-
             this._on( this.$bodyTable, 'click', 'tr', function(event){
 
-                if( This.options.disabledCheck === false  ){
-
-                    if( This.isChecked === true ){
-
-                        var $el = $(this),activeClass = This.options.activeClass;
-
-                        if( $el.hasClass(activeClass) === true ){
-
-                            $el.removeClass(activeClass);
-
-                            This._removeSelectRowArr(this);
-
-                            This._boxCheckOff(this);
-
-                        }else{
-
-                            $el.addClass(activeClass);
-
-                            This._addSelectRowArr(this);
-
-                            This._boxCheckOn(this);
-
-                        }
-
-                    }
-
-                    This.isChecked = true;
-
-                }
+                !!This._boxCheck && This._boxCheck(this);
 
             } );
 
@@ -829,10 +930,81 @@
 
         },
 
-        _getInfo:function(){
+        _createBoxCheckFn:function(){
 
+            var boxCheckType = this.options.boxCheckType;
 
+            if( boxCheckType === 'radio' ){
 
+                this._boxCheck = function(tr){
+
+                    var radioBoxRow = this.tableData.radioBoxRow,
+
+                    activeClass = this.options.activeClass,
+
+                    $tr = $(tr),radioBoxId = this.tableOption.radioBoxId;
+
+                    if( this.options.disabledCheck === false  ){
+
+                        if(radioBoxRow){
+
+                            $(radioBoxRow).removeClass(activeClass).find('input[checkid="'+ radioBoxId +'"]').prop( 'checked', false );
+
+                        }
+
+                        !radioBoxId ? $tr.addClass(activeClass) : $tr.addClass(activeClass).find('input[checkid="'+ radioBoxId +'"]').prop( 'checked', true );
+
+                        this.tableData.radioBoxRow = tr;
+
+                    }
+
+                }
+
+            }else if( boxCheckType === 'multiple' ){
+
+                var This = this;
+
+                this._boxCheck = function(tr){
+
+                    if( this.options.disabledCheck === false  ){
+
+                        if( this.isChecked === true ){
+
+                            var $tr = $(tr),activeClass = this.options.activeClass;
+
+                            if( $tr.hasClass(activeClass) === true ){
+
+                                $tr.removeClass(activeClass);
+
+                                this._removeSelectRowArr(tr);
+
+                                this._boxCheckOff(tr);
+
+                            }else{
+
+                                $tr.addClass(activeClass);
+
+                                this._addSelectRowArr(tr);
+
+                                this._boxCheckOn(tr);
+
+                            }
+
+                        }
+
+                        this.isChecked = true;
+
+                    }
+
+                }
+
+                this._on( this.$thCheck = this.$thCheck || this.$headTable.find( '#' + this.tableOption.checkBoxId ), 'click.checkBox', function(event){
+
+                    This.boxAllCheck( this, true );
+
+                } );
+
+            }
 
         },
 
@@ -852,31 +1024,33 @@
 
             if( this.options.disabledCheck === true ){ return; }
 
-            var checkBoxId = this.tableOption.checkBoxId,allChecked,This = this,
+            var checkBoxId = this.tableOption.checkBoxId,This = this,
 
-            activeClass = this.options.activeClass,checkBox;
+            activeClass = this.options.activeClass,
 
-            if( !checkBoxId ){ return; }
+            isAllChecked = this._getSelectRowArrLength() === this.$bodyTable[0].rows.length - 1;
 
-            this.$thCheck = this.$thCheck || this.$headTable.find( '#' + checkBoxId );
+            if( checkBoxId ){
 
-            checkBox = input || this.$thCheck[0];
+                this.$thCheck = this.$thCheck || this.$headTable.find( '#' + checkBoxId );
 
-            if( !notSetCheck ){
+                if( !notSetCheck ){
 
-                checkBox.checked === true ? this.$thCheck.prop( 'checked', false ) : this.$thCheck.prop( 'checked', true );
+                    isAllChecked === true ? this.$thCheck.prop( 'checked', false ) : this.$thCheck.prop( 'checked', true );
+
+                }
 
             }
 
             this.$bodyTable.find('tr').not('tr.jqgfirstrow').each(function(index, el) {
 
-                var $el = $(this),$input = $el.find('input[checkid="'+ checkBoxId +'"]');
+                var $el = $(this);
 
-                if( checkBox.checked === true ){
+                if( isAllChecked === false ){
 
                     $el.addClass(activeClass);
 
-                    $input.prop( 'checked', true );
+                    !!checkBoxId && $el.find('input[checkid="'+ checkBoxId +'"]').prop( 'checked', true );
 
                     This._addSelectRowArr(this);
 
@@ -884,7 +1058,7 @@
 
                     $el.removeClass(activeClass);
 
-                    $input.prop( 'checked', false );
+                    !!checkBoxId && $el.find('input[checkid="'+ checkBoxId +'"]').prop( 'checked', false );
 
                     This._removeSelectRowArr(this);
 
@@ -898,7 +1072,11 @@
 
         _boxIsAllCheck:function(){
 
-            var length = this.$bodyTable.find( 'tr.' + this.options.activeClass ).length;
+            var checkBoxId = this.tableOption.checkBoxId,length;
+
+            if( !checkBoxId ){ return; }
+
+            length = this._getSelectRowArrLength();
 
             this.$thCheck = this.$thCheck || this.$headTable.find( '#' + this.tableOption.checkBoxId );
 
@@ -938,9 +1116,21 @@
 
         },
 
+        _getSelectRowArrLength:function(){
+
+            return !!this.tableData.selectRowElArr && this.tableData.selectRowElArr.length || 0;
+
+        },
+
+        _removeSelectAllRowArr:function(){
+
+            this.tableData.selectRowElArr = [];
+
+        },
+
         _removeSelectRowArr:function(el){
 
-            var selectRowElArr = this.tableData.selectRowElArr = this.tableData.selectRowElArr || [],
+            var selectRowElArr = this.tableData.selectRowElArr || [],
 
             i = selectRowElArr.length;
 
@@ -964,6 +1154,8 @@
 
             this.totalItems++;
 
+            this._changePager( false, true );
+
             this._boxIsAllCheck();
 
             this._resizeTableWidth();
@@ -974,7 +1166,7 @@
 
             var tableModel = this.tableOption.tableModel,i = tableModel.length,
 
-            thId,child,val,$tr = $(tr);
+            thId,child,val,$tr = $(tr),$td;
 
             while( i-- ){
 
@@ -982,7 +1174,19 @@
 
                 if( val = data[child.id] ){
 
-                    $tr.find('td[thid="'+ this.leoGrid + child.id +'"]').text(val);
+                    $td = $tr.find('td[thid="'+ this.leoGrid + child.id +'"]');
+
+                    child.type === 'select' && ( $td.attr( 'selectval', data[child.selectValId] ) );
+
+                    if( typeof child.renderCell === 'function' && typeof ( child.renderCell = renderCell( value ) ) === 'string' ){
+
+                        $td.html(val);
+
+                    }else{
+
+                        $td.text(val);
+
+                    }
 
                 }
 
@@ -1078,17 +1282,19 @@
 
         _tableThStr:function(obj){
 
-            var prop,tableOption = this.tableOption,serialNumber,checkBox,str = '';
+            var prop,tableOption = this.tableOption,serialNumber,checkBox,radioBox,str = '';
 
-            if( obj.id || ( !tableOption.serialNumberId && ( serialNumber = obj.boxType === 'serialNumber' ) ) || ( !tableOption.checkBoxId && ( checkBox = obj.boxType === 'checkBox' ) ) ){
+            if( obj.id || ( !tableOption.serialNumberId && ( serialNumber = obj.boxType === 'serialNumber' ) ) || ( !tableOption.checkBoxId && ( checkBox = obj.boxType === 'checkBox' ) ) || ( !tableOption.radioBoxId && ( radioBox = obj.boxType === 'radioBox' ) ) ){
 
                 obj.thId = this.leoGrid + ( obj.id || obj.boxType );
 
                 prop = $.extend( {}, this.options.tableModelDefault, obj );
 
-                serialNumber === true && ( tableOption.serialNumberId = obj.thId );
+                serialNumber === true && ( tableOption.serialNumberId = prop.thId );
 
-                checkBox === true && ( tableOption.checkBoxId = obj.thId + '_input' );
+                radioBox === true && ( tableOption.radioBoxId = prop.thId + '_input' );
+
+                checkBox === true && ( tableOption.checkBoxId = prop.thId + '_input' );
 
                 tableOption.tableModel.push(prop);
 
@@ -1096,7 +1302,7 @@
 
                 str += '<th id = "'+ prop.thId +'" class="ui-state-default ui-th-column ui-th-ltr" style="width:'+ prop.width +'px">';
 
-                prop.resize === true && ( str += '<span class="ui-jqgrid-resize ui-jqgrid-resize-ltr" style="cursor: col-resize;"></span>' );
+                prop.resize === true && ( str += '<span class="ui-jqgrid-resize ui-jqgrid-resize-ltr">&nbsp;</span>' );
 
                 prop.sortable === true ? str += '<div class="ui-jqgrid-sortable">' : str += '<div>';
 
@@ -1142,11 +1348,11 @@
 
         },
 
-        _tableTbodyTrStr:function( gridJsonTb, gridJsonTh, trIndex ){
+        _tableTbodyTrStr:function( gridJsonTr, gridJsonTh, trIndex ){
 
             var str = '',width,i = 0,length = gridJsonTh.length,th,
 
-            trId = gridJsonTb[this.options.trIdKey],
+            trId = gridJsonTr[this.options.trIdKey],
 
             evenClass = this.options.evenClass;
 
@@ -1158,7 +1364,7 @@
 
                 th = gridJsonTh[i];
 
-                str += this._tableTdStr( gridJsonTb[th.id], th, trIndex );
+                str += this._tableTdStr( gridJsonTr[th.id], th, trIndex, gridJsonTr );
 
             };
 
@@ -1166,7 +1372,7 @@
 
         },
 
-        _tableTdStr:function( value, tableModel, trIndex ){
+        _tableTdStr:function( value, tableModel, trIndex, tr ){
 
             if( !tableModel ){ return; }
 
@@ -1174,9 +1380,13 @@
 
             str = '<td style="text-align:' + tableModel.align + '" thid="' + tableModel.thId + '"', value = value || '';
 
-            className === false ? str += '>' : str += 'class="' + className + '">'
+            className !== false && ( str += ' class="' + className + '"' );
 
-            if( typeof renderCell === 'function' && typeof ( renderCell = renderCell.call( null, value, trIndex ) ) === 'string' ){
+            tableModel.type === 'select' && ( str += ' selectval="' + tr[tableModel.selectValId] + '"' );
+
+            str += '>';
+
+            if( typeof renderCell === 'function' && typeof ( renderCell = renderCell( value, trIndex ) ) === 'string' ){
 
                 str += renderCell;
 
@@ -1188,6 +1398,10 @@
 
                 str += '<input type="checkbox" checkid="'+ this.tableOption.checkBoxId +'">';
 
+            }else if( tableModel.boxType === 'radioBox' ){
+
+                str += '<input type="checkbox" checkid="'+ this.tableOption.radioBoxId +'">';
+
             }else if( tableModel.boxType === 'serialNumber' ){
 
                 str += trIndex + 1;
@@ -1198,7 +1412,7 @@
 
             };
 
-            return str += '</div></th>';
+            return str += '</td>';
 
         }
 

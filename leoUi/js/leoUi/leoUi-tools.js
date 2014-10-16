@@ -1123,7 +1123,7 @@
 
                                 arg[last] = function(event){
 
-                                    if( !$( event.target ).closest( "." + This.disableClassName )[0] ){
+                                    if( This.$$disabledEvent === true || !$( event.target ).closest( "." + This.disableClassName )[0] ){
 
                                         if( This.options.disabledEvent === true ){ return; }
 
@@ -1139,7 +1139,7 @@
 
                             arg[last] = function(event){
 
-                                if( This.options.disabledEvent === true ){ return; }
+                                if( This.$$disabledEvent === true ){ return; }
 
                                 oldFn.apply(this,arguments);
 

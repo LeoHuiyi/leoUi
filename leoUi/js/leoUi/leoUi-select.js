@@ -71,13 +71,13 @@
 
             showAnimation: function(callBack) {
 
-                this.show( { effect: "drop", duration: "slow", complete: callBack } );
+                this.show( { effect: "bounce", duration: "slow", complete: callBack } );
 
             },
 
             hideAnimation: function(callBack) {
 
-                this.hide( { effect: "drop", duration: "slow", complete: callBack } );
+                this.hide( { effect: "bounce", duration: "slow", complete: callBack } );
 
             },
 
@@ -143,6 +143,8 @@
 
         	this.$selectItems = $(selectItemsStr).css( { 'zIndex': op.selectItemsZIndex, 'max-height': op.selectItemsMaxHeight,  'min-height': op.selectItemsMinHeight, 'height': op.selectItemsHeight } ).hide().append(ulStr).appendTo(this.$select);
 
+            this.$selectItemsUl = this.$selectItems.find('ul.leoSelect_items_ul');
+
         	this.$select.insertBefore($target);
 
             this._setSelectWidth();
@@ -203,9 +205,9 @@
 
         _addEvent:function(){
 
-        	var This = this,$ul = this.$selectItems.find('ul.leoSelect_items_ul'),
+        	var This = this,$ul = this.$selectItemsUl,op = this.options,
 
-            $val = this.$selectTit.find('span.leoSelect_tit_val'),op = this.options,
+            $val = this.$selectTit.find('span.leoSelect_tit_val'),
 
             disabledClass = op.disabledClass,selectedClass = op.selectedClass;
 
@@ -251,11 +253,15 @@
 
                 event.stopPropagation();
 
-                if( This._selectItemsState === 'closeing' ){ return; }
+                var $li = $(this);
 
-                $ul.children('li.'+selectedClass).removeClass(selectedClass);
+                if( This._selectItemsState === 'open' && !$li.hasClass(disabledClass) ){
 
-                $(this).addClass(selectedClass);
+                    $ul.children('li.'+selectedClass).removeClass(selectedClass);
+
+                    $li.addClass(selectedClass);
+
+                }
 
             } );
 
@@ -343,11 +349,13 @@
 
         _scrollSelectedToShow:function(){
 
-            var $li = $(this.selectedLi),liWidth = $li.outerHeight(true);
+            var $li = $(this.selectedLi),liWidth = $li.width(),
 
-            index = this.selectedLi.index();
+            $ul = this.$selectItemsUl,index = this.selectedLi.index(),
 
-            this.$selectItems.animate({scrollTop: index*(liWidth-10)}, 100);
+            scrollTop = $li.offset().top - $ul.offset().top - ( parseFloat($ul.css('paddingTop')) || 0 ) - ( parseFloat($ul.children('li').filter(":first").css('marginTop')) || 0 );
+
+            this.$selectItems.animate({'scrollTop': scrollTop}, 200);
 
         }
 

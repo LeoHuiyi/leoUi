@@ -309,6 +309,8 @@
 
                 this._addEvent();
 
+                this._createResizeTh();
+
                 this.$target.empty().append( this.$gridBox );
 
                 this._setTableHeight();
@@ -346,6 +348,8 @@
                     This._initPager(pagerInfo);
 
                     This._addEvent();
+
+                    This._createResizeTh();
 
                     This._setTableWidth();
 
@@ -1230,6 +1234,48 @@
 
         },
 
+        _createResizeTh:function(){
+
+            var tableOption;
+
+            if( ( tableOption = this.tableOption.isResize ) === true ){
+
+                this._resizeThEvent();
+
+                this.$rsLine = this.$gridBox.find('#rs_mgrid');
+
+            }
+
+        },
+
+        _resizeThEvent:function(){
+
+            var This = this;
+
+            this._on( this.$headTable, 'mousedown', 'span.ui-jqgrid-resize-ltr', function(event){
+
+                This._resizeLineDragStart(event,th);
+
+
+
+            } );
+
+
+
+
+        },
+
+        _resizeLineDragStart:function(event,th){
+
+            var $th = $(th),lineHeight = This.$uiJqgridHdiv.outerHeight() + This.$uiJqgridBdiv.outerHeight(),thWidth = $th.width();
+
+                this.startLeft = event.pageX - this.left;
+
+                This.$rsLine.offset({top:0,left:event.pageX}).height(lineHeight).show()
+
+
+        },
+
         _createHeadTable:function(){
 
             this.$headTable = $( this._headTableStr() ).appendTo( this.$uiJqgridHdiv.find('div.ui-jqgrid-hbox') );
@@ -1330,7 +1376,7 @@
 
                 str += '<th id = "'+ prop.thId +'" class="ui-state-default ui-th-column ui-th-ltr" style="width:'+ prop.width +'px">';
 
-                prop.resize === true && ( str += '<span class="ui-jqgrid-resize ui-jqgrid-resize-ltr">&nbsp;</span>' );
+                prop.resize === true && ( str += '<span class="ui-jqgrid-resize ui-jqgrid-resize-ltr">&nbsp;</span>', tableOption.isResize = true );
 
                 prop.sortable === true ? str += '<div class="ui-jqgrid-sortable">' : str += '<div>';
 

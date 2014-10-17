@@ -513,7 +513,8 @@
                         }
                     } else if (overBottom > 0) {
                         newOverTop = position.top - data.collisionPosition.marginTop + myOffset + atOffset + offset - offsetTop;
-                        if ((position.top + myOffset + atOffset + offset) > overBottom && (newOverTop > 0 || abs(newOverTop) < overBottom)) {
+                        if ((position.top + myOffset + atOffset + offset + data.collisionHeight - outerHeight - offsetTop) < overBottom && (newOverTop > 0 || abs(newOverTop) < overBottom)){
+                        // if ((position.top + myOffset + atOffset + offset) > overBottom && (newOverTop > 0 || abs(newOverTop) < overBottom))
                             position.top += myOffset + atOffset + offset;
                         }
                     }

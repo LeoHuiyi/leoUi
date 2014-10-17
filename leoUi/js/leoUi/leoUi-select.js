@@ -189,7 +189,7 @@
 
         	var position = position || this.options.position,
 
-        	$selectItems = this.$selectItems
+        	$selectItems = this.$selectItems,
 
         	isVisible = $selectItems.is( ":visible" );
 

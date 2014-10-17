@@ -217,13 +217,23 @@
 
         _mouseMove: function(event) {
 
-            if( $.leoTools.ie && ( !document.documentMode || document.documentMode < 9 ) && !event.button ){
+            if ( this._mouseMoved ) {
 
-                return this._mouseUp(event);
+                if ($.ui.ie && ( !document.documentMode || document.documentMode < 9 ) && !event.button) {
 
-            }else if( !event.which ){
+                        return this._mouseUp(event);
 
-                return this._mouseUp( event );
+                    } else if ( !event.which ) {
+
+                        return this._mouseUp( event );
+
+                    }
+
+            }
+
+            if ( event.which || event.button ) {
+
+                this._mouseMoved = true;
 
             }
 

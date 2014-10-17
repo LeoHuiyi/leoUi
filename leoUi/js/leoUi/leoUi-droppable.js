@@ -106,7 +106,7 @@
 
             var pageX = draggable.pageX,pageY = draggable.pageY,
 
-            x1 = draggable.left,y1 =draggable.top,
+            x1 = draggable.left,y1 = draggable.top,
 
             x2 = draggable.right,y2 = draggable.bottom,
 

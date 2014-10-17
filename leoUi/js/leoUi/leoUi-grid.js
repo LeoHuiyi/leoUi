@@ -167,6 +167,8 @@
 
                     This._changePager( This._getPagerInfo( pagerInfo.currentPage ) );
 
+                    This._removeSelectAllRowArr();
+
                     This._boxIsAllCheck();
 
                 }).fail(function(data){
@@ -179,6 +181,8 @@
 
                 this._changePager(pagerInfo);
 
+                this._removeSelectAllRowArr();
+
                 this._boxIsAllCheck();
 
             }
@@ -187,21 +191,19 @@
 
         _getPagerInfo:function( page, perPages, totalItems ){
 
-            var op = this.options,totalItems = + this.totalItems || + totalItems || 0,
+            var op = this.options,totalItems = + totalItems || + this.totalItems ||  0,
 
             index,currentPage,last,totalpages;
 
-            this.perPages = + perPages || this.perPages || op.rowNum;
+            perPages = + perPages || + this.perPages || + op.rowNum;
 
-            this.perPages < 1 && ( this.perPages = 1 );
+            perPages < 1 && ( perPages = 1 );
 
-            perPages = this.perPages;
+            this.perPages = perPages;
 
             totalpages = Math.ceil( totalItems/perPages );
 
-            this.currentPage = this.currentPage || + op.currentPage;
-
-            oldCurrentPage = this.currentPage;
+            oldCurrentPage = currentPage = this.currentPage || + op.currentPage;
 
             page = page || 0;
 
@@ -213,47 +215,45 @@
 
                 case 'first_page':
 
-                    this.currentPage = 0;
+                    currentPage = 0;
 
                     break;
 
                 case 'prev_page':
 
-                    this.currentPage -= 1;
+                    currentPage -= 1;
 
                     break;
 
                 case 'next_page':
 
-                    this.currentPage += 1;
+                    currentPage += 1;
 
                     break;
 
                 case 'last_page':
 
-                    this.currentPage = totalpages;
+                    currentPage = totalpages;
 
                     break;
 
                 default:
 
-                    this.currentPage = + page;
+                    currentPage = + page;
 
             }
 
-            if( this.currentPage < 1 ){
+            if( currentPage < 1 ){
 
-                this.currentPage = 1;
+                currentPage = 1;
 
-            }else if( this.currentPage > totalpages ){
+            }else if( currentPage > totalpages ){
 
-                this.currentPage = totalpages;
+                currentPage = totalpages;
 
             }
 
-            currentPage =  this.currentPage;
-
-            currentPage > totalpages && ( currentPage = totalpages );
+            this.currentPage =  currentPage;
 
             index = perPages * ( currentPage - 1 );
 
@@ -381,9 +381,13 @@
 
         },
 
-        _changePager:function( pagerInfo, notAddBodyTable ){
+        _changePager:function( pagerInfo, notAddBodyTable, rowLength ){
 
-            var fPageStyle,LPageStyle;
+            var fPageStyle,LPageStyle,lastItems,fristItems,oldCurrentPage,
+
+            pageRightInfo = this.$pageRightInfo;
+
+            rowLength === 0 && ( oldCurrentPage = this.currentPage );
 
             !pagerInfo && ( pagerInfo = this._getPagerInfo( 'now' ) );
 
@@ -395,17 +399,39 @@
 
             this.$firstPage.css( 'cursor', fPageStyle );
 
-            this.$prevPage.css( 'cursor', fPageStyle );
-
             this.$nextPage.css( 'cursor', LPageStyle );
 
             this.$lastPage.css( 'cursor', LPageStyle );
 
-            this.$setPageInput.val(pagerInfo.currentPage);
+            if( typeof rowLength === 'number' ){
 
-            this.$allPage.text(pagerInfo.totalpages);
+                lastItems = pagerInfo.fristItems + rowLength;
 
-            this.$pageRightInfo.html((pagerInfo.fristItems+1)+' - '+(pagerInfo.lastItems+1)+'&nbsp;&nbsp;共'+pagerInfo.totalItems+'条');
+                if( rowLength === 0 ){
+
+                    this.$pageRightInfo.text('无数据显示');
+
+                    this.currentPage = oldCurrentPage;
+
+                }else{
+
+                    this.$pageRightInfo.html((pagerInfo.fristItems+1)+' - '+lastItems+'&nbsp;&nbsp;共'+pagerInfo.totalItems+'条');
+
+                }
+
+            }else{
+
+                this.$allPage.text(pagerInfo.totalpages);
+
+                this.$prevPage.css( 'cursor', fPageStyle );
+
+                this.$setPageInput.val(pagerInfo.currentPage);
+
+                lastItems = pagerInfo.lastItems + 1;
+
+                this.$pageRightInfo.html((pagerInfo.fristItems+1)+' - '+lastItems+'&nbsp;&nbsp;共'+pagerInfo.totalItems+'条');
+
+            }
 
             this._setTableHeight(true);
 
@@ -433,7 +459,7 @@
 
             }
 
-            str += '</select></td></tr></tbody></table></td><td align="right" id="page_right"><div id="page_right_info" class="ui-paging-info" style="text-align:right">'+(pagerInfo.fristItems+1)+' - '+(pagerInfo.lastItems+1)+'&nbsp;&nbsp;共'+pagerInfo.totalItems+'条</div></td></tr></tbody></table></div></div>';
+            str += '</select></td></tr></tbody></table></td><td align="right" id="page_right"><div id="page_right_info" class="ui-paging-info" style="text-align:right"><span>'+(pagerInfo.fristItems+1)+'</span> - <span>'+(pagerInfo.lastItems+1)+'</span>&nbsp;&nbsp;共<span>'+pagerInfo.totalItems+'条</span></div></td></tr></tbody></table></div></div>';
 
             this.$pager = $(str);
 
@@ -462,8 +488,6 @@
             this.tableData = {};
 
             this.tableData.rowElArr = [];
-
-            this.isChecked = true;
 
             this.leoGrid = $.leoTools.getId('Grid') + '_';
 
@@ -553,6 +577,8 @@
 
             if( i > 0 ){
 
+                this.totalItems -= i;
+
                 while( i-- ){
 
                     $(selectRowElArr[i]).remove();
@@ -560,6 +586,8 @@
                 }
 
                 this._removeSelectAllRowArr();
+
+                this._changePager( false, true, this.$bodyTable[0].rows.length - 1 );
 
                 this._boxIsAllCheck();
 
@@ -712,7 +740,7 @@
 
             this.totalItems--;
 
-            this._changePager( false, true );
+            this._changePager( false, true, this.$bodyTable[0].rows.length - 1 );
 
             this._removeSelectRowArr(tr);
 
@@ -968,31 +996,25 @@
 
                     if( this.options.disabledCheck === false  ){
 
-                        if( this.isChecked === true ){
+                        var $tr = $(tr),activeClass = this.options.activeClass;
 
-                            var $tr = $(tr),activeClass = this.options.activeClass;
+                        if( $tr.hasClass(activeClass) === true ){
 
-                            if( $tr.hasClass(activeClass) === true ){
+                            $tr.removeClass(activeClass);
 
-                                $tr.removeClass(activeClass);
+                            this._removeSelectRowArr(tr);
 
-                                this._removeSelectRowArr(tr);
+                            this._boxCheckOff(tr);
 
-                                this._boxCheckOff(tr);
+                        }else{
 
-                            }else{
+                            $tr.addClass(activeClass);
 
-                                $tr.addClass(activeClass);
+                            this._addSelectRowArr(tr);
 
-                                this._addSelectRowArr(tr);
-
-                                this._boxCheckOn(tr);
-
-                            }
+                            this._boxCheckOn(tr);
 
                         }
-
-                        this.isChecked = true;
 
                     }
 
@@ -1148,13 +1170,13 @@
 
         addRow:function(data){
 
-            var $body = this.$bodyTable;
+            var $body = this.$bodyTable,rowLength = $body[0].rows.length - 1;
 
-            $body.find('tbody').append( this._tableTbodyTrStr( data, this.tableOption.tableModel, $body[0].rows.length - 1 ) );
+            $body.find('tbody').append( this._tableTbodyTrStr( data, this.tableOption.tableModel, rowLength ) );
 
             this.totalItems++;
 
-            this._changePager( false, true );
+            this._changePager( false, true, rowLength + 1 );
 
             this._boxIsAllCheck();
 
@@ -1167,6 +1189,14 @@
             var tableModel = this.tableOption.tableModel,i = tableModel.length,
 
             thId,child,val,$tr = $(tr),$td;
+
+            if( !$tr[0] ){
+
+                $tr = this.$bodyTable.find('tr[trid="'+ tr +'"]');
+
+                if( !$tr[0] ){ return; }
+
+            }
 
             while( i-- ){
 
@@ -1191,8 +1221,6 @@
                 }
 
             }
-
-            this.isChecked = false;
 
         },
 

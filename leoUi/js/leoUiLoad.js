@@ -740,6 +740,10 @@
 		//通过script节点加载目标模块
 		var node = DOC.createElement("script");
 
+		node.charset = 'utf-8';
+
+		node.async = true;
+
 		node.className = moduleClass; //让getCurrentScript只处理类名为moduleClass的script节点
 
 		node[W3C ? "onload" : "onreadystatechange"] = function() {

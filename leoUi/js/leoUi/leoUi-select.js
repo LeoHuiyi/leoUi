@@ -333,13 +333,21 @@
 
             this.options.showAnimation.call( this.$selectItems, function(){
 
-                $(this).scrollTop(1000);
-
-                console.log($(This.selectedLi).offset().top)
+                This._scrollSelectedToShow();
 
                 This._selectItemsState = 'open';
 
             } );
+
+        },
+
+        _scrollSelectedToShow:function(){
+
+            var $li = $(this.selectedLi),liWidth = $li.outerHeight(true);
+
+            index = this.selectedLi.index();
+
+            this.$selectItems.animate({scrollTop: index*(liWidth-10)}, 100);
 
         }
 

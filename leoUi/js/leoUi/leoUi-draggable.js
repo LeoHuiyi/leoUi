@@ -168,7 +168,7 @@
 
                 var iframe = $( this );
 
-                if( drag === this ){ return null; }
+                if( drag === this || iframe.is(':hidden') ){ return null; }
 
                 return $( "<div>" ).css( { position: "absolute", width: iframe.outerWidth(), height: iframe.outerHeight(), opacity: 0,'backgroundColor':'#fff'} ).insertBefore( this ).offset( iframe.offset() )[0];
 

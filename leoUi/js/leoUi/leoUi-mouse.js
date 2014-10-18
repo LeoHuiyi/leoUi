@@ -1,6 +1,6 @@
 /**
 +-------------------------------------------------------------------
-* jQuery leoUi--mouse
+* jQuery leoUi--mouse//参考jqueryUi
 +-------------------------------------------------------------------
 * @version    1.0.0 beta
 * @author     leo
@@ -20,6 +20,14 @@
     }
 
 }(function($) {
+
+    var mouseHandled = false;
+
+    $( document ).mouseup( function() {
+
+        mouseHandled = false;
+
+    });
 
     $.leoTools.plugIn({
 
@@ -67,7 +75,7 @@
 
                 }
 
-            })
+            });
 
             this.started = false;
 
@@ -143,6 +151,14 @@
 
         _mouseDown: function(event){
 
+            if ( mouseHandled ) {
+
+                return;
+
+            }
+
+            this._mouseMoved = false;
+
             ( this._mouseStarted && this._mouseUp(event) );
 
             this._mouseDownEvent = event;
@@ -211,6 +227,8 @@
 
             event.preventDefault();
 
+            mouseHandled = true;
+
             return true;
 
         },
@@ -221,13 +239,13 @@
 
                 if ($.ui.ie && ( !document.documentMode || document.documentMode < 9 ) && !event.button) {
 
-                        return this._mouseUp(event);
+                    return this._mouseUp(event);
 
-                    } else if ( !event.which ) {
+                } else if ( !event.which ) {
 
-                        return this._mouseUp( event );
+                    return this._mouseUp(event);
 
-                    }
+                }
 
             }
 
@@ -280,6 +298,8 @@
                 this._mouseStop(event);
 
             }
+
+            mouseHandled = false;
 
             return false;
 

@@ -74,6 +74,8 @@
 
             disable:false,
 
+            titlebarDblclickMax:true,//双击标题栏最大化
+
             appendTo: 'body',
 
             modalShowDelay: 0,
@@ -150,6 +152,8 @@
 
             draggableOption:{
 
+                distance:1,
+
                 bClone:false,
 
                 handle:'.leoDialog_titlebar',
@@ -167,6 +171,8 @@
             initResizable:true,
 
             resizableOption:{
+
+                distance:0,
 
                 edge:4,
 
@@ -328,6 +334,8 @@
 
             this._setElements( this.scope );
 
+            this._createDblclick();
+
             this.options.initCallBack.call( this.$target );
 
         },
@@ -341,6 +349,44 @@
         _getHandle:function(event, handle) {
 
             return $( event.target ).closest( this.$target.find(handle) )[0];
+
+        },
+
+        _createDblclick:function(){
+
+            if( this.options.titlebarDblclickMax === false || !this.$uiDialogTitlebar ){ return; }
+
+            var This = this;
+
+            this._on( this.$uiDialogTitlebar, 'dblclick.max', function(event){
+
+                event.preventDefault();
+
+                event.stopPropagation();
+
+                if( This._dialogState === 'open' && !$(event.target).closest('a.leoDialog_titlebar_button')[0] ){
+
+                    if( This.isMaximize ){
+
+                        This._leoDialogRestor();
+
+                    }else{
+
+                        This.$target[This.dependsFnName.resizable]( 'trigger', This.$target, 'mouseleave' );
+
+                        This._leoDialogMaximize();
+
+                    }
+
+                }
+
+            });
+
+        },
+
+        _destroyDblclick:function(){
+
+            this._off( this.$uiDialogTitlebar, 'dblclick.max' );
 
         },
 
@@ -599,6 +645,8 @@
                     this._on( buttonObject, 'click.' + name, function(event){
 
                         event.preventDefault();
+
+                        event.stopPropagation();
 
                         if( This._dialogState === 'open' ){
 
@@ -1403,6 +1451,22 @@
                this._handleDisabledOption(value);
 
                return;
+
+            }
+
+            if( key === 'titlebarDblclickMax' ){
+
+                if( value === false ){
+
+                    this._destroyDblclick();
+
+                }else{
+
+                    this._createDblclick();
+
+                }
+
+                return;
 
             }
 

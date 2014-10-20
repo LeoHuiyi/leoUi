@@ -1251,9 +1251,9 @@
 
                 },
 
-                trigger :function(){
+                trigger: function(){
 
-                    this._trigger();
+                    this._trigger.apply(this,arguments);
 
                 },
 

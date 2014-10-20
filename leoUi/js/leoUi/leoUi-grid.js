@@ -1248,33 +1248,116 @@
 
         },
 
+        _textselect:function(bool) {
+
+            this[bool ? "_on" : "_off"]( this.document, 'selectstart.darg', false );
+
+            this.document.css("-moz-user-select", bool ? "none" : "");
+
+            this.document[0].unselectable = bool ? "off" : "on";
+
+        },
+
         _resizeThEvent:function(){
 
             var This = this;
 
-            this._on( this.$headTable, 'mousedown', 'span.ui-jqgrid-resize-ltr', function(event){
+            this._on( this.$headTable, 'mousedown.dargLine', 'span.ui-jqgrid-resize-ltr', function(event){
 
-                This._resizeLineDragStart(event,th);
-
+                This._resizeLineDragStart(event,this.parentNode);
 
 
             } );
 
 
+        },
 
+        _getTableModel:function(thid){
+
+            var tableModels = this.tableOption.tableModel,
+
+            i = tableModels.length,tableModel;
+
+            while(i--){
+
+                tableModel = tableModels[i];
+
+                if( tableModel.thId === thid ){
+
+                    return tableModel;
+
+                }
+
+            }
 
         },
 
         _resizeLineDragStart:function(event,th){
 
-            var $th = $(th),lineHeight = This.$uiJqgridHdiv.outerHeight() + This.$uiJqgridBdiv.outerHeight(),thWidth = $th.width();
+            var $th = $(th),This = this,
 
-                this.startLeft = event.pageX - this.left;
+            lineHeight = this.$uiJqgridHdiv.outerHeight() + this.$uiJqgridBdiv.outerHeight();
 
-                This.$rsLine.offset({top:0,left:event.pageX}).height(lineHeight).show()
+            this.dargLine = {};
 
+            this.dargLine.tableModel = this._getTableModel(th.id);
+
+            this.$rsLine.css({top:0,left:this.dargLine.firstLeft = ( event.pageX - (this.dargLine.startLeft=this.$gridBox.offset().left))}).height(lineHeight).show();
+
+            this._textselect(true);
+
+            this._on( this.$headTable, 'mousemove.dargLine', function(event){
+
+                This._resizeLineDragMove(event);
+
+
+            } );
+
+            this._on( this.document, 'mouseup.dargLine', function(event){
+
+                This._resizeLineDragStop(event);
+
+
+            } );
+
+            event.preventDefault();
+
+            return true;
 
         },
+
+        _resizeLineDragMove:function(event){
+
+            var dargLine = this.dargLine,
+
+            left = event.pageX - dargLine.startLeft,
+
+            difWidth = left - dargLine.firstLeft;
+
+            this.$rsLine.css({top:0,left:event.pageX - this.dargLine.startLeft});
+
+            event.preventDefault();
+
+            return false;
+
+        },
+
+        _resizeLineDragStop:function(event){
+
+            this._off( this.$headTable, 'mousemove.dargLine' );
+
+            this._off( this.document, 'mouseup.dargLine' );
+
+            this.$rsLine.hide();
+
+            this._textselect(false);
+
+            this.dargLine = null;
+
+            return false;
+
+        },
+
 
         _createHeadTable:function(){
 

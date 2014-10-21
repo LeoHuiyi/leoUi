@@ -1462,6 +1462,8 @@
 
                 }else{
 
+                    this._destroyDblclick();
+
                     this._createDblclick();
 
                 }
@@ -1486,6 +1488,8 @@
 
                 }else{
 
+                    this._destroyOkButton();
+
                     this._createOkButton();
 
                 }
@@ -1501,6 +1505,8 @@
                     this._destroyCancelButton();
 
                 }else{
+
+                    this._destroyCancelButton();
 
                     this._createCancelButton();
 

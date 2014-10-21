@@ -567,7 +567,15 @@
 
             tableModel = tableOption.tableModel,first = false;
 
-            !this.$jqgThtrow && ( this.$jqgThtrow = this.$headTable.find('tr.ui-jqgrid-labels'), first = true );
+            if( !this.$jqgThtrow ){
+
+                this.$jqgThtrow = this.$headTable.find('tr.ui-jqgrid-labels');
+
+                first = true;
+
+                tableOption.firstTableWidth = tableWidth;
+
+            }
 
             this._resizeTableWidth( first, tableWidth );
 
@@ -596,8 +604,6 @@
                 this._boxIsAllCheck();
 
                 this._refreshEvenClass();
-
-                this._resizeTableWidth();
 
             }
 
@@ -752,29 +758,59 @@
 
             this._boxIsAllCheck();
 
-            this._resizeTableWidth();
-
         },
 
         _resizeTableWidth:function( first, firstTableWidth ){
-
-            if( this.tableOption.tableFixed.fixedWidth === 0 ){
-
-                first === true && ( this.$headTable.width(firstTableWidth), this.$bodyTable.width(firstTableWidth) );
-
-                return;
-
-            }
 
             var tableOption = this.tableOption,resizeGetWidth,jqgfirstrow,
 
             tableFixed = tableOption.tableFixed,i,width,prop,propArr = [];
 
-            first === true && this._makeFixedPercent(tableFixed);
+            if( tableOption.isFixed === true ){
 
-            resizeGetWidth = this._resizeGetWidth();
+                first === true && this._makeFixedPercent(tableFixed);
 
-            this._resizeCountWidth( resizeGetWidth.difWidth, tableFixed.fixedProp, resizeGetWidth.tableWidth );
+                resizeGetWidth = this._resizeGetWidth();
+
+                this._resizeCountWidth( resizeGetWidth.difWidth, tableFixed.fixedProp, resizeGetWidth.tableWidth, tableOption );
+
+            }else if( first === true ){
+
+                this.$headTable.width(firstTableWidth);
+
+                this.$bodyTable.width(firstTableWidth);
+
+            }else if( tableOption.isResize === true ){
+
+                this._resizeSetHeadTable(tableOption);
+
+            }
+
+        },
+
+        _resizeSetHeadTable:function(tableOption){
+
+            var tableModels = tableOption.tableModel,i = tableModels.length,
+
+            tableModel,$jqgThtrow = this.$jqgThtrow,
+
+            firstTableWidth = tableOption.firstTableWidth,
+
+            $jqgfirstrow = this.$bodyTable.find('tr.jqgfirstrow');
+
+            while( i-- ){
+
+                tableModel = tableModels[i]
+
+                $jqgThtrow.children('#' + tableModel.thId ).width(tableModel.width);
+
+                $jqgfirstrow.children('td[firstid="'+ tableModel.thId +'"]').width(tableModel.width);
+
+            }
+
+            this.$headTable.width(firstTableWidth);
+
+            this.$bodyTable.width(firstTableWidth);
 
         },
 
@@ -796,39 +832,55 @@
 
         },
 
-        _resizeCountWidth:function( difWidth, fixedProp, tableWidth ){
+        _resizeCountWidth:function( difWidth, fixedProp, tableWidth, tableOption ){
 
-            var i = fixedProp.length,oldWidth = 0,child,
+            var tableModels = tableOption.tableModel,i = tableModels.length,
 
-            jqgfirstrow = this.$bodyTable.find('tr.jqgfirstrow'),width = 0;
+            oldWidth = 0,child,j = fixedProp.length,
+
+            $jqgfirstrow = this.$bodyTable.find('tr.jqgfirstrow'),width = 0,tableModel,
+
+            $jqgThtrow = this.$jqgThtrow;
 
             while( i-- ){
 
-                child = fixedProp[i];
+                tableModel = tableModels[i]
 
-                if( i === 0 ){
+                if( tableModel.fixed === true ){
 
-                    width = difWidth - oldWidth;
+                    child = fixedProp[--j];
 
-                    child.minWidth >= width && ( tableWidth += child.minWidth - width, width = child.minWidth );
+                    if( j === 0 ){
 
-                    child.width = width;
+                        width = difWidth - oldWidth;
 
-                    this.$jqgThtrow.children('#' + child.id ).width(width)
+                        child.minWidth >= width && ( tableWidth += child.minWidth - width, width = child.minWidth );
 
-                    jqgfirstrow.children('td[firstid="'+ child.id +'"]').width(width);
+                        child.width = width;
 
-                }else{
+                        $jqgThtrow.children('#' + child.id ).width(width);
 
-                    oldWidth += width =  Math.round( child.fixedPercent * difWidth )
+                        $jqgfirstrow.children('td[firstid="'+ child.id +'"]').width(width);
 
-                    child.minWidth >= width && ( tableWidth += child.minWidth - width, width = child.minWidth );
+                    }else{
 
-                    child.width = width;
+                        oldWidth += width =  Math.round( child.fixedPercent * difWidth )
 
-                    this.$jqgThtrow.children('#' + child.id ).width(width)
+                        child.minWidth >= width && ( tableWidth += child.minWidth - width, width = child.minWidth );
 
-                    jqgfirstrow.children('td[firstid="'+ child.id +'"]').width(width);
+                        child.width = width;
+
+                        $jqgThtrow.children('#' + child.id ).width(width);
+
+                        $jqgfirstrow.children('td[firstid="'+ child.id +'"]').width(width);
+
+                    }
+
+                }else if( tableOption.isResize === true ){
+
+                    $jqgThtrow.children('#' + tableModel.thId ).width(tableModel.width);
+
+                    $jqgfirstrow.children('td[firstid="'+ tableModel.thId +'"]').width(tableModel.width);
 
                 }
 
@@ -1184,8 +1236,6 @@
 
             this._boxIsAllCheck();
 
-            this._resizeTableWidth();
-
         },
 
         editRow:function( tr, data ){
@@ -1236,15 +1286,37 @@
 
         _createResizeTh:function(){
 
-            var tableOption;
-
-            if( ( tableOption = this.tableOption.isResize ) === true ){
+            if( this.tableOption.isResize === true ){
 
                 this._resizeThEvent();
 
-                this.$rsLine = this.$gridBox.find('#rs_mgrid');
+                this.$rsLine = this.$rsLine || this.$gridBox.find('#rs_mgrid');
 
             }
+
+        },
+
+        _createSortTb:function(){
+
+            if( this.tableOption.isSort === true ){
+
+                this._resizeThEvent();
+
+            }
+
+
+        },
+
+        _resizeThEvent:function(){
+
+            var This = this;
+
+            this._on( this.$headTable, 'mousedown.dargLine', 'span.ui-jqgrid-resize-ltr', function(event){
+
+                This._resizeLineDragStart(event,this.parentNode);
+
+
+            } );
 
         },
 
@@ -1268,7 +1340,6 @@
 
 
             } );
-
 
         },
 
@@ -1294,19 +1365,27 @@
 
         _resizeLineDragStart:function(event,th){
 
-            var $th = $(th),This = this,
+            var $th = $(th),This = this,firstLeft,baseLeft,thId = th.id,dargLine,
 
             lineHeight = this.$uiJqgridHdiv.outerHeight() + this.$uiJqgridBdiv.outerHeight();
 
-            this.dargLine = {};
+            dargLine = this.dargLine = {};
 
-            this.dargLine.tableModel = this._getTableModel(th.id);
+            dargLine.width = $th.width();
 
-            this.$rsLine.css({top:0,left:this.dargLine.firstLeft = ( event.pageX - (this.dargLine.startLeft=this.$gridBox.offset().left))}).height(lineHeight).show();
+            dargLine.thId = thId;
+
+            dargLine.minWidth = this._getTableModel(thId).minWidth;
+
+            this.$rsLine.css({top:0,left:firstLeft = ( event.pageX - (this.dargLine.startLeft=this.$gridBox.offset().left))}).height(lineHeight).show();
+
+            baseLeft = dargLine.baseLeft = firstLeft - dargLine.width;
+
+            dargLine.minLeft = baseLeft + dargLine.minWidth;
 
             this._textselect(true);
 
-            this._on( this.$headTable, 'mousemove.dargLine', function(event){
+            this._on( this.$uiJqgridHdiv, 'mousemove.dargLine', function(event){
 
                 This._resizeLineDragMove(event);
 
@@ -1316,7 +1395,6 @@
             this._on( this.document, 'mouseup.dargLine', function(event){
 
                 This._resizeLineDragStop(event);
-
 
             } );
 
@@ -1330,11 +1408,13 @@
 
             var dargLine = this.dargLine,
 
-            left = event.pageX - dargLine.startLeft,
+            minLeft = dargLine.minLeft,left = event.pageX - dargLine.startLeft;
 
-            difWidth = left - dargLine.firstLeft;
+            minLeft > left && ( left = minLeft );
 
-            this.$rsLine.css({top:0,left:event.pageX - this.dargLine.startLeft});
+            dargLine.left = left;
+
+            this.$rsLine.css({top:0,left:left});
 
             event.preventDefault();
 
@@ -1344,11 +1424,15 @@
 
         _resizeLineDragStop:function(event){
 
-            this._off( this.$headTable, 'mousemove.dargLine' );
+            var dargLine = this.dargLine;
+
+            this._off( this.$uiJqgridHdiv, 'mousemove.dargLine' );
 
             this._off( this.document, 'mouseup.dargLine' );
 
             this.$rsLine.hide();
+
+            this._setTdWidth( dargLine.left - dargLine.baseLeft, dargLine );
 
             this._textselect(false);
 
@@ -1358,6 +1442,25 @@
 
         },
 
+        _setTdWidth:function( newTdWidth, dargLine ){
+
+            var difWidth = newTdWidth - dargLine.width,
+
+            tableOption = this.tableOption,id = dargLine.thId,
+
+            tableWidth = tableOption.tableWidth + difWidth;
+
+            this.$jqgThtrow.children('#' + id ).width(newTdWidth);
+
+            this.$bodyTable.find('tr.jqgfirstrow').children('td[firstid="'+ id +'"]').width(newTdWidth);
+
+            this.$headTable.width(tableWidth);
+
+            this.$bodyTable.width(tableWidth);
+
+            tableOption.isFixed === true && ( tableOption.tableWidth = tableWidth );
+
+        },
 
         _createHeadTable:function(){
 
@@ -1459,7 +1562,7 @@
 
                 str += '<th id = "'+ prop.thId +'" class="ui-state-default ui-th-column ui-th-ltr" style="width:'+ prop.width +'px">';
 
-                prop.resize === true && ( str += '<span class="ui-jqgrid-resize ui-jqgrid-resize-ltr">&nbsp;</span>', tableOption.isResize = true );
+                prop.resize === true && ( str += '<span class="ui-jqgrid-resize ui-jqgrid-resize-ltr" style="cursor: col-resize;">&nbsp;</span>', tableOption.isResize = true );
 
                 prop.sortable === true ? str += '<div class="ui-jqgrid-sortable">' : str += '<div>';
 
@@ -1477,9 +1580,17 @@
 
                 };
 
-                prop.sortable === true && ( str += '<span class="s-ico" style="display:none"><span class="ui-grid-ico-sort ui-icon-asc ui-state-disabled ui-icon ui-icon-triangle-1-n ui-sort-ltr" sort="asc"></span><span class="ui-grid-ico-sort ui-icon-desc ui-state-disabled ui-icon ui-icon-triangle-1-s ui-sort-ltr" sort="desc"></span></span>' );
+                prop.sortable === true && ( str += '<span class="s-ico" style="display:none"><span class="ui-grid-ico-sort ui-icon-asc ui-state-disabled ui-icon ui-icon-triangle-1-n ui-sort-ltr" sort="asc"></span><span class="ui-grid-ico-sort ui-icon-desc ui-state-disabled ui-icon ui-icon-triangle-1-s ui-sort-ltr" sort="desc"></span></span>', tableOption.isSort === true );
 
-                prop.fixed === true && ( tableOption.tableFixed.fixedProp.push( { id: prop.thId, width: prop.width, minWidth: prop.minWidth } ), tableOption.tableFixed.fixedWidth += prop.width );
+                if( prop.fixed === true ){
+
+                    tableOption.tableFixed.fixedProp.push( { id: prop.thId, width: prop.width, minWidth: prop.minWidth } );
+
+                    tableOption.tableFixed.fixedWidth += prop.width;
+
+                    tableOption.isFixed = true;
+
+                }
 
                 str += '</div></th>';
 

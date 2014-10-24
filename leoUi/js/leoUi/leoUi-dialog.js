@@ -1140,23 +1140,23 @@
 
         _initSize:function(){
 
-            var width = this.options.width,height = this.options.height;
-
             this._setContent();
 
-            this._appentTo();
+            var op = this.options,
 
-            this.$target.show().css({ visibility: 'visible', height: 'auto', width: width });
+            width = op.width,height = op.height,
 
-            this.reHeight = this.$target.height() - this.$content.height();
+            $target = this.$target,$content = this.$content;
 
-            this.reWidth = this.$target.width() - this.$content.width();
+            $target.css({ visibility: 'hidden', height: 'auto', width: width, top: -1999, left: -1999 }).show();
 
-            this.$target.css({ height: height, width: width });
+            this.reHeight = $target.height() - $content.height();
 
-            this.$content.width( width === 'auto' ? 'auto' : width - this.reWidth ).height( height === 'auto' ? 'auto' : height - this.reHeight );
+            this.reWidth = $target.width() - $content.width();
 
-            this.$target.hide();
+            $target.hide().css({visibility: 'visible', height: height, width: width});
+
+            $content.width( width === 'auto' ? 'auto' : width - this.reWidth ).height( height === 'auto' ? 'auto' : height - this.reHeight );
 
         },
 
@@ -1178,59 +1178,61 @@
 
         _setSize:function( key, value, firstFlag ){
 
-            var isVisible = this.$target.is( ":visible" ),This = this;
+            var $target = this.$target,This = this,$content = this.$content,
 
-            !isVisible && this.$target.show();
+            isVisible = $target.is( ":visible" );
+
+            !isVisible && $target.show();
 
             if( key === 'width' ){
 
-               this.$target.width(value);
+               $target.width(value);
 
-               this.$content.width( value === 'auto' ? 'auto' : value - this.reWidth );
+               $content.width( value === 'auto' ? 'auto' : value - this.reWidth );
 
             }
 
             if( key === 'height' ){
 
-               this.$target.height(value);
+               $target.height(value);
 
-               this.$content.height( value === 'auto' ? 'auto' : value - this.reHeight );
+               $content.height( value === 'auto' ? 'auto' : value - this.reHeight );
 
             }
 
             if( key === 'position' ){
 
-                this.$target.position(value);
+                $target.position(value);
 
             }
 
             if( key === 'offset' ){
 
-                this.$target.offset(value);
+                $target.offset(value);
 
             }
 
             if( key === 'top' ){
 
-                this.$target.css( 'top' , value );
+                $target.css( 'top' , value );
 
             }
 
             if( key === 'cssPosition' ){
 
-                this.$target.css( 'position' , value );
+                $target.css( 'position' , value );
 
             }
 
             if( key === 'left' ){
 
-                this.$target.css( 'left' , value );
+                $target.css( 'left' , value );
 
             }
 
             firstFlag !== undefined && ( this.firstTime = firstFlag );
 
-            !isVisible && this.$target.hide();
+            !isVisible && $target.hide();
 
         },
 

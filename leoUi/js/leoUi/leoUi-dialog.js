@@ -284,9 +284,7 @@
 
         _init:function(){
 
-            this._initSize();
-
-            this._setZindex();
+            this._createDialog();
 
             this._createCaptionButtons();
 
@@ -335,6 +333,10 @@
             this._setElements( this.scope );
 
             this._createDblclick();
+
+            this._appentTo();
+
+            this._setGialogSize();
 
             this.options.initCallBack.call( this.$target );
 
@@ -1124,11 +1126,9 @@
 
         },
 
-        _setContent:function(){
+        _createDialog:function(){
 
-            this.$content = this.$target.find( '.leoDialog_content' ).append( this.options.contentHtml );
-
-            this._appentTo();
+            this.$content = this.$target.css( 'z-index', this.options.zIndex ).find( '.leoDialog_content' ).append( this.options.contentHtml );
 
         },
 
@@ -1138,9 +1138,7 @@
 
         },
 
-        _initSize:function(){
-
-            this._setContent();
+        _setGialogSize:function(){
 
             var op = this.options,
 
@@ -1150,11 +1148,13 @@
 
             $target.css({ visibility: 'hidden', height: 'auto', width: width, top: -1999, left: -1999 }).show();
 
+            $content.css( 'width', 'auto' );
+
             this.reHeight = $target.height() - $content.height();
 
             this.reWidth = $target.width() - $content.width();
 
-            $target.hide().css({visibility: 'visible', height: height, width: width});
+            $target.hide().css({visibility: 'visible', height: height});
 
             $content.width( width === 'auto' ? 'auto' : width - this.reWidth ).height( height === 'auto' ? 'auto' : height - this.reHeight );
 
@@ -1251,6 +1251,8 @@
         dialogShow:function(){
 
             if( this._dialogState === 'close' && !this.$modal ){
+
+                this._setGialogSize();
 
                 this._moveToTop();
 

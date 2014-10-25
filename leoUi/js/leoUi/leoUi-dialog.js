@@ -336,8 +336,6 @@
 
             this._appentTo();
 
-            this._setGialogSize();
-
             this.options.initCallBack.call( this.$target );
 
         },
@@ -1128,7 +1126,7 @@
 
         _createDialog:function(){
 
-            this.$content = this.$target.css( 'z-index', this.options.zIndex ).find( '.leoDialog_content' ).append( this.options.contentHtml );
+            this.$content = this.$target.hide().css( 'z-index', this.options.zIndex ).find( '.leoDialog_content' ).append( this.options.contentHtml );
 
         },
 
@@ -1138,25 +1136,31 @@
 
         },
 
-        _setGialogSize:function(){
+        _setFirstGialogSize:function(){
 
-            var op = this.options,
+            if( this.firstTime === true ){
 
-            width = op.width,height = op.height,
+                var op = this.options,
 
-            $target = this.$target,$content = this.$content;
+                width = op.width,height = op.height,
 
-            $target.css({ visibility: 'hidden', height: 'auto', width: width, top: -1999, left: -1999 }).show();
+                $target = this.$target,$content = this.$content;
 
-            $content.css( 'width', 'auto' );
+                $content.css( 'width', 'auto' );
 
-            this.reHeight = $target.height() - $content.height();
+                $target.css({  height: 'auto', width: width, top: -1999, left: -1999 }).show();
 
-            this.reWidth = $target.width() - $content.width();
+                this.reHeight = $target.height() - $content.height();
 
-            $target.hide().css({visibility: 'visible', height: height});
+                this.reWidth = $target.width() - $content.width();
 
-            $content.width( width === 'auto' ? 'auto' : width - this.reWidth ).height( height === 'auto' ? 'auto' : height - this.reHeight );
+                $target.css({height: height}).position(op.position).hide();
+
+                $content.width( width === 'auto' ? 'auto' : width - this.reWidth ).height( height === 'auto' ? 'auto' : height - this.reHeight );
+
+                this.firstTime = false;
+
+            }
 
         },
 
@@ -1176,7 +1180,7 @@
 
         },
 
-        _setSize:function( key, value, firstFlag ){
+        _setSize:function( key, value ){
 
             var $target = this.$target,This = this,$content = this.$content,
 
@@ -1230,8 +1234,6 @@
 
             }
 
-            firstFlag !== undefined && ( this.firstTime = firstFlag );
-
             !isVisible && $target.hide();
 
         },
@@ -1244,7 +1246,7 @@
 
         _restore:function(){
 
-            !this.firstTime && this.options.restore && this._setSizes( this.originalSize );
+            this.firstTime === false && this.options.restore === true && this._setSizes( this.originalSize );
 
         },
 
@@ -1252,7 +1254,9 @@
 
             if( this._dialogState === 'close' && !this.$modal ){
 
-                this._setGialogSize();
+                this._restore();
+
+                this._setFirstGialogSize();
 
                 this._moveToTop();
 
@@ -1261,10 +1265,6 @@
                 this._setDraggableDisabled(true);
 
                 this._setResizableDisabled(true);
-
-                this.firstTime === true && this._setSize( 'position', this.options.position, false );
-
-                this._restore();
 
                 this.options.beforeShow.call( this.$target );
 

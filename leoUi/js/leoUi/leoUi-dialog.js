@@ -296,7 +296,7 @@
 
             this._dialogEventBind();
 
-            this._setInnerFrame();
+            this._setInnerIframe();
 
             this.originalSize = {
 
@@ -776,7 +776,7 @@
 
         _handleIframeMask: function(flag) {
 
-            if( !this.innerFrame ){return;}
+            if( !this.innerIframe ){return;}
 
             if ( flag === true ) {
 
@@ -792,15 +792,35 @@
 
         },
 
-        _setInnerFrame:function(){
+        _setInnerIframe:function(){
 
             if( this.options.fixIframeMask ){
 
-                this.innerFrame = this.$content.find('iframe')[0];
+                this.innerIframe = this.$content.find('iframe')[0];
 
             }else{
 
-                this.innerFrame = false;
+                this.innerIframe = false;
+
+            }
+
+        },
+
+        _destoryIframe:function(){
+
+            if( this.innerIframe ){
+
+                var iframe = this.innerIframe,$iframe = $( this.innerIframe );
+
+                $iframe.attr('src', 'about:blank');
+
+                iframe.contentWindow.document.write('');
+
+                iframe.contentWindow.document.close();
+
+                (/msie/.test(navigator.userAgent.toLowerCase())) && CollectGarbage();
+
+                $iframe.remove();
 
             }
 
@@ -808,7 +828,7 @@
 
         _destoryIframeMask: function() {
 
-            if ( this.innerFrame && this.mask ) {
+            if ( this.innerIframe && this.mask ) {
 
                 this.mask.remove();
 
@@ -820,11 +840,11 @@
 
         _leoDialogRefresh:function(){
 
-            if ( this.innerFrame ) {
+            if ( this.innerIframe ) {
 
-                var fr = $( this.innerFrame );
+                var $fr = $( this.innerIframe );
 
-                fr.attr( "src", fr.attr("src") );
+                $fr.attr( "src", $fr.attr("src") );
 
             }
 
@@ -866,7 +886,7 @@
 
             !this.$modal ? zIndex = this.options.zIndex : zIndex = this.$modal.css('zIndex') + 1;
 
-            if( this.innerFrame ){
+            if( this.innerIframe ){
 
                 this.$target.hide();
 
@@ -886,7 +906,7 @@
 
             this.$target.find('.leoDialog_titlebar_button_float').css( 'float', '' ).end().find('.leoDialog_titlebar_button_hide').show();
 
-            if( this.innerFrame ){
+            if( this.innerIframe ){
 
                 this.$target.show();
 
@@ -1478,7 +1498,7 @@
 
             if( key === 'fixIframeMask' ){
 
-                this._setInnerFrame();
+                this._setInnerIframe();
 
                 return;
 
@@ -1755,7 +1775,7 @@
 
                 var This = this,$target = this.$target;
 
-                !!this.innerFrame && !!this.isMinimize && ( $target = this.$minimizeBar );
+                !!this.innerIframe && !!this.isMinimize && ( $target = this.$minimizeBar );
 
                 this._dialogState = 'opening';
 
@@ -1861,7 +1881,7 @@
 
                 var This = this,$target = this.$target;
 
-                !!this.innerFrame && !!this.isMinimize && ( $target = this.$minimizeBar );
+                !!this.innerIframe && !!this.isMinimize && ( $target = this.$minimizeBar );
 
                 this._beforeDialogHideCallback.call(this);
 
@@ -1910,6 +1930,8 @@
             this.$target[this.dependsFnName.draggable]('destroy');
 
             this.$target[this.dependsFnName.resizable]('destroy');
+
+            this._destoryIframe();
 
             this.$target.remove();
 

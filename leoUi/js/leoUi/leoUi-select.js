@@ -93,7 +93,7 @@
 
         	}
 
-        	this._cearteSelectHtml();
+        	this._createSelectHtml();
 
         	this._initSelectItemsState();
 
@@ -101,7 +101,7 @@
 
         },
 
-        _cearteSelectHtml:function(){
+        _createSelectHtml:function(){
 
         	var $target = this.$target,op = this.options,
 

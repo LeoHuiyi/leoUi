@@ -105,7 +105,7 @@
 
         	var $target = this.$target,op = this.options,
 
-        	selectTitStr = op.selectTitHtml,$el,opWidth = op.width,
+        	selectTitStr = op.selectTitHtml,$el,
 
         	selectItemsStr = op.selectItemsHtml,selectedClass = op.selectedClass,
 
@@ -119,7 +119,7 @@
 
                 if( $el.prop('selected') === true ){
 
-                    ulStr += '<li class="selected';
+                    ulStr += '<li class="'+selectedClass+'"';
 
                     $el.prop('disabled') === true ? ulStr += ' ' + disabledClass + '"' : ulStr += '"';
 

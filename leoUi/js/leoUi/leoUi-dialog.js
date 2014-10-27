@@ -262,6 +262,8 @@
 
             quickCloseCallBack:$.noop,
 
+            iframeLoadCallBack:$.noop,
+
             dialogShowCallBack: function(clickCallBackName){
 
                 // this.dialogHide();
@@ -796,7 +798,24 @@
 
             if( this.options.fixIframeMask ){
 
-                this.innerIframe = this.$content.find('iframe')[0];
+                var $content = this.$content,$iframe = $content.find('iframe'),
+
+                iframeLoadCallBack = this.options.iframeLoadCallBack;
+
+                if( $iframe[0] ){
+
+                    this.innerIframe = $iframe[0];
+
+                    this._on( $iframe, 'load', function(event){
+
+                        !!iframeLoadCallBack && iframeLoadCallBack.call( $content, event );
+
+                    } );
+
+                }else{
+
+                    this.innerIframe = false;
+                }
 
             }else{
 
@@ -812,11 +831,17 @@
 
                 var iframe = this.innerIframe,$iframe = $( this.innerIframe );
 
+                this._off( $iframe, 'load' );
+
                 $iframe.attr('src', 'about:blank');
 
-                iframe.contentWindow.document.write('');
+                try{
 
-                iframe.contentWindow.document.close();
+                    iframe.contentWindow.document.write('');
+
+                    iframe.contentWindow.document.close();
+
+                }catch(e){};
 
                 (/msie/.test(navigator.userAgent.toLowerCase())) && CollectGarbage();
 

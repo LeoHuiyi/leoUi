@@ -190,7 +190,9 @@
 
         _mouseCapture:function(event){
 
-            if( this.options.disabled === true || this.options.onBeforeDrag.call( this.$target[0] ) === false || this._getHandle(event) === false ){
+            var op = this.options
+
+            if( op.disabled === true || op.onBeforeDrag.call( this.$target[0] ) === false || this._getHandle(event) === false ){
 
                 return false;
 
@@ -204,17 +206,17 @@
 
             if( !( init === true || this.isDelegatSelector === true ) ){ return; }
 
-            var oc = this.options.containment,el = this.$target,
+            var op = this.options,oc = op.containment,el = this.$target,
 
             ce = ( oc instanceof $ ) ? oc.get( 0 ) : ( oc === 'parent' ) ? el.parent().get( 0 ) : oc;
 
             if(!ce){
 
-                this.$dragMaxX = this.$dragMaxY = 'max';
+                this.dragMaxX = this.dragMaxY = 'max';
 
-                this.$dragMinX = this.$dragMinY = 'min';
+                this.dragMinX = this.dragMinY = 'min';
 
-                this.options.containment = false;
+                op.containment = false;
 
                 return;
 
@@ -240,13 +242,13 @@
 
             if( oc.constructor === Array ){
 
-                this.$dragMinX = oc[0];
+                this.dragMinX = oc[0];
 
-                this.$dragMinY = oc[1];
+                this.dragMinY = oc[1];
 
-                this.$dragMaxX = oc[2] - this.dragBoxouterW;
+                this.dragMaxX = oc[2] - this.dragBoxouterW;
 
-                this.$dragMaxY = oc[3] - this.dragBoxouterH;
+                this.dragMaxY = oc[3] - this.dragBoxouterH;
 
                 this._setAxis();
 
@@ -278,11 +280,11 @@
 
             if( this.options.axis === 'x' ){
 
-                this.$dragMinY = this.$dragMaxY = this.top;
+                this.dragMinY = this.dragMaxY = this.top;
 
             }else if( this.options.axis === 'y' ){
 
-                this.$dragMinX = this.$dragMaxX = this.left;
+                this.dragMinX = this.dragMaxX = this.left;
 
             }
 
@@ -296,41 +298,23 @@
 
             }
 
-            var within = $.position.getWithinInfo( this.$containment[0] ),
+            var fnPosition = $.position,borderWidths = this.borderWidths,
 
-            scrollInfo = $.position.getScrollInfo( within ),maxX,maxY
+            within = fnPosition.getWithinInfo( this.$containment[0] ),
+
+            scrollInfo = fnPosition.getScrollInfo( within ),maxX,maxY,
 
             outerH = this.dragBoxouterH,outerW = this.dragBoxouterW,
 
             withinOffset = within.isDocument ? { left: 0, top: 0 } : within.isWindow ? { left: within.scrollLeft, top: within.scrollTop } : within.offset;
 
-            this.$dragMinY = withinOffset.top + this.borderWidths.top;
+            this.dragMinY = withinOffset.top + borderWidths.top;
 
-            this.$dragMinX = withinOffset.left + this.borderWidths.left;
+            this.dragMinX = withinOffset.left + borderWidths.left;
 
-            this.$dragMaxY = withinOffset.top + within.height - scrollInfo.height - this.borderWidths.bottom - outerH;
+            this.dragMaxY = withinOffset.top + within.height - scrollInfo.height - borderWidths.bottom - outerH;
 
-            this.$dragMaxX = withinOffset.left + within.width - scrollInfo.width - this.borderWidths.right - outerW;
-
-            if( this.$dragMinX > this.$dragMaxX ){
-
-                maxX = this.$dragMinX;
-
-                this.$dragMinX = this.$dragMaxX;
-
-                this.$dragMaxX = maxX;
-
-            }
-
-            if( this.$dragMinY > this.$dragMaxY ){
-
-                maxY = this.$dragMinY;
-
-                this.$dragMinY = this.$dragMaxY;
-
-                this.$dragMaxY = maxY;
-
-            }
+            this.dragMaxX = withinOffset.left + within.width - scrollInfo.width - borderWidths.right - outerW;
 
             this._setAxis();
 
@@ -384,7 +368,7 @@
 
         _mouseStart:function(event) {
 
-            var offset,o = this.options;
+            var offset,o = this.options,$target = this.$target;
 
             if( this.hasClone === true ){
 
@@ -392,15 +376,15 @@
 
             }
 
-            this.$dragBox = this.$target;
+            this.$dragBox = $target;
 
             this.options.cursor !== false && ( this.oldCur = this.$body.css('cursor') );
 
-            this.revertBoxTop = $.leoTools.parseCss(this.$target[0],'top');
+            this.revertBoxTop = $.leoTools.parseCss($target[0],'top');
 
-            this.revertBoxLeft = $.leoTools.parseCss(this.$target[0],'left');
+            this.revertBoxLeft = $.leoTools.parseCss($target[0],'left');
 
-            offset = this.$target.offset();
+            offset = $target.offset();
 
             this.left = offset.left;
 
@@ -408,9 +392,9 @@
 
             if ( o.bClone ) {
 
-                !! o.bCloneAnimate && this.$target.stop(true, false);
+                !! o.bCloneAnimate && $target.stop(true, false);
 
-                this.$dragBox = o.proxy.call( null, this.$target[0] ).offset( { left: this.left, top: this.top } );
+                this.$dragBox = o.proxy.call( null, $target[0] ).offset( { left: this.left, top: this.top } );
 
                 this.hasClone = true;
 
@@ -424,7 +408,7 @@
 
             this.revertBoxLeft = this.left;
 
-            !!this.options.mouseDownSelector && this._getContainment();
+            !!o.mouseDownSelector && this._getContainment();
 
             this._getContainmentInfo();
 
@@ -440,7 +424,7 @@
 
             this._blockFrames();
 
-            o.onStartDrag.call( this.$target[0], event, this.$dragBox[0] );
+            o.onStartDrag.call( $target[0], event, this.$dragBox[0] );
 
             !!this.oldCur && this.$body.css( 'cursor', o.cursor );
 
@@ -479,7 +463,7 @@
 
                 }
 
-                this.$dragBox.offset( { left: this.left,top: this.top } );
+                this.$dragBox.offset( { left: this.left, top: this.top } );
 
             }
 
@@ -493,27 +477,31 @@
 
         setDropsProp:function(){
 
-            if( this.options.useDroppable === false && !$.fn[this.relevanceFnName.droppable] ){
+            var fnFroppable = $.fn[this.relevanceFnName.droppable],op = this.options;
+
+            if( op.useDroppable === false && !fnFroppable ){
 
                 return;
 
             }
 
-            $.fn[this.relevanceFnName.droppable].setDropsProp( this.options.droppableScope, this.$target );
+            fnFroppable.setDropsProp( op.droppableScope, this.$target );
 
         },
 
         _checkPosition:function( event, top, left, first ){
 
-            if( this.options.useDroppable === false && !$.fn[this.relevanceFnName.droppable]  ){
+            var fnDroppable = $.fn[this.relevanceFnName.droppable],op = this.options;
+
+            if( op.useDroppable === false && !fnDroppable  ){
 
                 return;
 
             }
 
-            $.fn[this.relevanceFnName.droppable].checkPosition( event, {
+            fnDroppable.checkPosition( event, {
 
-                scope: this.options.droppableScope,
+                scope: op.droppableScope,
 
                 box: this.$target,
 
@@ -533,15 +521,17 @@
 
         _drop:function( event, top, left ){
 
-            if( this.options.useDroppable === false && !$.fn[this.relevanceFnName.droppable] ){
+            var fnDroppable = $.fn[this.relevanceFnName.droppable],op = this.options;
+
+            if( op.useDroppable === false && !fnDroppable ){
 
                 return;
 
             }
 
-            return $.fn[this.relevanceFnName.droppable].drop( event, {
+            return fnDroppable.drop( event, {
 
-                scope: this.options.droppableScope,
+                scope: op.droppableScope,
 
                 box: this.$target,
 
@@ -559,19 +549,23 @@
 
         },
 
-        _scroll:function( event, scrollParent, o, scrolled, doc , win ){
+        _scroll:function( event, scrollParent, o, $doc , $win ){
 
-            if ( scrollParent !== doc && scrollParent.tagName !== "HTML" ) {
+            var axis = o.axis,scrolled = false,pageX = event.pageX,pageY = event.pageY,
 
-                var overflowOffset = $(scrollParent).offset();
+            overflowOffset,docScrollTop,docScrollTop;
 
-                if ( !o.axis || o.axis !== "x" ) {
+            if ( scrollParent !== $doc[0] && scrollParent.tagName !== "HTML" ) {
 
-                    if ( ( overflowOffset.top + scrollParent.offsetHeight) - event.pageY < o.scrollSensitivity ) {
+                overflowOffset = $(scrollParent).offset();
+
+                if ( !axis || axis !== "x" ) {
+
+                    if ( ( overflowOffset.top + scrollParent.offsetHeight ) - pageY < o.scrollSensitivity ) {
 
                         scrollParent.scrollTop = scrolled = scrollParent.scrollTop + o.scrollSpeed;
 
-                    } else if ( event.pageY - overflowOffset.top < o.scrollSensitivity ) {
+                    } else if ( pageY - overflowOffset.top < o.scrollSensitivity ) {
 
                         scrollParent.scrollTop = scrolled = scrollParent.scrollTop - o.scrollSpeed;
 
@@ -579,13 +573,13 @@
 
                 }
 
-                if ( !o.axis || o.axis !== "y" ) {
+                if ( !axis || axis !== "y" ) {
 
-                    if ( ( overflowOffset.left + scrollParent.offsetWidth) - event.pageX < o.scrollSensitivity ) {
+                    if ( ( overflowOffset.left + scrollParent.offsetWidth) - pageX < o.scrollSensitivity ) {
 
                         scrollParent.scrollLeft = scrolled = scrollParent.scrollLeft + o.scrollSpeed;
 
-                    } else if ( event.pageX - overflowOffset.left < o.scrollSensitivity ) {
+                    } else if ( pageX - overflowOffset.left < o.scrollSensitivity ) {
 
                         scrollParent.scrollLeft = scrolled = scrollParent.scrollLeft - o.scrollSpeed;
 
@@ -595,29 +589,37 @@
 
             } else {
 
-                if ( !o.axis || o.axis !== "x" ) {
+                if ( !axis || axis !== "x" ) {
 
-                    if ( event.pageY - $(doc).scrollTop() < o.scrollSensitivity ) {
+                    docScrollTop = $doc.scrollTop();
 
-                        scrolled = $(doc).scrollTop( $(doc).scrollTop() - o.scrollSpeed );
+                    this.isWinScrollToplock = true;
 
-                    } else if ( $(win).height() - ( event.pageY - $(doc).scrollTop() ) < o.scrollSensitivity ) {
+                    if ( pageY - docScrollTop < o.scrollSensitivity ) {
 
-                        scrolled = $(doc).scrollTop( $(doc).scrollTop() + o.scrollSpeed );
+                        scrolled = $doc.scrollTop( docScrollTop - o.scrollSpeed );
+
+                    } else if ( this.winScrollToplock === true && $win.height() - ( pageY - docScrollTop ) < o.scrollSensitivity ) {
+
+                        scrolled = $doc.scrollTop( docScrollTop + o.scrollSpeed );
 
                     }
 
                 }
 
-                if ( !o.axis || o.axis !== "y" ) {
+                if ( !axis || axis !== "y" ) {
 
-                    if ( event.pageX - $(doc).scrollLeft() < o.scrollSensitivity ) {
+                    docScrollLeft = $doc.scrollLeft();
 
-                        scrolled = $(doc).scrollLeft( $(doc).scrollLeft() - o.scrollSpeed );
+                    this.isWinScrollLeftlock = true;
 
-                    } else if ( $(win).width() - ( event.pageX - $(doc).scrollLeft() ) < o.scrollSensitivity) {
+                    if ( pageX - docScrollLeft < o.scrollSensitivity ) {
 
-                        scrolled = $(doc).scrollLeft( $(doc).scrollLeft() + o.scrollSpeed );
+                        scrolled = $doc.scrollLeft( docScrollLeft - o.scrollSpeed );
+
+                    } else if ( this.winScrollLeftlock === true && $win.width() - ( pageX - docScrollLeft ) < o.scrollSensitivity ) {
+
+                        scrolled = $doc.scrollLeft( docScrollLeft + o.scrollSpeed );
 
                     }
 
@@ -625,7 +627,7 @@
 
             }
 
-            this._checkPosition( event, this.top, this.left );
+            scrolled !== false && this._checkPosition( event, this.top, this.left );
 
         },
 
@@ -637,19 +639,13 @@
 
             }
 
-            var scrollParents = this.scrollParents,length =  scrollParents.length;
+            var scrollParents = this.scrollParents,i = scrollParents.length,
 
-            if( length > 1 ){
+            $doc = this.document,$win = this.window,op = this.options;
 
-                for ( i = length - 1; i >= 0; i--) {
+            while( i-- ){
 
-                    this._scroll( event, scrollParents[i], this.options, false, this.document[0], this.window );
-
-                };
-
-            }else{
-
-                this._scroll( event, scrollParents[0], this.options, false, this.document[0], this.window );
+                this._scroll( event, scrollParents[i], op, $doc, $win );
 
             }
 
@@ -657,19 +653,21 @@
 
         _setGrid:function(){
 
-            var o = this.options;
+            var grid = this.options.grid;
 
-            if( o.grid ){
+            if( grid ){
 
-                this.top = o.grid[1] ? Math.round( this.top / o.grid[1] ) * o.grid[1] : this.top;
+                this.top = grid[1] ? Math.round( this.top / grid[1] ) * grid[1] : this.top;
 
-                this.left = o.grid[0] ? Math.round( this.left / o.grid[1] ) * o.grid[1] : this.left;
+                this.left = grid[0] ? Math.round( this.left / grid[1] ) * grid[1] : this.left;
 
             }
 
         },
 
         _mouseDrag:function(event) {
+
+            var range = $.leoTools.range,op,$win = this.window,scroll,top,left;
 
             this._dragScroll(event);
 
@@ -681,15 +679,75 @@
 
             this._setGrid();
 
-            this.options.onDrag.call( this.$target[0], event, this.$dragBox[0] );
+            op = this.options;
 
-            this.left = $.leoTools.range( this.left, this.$dragMinX, this.$dragMaxX );
+            scroll = op.scroll;
 
-            this.top = $.leoTools.range( this.top, this.$dragMinY, this.$dragMaxY );
+            top = this.top;
 
-            this.$dragBox.offset( { left:this.left, top:this.top } );
+            left = this.left;
 
-            this.options.refreshPositions === true && this.setDropsProp();
+            op.onDrag.call( this.$target[0], event, this.$dragBox[0] );
+
+            if( this.dragMinX > this.dragMaxX ){
+
+                left = range( -left, this.dragMaxX, this.dragMinX );
+
+                if( scroll === true ){
+
+                    if( this.isWinScrollLeftlock === true && event.pageX >= $win.width() - op.scrollSensitivity ){
+
+                        left = this.dragMaxX;
+
+                        this.winScrollLeftlock = true;
+
+                    }else{
+
+                        this.winScrollLeftlock = false;
+
+                    }
+
+                }
+
+            }else{
+
+                scroll === true && ( this.winScrollLeftlock = true );
+
+                left = range( left, this.dragMinX, this.dragMaxX );
+
+            }
+
+            if( this.dragMinY > this.dragMaxY ){
+
+                top = range( -top, this.dragMaxY, this.dragMinY );
+
+                if( scroll === true ){
+
+                    if( this.isWinScrollToplock === true && event.pageY >= $win.height() - op.scrollSensitivity - 3 ){
+
+                        top = this.dragMaxY;
+
+                        this.winScrollToplock = true;
+
+                    }else{
+
+                        this.winScrollToplock = false;
+
+                    }
+
+                }
+
+            }else{
+
+                scroll === true && ( this.winScrollToplock = true );
+
+                top = range( top, this.dragMinY, this.dragMaxY );
+
+            }
+
+            this.$dragBox.offset( { left: this.left = left, top: this.top = top } );
+
+            op.refreshPositions === true && this.setDropsProp();
 
             this._checkPosition( event, this.top, this.left );
 
@@ -697,11 +755,13 @@
 
         _mouseStop:function(event) {
 
-            var This = this,boxOffset,o = this.options,droped;
+            var This = this,boxOffset,o = this.options,droped,
+
+            $target = this.$target,$dragBox = this.$dragBox,onStopDrag = o.onStopDrag;
 
             !!this.oldCur && this.$body.css( 'cursor', this.oldCur );
 
-            o.onBeforeStopDrag.call( this.$target[0], event, this.$dragBox[0] );
+            o.onBeforeStopDrag.call( $target[0], event, $dragBox[0] );
 
             this._stopOffMouseWheel();
 
@@ -713,7 +773,7 @@
 
                 if( o.bClone ){
 
-                    this.$dragBox.remove();
+                    $dragBox.remove();
 
                     this.hasClone = false;
 
@@ -727,13 +787,13 @@
 
                         if( o.revertAnimate && this._isMove( this.revertBoxLeft, this.revertBoxTop, this.left, this.top ) ){
 
-                            $.offset.setOffset( this.$dragBox[0], { top: this.revertBoxTop, left: this.revertBoxLeft, using: function(prop){
+                            $.offset.setOffset( $dragBox[0], { top: this.revertBoxTop, left: this.revertBoxLeft, using: function(prop){
 
-                                This.$dragBox.animate( { left: prop.left, top: prop.top }, { duration: o.duration, complete:function(){
+                                $dragBox.animate( { left: prop.left, top: prop.top }, { duration: o.duration, complete:function(){
 
-                                    This.$dragBox.remove();
+                                    $dragBox.remove();
 
-                                    o.onStopDrag.call(This.$target[0], event);
+                                    onStopDrag.call($target[0], event);
 
                                     This.hasClone = false;
 
@@ -743,11 +803,11 @@
 
                         }else{
 
-                            this.$dragBox.remove();
+                            $dragBox.remove();
 
                             this.hasClone = false;
 
-                            o.onStopDrag.call( this.$target[0], event );
+                            onStopDrag.call( $target[0], event );
 
                         }
 
@@ -755,17 +815,17 @@
 
                         if( o.dragBoxReturnToTarget ){
 
-                            boxOffset = this.$target.offset();
+                            boxOffset = $target.offset();
 
                             if( o.bCloneAnimate && this._isMove( boxOffset.left, boxOffset.top, this.left, this.top ) ){
 
-                                $.offset.setOffset( this.$dragBox[0], { top: boxOffset.top, left: boxOffset.left, using: function(prop){
+                                $.offset.setOffset( $dragBox[0], { top: boxOffset.top, left: boxOffset.left, using: function(prop){
 
-                                    This.$dragBox.animate( { left: prop.left, top: prop.top }, { duration: o.duration, complete:function(){
+                                    $dragBox.animate( { left: prop.left, top: prop.top }, { duration: o.duration, complete:function(){
 
-                                        This.$dragBox.remove();
+                                        $dragBox.remove();
 
-                                        o.onStopDrag.call(This.$target[0], event);
+                                        onStopDrag.call($target[0], event);
 
                                         This.hasClone = false;
 
@@ -775,27 +835,27 @@
 
                             }else{
 
-                                this.$dragBox.remove();
+                                $dragBox.remove();
 
-                                !o.bCloneAnimate && this.$target.offset( { left: boxOffset.left, top: boxOffset.top } );
+                                !o.bCloneAnimate && $target.offset( { left: boxOffset.left, top: boxOffset.top } );
 
                                 this.hasClone = false;
 
-                                o.onStopDrag.call( this.$target[0], event );
+                                onStopDrag.call( $target[0], event );
 
                             }
 
                         }else{
 
-                            this.$dragBox.remove();
+                            $dragBox.remove();
 
                             if( o.bCloneAnimate && this._isMove( this.revertBoxLeft, this.revertBoxTop, this.left, this.top ) ){
 
-                                $.offset.setOffset( this.$target[0], { top: this.top,left: this.left, using: function(prop){
+                                $.offset.setOffset( $target[0], { top: this.top,left: this.left, using: function(prop){
 
-                                    This.$target.animate( { left: prop.left, top: prop.top}, { duration: o.duration, complete:function(){
+                                    $target.animate( { left: prop.left, top: prop.top}, { duration: o.duration, complete:function(){
 
-                                        o.onStopDrag.call(This.$target[0], event);
+                                        onStopDrag.call($target[0], event);
 
                                     }});
 
@@ -803,9 +863,9 @@
 
                             }else{
 
-                                !o.bCloneAnimate && this.$target.offset( { left: this.left, top: this.top } );
+                                !o.bCloneAnimate && $target.offset( { left: this.left, top: this.top } );
 
-                                o.onStopDrag.call( this.$target[0], event );
+                                onStopDrag.call( $target[0], event );
 
                             }
 
@@ -821,11 +881,11 @@
 
                         if( o.revertAnimate && this._isMove( this.revertBoxLeft, this.revertBoxTop, this.left, this.top ) ){
 
-                            $.offset.setOffset( this.$target[0], { top: this.revertBoxTop, left: this.revertBoxLeft, using: function(prop){
+                            $.offset.setOffset( $target[0], { top: this.revertBoxTop, left: this.revertBoxLeft, using: function(prop){
 
-                                This.$target.animate( { left: prop.left, top: prop.top }, { duration: o.duration, complete:function(){
+                                $target.animate( { left: prop.left, top: prop.top }, { duration: o.duration, complete:function(){
 
-                                    o.onStopDrag.call(This.$target[0], event);
+                                    onStopDrag.call($target[0], event);
 
                                 }});
 
@@ -833,13 +893,13 @@
 
                         }else{
 
-                            o.onStopDrag.call( this.$target[0], event );
+                            onStopDrag.call( $target[0], event );
 
                         }
 
                     }else{
 
-                        o.onStopDrag.call( this.$target[0], event );
+                        onStopDrag.call( $target[0], event );
 
                     }
 

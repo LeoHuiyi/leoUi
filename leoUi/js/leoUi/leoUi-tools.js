@@ -458,7 +458,7 @@
 
         excludeStaticParent = position === "absolute",doc =  $box[ 0 ].ownerDocument || document;
 
-        if( ( /fixed/ ).test( $box.css( "position" ) ) && !all ){
+        if( ( /fixed/ ).test( position ) && !all ){
 
             return 'boxFixed';
 

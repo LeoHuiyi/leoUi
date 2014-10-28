@@ -839,7 +839,9 @@
 
                             var dfd = $.Deferred();
 
-                            fnArr.push(dfd.done(child.edit.typeOption( dfd, prop.edit, 'typeOption' )));
+                            child.edit.typeOption( dfd, prop.edit, 'typeOption' );
+
+                            fnArr.push(dfd);
 
                         }else{
 
@@ -1186,7 +1188,7 @@
 
                 this._on( this.$thCheck = this.$thCheck || this.$headTable.find( '#' + this.tableOption.checkBoxId ), 'click.checkBox', function(event){
 
-                    This.boxAllCheck( this, true );
+                    This.boxAllCheck( event, this, true );
 
                 } );
 
@@ -1206,13 +1208,13 @@
 
         },
 
-        boxAllCheck:function( input, notSetCheck ){
+        boxAllCheck:function( event, input, notSetCheck ){
 
             if( this.options.disabledCheck === true ){ return; }
 
             var checkBoxId = this.tableOption.checkBoxId,This = this,
 
-            activeClass = this.options.activeClass,
+            activeClass = this.options.activeClass,$input = $(input),
 
             isAllChecked = this._getSelectRowArrLength() === this.$bodyTable[0].rows.length - 1;
 
@@ -1226,7 +1228,7 @@
 
                 }
 
-            }
+            };
 
             this.$bodyTable.find('tr').not('tr.jqgfirstrow').each(function(index, el) {
 
@@ -1251,6 +1253,8 @@
                 }
 
             });
+
+            isAllChecked === false ? $input.prop( 'checked', true ) : $input.prop( 'checked', false );
 
             !notSetCheck && this._boxIsAllCheck();
 
@@ -1334,13 +1338,23 @@
 
         addRow:function(data){
 
-            var $body = this.$bodyTable,rowLength = $body[0].rows.length - 1;
+            var $body = this.$bodyTable,rowLength = $body[0].rows.length - 1,
 
-            $body.find('tbody').append( this._tableTbodyTrStr( data, this.tableOption.tableModel, rowLength ) );
+            length,i = 0,totalItems = +this.totalItems;
 
-            this.totalItems++;
+            $.type(data) !== 'array' && (data = [data]);
 
-            this._changePager( false, true, rowLength + 1 );
+            length = data.length;
+
+            for ( ; i < length; i++ ) {
+
+                $body.find('tbody').append( this._tableTbodyTrStr( data[i], this.tableOption.tableModel, rowLength++ ) );
+
+            };
+
+            this.totalItems = totalItems + length;
+
+            this._changePager( false, true, rowLength );
 
             this._boxIsAllCheck();
 
@@ -1780,7 +1794,7 @@
 
             }else{
 
-                length = this.totalItems;
+                length = teams.length || this.totalItems;
 
                 for ( i = 0; i < length; i++ ) {
 

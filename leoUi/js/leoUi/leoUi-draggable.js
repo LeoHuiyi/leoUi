@@ -723,7 +723,7 @@
 
                 if( scroll === true ){
 
-                    if( this.isWinScrollToplock === true && event.pageY >= $win.height() - op.scrollSensitivity - 3 ){
+                    if( this.isWinScrollToplock === true && event.pageY >= $win.height() - op.scrollSensitivity ){
 
                         top = this.dragMaxY;
 
@@ -923,6 +923,6 @@
 
     });
 
-	return $;
+    return $;
 
 }));

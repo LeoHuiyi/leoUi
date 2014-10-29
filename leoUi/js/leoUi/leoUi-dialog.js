@@ -232,7 +232,7 @@
 
             showAnimation: function(callBack) {
 
-                  this.show( { effect: "clip", duration: "slow", complete: callBack } );
+                this.show( { effect: "clip", duration: "slow", complete: callBack } );
 
             },
 
@@ -288,6 +288,8 @@
 
             this._createDialog();
 
+            this._appentTo();
+
             this._createCaptionButtons();
 
             this._createOkButton();
@@ -335,8 +337,6 @@
             this._setElements( this.scope );
 
             this._createDblclick();
-
-            this._appentTo();
 
             this.options.initCallBack.call( this.$target );
 

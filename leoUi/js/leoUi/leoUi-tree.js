@@ -46,6 +46,8 @@
 
             autoCollapse:false,//自动折叠的功能
 
+            arrowSrc: '../../img/arrow.png',//箭头图标src
+
             key:{
 
                 children:'children',
@@ -67,7 +69,9 @@
 
             },//是否启用简单的json数据
 
-            dragAndDrop:true//是否能拖放
+            dragAndDrop:false,//是否能拖放
+
+            clickNodeCallBack: $.noop//点击节点回调
 
         },
 
@@ -497,7 +501,7 @@
 
         _createArrow:function(){
 
-            !this.$arrow && ( this.$arrow = $("<div class='leoTree_arrow'><img src = '../../img/arrow.png' /></div>").hide().appendTo('body') );
+            !this.$arrow && ( this.$arrow = $("<div class='leoTree_arrow'><img src = '"+this.options.arrowSrc+"' /></div>").hide().appendTo('body') );
 
         },
 
@@ -581,7 +585,11 @@
 
             var i = 0,length,child,id,treeId,rootId,key = this.options.key,
 
-            children = key.children,name = key.name,url = key.url;
+            children = key.children,name = key.name,url = key.url,
+
+            simpleDataIdKey;
+
+            console.log(treeJson)
 
             if( !isChild ){
 
@@ -711,17 +719,19 @@
 
         _changeSimpleTreeJson:function(){
 
-            var simpleDatas = this.options.treeJson,treeJson = [],
+            var op = this.options,
 
-            length = simpleDatas.length,i = 0,simpleData,
+            simpleDatas = op.treeJson,treeJson = [],
 
-            id = this.options.isSimpleData.idKey,pid = this.options.isSimpleData.pidKey;
+            i = simpleDatas.length,simpleData,isSimpleData = op.isSimpleData,
 
-            while( i < length ){
+            id = isSimpleData.idKey,pid = isSimpleData.pidKey;
 
-                simpleData = simpleDatas[i++];
+            while( i-- ){
 
-                if( simpleData[pid] === 0 ){
+                simpleData = simpleDatas[i];
+
+                if( simpleData[pid] - 0 === 0 ){
 
                     treeJson.push( simpleData );
 
@@ -741,13 +751,13 @@
 
                     jsonData = json[i++];
 
-                    jsonId = jsonData[id];
+                    jsonId = jsonData[id] - 0;
 
                     while( j < dataLen ){
 
                         dataData = data[j++];
 
-                        if( dataData[pid] === jsonId ){
+                        if( dataData[pid] - 0 === jsonId ){
 
                             !jsonData.children && ( jsonData.children = [] );
 
@@ -852,9 +862,11 @@
 
         _addEvent:function(){
 
-            var This = this;
+            var This = this,$tree = this.$tree,
 
-            this._on( this.$tree, 'mouseenter.hover', 'span.leoTree_inner', function(event){
+            clickNodeCallBack = this.options.clickNodeCallBack;
+
+            this._on( $tree, 'mouseenter.hover', 'span.leoTree_inner', function(event){
 
                 event.stopPropagation();
 
@@ -864,7 +876,7 @@
 
             });
 
-            this._on( this.$tree, 'mouseleave.hover', 'span.leoTree_inner', function(event){
+            this._on( $tree, 'mouseleave.hover', 'span.leoTree_inner', function(event){
 
                 event.stopPropagation();
 
@@ -874,7 +886,7 @@
 
             });
 
-            this._on( this.$tree, 'click.switch', 'span.leoTree_icon_triangle', function(event){
+            this._on( $tree, 'click.switch', 'span.leoTree_icon_triangle', function(event){
 
                 event.stopPropagation();
 
@@ -882,7 +894,7 @@
 
             });
 
-            this._on( this.$tree, 'dblclick.switch', 'a.leoTree_dblclick_a', function(event){
+            this._on( $tree, 'dblclick.switch', 'a.leoTree_dblclick_a', function(event){
 
                 event.stopPropagation();
 
@@ -890,7 +902,13 @@
 
             });
 
-            this._on( this.$tree, 'click.active', 'span.leoTree_inner', function(event){
+            this._on( $tree, 'click.switch', 'a.leoTree_dblclick_a', function(event){
+
+                clickNodeCallBack.call( this, event, This._getTreeNodeId( this.id, 'a' ) )
+
+            });
+
+            this._on( $tree, 'click.active', 'span.leoTree_inner', function(event){
 
                 event.stopPropagation();
 

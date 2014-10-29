@@ -40,6 +40,20 @@
 
             treeJson:false,//tree的jsan(格式见例子)
 
+            dataType:'data',//ajax,data
+
+            ajax:{
+
+                url:'leoui.com',
+
+                type: 'GET',
+
+                dataType:'json',
+
+                teamsKey:'teams',//总数据(为false时直接用data)
+
+            },//是否用ajax调出数据
+
             isIcon:true,//是否展现图标
 
             hoverOpenClose:false,//通过鼠标悬浮收起菜单
@@ -77,7 +91,15 @@
 
         _init:function(){
 
-            if( this.options.treeJson.constructor !== Array ){ return; }
+            this._getData();
+
+        },
+
+        _createTree:function(){
+
+            var op = this.options;
+
+            if( op.treeJson.constructor !== Array ){ return; }
 
             this.expando = "leoTree_" + ( this.version + Math.random() ).replace( /\D/g, "" );
 
@@ -85,7 +107,55 @@
 
             this._addEvent();
 
-            this.options.dragAndDrop === true && this._setDraggable();
+            op.dragAndDrop === true && this._setDraggable();
+
+        },
+
+        _createLoading:function(){
+
+            this.$loading = $('<div class="leoTree_loading" style="display: none;">读取中...</div>').appendTo(this.$target).show();
+
+        },
+
+        _destroyLoading:function(){
+
+            this.$loading.remove();
+
+            this.$loading = null;
+
+        },
+
+        _getData:function(){
+
+            var op = this.options,ajax = op.ajax,This = this,
+
+            teamsKey = ajax.teamsKey,dataType = op.dataType;
+
+            if( dataType === 'ajax' ){
+
+                this._createLoading();
+
+                $.ajax(ajax).done(function(data){
+
+                    console.log(data)
+
+                    This._destroyLoading();
+
+                    teamsKey === false ? op.treeJson = data : op.treeJson = data[teamsKey];
+
+                    This._createTree();
+
+                }).fail(function(data){
+
+                    console.log(data.statusText);
+
+                });
+
+            }else if( dataType === 'data' ){
+
+                this._createTree();
+
+            }
 
         },
 
@@ -525,6 +595,28 @@
 
         },
 
+        _getNodeTreeJson:function( id, name ){
+
+             return this.treeJson[id.slice( 0, id.indexOf( '_' + name ) )] || {};
+
+        },
+
+        _getNodeSimpleDataId:function( id, name ){
+
+            var id = this._getNodeTreeJson( id, name ).simpleDataId;
+
+            if( typeof id === 'undefined' ){
+
+                return false;
+
+            }else{
+
+                return id;
+
+            }
+
+        },
+
         _setTreeNodeId:function( id, name, level, flag ){
 
             if( flag === true ){
@@ -583,13 +675,11 @@
 
         _markNodeTree:function( treeJson, isChild, level, parentId ){
 
-            var i = 0,length,child,id,treeId,rootId,key = this.options.key,
+            var i = 0,length,child,id,treeId,rootId,op = this.options,
 
-            children = key.children,name = key.name,url = key.url,
+            key = op.key,children = key.children,name = key.name,url = key.url,
 
-            simpleDataIdKey;
-
-            console.log(treeJson)
+            simpleDataIdKey = op.isSimpleData.idKey;
 
             if( !isChild ){
 
@@ -639,6 +729,8 @@
 
                         this.treeJson[treeId].url = child[url];
 
+                        this.treeJson[treeId].simpleDataId = child[simpleDataIdKey];
+
                         this.treeJson[treeId].level = level;
 
                         this.treeJson[treeId].liId = this._setTreeNodeId( id, 'li', level );
@@ -684,6 +776,8 @@
                         this.treeJson[treeId].name = child[name];
 
                         this.treeJson[treeId].url = child[url];
+
+                        this.treeJson[treeId].simpleDataId = child[simpleDataIdKey];
 
                         this.treeJson[treeId].level = level;
 
@@ -862,7 +956,7 @@
 
         _addEvent:function(){
 
-            var This = this,$tree = this.$tree,
+            var This = this,$tree = this.$tree,clickTime,
 
             clickNodeCallBack = this.options.clickNodeCallBack;
 
@@ -898,13 +992,23 @@
 
                 event.stopPropagation();
 
+                !!clickTime && clearTimeout(clickTime);
+
                 This._treeNodeOpenOrClose( this, 'a' );
 
             });
 
             this._on( $tree, 'click.switch', 'a.leoTree_dblclick_a', function(event){
 
-                clickNodeCallBack.call( this, event, This._getTreeNodeId( this.id, 'a' ) )
+                var self = this;
+
+                !!clickTime && clearTimeout(clickTime);
+
+                clickTime = setTimeout(function(){
+
+                    clickNodeCallBack.call( self, event, This._getNodeSimpleDataId( self.id, 'a' ) )
+
+                }, 300);
 
             });
 

@@ -109,7 +109,7 @@
 
                 teamsCountKey:'teams_count',//数据总条数
 
-                teamsKey:'teams',//总数据
+                teamsKey:'teams',//总数据(为false时直接用data)
 
                 data:{}
 
@@ -159,11 +159,13 @@
 
         _getData:function(pagerInfo){
 
-            var op = this.options,dataType = op.dataType,ajax,This = this;
+            var op = this.options,dataType = op.dataType,ajax,This = this,teamsKey;
 
             if(dataType === 'ajax'){
 
                 this._loading(true);
+
+                teamsKey = op.ajax.teamsKey;
 
                 if(op.isPage === true){
 
@@ -181,7 +183,7 @@
 
                     This.totalItems = data[ajax.teamsCountKey];
 
-                    This.teams = data[ajax.teamsKey];
+                    teamsKey === false ? This.teams = data : This.teams = data[teamsKey];
 
                     if(op.isPage === true){
 
@@ -339,7 +341,7 @@
 
         _initData:function(){
 
-            var op = this.options,pagerInfo,This = this;
+            var op = this.options,pagerInfo,This = this,teamsKey;
 
             if( op.dataType === 'data' ){
 
@@ -371,6 +373,8 @@
 
                 this._loading(true);
 
+                teamsKey = op.ajax.teamsKey;
+
                 this.options.isPage === true ? ajax = this._getSendAjaxPagerInfo( op.currentPage, op.rowNum, true ) : ajax = op.ajax;;
 
                 this.$target.empty().append( this.$gridBox );
@@ -385,7 +389,7 @@
 
                     This.totalItems = data[ajax.teamsCountKey];
 
-                    This.teams = data[ajax.teamsKey];
+                    teamsKey === false ? This.teams = data : This.teams = data[teamsKey];
 
                     This.options.isPage === true && ( pagerInfo = This._getPagerInfo( op.currentPage, op.rowNum ) );
 

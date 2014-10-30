@@ -595,19 +595,25 @@
 
                     if ( pageY - docScrollTop < o.scrollSensitivity ) {
 
-                        scrolled = $doc.scrollTop( docScrollTop - o.scrollSpeed );
+                        this.isWinScrollToplockMin = true;
 
-                        this.winScrollToplock = false;
+                        this.winScrollToplockMin === true && ( scrolled = $doc.scrollTop( docScrollTop - o.scrollSpeed ) );
+
+                        this.winScrollToplockMax = false;
 
                     } else if ( $win.height() - ( pageY - docScrollTop ) < o.scrollSensitivity ) {
 
-                        this.isWinScrollToplock = true;
+                        this.isWinScrollToplockMax = true;
 
-                        this.winScrollToplock === true && ( scrolled = $doc.scrollTop( docScrollTop + o.scrollSpeed ) );
+                        this.winScrollToplockMax === true && ( scrolled = $doc.scrollTop( docScrollTop + o.scrollSpeed ) );
+
+                        this.winScrollToplockMin = false;
 
                     }else{
 
-                        this.winScrollToplock = false;
+                        this.winScrollToplockMin = false;
+
+                        this.winScrollToplockMax = false;
 
                     }
 
@@ -619,19 +625,25 @@
 
                     if ( pageX - docScrollLeft < o.scrollSensitivity ) {
 
-                        scrolled = $doc.scrollLeft( docScrollLeft - o.scrollSpeed );
+                        this.isWinScrollLeftlockMin = true;
 
-                        this.winScrollLeftlock = false;
+                        this.winScrollLeftlockMin === true && ( scrolled = $doc.scrollLeft( docScrollLeft - o.scrollSpeed ) );
+
+                        this.winScrollLeftlockMax = false;
 
                     } else if ( $win.width() - ( pageX - docScrollLeft ) < o.scrollSensitivity ) {
 
-                        this.isWinScrollLeftlock = true;
+                        this.isWinScrollLeftlockMax = true;
 
-                        this.winScrollLeftlock === true && ( scrolled = $doc.scrollLeft( docScrollLeft + o.scrollSpeed ) );
+                        this.winScrollLeftlockMax === true && ( scrolled = $doc.scrollLeft( docScrollLeft + o.scrollSpeed ) );
+
+                        this.winScrollLeftlockMin = false;
 
                     }else{
 
-                        this.winScrollLeftlock = false;
+                        this.winScrollLeftlockMin = false;
+
+                        this.winScrollLeftlockMax = false;
 
                     }
 
@@ -655,9 +667,13 @@
 
             $doc = this.document,$win = this.window,op = this.options;
 
-            this.isWinScrollLeftlock = false;
+            this.isWinScrollLeftlockMin = false;
 
-            this.isWinScrollToplock = false;
+            this.isWinScrollLeftlockMax = false;
+
+            this.isWinScrollToplockMin = false;
+
+            this.isWinScrollToplockMax = false;
 
             while( i-- ){
 
@@ -667,15 +683,25 @@
 
         },
 
-        _setGrid:function(){
+        _setGrid:function( val, LR ){
 
             var grid = this.options.grid;
 
             if( grid ){
 
-                this.top = grid[1] ? Math.round( this.top / grid[1] ) * grid[1] : this.top;
+                if( LR === 'top' ){
 
-                this.left = grid[0] ? Math.round( this.left / grid[1] ) * grid[1] : this.left;
+                    return grid[1] ? Math.round( val / grid[1] ) * grid[1] : val
+
+                }else if( LR === 'left' ){
+
+                    return grid[0] ? Math.round( val / grid[0] ) * grid[0] : val;
+
+                }
+
+            }else{
+
+                return val;
 
             }
 
@@ -683,63 +709,101 @@
 
         _mouseDrag:function(event) {
 
-            var range = $.leoTools.range,op,$win = this.window,top,left;
+            var range = $.leoTools.range,op,$win = this.window,top,left,pageX,pageY;
 
             this._dragScroll(event);
-
-            this.left = event.pageX - this.startLeft;
-
-            this.top = event.pageY - this.startTop;
-
-            this._setGrid();
 
             this._getContainmentRange();
 
             op = this.options;
 
-            top = this.top;
+            pageX = event.pageX;
 
-            left = this.left;
+            pageY = event.pageY;
 
             op.onDrag.call( this.$target[0], event, this.$dragBox[0] );
 
-            if( this.dragMinX - 0 > this.dragMaxX - 0 ){
+            if( + this.dragMinX > + this.dragMaxX ){
 
-                left = range( -left, this.dragMaxX, this.dragMinX );
+                if( this.firstPageX ){
 
-                if( this.isWinScrollLeftlock === true ){
+                    left = this.firstLeft - pageX + this.firstPageX;
+
+                }else{
+
+                    this.firstLeft = left = pageX - this.startLeft;
+
+                    this.firstPageX = pageX;
+
+                }
+
+                left = this._setGrid( left, 'left' );
+
+                if( this.isWinScrollLeftlockMin === true ){
+
+                    left = this.dragMinX;
+
+                    this.winScrollLeftlockMin = true;
+
+                }else if( this.isWinScrollLeftlockMax === true ){
 
                     left = this.dragMaxX;
 
-                    this.winScrollLeftlock = true;
+                    this.winScrollLeftlockMax = true;
 
                 }
 
+                left = range( left, this.dragMaxX, this.dragMinX );
+
             }else{
 
-                this.isWinScrollLeftlock === true && ( this.winScrollLeftlock = true );
+                left = range( this._setGrid( pageX - this.startLeft, 'left' ), this.dragMinX, this.dragMaxX );
 
-                left = range( left, this.dragMinX, this.dragMaxX );
+                this.isWinScrollLeftlockMin === true && ( this.winScrollLeftlockMin = true );
+
+                this.isWinScrollLeftlockMax === true && ( this.winScrollLeftlockMax = true );
 
             }
 
-            if( this.dragMinY - 0 > this.dragMaxY - 0 ){
+            if( + this.dragMinY > + this.dragMaxY ){
 
-                top = range( -top, this.dragMaxY, this.dragMinY );
+                if( this.firstPageY ){
 
-                if( this.isWinScrollToplock === true ){
+                    top = this.firstTop - pageY + this.firstPageY;
 
-                    top = this.dragMaxY;
+                }else{
 
-                    this.winScrollToplock = true;
+                    this.firstTop = top = pageY - this.startTop;
+
+                    this.firstPageY = pageY;
 
                 }
 
+                top = this._setGrid( top, 'top' );
+
+                if( this.isWinScrollToplockMin === true ){
+
+                    top = this.dragMinY;
+
+                    this.winScrollToplockMin = true;
+
+                }else if( this.isWinScrollToplockMax === true ){
+
+                    top = this.dragMaxY;
+
+                    this.winScrollToplockMax = true;
+
+                }
+
+                top = range( top, this.dragMaxY, this.dragMinY );
+
             }else{
 
-                this.isWinScrollToplock === true && ( this.winScrollToplock = true );
+                top = range( this._setGrid( pageY - this.startTop, 'top' ), this.dragMinY, this.dragMaxY );
 
-                top = range( top, this.dragMinY, this.dragMaxY );
+                this.isWinScrollToplockMin === true && ( this.winScrollToplockMin = true );
+
+                this.isWinScrollToplockMax === true && ( this.winScrollToplockMax = true );
 
             }
 
@@ -760,6 +824,10 @@
             !!this.oldCur && this.$body.css( 'cursor', this.oldCur );
 
             o.onBeforeStopDrag.call( $target[0], event, $dragBox[0] );
+
+            this.firstPageX = false;
+
+            this.firstPageY = false;
 
             this._stopOffMouseWheel();
 

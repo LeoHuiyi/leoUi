@@ -129,11 +129,13 @@
 
             var op = this.options,ajax = op.ajax,This = this,
 
-            teamsKey = ajax.teamsKey,dataType = op.dataType;
+            teamsKey,dataType = op.dataType;
 
             if( dataType === 'ajax' ){
 
                 this._createLoading();
+
+                teamsKey = ajax.teamsKey;
 
                 $.ajax(ajax).done(function(data){
 
@@ -825,7 +827,7 @@
 
                 simpleData = simpleDatas[i];
 
-                if( simpleData[pid] - 0 === 0 ){
+                if( + simpleData[pid] === 0 ){
 
                     treeJson.push( simpleData );
 
@@ -845,13 +847,13 @@
 
                     jsonData = json[i++];
 
-                    jsonId = jsonData[id] - 0;
+                    jsonId = + jsonData[id];
 
                     while( j < dataLen ){
 
                         dataData = data[j++];
 
-                        if( dataData[pid] - 0 === jsonId ){
+                        if( + dataData[pid] === jsonId ){
 
                             !jsonData.children && ( jsonData.children = [] );
 

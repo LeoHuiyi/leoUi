@@ -1109,6 +1109,8 @@
 
         _leoDialogRestor:function(){
 
+            var size = $.extend( {}, this.oldSize );
+
             if( this.isMinimize ){
 
                 this._unWrapMinimize();
@@ -1131,15 +1133,15 @@
 
             if( this.contentHide ){
 
-                this.oldSize.height = 'auto';
+                size.height = 'auto';
 
                 this.$content.hide();
 
             }
 
-            this._setSizes( this.oldSize );
+            this._setSizes( size );
 
-            this.$target.offset( this.oldSize.offset );
+            this.$target.offset( size.offset );
 
             $( this.buttons.restore.element ).detach();
 

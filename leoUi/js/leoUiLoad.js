@@ -410,7 +410,7 @@
 
 	function init() {
 
-		var i = 0,script, scripts, initMod, initBaseUrl, url ,initCoreLib;
+		var i = 0,script, scripts, initMod, initBaseUrl, url ,initCoreLib, configUrl;
 
         // firefox支持currentScript属性
         if (document.currentScript) {
@@ -427,6 +427,8 @@
         }
 
         initMod = script.getAttribute('data-main');
+
+        config = script.getAttribute('data-config');
 
         initBaseUrl = script.getAttribute('data-baseurl');
 
@@ -460,7 +462,21 @@
 
         if (initMod) {
 
-			loadJSCSS( initMod, basepath, false, true );
+        	if (config){
+
+	        	( configUrl = basepath + config ).indexOf('.js') === -1 && ( configUrl += '.js' );
+
+	        	loadJS( configUrl, function() {
+
+					loadJSCSS( initMod, basepath, false, true );
+
+				} )
+
+			}else{
+
+				loadJSCSS( initMod, basepath, false, true );
+
+			}
 
 		}
 
@@ -755,7 +771,7 @@
 
 				factory && factory.delay(node.src);
 
-				head.removeChild(node);
+				// head.removeChild(node);
 
 				if (callback) {
 

@@ -12,7 +12,7 @@
     if (typeof define === "function" && define.amd) {
 
         // AMD. Register as an anonymous module.
-        define(["leoUi-tools","leoUi-droppable"], factory);
+        define(["leoUi-tools"], factory);
 
     } else {
 

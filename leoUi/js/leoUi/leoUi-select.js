@@ -71,13 +71,13 @@
 
             showAnimation: function(callBack) {
 
-                this.show( { effect: "bounce", duration: "slow", complete: callBack } );
+                this.show( { effect: "blind", duration: "slow", complete: callBack } );
 
             },
 
             hideAnimation: function(callBack) {
 
-                this.hide( { effect: "bounce", duration: "slow", complete: callBack } );
+                this.hide( { effect: "blind", duration: "slow", complete: callBack } );
 
             },
 

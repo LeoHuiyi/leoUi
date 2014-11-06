@@ -1,6 +1,6 @@
 /**
 +-------------------------------------------------------------------
-* jQuery leoUi--加载leoUiLoad
+* leoUi--加载leoUiLoad
 +-------------------------------------------------------------------
 * @version    1.0.0 beta
 * @author     leo
@@ -566,7 +566,7 @@
 
 			for ( var key in deps ) {
 
-				if ( hasOwn.call(deps, key) && modules[key].state !== 2 ) {
+				if ( hasOwn.call(deps, key) && modules[key] && modules[key].state !== 2 ) {
 
 					continue loop;
 
@@ -851,31 +851,53 @@
 
 		String(list).replace($.rword, function(el) {
 
-			if( !!$.config.shim && $.config.shim[el] ){
-
-				url = loadJSCSS( el, parent, $.config.shim[el] );
-
-			}else{
-
-				url = loadJSCSS( el, parent );
-
-			}
-
-			if (url) {
+			if($.config.leoUiLoadCombo === true){
 
 				dn++;
 
-				if ( modules[url] && modules[url].state === 2 ) {
+				if ( modules[el] && modules[el].state === 2 ) {
 
 					cn++;
 
 				}
 
-				if (!deps[url]) {
+				if (!deps[el]) {
 
-					args.push(url);
+					args.push(el);
 
-					deps[url] = "leoUi"; //去重
+					deps[el] = "leoUi"; //去重
+
+				}
+
+			}else{
+
+				if( !!$.config.shim && $.config.shim[el] ){
+
+					url = loadJSCSS( el, parent, $.config.shim[el] );
+
+				}else{
+
+					url = loadJSCSS( el, parent );
+
+				}
+
+				if (url) {
+
+					dn++;
+
+					if ( modules[url] && modules[url].state === 2 ) {
+
+						cn++;
+
+					}
+
+					if (!deps[url]) {
+
+						args.push(url);
+
+						deps[url] = "leoUi"; //去重
+
+					}
 
 				}
 
@@ -921,7 +943,9 @@
 	 */
 	window.define = $.define = function(id, deps, factory) { //模块名,依赖列表,模块本身
 
-		var args = $.slice(arguments);
+		var args = $.slice(arguments),
+
+		isLeoUiLoadCombo = $.config.leoUiLoadCombo === true;
 
 		if (typeof id === "string") {
 
@@ -929,35 +953,41 @@
 
 		}
 
-		if (typeof args[0] === "boolean") { //用于文件合并, 在标准浏览器中跳过补丁模块
-
-			if (args[0]) {
-
-				return;
-
-			}
-
-			args.shift();
-
-		}
-		if (typeof args[0] === "function") {
-
-			args.unshift([]);
-
-		} //上线合并后能直接得到模块ID,否则寻找当前正在解析中的script节点的src作为模块ID
 		//现在除了safari外，我们都能直接通过getCurrentScript一步到位得到当前执行的script节点，
 		//safari可通过onload+delay闭包组合解决
-		id = modules[id] && modules[id].state >= 1 ? _id : getCurrentScript();
+		id = modules[id] && modules[id].state >= 1 || isLeoUiLoadCombo === true ? _id : getCurrentScript();
 
 		if (!modules[id] && _id) {
 
-			modules[id] = {
+			if(isLeoUiLoadCombo === true){
 
-				id: id,
+				modules[id] = {
 
-				factory: factory,
+					id: id,
 
-				state: 1
+					factory: factory,
+
+					state: 1
+
+				};
+
+				modules[id].deps = deps;
+
+				fireFactory( id, deps, factory );
+
+				return;
+
+			}else{
+
+				modules[id] = {
+
+					id: id,
+
+					factory: factory,
+
+					state: 1
+
+				};
 
 			}
 
@@ -1020,7 +1050,7 @@
 
 		for (var i = 0, array = [], d; d = deps[i++];) {
 
-			d !== "ready" && array.push( modules[d].exports );
+			d !== "ready" && modules[d] && array.push( modules[d].exports );
 
 		}
 

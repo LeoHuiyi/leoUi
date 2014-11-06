@@ -1,6 +1,6 @@
 /**
 +-------------------------------------------------------------------
-* leoUi--加载leoUiLoadCombo
+* leoUi--合并leoUiLoadCombo
 +-------------------------------------------------------------------
 * @version    1.0.0 beta
 * @author     leo
@@ -18,11 +18,19 @@ var rExistId = /define\(\s*['"][^\[\('"\{]+['"]\s*,?/,
 
 	rDeps = /((?:define|require)\([^\[\(\{]*\[)([^\]]+)/,
 
+	rNames = /((?:define|require)\()[\'\"]([^\[\(\{]*)[\'\"],/,
+
 	rDefine = /define\(/,
 
 	rword = /[^, ]+/g,
 
 	rConfig = /(?:config\([^\)]*\))/g,
+
+	rReConfig = /(?:\.config\([^\)]*\))/g,
+
+	r$Config = /\$\.config/,
+
+	r$Require = /\$\.require/,
 
 	fs = require('fs'),
 
@@ -34,11 +42,11 @@ var rExistId = /define\(\s*['"][^\[\('"\{]+['"]\s*,?/,
 
 		require: function(ids) {
 
-			return typeof ids === 'string' ? ids.replace( 'ready', '' ).split(',') : ids;
+			return typeof ids === 'string' ? ids.replace('ready', '').split(',') : ids;
 
 		},
 
-		config: function(obj){
+		config: function(obj) {
 
 			return obj || {};
 
@@ -59,15 +67,15 @@ var rExistId = /define\(\s*['"][^\[\('"\{]+['"]\s*,?/,
 	},
 
 	// 分析模块的依赖，将依赖模块的模块标识组成一个数组以便合并
-	parseDeps = function(key, mods, encoding, config) {
+	parseDeps = function(key, mods, encoding, config, baseUrl) {
 
-		var cache = depsCache[key],deps = [],config = config || {};
+		var cache = depsCache[key],
+			deps = [],
+			config = config || {};
 
 		mods.forEach(function(modUrl) {
 
-			var baseUrl = path.resolve(modUrl, '../../'),
-
-				content, literals,alias,shim,strConfig;
+			var content, literals, alias, shim, strConfig;
 
 			if (!~modUrl.indexOf('.js')) {
 
@@ -97,7 +105,7 @@ var rExistId = /define\(\s*['"][^\[\('"\{]+['"]\s*,?/,
 
 			!strConfig ? strConfig = false : strConfig = strConfig[0];
 
-			config = !strConfig ? config : eval( '$.' + strConfig );
+			config = !strConfig ? config : eval('$.' + strConfig);
 
 			alias = config.alias;
 
@@ -105,24 +113,24 @@ var rExistId = /define\(\s*['"][^\[\('"\{]+['"]\s*,?/,
 
 			literals.forEach(function(literal) {
 
-				var arr,depsArr = [];
+				var arr, depsArr = [];
 				// define('hello', ['hello1'], function(){  =>  define('hello', ['hello1'])
 				// require('hello', function(){  =>  require('hello')
 				literal = literal.replace(rRightEnd, ')');
 				// 然后用eval去执行处理过的define和require获取到依赖模块的标识
-				arr = eval( '$.' + literal );
+				arr = eval('$.' + literal);
 
 				if (arr && arr.length) {
 					// 为依赖模块解析真实的模块路径
 					arr.forEach(function(item, i) {
 
-						var prop,isShim = false;
+						var prop, isShim = false;
 
-						if(alias){
+						if (alias) {
 
-							for( prop in alias ){
+							for (prop in alias) {
 
-								if(item === prop){
+								if (item === prop) {
 
 									item = alias[prop];
 
@@ -132,11 +140,11 @@ var rExistId = /define\(\s*['"][^\[\('"\{]+['"]\s*,?/,
 
 						}
 
-						if(shim){
+						if (shim) {
 
-							for( prop in shim ){
+							for (prop in shim) {
 
-								if(item === prop){
+								if (item === prop) {
 
 									item = shim[prop].src;
 
@@ -146,9 +154,9 @@ var rExistId = /define\(\s*['"][^\[\('"\{]+['"]\s*,?/,
 
 						}
 
-						if(item){
+						if (item) {
 
-							depsArr.push( path.resolve(baseUrl, item) );
+							depsArr.push(path.resolve(baseUrl, item));
 
 						}
 
@@ -164,10 +172,10 @@ var rExistId = /define\(\s*['"][^\[\('"\{]+['"]\s*,?/,
 
 		if (deps.length > 0) {
 
-			cache.ids = deps.concat( cache.ids );
+			cache.ids = deps.concat(cache.ids);
 
 			// 递归调用直到所有的依赖模块都添加完
-			parseDeps(key, deps, encoding, config);
+			parseDeps(key, deps, encoding, config, baseUrl);
 
 		}
 
@@ -175,7 +183,10 @@ var rExistId = /define\(\s*['"][^\[\('"\{]+['"]\s*,?/,
 
 	formatDeps = function(_, define, deps) {
 
-		var arr = deps.split(','),len = arr.length,i = 0,item, index;
+		var arr = deps.split(','),
+			len = arr.length,
+			i = 0,
+			item, index;
 
 		for (; i < len; i++) {
 
@@ -193,119 +204,268 @@ var rExistId = /define\(\s*['"][^\[\('"\{]+['"]\s*,?/,
 
 	},
 
+	formatNames = function(_, define, deps) {
+
+		var arr = deps.split(','),
+			len = arr.length,
+			i = 0,
+			item, index;
+
+		for (; i < len; i++) {
+
+			item = arr[i];
+
+			item = item.replace(/['"]/g, '').trim();
+
+			index = item.lastIndexOf('/');
+
+			arr[i] = ~index ? item.slice(index + 1) : item;
+
+		}
+
+		return define + "'" + arr.join(",") + "',";
+
+	},
+
+	//创建文件夹
+	mkdirSync = function(url, mode, cb) {
+
+		var arr = url.split("/");
+
+		mode = mode || 0755;
+
+		cb = cb || function() {};
+
+		if (arr[0] === ".") { //处理 ./aaa
+
+			arr.shift();
+
+		}
+
+		if (arr[0] == "..") { //处理 ../ddd/d
+
+			arr.splice(0, 2, arr[0] + "/" + arr[1])
+
+		}
+
+		function inner(cur) {
+
+			if (!path.existsSync(cur)) { //不存在就创建一个
+
+				fs.mkdirSync(cur, mode)
+
+			}
+
+			if (arr.length) {
+
+				inner(cur + "/" + arr.shift());
+
+			} else {
+
+				cb();
+
+			}
+
+		}
+
+		arr.length && inner(arr.shift());
+
+	},
+
 	// 合并内容
 	comboContent = function(key, baseUrl, encoding, format) {
+
 		var cache = depsCache[key],
 			unique = cache.unique,
 			ids = cache.ids;
 
 		ids.forEach(function(id) {
+
 			var modName = id.match(rModId)[1],
-				modUrl = path.resolve(__dirname, id),
+
+				modUrl = path.resolve(baseUrl, id),
 				content;
 
 			if (!~modUrl.indexOf('.js')) {
-				modUrl += '.js'
+
+				modUrl += '.js';
+
 			}
 
 			content = fs.readFileSync(modUrl, encoding);
 
 			// 非require()的情况下防止重复合并
 			if (!~content.indexOf('require(')) {
+
 				if (unique[modUrl]) {
+
 					return;
+
 				}
 
 				unique[modUrl] = true;
+
 			}
 
 			// utf-8 编码格式的文件可能会有 BOM 头，需要去掉
 			if (encoding === 'UTF-8' && content.charCodeAt(0) === 0xFEFF) {
+
 				content = content.slice(1);
+
 			}
 
 			// 格式化
 			if (typeof format === 'function') {
+
 				content = format(content);
+
 			}
+
+			if (rReConfig.test(content)) {
+
+				content = content.replace(rReConfig, "");
+
+			};
+
+			if (r$Config.test(content)) {
+
+				content = content.replace(r$Config, "leoUiLoad.config");
+
+			};
+
+			if (r$Require.test(content)) {
+
+				content = content.replace(r$Require, "leoUiLoad.require");
+
+			};
 
 			// 为匿名模块添加模块名
 			if (!rExistId.test(content)) {
+
 				content = content.replace(rDefine, "define('" + modName + "',");
+
 			}
 
 			// 格式化依赖模块列表 ['../hello5'] => ['hello5']
 			content = content.replace(rDeps, formatDeps);
 
+			content = content.replace(rNames, formatNames);
+
 			// 合并
 			cache.contents += content + '\n';
+
 			console.log('Combo the [' + modName + '] success.');
+
 		});
+
 	},
 
 	// 写入文件
 	writeFile = function(key, mod, uglifyUrl) {
+
 		var output = mod.output,
+			outputDir = output.replace(/\/[^\/]*(?:.js)$/, ''),
+
 			contents = depsCache[key].contents,
+
 			uglify, jsp, pro, ast;
+
+		contents = "leoUiLoad.config.leoUiLoadCombo = true;\n" + contents;
 
 		// 压缩文件
 		if (uglifyUrl) {
+
 			uglify = require(uglifyUrl);
+
 			jsp = uglify.parser;
+
 			pro = uglify.uglify;
 
 			ast = jsp.parse(contents);
+
 			ast = pro.ast_mangle(ast);
+
 			ast = pro.ast_squeeze(ast);
+
 			contents = pro.gen_code(ast);
+
 		}
 
 		// 合并好文本内容后的回调
 		if (typeof complete === 'function') {
+
 			contents = complete(contents);
+
 		}
 
 		// 写入文件
 		try {
+
+			mkdirSync(outputDir);
+
 			fs.writeFileSync(output, contents, mod.encoding);
+
 		} catch (error) {
+
 			console.log('Output file ' + error);
+
 			return;
+
 		}
 
 		console.log('\n');
+
 		console.log('============================================================');
+
 		console.log('Output the [' + output + '] success.');
+
 		console.log('============================================================');
+
 		console.log('\n');
+
 		delete depsCache[key];
+
 	},
 
 	leoUiLoadCombo = function(options) {
+
 		var modules = options.modules,
+			config = options.config,
+
 			baseUrl = path.resolve() + options.baseUrl;
 
 		modules.forEach(function(mod) {
+
 			var encoding = mod.encoding = (mod.encoding || 'UTF-8').toUpperCase(),
+
 				randomKey = (+new Date() + '') + (Math.random() + '').slice(-8);
 
 			depsCache[randomKey] = {
+
 				ids: [],
+
 				unique: {},
+
 				contents: ''
+
 			};
 
 			mod.input.forEach(function(id) {
+
 				var modUrl = path.resolve(baseUrl, id);
 
 				depsCache[randomKey].ids.push(modUrl);
-				parseDeps(randomKey, [modUrl], encoding);
+
+				parseDeps(randomKey, [modUrl], encoding, config, baseUrl);
+
 			});
 
 			comboContent(randomKey, baseUrl, encoding, mod.format);
+
 			writeFile(randomKey, mod, options.uglifyUrl);
+
 		});
+
 	};
 
 exports.leoUiLoadCombo = leoUiLoadCombo;

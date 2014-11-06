@@ -264,6 +264,8 @@
 
             iframeLoadCallBack:$.noop,
 
+            resize: $.noop,
+
             dialogShowCallBack: function(clickCallBackName){
 
                 // this.dialogHide();
@@ -286,6 +288,8 @@
 
         _init:function(){
 
+            var op = this.options;
+
             this._createDialog();
 
             this._appentTo();
@@ -304,11 +308,11 @@
 
             this.originalSize = {
 
-                width:this.options.width,
+                width:op.width,
 
-                height:this.options.height,
+                height:op.height,
 
-                position:$.extend( {}, this.options.position )
+                position:$.extend( {}, op.position )
 
             }
 
@@ -322,8 +326,6 @@
 
             this.isMaximize = false;
 
-            this.scope = this.options.scope;
-
             this.hasResizable = false;
 
             this.draggableDisabled = false;
@@ -334,11 +336,11 @@
 
             this._makeResizable(true);
 
-            this._setElements( this.scope );
+            this._setElements( this.scope = op.scope );
 
             this._createDblclick();
 
-            this.options.initCallBack.call( this.$target );
+            op.initCallBack.call( this.$target );
 
         },
 
@@ -979,6 +981,8 @@
 
             this._leoDialogRestoreAdd( $( this.buttons.maximize.element ) );
 
+            this.options.resize.call(this.$target[0]);
+
         },
 
         _leoDialogToggle:function(){
@@ -1142,6 +1146,8 @@
             this._setSizes( size );
 
             this.$target.offset( size.offset );
+
+            this.options.resize.call(this.$target[0]);
 
             $( this.buttons.restore.element ).detach();
 
@@ -1333,13 +1339,15 @@
 
         _makeDraggable:function(init){
 
-            if( !$.fn[this.dependsFnName.draggable] ){
+            var op = this.options,dependsFnName = this.dependsFnName;
+
+            if( !$.fn[dependsFnName.draggable] ){
 
                 return;
 
             }
 
-            if ( this.options.initDraggable ) {
+            if ( op.initDraggable ) {
 
                 if( init === true && this.hasDraggable === false ){
 
@@ -1353,7 +1361,7 @@
 
                             This._handleIframeMask(true);
 
-                            This.hasResizable && This.$target[This.dependsFnName.resizable].setCursorChange(false);
+                            This.hasResizable && This.$target[dependsFnName.resizable].setCursorChange(false);
 
                         },
 
@@ -1361,25 +1369,25 @@
 
                             This._handleIframeMask(false);
 
-                            This.hasResizable && This.$target[This.dependsFnName.resizable].setCursorChange(true);
+                            This.hasResizable && This.$target[dependsFnName.resizable].setCursorChange(true);
 
                         }
 
                     }
 
-                    this.$target[this.dependsFnName.draggable]( $.extend( this.options.draggableOption, this.draggableDefault ) );
+                    this.$target[dependsFnName.draggable]( $.extend( op.draggableOption, this.draggableDefault ) );
 
                     this.hasDraggable = true;
 
                 }
 
-                this.$target[this.dependsFnName.draggable]( 'option', $.extend( this.options.draggableOption, this.draggableDefault ) );
+                this.$target[dependsFnName.draggable]( 'option', $.extend( op.draggableOption, this.draggableDefault ) );
 
-            }else if( !this.options.initDraggable && init === false && this.hasDraggable === true ){
+            }else if( !op.initDraggable && init === false && this.hasDraggable === true ){
 
-                    this.$target[this.dependsFnName.draggable]('destroy');
+                this.$target[dependsFnName.draggable]('destroy');
 
-                    this.hasDraggable = false;
+                this.hasDraggable = false;
 
             }
 
@@ -1393,13 +1401,15 @@
 
         _makeResizable:function(init){
 
-            if( !$.fn[this.dependsFnName.resizable] ){
+            var op = this.options,dependsFnName = this.dependsFnName;
+
+            if( !$.fn[dependsFnName.resizable] ){
 
                 return;
 
             }
 
-            if ( this.options.initResizable ) {
+            if ( op.initResizable ) {
 
                 if( init === true && this.hasResizable === false ){
 
@@ -1423,6 +1433,8 @@
 
                             })
 
+                            op.resize.call(this, event);
+
                         },
 
                         onStopResize:function(){
@@ -1441,7 +1453,7 @@
 
                             }
 
-                            this[This.dependsFnName.draggable]( 'setLockDrag', true );
+                            this[dependsFnName.draggable]( 'setLockDrag', true );
 
                         },
 
@@ -1449,25 +1461,25 @@
 
                             if( !This.hasDraggable ){ return; }
 
-                            this.removeClass('leoDialog_inherit')[This.dependsFnName.draggable]( 'setLockDrag', false );
+                            this.removeClass('leoDialog_inherit')[dependsFnName.draggable]( 'setLockDrag', false );
 
                         }
 
                     }
 
-                    this.$target[this.dependsFnName.resizable]( $.extend( this.options.resizableOption, this.resizableDefault ) );
+                    this.$target[dependsFnName.resizable]( $.extend( op.resizableOption, this.resizableDefault ) );
 
                     this.hasResizable = true;
 
                 }
 
-                this.$target[this.dependsFnName.resizable]( 'option', $.extend( this.options.resizableOption, this.resizableDefault ) );
+                this.$target[dependsFnName.resizable]( 'option', $.extend( op.resizableOption, this.resizableDefault ) );
 
-            }else if( !this.options.initResizable && init === false && this.hasResizable === true ){
+            }else if( !op.initResizable && init === false && this.hasResizable === true ){
 
-                    this.$target[this.dependsFnName.resizable]('destroy');
+                this.$target[dependsFnName.resizable]('destroy');
 
-                    this.hasResizable = false;
+                this.hasResizable = false;
 
             }
 

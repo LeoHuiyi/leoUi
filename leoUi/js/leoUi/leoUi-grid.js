@@ -115,6 +115,10 @@
 
             },
 
+            minRow:1,//至少一条数据
+
+            defaulTrId: 0,//默认trid
+
             isPage:true,//是否要分页功能
 
             rowNum:10,//每一页条数
@@ -694,6 +698,39 @@
             !!this.$pager && this.$pager.width(tableWidth);
 
             this.tableOption.boxWidth = tableWidth;
+
+        },
+
+        setTableWidthOrHeight:function(tableWidth, tableHeight){
+
+            var flag = false;
+
+            if(typeof tableWidth === 'number'){
+
+                this.$gridBox.width(tableWidth);
+
+                this.$gviewGrid.width(tableWidth);
+
+                this.$uiJqgridHdiv.width(tableWidth);
+
+                this.$uiJqgridBdiv.width(tableWidth);
+
+                !!this.$pager && this.$pager.width(tableWidth);
+
+                this.tableOption.boxWidth = tableWidth;
+
+                flag = true;
+
+            }
+
+            if(typeof tableWidth === 'number'){
+
+               this.$uiJqgridBdiv.height(tableHeight);
+
+               flag = true;
+            }
+
+            flag === true && this._resizeTableWidth();
 
         },
 
@@ -1766,9 +1803,9 @@
 
             if( !this.teams ){ return ''; }
 
-            var opModel = this.tableOption.tableModel,index,
+            var opModel = this.tableOption.tableModel,index,op = this.options,
 
-            pagerInfo,i,length,teams = this.teams,op = this.options,
+            pagerInfo,i,length,teams = this.teams,minRow = op.minRow,
 
             str = '<tbody>' + this._tableTbodyFirstTrStr( opModel, opModel.length );
 
@@ -1788,6 +1825,10 @@
 
                 }
 
+                teams = this.createEmptyArray(length, teams);
+
+                length = teams.length;
+
                 for ( ; i < length; i++ ) {
 
                     str += this._tableTbodyTrStr( teams[i], opModel, index );
@@ -1800,17 +1841,55 @@
 
                 length = teams.length || this.totalItems;
 
+                teams = this.createEmptyArray(length, teams);
+
+                length = teams.length;
+
                 for ( i = 0; i < length; i++ ) {
 
                     str += this._tableTbodyTrStr( teams[i], opModel, i );
 
                 };
 
-
-
             }
 
             return str += '</tbody>';
+
+        },
+
+        createEmptyArray:function(length, teams){
+
+            var minLength,op = this.options,minRow = op.minRow,
+
+            tableModel = op.tableModel,i,obj;
+
+            if((minLength = minRow - length) > 0 && tableModel){
+
+                i = tableModel.length;
+
+                obj = {};
+
+                obj[op.trIdKey] = op.defaulTrId;
+
+                while(i--){
+
+                    obj[tableModel[i].id] = "";
+
+                }
+
+                while(minLength--){
+
+                    teams.push($.extend({}, obj));
+
+                }
+
+                return teams;
+
+            }else{
+
+                return teams;
+
+            }
 
         },
 
@@ -1918,21 +1997,21 @@
 
         _tableTbodyTrStr:function( gridJsonTr, gridJsonTh, trIndex ){
 
-            var str = '',width,i = 0,length = gridJsonTh.length,th,
+            var str = '',width,i = 0,length = gridJsonTh.length,th,op = this.options,
 
-            trId = gridJsonTr[this.options.trIdKey],
+            trId = gridJsonTr && gridJsonTr[op.trIdKey],
 
-            evenClass = this.options.evenClass;
+            evenClass = op.evenClass;
 
             typeof evenClass !== 'string' ? str = '<tr class="leoUi-widget-content jqgrow leoUi-row-ltr" tabindex="-1" ' : trIndex % 2 === 1 ? str = '<tr class="leoUi-widget-content jqgrow leoUi-row-ltr ' + evenClass + '" tabindex="-1" ' : str = '<tr class="leoUi-widget-content jqgrow leoUi-row-ltr" tabindex="-1"';
 
-            !trId ? str += '>' : str += 'trid="' + trId + '">';
+            !~trId ? str += '>' : str += 'trid="' + trId + '">';
 
             for ( ; i < length; i++ ) {
 
                 th = gridJsonTh[i];
 
-                str += this._tableTdStr( gridJsonTr[th.id], th, trIndex, gridJsonTr );
+                str += this._tableTdStr( gridJsonTr && gridJsonTr[th.id], th, trIndex, gridJsonTr );
 
             };
 

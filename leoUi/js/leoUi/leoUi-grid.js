@@ -115,6 +115,8 @@
 
             },
 
+            cellEdit:false,//是否可编辑单元格
+
             minRow:1,//至少一条数据
 
             defaulTrId: 0,//默认trid
@@ -134,6 +136,12 @@
             width:500,//设置表格的宽度(可用函数返回值)
 
             resizeWidth:false,//是否在改变尺寸时调节宽度
+
+            afterSaveCell:$.noop,//保存后回调
+
+            beforeCellEdit:$.noop,//编辑之前回调
+
+            afterCellEdit:$.noop,//编辑后回调
 
             setTableWidthCallback:$.noop,//设置表格的宽度默认与父级宽高
 
@@ -189,6 +197,8 @@
 
                     teamsKey === false ? This.teams = data : This.teams = data[teamsKey];
 
+                    This._clearTableData();
+
                     if(op.isPage === true){
 
                         This._changePager( This._getPagerInfo( pagerInfo.currentPage ) );
@@ -203,8 +213,6 @@
 
                     }
 
-                    This._removeSelectAllRowArr();
-
                     This._boxIsAllCheck();
 
                     This._restoreSortClass();
@@ -216,6 +224,8 @@
                 });
 
             }else if(dataType === 'data'){
+
+                this._clearTableData();
 
                 if(op.isPage === true){
 
@@ -230,8 +240,6 @@
                     this._resizeTableWidth();
 
                 }
-
-                this._removeSelectAllRowArr();
 
                 this._boxIsAllCheck();
 
@@ -531,13 +539,13 @@
 
             pagerInfo = pagerInfo !== 'init' ? (pagerInfo || this._getPagerInfo()) : {},
 
-            perPages = pagerInfo.perPages,
+            perPages = pagerInfo.perPages,leoGrid = this.leoGrid,
 
             fPageStyle = pagerInfo.isFristPage === true ? 'cursor: default;' : 'cursor: pointer;';
 
             LPageStyle = pagerInfo.isLastPage === true ? 'cursor: default;' : 'cursor: pointer;';
 
-            str = '<div id="page" class="leoUi-state-default leoUi-jqgrid-pager leoUi-corner-bottom"><div class="leoUi-pager-control" id="pg_page"><table cellspacing="0" cellpadding="0" border="0" role="row" style="width:100%;table-layout:fixed;height:100%;" class="leoUi-pg-table"><tbody><tr><td align="left" id="page_left"></td><td align="center" style="white-space: pre; width: 276px;" id="page_center"><table cellspacing="0" cellpadding="0" border="0" class="leoUi-pg-table" style="table-layout:auto;" id="page_center_table"><tbody><tr><td class="leoUi-pg-button leoUi-corner-all leoUi-state-disabled" id="first_page" style="'+fPageStyle+'"><span class="leoUi-icon leoUi-icon-seek-first"></span></td><td class="leoUi-pg-button leoUi-corner-all leoUi-state-disabled" id="prev_page" style="'+fPageStyle+'"><span class="leoUi-icon leoUi-icon-seek-prev"></span></td><td style="width: 4px; cursor: default;" class="leoUi-pg-button leoUi-state-disabled"><span class="leoUi-separator"></span></td><td><input id="set_page_input" type="text" role="textbox" value="'+pagerInfo.currentPage+'" maxlength="7" size="2" class="leoUi-pg-input"><span style="margin:0 4px 0 8px">共</span><span id="sp_1_page">'+pagerInfo.totalpages+'</span><span style="margin:0 4px">页</span></td><td style="width:4px;" class="leoUi-pg-button leoUi-state-disabled"><span class="leoUi-separator"></span></td><td class="leoUi-pg-button leoUi-corner-all leoUi-state-disabled" id="next_page" style="'+LPageStyle+'"><span class="leoUi-icon leoUi-icon-seek-next"></span></td><td class="leoUi-pg-button leoUi-corner-all leoUi-state-disabled" id="last_page" style="'+LPageStyle+'"><span class="leoUi-icon leoUi-icon-seek-end"></span></td><td><select  id="get_perPages_select" class="leoUi-pg-selbox">';
+            str = '<div id="'+ leoGrid +'page" class="leoUi-state-default leoUi-jqgrid-pager leoUi-corner-bottom"><div class="leoUi-pager-control" id="'+ leoGrid +'pg_page"><table cellspacing="0" cellpadding="0" border="0" role="row" style="width:100%;table-layout:fixed;height:100%;" class="leoUi-pg-table"><tbody><tr><td align="left" id="'+ leoGrid +'page_left"></td><td align="center" style="white-space: pre; width: 276px;" id="'+ leoGrid +'page_center"><table cellspacing="0" cellpadding="0" border="0" class="leoUi-pg-table" style="table-layout:auto;" id="'+ leoGrid +'page_center_table"><tbody><tr><td class="leoUi-pg-button leoUi-corner-all leoUi-state-disabled" id="'+ leoGrid +'first_page" style="'+fPageStyle+'"><span class="leoUi-icon leoUi-icon-seek-first"></span></td><td class="leoUi-pg-button leoUi-corner-all leoUi-state-disabled" id="'+ leoGrid +'prev_page" style="'+fPageStyle+'"><span class="leoUi-icon leoUi-icon-seek-prev"></span></td><td style="width: 4px; cursor: default;" class="leoUi-pg-button leoUi-state-disabled"><span class="leoUi-separator"></span></td><td><input id="'+ leoGrid +'set_page_input" type="text" role="textbox" value="'+pagerInfo.currentPage+'" maxlength="7" size="2" class="leoUi-pg-input"><span style="margin:0 4px 0 8px">共</span><span id="'+ leoGrid +'sp_1_page">'+pagerInfo.totalpages+'</span><span style="margin:0 4px">页</span></td><td style="width:4px;" class="leoUi-pg-button leoUi-state-disabled"><span class="leoUi-separator"></span></td><td class="leoUi-pg-button leoUi-corner-all leoUi-state-disabled" id="'+ leoGrid +'next_page" style="'+LPageStyle+'"><span class="leoUi-icon leoUi-icon-seek-next"></span></td><td class="leoUi-pg-button leoUi-corner-all leoUi-state-disabled" id="'+ leoGrid +'last_page" style="'+LPageStyle+'"><span class="leoUi-icon leoUi-icon-seek-end"></span></td><td><select  id="'+ leoGrid +'get_perPages_select" class="leoUi-pg-selbox">';
 
             for( ; i < length; i++ ){
 
@@ -547,23 +555,23 @@
 
             }
 
-            pagerInfo.length === 0 ? str += '</select></td></tr></tbody></table></td><td align="right" id="page_right"><div id="page_right_info" class="leoUi-paging-info" style="text-align:right">无数据显示</div></td></tr></tbody></table></div></div>' : str += '</select></td></tr></tbody></table></td><td align="right" id="page_right"><div id="page_right_info" class="leoUi-paging-info" style="text-align:right">'+(pagerInfo.fristItems+1)+' - '+(pagerInfo.lastItems+1)+'&nbsp;&nbsp;共'+pagerInfo.totalItems+'条</div></td></tr></tbody></table></div></div>';;
+            pagerInfo.length === 0 ? str += '</select></td></tr></tbody></table></td><td align="right" id="'+ leoGrid +'page_right"><div id="'+ leoGrid +'page_right_info" class="leoUi-paging-info" style="text-align:right">无数据显示</div></td></tr></tbody></table></div></div>' : str += '</select></td></tr></tbody></table></td><td align="right" id="'+ leoGrid +'page_right"><div id="'+ leoGrid +'page_right_info" class="leoUi-paging-info" style="text-align:right">'+(pagerInfo.fristItems+1)+' - '+(pagerInfo.lastItems+1)+'&nbsp;&nbsp;共'+pagerInfo.totalItems+'条</div></td></tr></tbody></table></div></div>';;
 
             this.$pager = $(str);
 
-            this.$firstPage = this.$pager.find('#first_page');
+            this.$firstPage = this.$pager.find('#' + leoGrid + 'first_page');
 
-            this.$prevPage = this.$pager.find('#prev_page');
+            this.$prevPage = this.$pager.find('#' + leoGrid + 'prev_page');
 
-            this.$nextPage = this.$pager.find('#next_page');
+            this.$nextPage = this.$pager.find('#' + leoGrid + 'next_page');
 
-            this.$lastPage = this.$pager.find('#last_page');
+            this.$lastPage = this.$pager.find('#' + leoGrid + 'last_page');
 
-            this.$allPage = this.$pager.find('#sp_1_page');
+            this.$allPage = this.$pager.find('#' + leoGrid + 'sp_1_page');
 
-            this.$pageRightInfo = this.$pager.find('#page_right_info');
+            this.$pageRightInfo = this.$pager.find('#' + leoGrid + 'page_right_info');
 
-            this.$setPageInput = this.$pager.find('#set_page_input');
+            this.$setPageInput = this.$pager.find('#' + leoGrid + 'set_page_input');
 
             this._initPagerEvent();
 
@@ -573,25 +581,25 @@
 
         _initPagerEvent:function(){
 
-        	var This = this;
+        	var This = this,leoGrid = this.leoGrid;
 
-            this._on( this.$pager.find('#page_center_table'), 'click', 'td', function(event){
+            this._on( this.$pager.find('#' + leoGrid + 'page_center_table'), 'click', 'td', function(event){
 
                 event.preventDefault();
 
-                if( this.id === 'first_page' ){
+                if( this.id === leoGrid + 'first_page' ){
 
                     This._setPager('first_page');
 
-                }else if( this.id === 'prev_page' ){
+                }else if( this.id === leoGrid + 'prev_page' ){
 
                     This._setPager('prev_page');
 
-                }else if( this.id === 'next_page' ){
+                }else if( this.id === leoGrid + 'next_page' ){
 
                     This._setPager('next_page');
 
-                }else if( this.id === 'last_page' ){
+                }else if( this.id === leoGrid + 'last_page' ){
 
                     This._setPager('last_page');
 
@@ -599,7 +607,7 @@
 
             } );
 
-            this._on( this.$pager.find('#get_perPages_select'), 'change', function(event){
+            this._on( this.$pager.find('#' + leoGrid + 'get_perPages_select'), 'change', function(event){
 
                 event.preventDefault();
 
@@ -617,15 +625,17 @@
 
         _createGridBox:function(){
 
-            this.$gridBox = $('<div id="leoUi_grid" class="leoUi-jqgrid leoUi-widget leoUi-widget-content leoUi-corner-all" style="visibility:hidden"><div id="lui_grid" class="leoUi-widget-overlay jqgrid-overlay"></div><div id="load_grid" class="loading leoUi-state-default leoUi-state-active">读取中...</div><div class="leoUi-jqgrid-view" id="gview_grid"><div class="leoUi-state-default leoUi-jqgrid-hdiv"><div class="leoUi-jqgrid-hbox"></div></div><div class="leoUi-jqgrid-bdiv"><div class="leoUi-jqgrid-hbox-inner" style="position:relative;"></div></div></div><div id="rs_mgrid" class="leoUi-jqgrid-resize-mark" ></div></div>');
+            var leoGrid = this.leoGrid = $.leoTools.getId('Grid') + '_';
+
+            this.$gridBox = $('<div id="'+ leoGrid +'leoUi_grid" class="leoUi-jqgrid leoUi-widget leoUi-widget-content leoUi-corner-all" style="visibility:hidden"><div id="'+ leoGrid +'lui_grid" class="leoUi-widget-overlay jqgrid-overlay"></div><div id="'+ leoGrid +'load_grid" class="loading leoUi-state-default leoUi-state-active">读取中...</div><div class="leoUi-jqgrid-view" id="'+ leoGrid +'gview_grid"><div class="leoUi-state-default leoUi-jqgrid-hdiv"><div class="leoUi-jqgrid-hbox"></div></div><div class="leoUi-jqgrid-bdiv"><div class="leoUi-jqgrid-hbox-inner" style="position:relative;"></div></div></div><div id="'+ leoGrid +'rs_mgrid" class="leoUi-jqgrid-resize-mark" ></div></div>');
 
             this.tableData = {};
 
-            this.tableData.rowElArr = [];
+            this.tableData.selectRowElArr = [];
 
-            this.leoGrid = $.leoTools.getId('Grid') + '_';
+            this.leoGridTrId = 0;
 
-            this.$gviewGrid = this.$gridBox.find('#gview_grid');
+            this.$gviewGrid = this.$gridBox.find('#' + leoGrid + 'gview_grid');
 
             this.$uiJqgridHdiv = this.$gviewGrid.find('div.leoUi-jqgrid-hdiv');
 
@@ -663,9 +673,17 @@
 
         },
 
+        _clearTableData:function(){
+
+            this.tableData = {};
+
+            this.tableData.selectRowElArr = [];
+
+        },
+
         _loading:function(show){
 
-            !this.$loading && ( this.$loading = this.$gridBox.find('#load_grid') );
+            !this.$loading && ( this.$loading = this.$gridBox.find('#' + this.leoGrid + 'load_grid') );
 
             show === true ? this.$loading.show() : this.$loading.hide();
 
@@ -772,7 +790,7 @@
 
             var selectRowElArr = this.tableData.selectRowElArr,
 
-            i = selectRowElArr && selectRowElArr.length || 0;
+            i = selectRowElArr.length;
 
             if( i > 0 ){
 
@@ -781,6 +799,8 @@
                 while( i-- ){
 
                     $(selectRowElArr[i]).remove();
+
+                    this._removeSelectRowtableData(selectRowElArr[i]);
 
                 }
 
@@ -793,6 +813,12 @@
                 this._refreshEvenClass();
 
             }
+
+        },
+
+        _removeSelectRowtableData:function(tr){
+
+            delete this.tableData[tr.id];
 
         },
 
@@ -812,15 +838,15 @@
 
         },
 
-        getSelectRowInfo:function(){
+        getSelectRowsTrId:function(){
 
             var arr = [],selectRowElArr = this.tableData.selectRowElArr,
 
-            i = selectRowElArr && selectRowElArr.length || 0;
+            i = selectRowElArr.length;
 
             while( i-- ){
 
-                arr.push( $(selectRowElArr[i]).attr('trid') );
+                arr.push( this.getTrId(selectRowElArr[i]) );
 
             }
 
@@ -830,17 +856,19 @@
 
         getTrId:function(tr){
 
-            return $(tr).attr('trid');
+            return this.tableData[tr.id].trId || '';
 
         },
 
-        getEditTdInfo:function( tr, typeOptionDoneCallBack, typeOptionFailCallBack ){
+        getEditRowInfo: function( tr, typeOptionDoneCallBack, typeOptionFailCallBack ){
 
             var tableModel = this.tableOption.tableModel,length = tableModel.length,
 
-            $tr = $(tr),child,prop,data = { trId: $tr.attr('trid') },arr = [],
+            child,prop,arr = [],tableData = this.tableData[tr.id],
 
-            fnArr = [],This = this,typeOptions = {},i = 0;
+            fnArr = [],This = this,typeOptions = {},i = 0,edit,
+
+            data = { trId: tableData.trId };
 
             for( ;i < length; i++ ){
 
@@ -848,51 +876,53 @@
 
                 prop = {};
 
-                if( child.edit !== false ){
+                edit = child.edit;
 
-                    if( child.type === 'text' ){
+                if( edit !== false ){
 
-                        prop.theadName = child.theadName;
-
-                        prop.id = child.id;
-
-                        prop.val = $tr.children('td[thid="'+ child.thId +'"]').text();
-
-                    }else if( child.type === 'select' ){
+                    if( edit.type === 'text' ){
 
                         prop.theadName = child.theadName;
 
                         prop.id = child.id;
 
-                        prop.val = $tr.children('td[thid="'+ child.thId +'"]').text();
+                        prop.val = tableData[child.thId].val;
 
-                        prop.selectValKey = child.selectValId;
+                    }else if( edit.type === 'select' ){
 
-                        prop.selectVal = $tr.children('td[thid="'+ child.thId +'"]').attr('selectval');
+                        prop.theadName = child.theadName;
+
+                        prop.id = child.id;
+
+                        prop.val = tableData[child.thId].val;
+
+                        prop.selectKeyId = edit.selectKeyId;
+
+                        prop.selectKey = tableData[child.thId].selectKey;
 
                     }
 
-                    prop.edit = $.extend( {}, child.edit );
+                    prop.edit = $.extend( {}, edit );
 
-                    if( typeof child.edit.typeOption === 'function' ){
+                    if( typeof edit.typeOption === 'function' ){
 
-                        if( child.edit.typeOptionFnAsyn === true ){
+                        if( edit.typeOptionFnAsyn === true ){
 
                             var dfd = $.Deferred();
 
-                            child.edit.typeOption( dfd, prop.edit, 'typeOption' );
+                            edit.typeOption( dfd, prop.edit, 'typeOption' );
 
                             fnArr.push(dfd);
 
                         }else{
 
-                            prop.edit.typeOption = child.edit.typeOption();
+                            prop.edit.typeOption = edit.typeOption();
 
                         }
 
                     }else{
 
-                        prop.edit.typeOption = child.edit.typeOption;
+                        prop.edit.typeOption = edit.typeOption;
 
                     }
 
@@ -905,6 +935,8 @@
             if( fnArr.length === 0 ){
 
                 data.teams = arr;
+
+                typeOptionDoneCallBack && typeOptionDoneCallBack(data);
 
                 return data;
 
@@ -928,8 +960,59 @@
 
                 })
 
+            }
+
+        },
+
+        _getEditTypeOption:function(edit, doneCallBack){
+
+            var dfd,prop;
+
+            if( typeof edit.typeOption === 'function' ){
+
+                if( edit.typeOptionFnAsyn === true ){
+
+                    prop = {};
+
+                    edit.typeOption( dfd = $.Deferred(), prop, 'typeOption' );
+
+                    dfd.done(function(data){
+
+                        doneCallBack && doneCallBack(prop.typeOption);
+
+                    });
+
+                }else{
+
+                    doneCallBack && doneCallBack(edit.typeOption());
+
+                }
+
+            }else{
+
+                doneCallBack && doneCallBack(edit.typeOption);
 
             }
+
+        },
+
+        getEditCellInfo: function( td, typeOptionDoneCallBack, typeOptionFailCallBack ){
+
+            if(!tr){return;}
+
+            var This = this,thid = $(td).attr('thid'),
+
+            tableData = this.tableData[td.parentNode.id],data = { thid: thid };
+
+            data.tableModel = $.extend({}, this._getTableModel(thid));
+
+            data.rowDatas = $.extend({}, tableData.rowDatas);
+
+            data.trId = tableData.trId;
+
+            $.extend(data, tableData[thid]);
+
+            return data;
 
         },
 
@@ -942,6 +1025,8 @@
             this._changePager( false, true, this.$bodyTable[0].rows.length - 1 );
 
             this._removeSelectRowArr(tr);
+
+            this._removeSelectRowtableData(tr);
 
             this._refreshEvenClass();
 
@@ -1161,7 +1246,239 @@
 
                 This.options.clickTdCallback.call( this, event, this, This._publicEvent, This.$bodyTable[0] );
 
+                This.cellEdit(this);
+
             } );
+
+        },
+
+        saveCell: function(){
+
+            var $edit = this.$bodyTable.find('#' + this.editId || ''),td,
+
+            $td,thid,tableModel,tdData,val,edit,selectKey,afterSaveCell;
+
+            if(!$edit[0]){return;}
+
+            afterSaveCell = this.options.afterSaveCell;
+
+            $td = $edit.parent('td');
+
+            td = $td[0];
+
+            trid = td.parentNode.id;
+
+            thid = $td.attr('thid');
+
+            tableModel = this._getTableModel(thid);
+
+            tdData = this.tableData[trid][thid];
+
+            edit = tableModel.edit;
+
+            switch(edit.type){
+
+                case 'text':
+
+                    this._editKeyDownOff($edit);
+
+                    $td.text(val = $edit.val());
+
+                    tdData.val = val;
+
+                    afterSaveCell(td, val, tdData.tableModelId);
+
+                    break;
+
+                case 'select':
+
+                    this._editKeyDownOff($edit);
+
+                    tdData.selectKey = selectKey = $edit.val();
+
+                    $td.text(val = $edit.find("option:selected").text());
+
+                    tdData.val = val;
+
+                    afterSaveCell(td, selectKey, tdData.tableModelId);
+
+                    break;
+
+                default:
+
+            }
+
+        },
+
+        cellEdit: function(td){
+
+            if(this.options.cellEdit === false && !$.contains( td, this.$bodyTable[0] )){return;}
+
+            var This = this,thid,trData,$td = $(td),
+
+            thid = $td.attr('thid'),tdId,
+
+            tableModel = this._getTableModel(thid),edit = tableModel.edit;
+
+            if(edit){
+
+                trData = this.tableData[tdId = td.parentNode.id];
+
+                tdData = trData[thid];
+
+                id = tdId + tableModel.id;
+
+                if($td.find('#' + id)[0]){return;}
+
+                this.saveCell();
+
+                switch(edit.type){
+
+                    case 'text':
+
+                        this._editCellText(td, tdData, id);
+
+                        break;
+
+                    case 'select':
+
+                        this._editCellSelect(id, td, edit, tdData);
+
+                        break;
+
+                    default:
+
+                }
+
+            }
+
+        },
+
+        _editCellText:function(td, tdData, id){
+
+            var op = this.options,val = tdData.val;
+
+            this._editKeyDownOn($('<input id="'+ id +'" class="textbox" type="text" style="width: 100%;">').val(op.beforeCellEdit(val) || val).appendTo($(td).empty()).select());
+
+            this.editId = id;
+
+            op.afterCellEdit(td, tdData.val);
+
+        },
+
+        _editCellSelect:function(id, td, edit, tdData){
+
+            var This = this,op = this.options,selectKey = tdData.selectKey;
+
+            this._getEditTypeOption(edit, function(typeOption){
+
+                var str = '<select id="'+ id +'" size="1">',prop;
+
+                for(prop in typeOption){
+
+                    if(typeOption.hasOwnProperty(prop)){
+
+                        str += '<option value="'+ prop +'">'+ typeOption[prop] +'</option>';
+
+                    }
+
+                }
+
+                str += '</select>';
+
+                This._editKeyDownOn($(str).val(op.beforeCellEdit(selectKey) || selectKey).appendTo($(td).empty()).focus());
+
+                This.editId = id;
+
+                op.afterCellEdit(td, tdData.selectKey);
+
+            })
+
+        },
+
+        _editKeyDownOn: function($el){
+
+            var This = this;
+
+            this._on($el, 'keydown', function(event) {
+
+                if (event.which === 13) {
+
+                    This.saveCell();
+
+                    return false;
+
+                }
+
+            });
+
+        },
+
+        getEditTableData: function(cellCallBack, rowCallBack, tableCallBack){
+
+            var tableData = $.extend({}, this.tableData),callBackData,
+
+            prop,arr = [],row,rowObj,cell,isEmpty,val,tableModelId;
+
+            for(prop in tableData){
+
+                if(tableData.hasOwnProperty(prop)){
+
+                    row = tableData[prop];
+
+                    if(!!prop && prop !== 'selectRowElArr'){
+
+                        rowObj = {};
+
+                        isEmpty = true;
+
+                        for(prop in row){
+
+                            if(row.hasOwnProperty(prop)){
+
+                                if(!!prop && prop !== 'rowDatas' && prop !== 'trId' &&  prop !== 'trIndex'){
+
+                                    cell = row[prop];
+
+                                    tableModelId = cell.tableModelId;
+
+                                    !!cellCallBack ? val = cellCallBack(tableModelId, cell.selectKey || cell.val) : val = cell.selectKey || cell.val;
+
+                                    rowObj[tableModelId] = val;
+
+                                    val !== '' && (cell.isMust === true) && (isEmpty = false);
+
+                                }
+
+                            }
+
+                        }
+
+                        if(rowCallBack && (callBackData = rowCallBack(rowObj, isEmpty)) !== false){
+
+                            arr.push(callBackData);
+
+                        }else{
+
+                            isEmpty === false && arr.push(rowObj);
+
+                        }
+
+                    }
+
+                }
+
+            }
+
+            !!tableCallBack && (arr = tableCallBack(arr) || arr);
+
+            return arr;
+
+        },
+
+        _editKeyDownOff: function($el){
+
+            this._off($el, 'keydown');
 
         },
 
@@ -1341,7 +1658,7 @@
 
         _addSelectRowArr:function(el){
 
-            var selectRowElArr = this.tableData.selectRowElArr = this.tableData.selectRowElArr || [];
+            var selectRowElArr = this.tableData.selectRowElArr;
 
             $.inArray( el, selectRowElArr ) === -1 && this.tableData.selectRowElArr.push(el);
 
@@ -1361,7 +1678,7 @@
 
         _removeSelectRowArr:function(el){
 
-            var selectRowElArr = this.tableData.selectRowElArr || [],
+            var selectRowElArr = this.tableData.selectRowElArr,
 
             i = selectRowElArr.length;
 
@@ -1369,7 +1686,7 @@
 
                 if( selectRowElArr[i] === el ){
 
-                    this.tableData.selectRowElArr.splice( i, 1 );
+                    selectRowElArr.splice( i, 1 );
 
                 }
 
@@ -1401,15 +1718,71 @@
 
         },
 
+        editCell:function(td, val, selectKey){
+
+            if(!td && (val === undefined)){return;}
+
+            var $td = $(td),thId = $td.attr('thid'),typeOption,
+
+            trId = td.parentNode.id,tableModel = this._getTableModel(thId),
+
+            rowData = this.tableData[trId],
+
+            cellData = rowData[thId],edit = tableModel.edit,
+
+            trIndex = rowData.trIndex;
+
+            if(edit){
+
+                if(edit.type === 'select'){
+
+                    if(selectKey && (edit.selectKeyId !== undefined)){
+
+                        cellData.selectKey = selectKey;
+
+                    }else if(typeof (typeOption = edit.typeOption) === 'object'){
+
+                        selectKey = val + '' || '';
+
+                        val = typeOption[selectKey] || '';
+
+                        cellData.selectKey = selectKey;
+
+                    }
+
+                }
+
+                if( typeof tableModel.renderCell === 'function' && (val = tableModel.renderCell(selectKey || val, trIndex)) ){
+
+                    $td.html(val);
+
+                }else{
+
+                    $td.text(val);
+
+                }
+
+                cellData.val = val;
+
+            }
+
+        },
+
         editRow:function( tr, data ){
+
+            if(!tr && (data === undefined)){return;}
 
             var tableModel = this.tableOption.tableModel,i = tableModel.length,
 
-            thId,child,val,$tr = $(tr),$td;
+            thId,child,val,$tr = $(tr),edit,tdData,selectKey,thid,
+
+            trId = tr.id,$td,tableData = this.tableData[trId],
+
+            trIndex = tableData.trIndex;
 
             if( !$tr[0] ){
 
-                $tr = this.$bodyTable.find('tr[trid="'+ tr +'"]');
+                $tr = this.$bodyTable.find('#' + trId);
 
                 if( !$tr[0] ){ return; }
 
@@ -1419,13 +1792,35 @@
 
                 child = tableModel[i];
 
+                edit = child.edit;
+
                 if( val = data[child.id] ){
 
-                    $td = $tr.find('td[thid="'+ this.leoGrid + child.id +'"]');
+                    thid = this.leoGrid + child.id;
 
-                    child.type === 'select' && ( $td.attr( 'selectval', data[child.selectValId] ) );
+                    tdData = tableData[thid];
 
-                    if( typeof child.renderCell === 'function' && typeof ( child.renderCell = renderCell( value ) ) === 'string' ){
+                    $td = $tr.find('td[thid="'+ thid +'"]');
+
+                    if(edit.type === 'select'){
+
+                        if(edit.selectKeyId && (selectKey = data[edit.selectKeyId]) !== undefined){
+
+                            tdData && (tdData.selectKey = selectKey);
+
+                        }else if(typeof (typeOption = edit.typeOption) === 'object'){
+
+                            selectKey = val + '' || '';
+
+                            val = typeOption[selectKey] || '';
+
+                            tdData && (tdData.selectKey = selectKey);
+
+                        }
+
+                    }
+
+                    if( typeof child.renderCell === 'function' && (val = child.renderCell(selectKey || val, trIndex)) ){
 
                         $td.html(val);
 
@@ -1434,6 +1829,8 @@
                         $td.text(val);
 
                     }
+
+                    tdData && (tdData.val = val);
 
                 }
 
@@ -1453,7 +1850,7 @@
 
                 this._resizeThEvent();
 
-                this.$rsLine = this.$rsLine || this.$gridBox.find('#rs_mgrid');
+                this.$rsLine = this.$rsLine || this.$gridBox.find('#' + this.leoGrid + 'rs_mgrid');
 
             }
 
@@ -1999,19 +2396,37 @@
 
             var str = '',width,i = 0,length = gridJsonTh.length,th,op = this.options,
 
-            trId = gridJsonTr && gridJsonTr[op.trIdKey],
+            trId = gridJsonTr && gridJsonTr[op.trIdKey],tableDatas = this.tableData,
 
-            evenClass = op.evenClass;
+            evenClass = op.evenClass,leoGrid = this.leoGrid,tableData,rowDatas,
 
-            typeof evenClass !== 'string' ? str = '<tr class="leoUi-widget-content jqgrow leoUi-row-ltr" tabindex="-1" ' : trIndex % 2 === 1 ? str = '<tr class="leoUi-widget-content jqgrow leoUi-row-ltr ' + evenClass + '" tabindex="-1" ' : str = '<tr class="leoUi-widget-content jqgrow leoUi-row-ltr" tabindex="-1"';
+            id = leoGrid + this.leoGridTrId++,rowDataKeys = op.rowDataKeys,value;
 
-            !~trId ? str += '>' : str += 'trid="' + trId + '">';
+            typeof evenClass !== 'string' ? str = '<tr id="' + id + '" class="leoUi-widget-content jqgrow leoUi-row-ltr" tabindex="-1" ' : trIndex % 2 === 1 ? str = '<tr id="' + id + '" class="leoUi-widget-content jqgrow leoUi-row-ltr ' + evenClass + '" tabindex="-1" ' : str = '<tr id="' + id + '" class="leoUi-widget-content jqgrow leoUi-row-ltr" tabindex="-1"';
+
+            str += '>';
+
+            tableData = tableDatas[id] = {};
+
+            rowDatas = tableData.rowDatas = {};
+
+            !!rowDataKeys && rowDataKeys.replace(/[^, ]+/g,function(key){
+
+                rowDatas[key] = gridJsonTr[key] || '';
+
+            });
+
+            !!~trId && (tableData.trId = trId);
+
+            tableData.trIndex = trIndex;
 
             for ( ; i < length; i++ ) {
 
                 th = gridJsonTh[i];
 
-                str += this._tableTdStr( gridJsonTr && gridJsonTr[th.id], th, trIndex, gridJsonTr );
+                value = gridJsonTr && gridJsonTr[th.id] || '';
+
+                str += this._tableTdStr( value, th, trIndex, gridJsonTr, tableData );
 
             };
 
@@ -2019,27 +2434,45 @@
 
         },
 
-        _tableTdStr:function( value, tableModel, trIndex, tr ){
+        _tableTdStr:function( value, tableModel, trIndex, tr, tableData ){
 
             if( !tableModel ){ return; }
 
-            var className = tableModel.className,renderCell = tableModel.renderCell;
+            var className = tableModel.className,renderCell = tableModel.renderCell,
 
-            str = '<td style="text-align:' + tableModel.align + '" thid="' + tableModel.thId + '"', value = value || '';
+            typeOption,selectKey,edit = tableModel.edit,thId = tableModel.thId,
+
+            tdData,value = value + '',tdData,
+
+            str = '<td style="text-align:' + tableModel.align + '" thid="' + thId + '"';
 
             className !== false && ( str += ' class="' + className + '"' );
 
-            tableModel.type === 'select' && ( str += ' selectval="' + tr[tableModel.selectValId] + '"' );
+            !!edit && (tdData = tableData[thId] = {});
+
+            if(edit.type === 'select'){
+
+                if(edit.selectKeyId && (selectKey = tr[edit.selectKeyId]) !== undefined){
+
+                    !!tdData && (tdData.selectKey = selectKey);
+
+                }else if(typeof (typeOption = edit.typeOption) === 'object'){
+
+                    selectKey = value + '' || '';
+
+                    value = typeOption[selectKey] || '';
+
+                    !!tdData && (tdData.selectKey = selectKey);
+
+                }
+
+            }
 
             str += '>';
 
-            if( typeof renderCell === 'function' && typeof ( renderCell = renderCell( value, trIndex ) ) === 'string' ){
+            if( typeof renderCell === 'function' && typeof ( renderCell = renderCell( selectKey || value, trIndex ) ) === 'string' ){
 
-                str += renderCell;
-
-            }else if( tableModel.type === 'check' ){
-
-                tableModel.checked === true ? str += '<input type="checkbox" checked>' : str += '<input type="checkbox">';
+                str += (value = renderCell);
 
             }else if( tableModel.boxType === 'checkBox' ){
 
@@ -2055,9 +2488,19 @@
 
             }else{
 
-                str += value + '';
+                str += value;
 
             };
+
+            if(tdData){
+
+                tdData.val = value;
+
+                tdData.tableModelId = tableModel.id;
+
+                edit.isMust === false ? tdData.isMust = false : tdData.isMust = true;
+
+            }
 
             return str += '</td>';
 

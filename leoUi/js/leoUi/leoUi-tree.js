@@ -50,11 +50,13 @@
 
                 dataType:'json',
 
-                teamsKey:'teams',//总数据(为false时直接用data)
+                teamsKey:'teams'//总数据(为false时直接用data)
 
             },//是否用ajax调出数据
 
             isIcon:true,//是否展现图标
+
+            isDblclick:true,//是否双击打开关闭菜单
 
             hoverOpenClose:false,//通过鼠标悬浮收起菜单
 
@@ -85,7 +87,7 @@
 
             dragAndDrop:false,//是否能拖放
 
-            clickNodeCallBack: $.noop//点击节点回调
+            clickNodeCallBack: false//点击节点回调
 
         },
 
@@ -605,15 +607,15 @@
 
         _getNodeSimpleDataId:function( id, name ){
 
-            var id = this._getNodeTreeJson( id, name ).simpleDataId;
+            var simpleDataId = this._getNodeTreeJson( id, name ).simpleDataId;
 
-            if( typeof id === 'undefined' ){
+            if( typeof simpleDataId === 'undefined' ){
 
                 return false;
 
             }else{
 
-                return id;
+                return simpleDataId;
 
             }
 
@@ -911,7 +913,7 @@
 
             switchId = child.switchId, isOpen = child.open,aId = child.aId,
 
-            url = child.url;
+            url = child.url,target;
 
             !notWrap ? this.html +='<div id="' + divId + '" class="leoTree_node">' :
 
@@ -942,13 +944,28 @@
 
             if( url ){
 
-                href = url.href || '###';
+                if(href = url.href){
 
-                this.html += '<a id="' + aId + '" href="' + href + '" target = "' + url.target + '" class="leoTree_dblclick_a"><span>' + name + '</span></a></span>';
+                    this.html += '<a id="' + aId + '" href="' + href + '"';
+
+                }else{
+
+                    this.html += '<a id="' + aId + '"';
+
+                }
+
+                if(target = url.target){
+
+                    this.html += 'target = "' + url.target + '" class="leoTree_dblclick_a"><span>' + name + '</span></a></span>';
+                }else{
+
+                    this.html += 'class="leoTree_dblclick_a"><span>' + name + '</span></a></span>';
+
+                }
 
             }else{
 
-                this.html += '<a id="' + aId + '" href="###" class="leoTree_dblclick_a"><span>' + name + '</span></a></span>';
+                this.html += '<a id="' + aId + '" class="leoTree_dblclick_a"><span>' + name + '</span></a></span>';
 
             }
 
@@ -958,9 +975,7 @@
 
         _addEvent:function(){
 
-            var This = this,$tree = this.$tree,clickTime,
-
-            clickNodeCallBack = this.options.clickNodeCallBack;
+            var This = this,$tree = this.$tree;
 
             this._on( $tree, 'mouseenter.hover', 'span.leoTree_inner', function(event){
 
@@ -990,30 +1005,6 @@
 
             });
 
-            this._on( $tree, 'dblclick.switch', 'a.leoTree_dblclick_a', function(event){
-
-                event.stopPropagation();
-
-                !!clickTime && clearTimeout(clickTime);
-
-                This._treeNodeOpenOrClose( this, 'a' );
-
-            });
-
-            this._on( $tree, 'click.switch', 'a.leoTree_dblclick_a', function(event){
-
-                var self = this;
-
-                !!clickTime && clearTimeout(clickTime);
-
-                clickTime = setTimeout(function(){
-
-                    clickNodeCallBack.call( self, event, This._getNodeSimpleDataId( self.id, 'a' ) )
-
-                }, 300);
-
-            });
-
             this._on( $tree, 'click.active', 'span.leoTree_inner', function(event){
 
                 event.stopPropagation();
@@ -1022,7 +1013,53 @@
 
             });
 
+            this._treeSwitchClickEvent();
+
             this._treeHoverEvent();
+
+        },
+
+        _treeSwitchClickEvent:function(){
+
+            var op = this.options, This = this,clickTime,$tree = this.$tree,
+
+            clickNodeCallBack = this.options.clickNodeCallBack;
+
+            if(op.isDblclick){
+
+                this._on( $tree, 'dblclick.switch', 'a.leoTree_dblclick_a', function(event){
+
+                    event.stopPropagation();
+
+                    !!clickTime && clearTimeout(clickTime);
+
+                    This._treeNodeOpenOrClose( this, 'a' );
+
+                });
+
+                this._on( $tree, 'click.switch', 'a.leoTree_dblclick_a', function(event){
+
+                    var self = this;
+
+                    !!clickTime && clearTimeout(clickTime);
+
+                    clickTime = setTimeout(function(){
+
+                        clickNodeCallBack !== false && clickNodeCallBack.call( self, event, This._getNodeSimpleDataId( self.id, 'a' ) );
+
+                    }, 300);
+
+                });
+
+            }else{
+
+                this._on( $tree, 'click.switch', 'a.leoTree_dblclick_a', function(event){
+
+                    clickNodeCallBack !== false && clickNodeCallBack.call( this, event, This._getNodeSimpleDataId( this.id, 'a' ) );
+
+                });
+
+            }
 
         },
 
@@ -1032,7 +1069,7 @@
 
             var childrens = this.treeJson[treeJson.parentId].children,
 
-            i = childrens.length - 1,childJson;
+            i = childrens.length - 1,childJson,document = this.document[0];
 
             while( i >= 0 ){
 

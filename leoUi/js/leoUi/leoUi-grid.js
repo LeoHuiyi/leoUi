@@ -45,6 +45,10 @@
 
             disabledCheck:false,//禁用选择
 
+            isHover:true,//是否移入变色
+
+            hoverClass:'leoUi-state-hover',//移入添加的类名称
+
             evenClass:'leoUi-priority-secondary',//为表身的偶数行添加一个类名，以实现斑马线效果。false 没有
 
             activeClass:'leoUi-state-highlight',//选中效果
@@ -137,9 +141,11 @@
 
             resizeWidth:false,//是否在改变尺寸时调节宽度
 
+            beforeSaveCell:false,//保存之前回调
+
             afterSaveCell:$.noop,//保存后回调
 
-            beforeCellEdit:$.noop,//编辑之前回调
+            beforeCellEdit:false,//编辑之前回调
 
             afterCellEdit:$.noop,//编辑后回调
 
@@ -367,11 +373,11 @@
 
                 this._initPager(pagerInfo);
 
-                this._setTableWidth();
-
                 this._addEvent();
 
                 this.$target.empty().append( this.$gridBox );
+
+                this._setTableWidth();
 
                 this._setTableHeight();
 
@@ -655,13 +661,13 @@
 
                 this._initPager('init');
 
+                this.$target.empty().append( this.$gridBox );
+
                 this._addEvent();
 
                 this._setTableWidth();
 
                 this._tableWidthAuto();
-
-                this.$target.empty().append( this.$gridBox );
 
                 this.$gridBox.hide().css( 'visibility', '' );
 
@@ -701,21 +707,39 @@
 
             var tableWidth = this.options.width;
 
+            if(tableWidth === false){return;}
+
             $.isFunction( tableWidth ) === true && ( tableWidth = tableWidth(this.$target) + 0 );
 
-            if( isNaN(tableWidth) ){ return; }
+            if(typeof tableWidth === 'number'){
 
-            this.$gridBox.width(tableWidth);
+                this.$gridBox.width(tableWidth);
 
-            this.$gviewGrid.width(tableWidth);
+                this.$gviewGrid.width(tableWidth);
 
-            this.$uiJqgridHdiv.width(tableWidth);
+                this.$uiJqgridHdiv.width(tableWidth);
 
-            this.$uiJqgridBdiv.width(tableWidth);
+                this.$uiJqgridBdiv.width(tableWidth);
 
-            !!this.$pager && this.$pager.width(tableWidth);
+                !!this.$pager && this.$pager.width(tableWidth);
 
-            this.tableOption.boxWidth = tableWidth;
+                this.tableOption.boxWidth = tableWidth;
+
+            }else{
+
+                this.$gridBox.width(tableWidth);
+
+                tableWidth = this.tableOption.boxWidth = this.$gridBox.width();
+
+                this.$gviewGrid.width(tableWidth);
+
+                this.$uiJqgridHdiv.width(tableWidth);
+
+                this.$uiJqgridBdiv.width(tableWidth);
+
+                !!this.$pager && this.$pager.width(tableWidth);
+
+            }
 
         },
 
@@ -739,13 +763,29 @@
 
                 flag = true;
 
+            }else{
+
+                this.$gridBox.width(tableWidth);
+
+                tableWidth = this.tableOption.boxWidth = this.$gridBox.width();
+
+                this.$gviewGrid.width(tableWidth);
+
+                this.$uiJqgridHdiv.width(tableWidth);
+
+                this.$uiJqgridBdiv.width(tableWidth);
+
+                !!this.$pager && this.$pager.width(tableWidth);
+
+                flag = true;
             }
 
-            if(typeof tableWidth === 'number'){
+            if(tableWidth){
 
                this.$uiJqgridBdiv.height(tableHeight);
 
                flag = true;
+
             }
 
             flag === true && this._resizeTableWidth();
@@ -758,11 +798,19 @@
 
             var tableHeight = this.options.height;
 
+            if(tableHeight === false){return;}
+
             $.isFunction( tableHeight ) === true && ( tableHeight = tableHeight() + 0 );
 
-            if( isNaN(tableHeight) ){ return; }
+            if(typeof tableHeight === 'number'){
 
-            this.$uiJqgridBdiv.height( tableHeight - this.$gridBox.outerHeight() + this.$uiJqgridBdiv.outerHeight() );
+                this.$uiJqgridBdiv.height( tableHeight - this.$gridBox.outerHeight() + this.$uiJqgridBdiv.outerHeight() );
+
+            }else{
+
+                this.$gridBox.height(tableHeight);
+
+            }
 
         },
 
@@ -856,7 +904,7 @@
 
         getTrId:function(tr){
 
-            return this.tableData[tr.id].trId || '';
+            return this.tableData[tr.id][this.options.trIdKey] || '';
 
         },
 
@@ -866,9 +914,11 @@
 
             child,prop,arr = [],tableData = this.tableData[tr.id],
 
-            fnArr = [],This = this,typeOptions = {},i = 0,edit,
+            fnArr = [],This = this,typeOptions = {},i = 0,
 
-            data = { trId: tableData.trId };
+            edit,trIdKey = this.options.trIdKey,data = {};
+
+            data[trIdKey] = tableData[trIdKey];
 
             for( ;i < length; i++ ){
 
@@ -1000,7 +1050,7 @@
 
             if(!tr){return;}
 
-            var This = this,thid = $(td).attr('thid'),
+            var This = this,thid = $(td).attr('thid'),trIdKey = this.options.trIdKey,
 
             tableData = this.tableData[td.parentNode.id],data = { thid: thid };
 
@@ -1008,7 +1058,7 @@
 
             data.rowDatas = $.extend({}, tableData.rowDatas);
 
-            data.trId = tableData.trId;
+            data[trIdKey] = tableData[trIdKey];
 
             $.extend(data, tableData[thid]);
 
@@ -1090,9 +1140,13 @@
 
         _resizeGetWidth:function(){
 
-            var difWidth,scrollWidth = 18,boxWidth,tableOption = this.tableOption;
+            var difWidth,scrollWidth = 18,boxWidth,tableOption = this.tableOption
 
-            boxWidth = this._resizeTableIsScroll() === true ? tableOption.boxWidth - scrollWidth : tableOption.boxWidth;
+            opBoxWidth = tableOption.boxWidth;
+
+            !opBoxWidth && (opBoxWidth = this.$gridBox.width());
+
+            boxWidth = this._resizeTableIsScroll() === true ? opBoxWidth - scrollWidth : opBoxWidth;
 
             difWidth = boxWidth - tableOption.fixed;
 
@@ -1220,22 +1274,6 @@
 
             } );
 
-            this._on( this.$bodyTable, 'mouseenter', 'tr', function(event){
-
-                event.preventDefault();
-
-                $(this).addClass('leoUi-state-hover');
-
-            } );
-
-            this._on( this.$bodyTable, 'mouseleave', 'tr', function(event){
-
-                event.preventDefault();
-
-                $(this).removeClass('leoUi-state-hover');
-
-            } );
-
             this._on( this.$bodyTable, 'click', 'tr', function(event){
 
                 !!This._boxCheck && This._boxCheck(this);
@@ -1250,17 +1288,46 @@
 
             } );
 
+            this._addMouseHover();
+
+        },
+
+        _addMouseHover:function(){
+
+            var op = this.options,hoverClass = op.hoverClass;
+
+            if(op.isHover){
+
+                this._on( this.$bodyTable, 'mouseenter', 'tr', function(event){
+
+                    event.preventDefault();
+
+                    $(this).addClass(hoverClass);
+
+                } );
+
+                this._on( this.$bodyTable, 'mouseleave', 'tr', function(event){
+
+                    event.preventDefault();
+
+                    $(this).removeClass(hoverClass);
+
+                } );
+
+
+            }
+
         },
 
         saveCell: function(){
 
             var $edit = this.$bodyTable.find('#' + this.editId || ''),td,
 
-            $td,thid,tableModel,tdData,val,edit,selectKey,afterSaveCell;
+            $td,thid,tableModel,tdData,val,edit,selectKey,op,tableModelId;
 
             if(!$edit[0]){return;}
 
-            afterSaveCell = this.options.afterSaveCell;
+            op = this.options;
 
             $td = $edit.parent('td');
 
@@ -1274,6 +1341,8 @@
 
             tdData = this.tableData[trid][thid];
 
+            tableModelId = tdData.tableModelId;
+
             edit = tableModel.edit;
 
             switch(edit.type){
@@ -1282,11 +1351,15 @@
 
                     this._editKeyDownOff($edit);
 
+                    val = $edit.val();
+
+                    op.beforeSaveCell !== false && (val = op.beforeSaveCell(td, val, tableModelId));
+
                     $td.text(val = $edit.val());
 
-                    tdData.val = val;
+                    op.afterSaveCell(td, val, tableModelId, tdData.val);
 
-                    afterSaveCell(td, val, tdData.tableModelId);
+                    tdData.val = val;
 
                     break;
 
@@ -1294,13 +1367,17 @@
 
                     this._editKeyDownOff($edit);
 
-                    tdData.selectKey = selectKey = $edit.val();
+                    selectKey = $edit.val();
 
-                    $td.text(val = $edit.find("option:selected").text());
+                    op.beforeSaveCell !== false && (selectKey = op.beforeSaveCell(td, selectKey, tableModelId));
+
+                    $td.text(val = $edit.find('option[value="'+selectKey+'"]').text());
+
+                    op.afterSaveCell(td, selectKey, tableModelId, tdData.selectKey);
+
+                    tdData.selectKey = selectKey;
 
                     tdData.val = val;
-
-                    afterSaveCell(td, selectKey, tdData.tableModelId);
 
                     break;
 
@@ -1356,23 +1433,31 @@
 
         _editCellText:function(td, tdData, id){
 
-            var op = this.options,val = tdData.val;
+            var op = this.options,val = tdData.val,
 
-            this._editKeyDownOn($('<input id="'+ id +'" class="textbox" type="text" style="width: 100%;">').val(op.beforeCellEdit(val) || val).appendTo($(td).empty()).select());
+            tableModelId = tdData.tableModelId;
+
+            op.beforeCellEdit !== false && (val = op.beforeCellEdit(td, val, tableModelId));
+
+            this._editKeyDownOn($('<input id="'+ id +'" class="textbox" type="text" style="width: 100%;">').val(val).appendTo($(td).empty()).select());
 
             this.editId = id;
 
-            op.afterCellEdit(td, tdData.val);
+            op.afterCellEdit(td, val, tableModelId);
 
         },
 
         _editCellSelect:function(id, td, edit, tdData){
 
-            var This = this,op = this.options,selectKey = tdData.selectKey;
+            var This = this,op = this.options;
 
             this._getEditTypeOption(edit, function(typeOption){
 
-                var str = '<select id="'+ id +'" size="1">',prop;
+                var str = '<select id="'+ id +'" size="1">',prop,
+
+                selectKey = tdData.selectKey,
+
+                tableModelId = tdData.tableModelId;
 
                 for(prop in typeOption){
 
@@ -1386,11 +1471,13 @@
 
                 str += '</select>';
 
-                This._editKeyDownOn($(str).val(op.beforeCellEdit(selectKey) || selectKey).appendTo($(td).empty()).focus());
+                op.beforeCellEdit !== false && (selectKey = op.beforeCellEdit(td, selectKey, tableModelId));
+
+                This._editKeyDownOn($(str).val(selectKey).appendTo($(td).empty()).focus());
 
                 This.editId = id;
 
-                op.afterCellEdit(td, tdData.selectKey);
+                op.afterCellEdit(td, selectKey, tableModelId);
 
             })
 
@@ -1418,7 +1505,9 @@
 
             var tableData = $.extend({}, this.tableData),callBackData,
 
-            prop,arr = [],row,rowObj,cell,isEmpty,val,tableModelId;
+            prop,arr = [],row,rowObj,cell,isEmpty,val,tableModelId,
+
+            trIdKey = this.options.trIdKey;
 
             for(prop in tableData){
 
@@ -1426,7 +1515,7 @@
 
                     row = tableData[prop];
 
-                    if(!!prop && prop !== 'selectRowElArr'){
+                    if(prop !== 'selectRowElArr'){
 
                         rowObj = {};
 
@@ -1436,11 +1525,13 @@
 
                             if(row.hasOwnProperty(prop)){
 
-                                if(!!prop && prop !== 'rowDatas' && prop !== 'trId' &&  prop !== 'trIndex'){
+                                cell = row[prop];
 
-                                    cell = row[prop];
+                                if(prop === trIdKey){
 
-                                    tableModelId = cell.tableModelId;
+                                    rowObj[prop] = cell;
+
+                                }else if(tableModelId = cell.tableModelId){
 
                                     !!cellCallBack ? val = cellCallBack(tableModelId, cell.selectKey || cell.val) : val = cell.selectKey || cell.val;
 
@@ -1454,7 +1545,7 @@
 
                         }
 
-                        if(rowCallBack && (callBackData = rowCallBack(rowObj, isEmpty)) !== false){
+                        if(rowCallBack && (callBackData = rowCallBack(rowObj, isEmpty, row)) !== false){
 
                             arr.push(callBackData);
 
@@ -2416,7 +2507,7 @@
 
             });
 
-            !!~trId && (tableData.trId = trId);
+            !!~trId && (tableData[op.trIdKey] = trId);
 
             tableData.trIndex = trIndex;
 

@@ -286,7 +286,11 @@
 		 */
 		config: function(settings) {
 
-			settings.level && ( $.config.level = settings.level );
+			var config = $.config;
+
+			config.nocache = !!settings.nocache;
+
+			settings.level && ( config.level = settings.level );
 
 			if ( settings.baseUrl ) {
 
@@ -296,17 +300,17 @@
 
 			if ( settings.alias ) {
 
-				!$.config.alias && ($.config.alias = {});
+				!config.alias && (config.alias = {});
 
-				mix( $.config.alias, settings.alias );
+				mix( config.alias, settings.alias );
 
 			}
 
 			if ( settings.shim ) {
 
-				!$.config.shim && ($.config.shim = {});
+				!config.shim && (config.shim = {});
 
-				mix( $.config.shim, settings.shim );
+				mix( config.shim, settings.shim );
 
 			}
 
@@ -566,7 +570,7 @@
 
 			for ( var key in deps ) {
 
-				if ( hasOwn.call(deps, key) && modules[key] && modules[key].state !== 2 ) {
+				if ( hasOwn.call(deps, key) && modules[key].state !== 2 ) {
 
 					continue loop;
 
@@ -687,7 +691,7 @@
 
 		}
 
-		if ( !!$.config.nocache && $.config.nocache[url] ) {
+		if ($.config.nocache) {
 
             src += ( src.indexOf("?") === -1 ? "?" : "&" ) + ( new Date - 0 );
 
@@ -953,7 +957,12 @@
 
 		}
 
-		//现在除了safari外，我们都能直接通过getCurrentScript一步到位得到当前执行的script节点，
+		if (typeof args[0] === "function") {
+
+			args.unshift([]);
+
+		}//现在除了safari外，我们都能直接通过getCurrentScript一步到位得到当前执行的script节点，
+
 		//safari可通过onload+delay闭包组合解决
 		id = modules[id] && modules[id].state >= 1 || isLeoUiLoadCombo === true ? _id : getCurrentScript();
 
@@ -1054,7 +1063,9 @@
 
 		}
 
-		var module = Object( modules[id] ),ret = factory.apply( global, array );
+		var module = Object( modules[id] ),ret;
+
+		factory && (ret = factory.apply( global, array ));
 
 		if( module.id.indexOf( 'callback' ) !== -1 ){
 

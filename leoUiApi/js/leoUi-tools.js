@@ -967,7 +967,7 @@
 
         if( typeof li.name !== 'string' ){ return; }
 
-        if( !!$.leoTools.plugIn[li.inherit] && $.isFunction( inherit = $.leoTools.plugIn[li.inherit]['prototype'] ) ){
+        if( !!$.leoTools.plugIn[li.inherit] && jQuery.isFunction( inherit = $.leoTools.plugIn[li.inherit]['prototype'] ) ){
 
             function PlugIn( hash, target, dataId ){
 
@@ -985,7 +985,7 @@
 
             }
 
-            li.defaults = $.extend( true, {}, $.leoTools.plugIn[li.inherit]['options'], li.defaults );
+            li.defaults = $.extend( {}, $.leoTools.plugIn[li.inherit]['options'], li.defaults );
 
             $.extend( PlugIn.prototype, li );
 
@@ -1065,7 +1065,7 @@
 
                 _create:function(){
 
-                    this.document = $( this.$target[0].style ? this.$target[0].ownerDocument : this.$target[0].document || this.$target[0] );
+                    this.document = $( this.$target[0].style ?this.$target[0].ownerDocument :this.$target[0].document || this.$target[0] );
 
                     this.window = $( this.document[0].defaultView || this.document[0].parentWindow );
 

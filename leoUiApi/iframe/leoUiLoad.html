@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+
+<head>
+    <meta charset="utf-8" />
+    <title>leoUiLoad</title>
+    <meta name="description" content="https://github.com/LeoHuiyi" />
+    <meta name="keywords" content="leoUi,jquery插件,jqueryUi" />
+    <meta name="author" content="leo" />
+    <meta name="robots" content="all" />
+    <!--[if lte IE 8]>
+        <script src="../js/html5.js"></script>
+    <![endif]-->
+    <link rel="stylesheet" href="../css/reset.css" />
+    <link rel="stylesheet" href="../css/leoUi-grid.css" />
+    <link rel="stylesheet" href="../css/shCoreDjango.css" />
+    <link rel="stylesheet" href="../css/leoUiApiCssIframe.css" />
+</head>
+
+<body>
+    <nav id="guide" class="g-mod">
+        <div class="from">
+            <span>github:</span>
+            <a href="https://github.com/LeoHuiyi" target="_top">https://github.com/LeoHuiyi</a>
+        </div>
+    </nav>
+    <header id="hd">
+        <section class="g-mod" id="title">
+            <h1 class="tit">leoUiLoad</h1>
+            <div class="g-browser g-clear">
+                <p>leoUiLoad是一个简单纯粹的 JavaScript 模块加载器，基于 AMD 的模块化规范</p>
+            </div>
+        </section>
+    </header>
+    <section id="bd">
+        <section class="g-mod g-attr g-block">
+            <h2 class="tit">基本配置</h2>
+            <div class="cont">
+                <p><strong>全局对象</strong>：leoUiLoad|$</p>
+                <p><strong>全局基础路径</strong>： 全局对象：leoUiLoad.js 加载时所在的路径，使用 全局对象：leoUiLoad.require 加载模块时，将基于全局基础路径来解析相对标识，全局基础路径可以使用 全局对象：leoUiLoad.config 方法来进行配置。</p>
+            </div>
+        </section>
+        <section class="g-mod g-attr g-block">
+            <h2 class="tit">script 标签加载</h2>
+            <div class="cont">
+                <p><strong>例子</strong>：</p>
+                <pre class="brush: js;">
+                    <script src="leoUiLoad.js" data-main="leo.js" data-baseurl="static/js/"></script>
+                </pre>
+                <p><strong>data-main</strong>：要加载的主要js文件路径（相对于当前html）</p>
+                <p><strong>data-baseurl</strong>：全局基础路径（相对于当前html）</p>
+            </div>
+        </section>
+        <section class="g-mod g-attr g-block">
+            <h2 class="tit">noConflict 变量装换</h2>
+            <div class="cont">
+                <p><strong>leoUiLoad.noConflict|$.noConflict( [removeAll ] )</strong>：removeAll(boolean)</p>
+                <p><strong>removeAll</strong>：false：从全局作用域中内去$变量；true：全局作用域中内去除leoUiLoad|$变量，判断是否从全局作用域中内去除所有leoUiLoad|$变量；返回值：leoUiLoad</p>
+            </div>
+        </section>
+        <section class="g-mod g-attr g-block">
+            <h2 class="tit">config 配置选项</h2>
+            <div class="cont">
+                <p><strong>leoUiLoad.noConflict|$.noConflict( options )</strong>
+                <p><strong>options</strong>：</p>
+                <div id="config-grid" class="g-grid"></div>
+                <p><strong>例子</strong>：</p>
+                <pre class="brush: js;">
+                    $.config({
+
+                        level: 6,
+
+                        nocache: false,
+
+                        baseurl: static/js/,
+
+                        alias: {
+
+                            'leoUiCss': '../css/leoUi.css',//css别名
+
+                            'leoUi-grid': 'leoUi/leoUi-grid',//js别名（可省略.js）
+                        },
+
+                        shim: {
+
+                            jquery: {//别名
+
+                                src: 'lib/jquery-1.11.1-min.js',//路径
+
+                                exports: "$"//输出（可以是函数，return输出变量）
+
+                            }
+
+                        }
+
+                    });
+                </pre>
+            </div>
+        </section>
+        <section class="g-mod g-attr g-block">
+            <h2 class="tit">define 创建模块</h2>
+            <div class="cont">
+                <p><strong>define( [ name, deps ], factory )</strong>：define 是一个全局函数，通过该函数就可以创建一个符合 AMD 规范的模块，然后就可以通过<mark class="defaultvalue">leoUiLoad.require/$.require</mark>方法来加载这个模块。</p>
+                <p><strong>arguments</strong>：</p>
+                <div id="define-grid" class="g-grid"></div>
+            </div>
+        </section>
+        <section class="g-mod g-attr g-block">
+            <h2 class="tit">require 加载模块</h2>
+            <div class="cont">
+                <p><strong>leoUiLoad.require|$.require( list, [ factory ] )</strong>：require 方法是 leoUiLoad 提供的用于加载模块的方法，该模块只要遵循 AMD 的模块化规范，就可以加载。</p>
+                <p><strong>arguments</strong>：</p>
+                <div id="require-grid" class="g-grid"></div>
+            </div>
+        </section>
+        <section class="g-mod g-attr g-block">
+            <h2 class="tit">合并模块</h2>
+            <div class="cont">
+                <p>leoUiLoad.js 提供了一个 leoUiLoadCombo 的合并工具，该合并工具运行在 node.js 的环境中，配置很简单。将下面的代码保存成 build.js：</p>
+                <pre class="brush: js;">
+                    require('./js/leoUiLoadCombo.js').leoUiLoadCombo({
+                        baseUrl : '/js',//是需要合并的模块的基础路径。
+                        uglifyUrl : '../uglify/uglify-js',//是压缩工具 uglify 的路径。
+                        modules: [{//可以传一组待合并的数据。
+                            input: ['src/i_class.js'],//一个或一组待合并的的模块，(多个模块压缩成一个文件就是一组)。
+                            output: 'leo/js/src/i_class.js'//输出合并文件路径
+                        }],
+                        config:{//配置文件可以统一放在这里
+
+                            level: 6,
+
+                            alias: {
+
+                                'leoUiCss': '../css/leoUi.css',
+
+                                'public': 'src/public',
+
+                            },
+
+                            shim: {
+
+                                jquery: {
+
+                                    src: 'lib/jquery-1.11.1-min.js',
+
+                                    exports: "$"
+
+                                }
+
+                            }
+
+                        }
+                    });
+                </pre>
+                 <p>配置好后，可以直接在 cmd 中运行命令：node build，当然，前提是你必须安装了 node.js。</p>
+            </div>
+        </section>
+    </section>
+    <footer id="ft">
+        <aside class="g-mod">
+            <div class="g-browser g-clear">
+                <p>author: leo</p>
+                <p>如有问题请联系：253383559@qq.com</p>
+            </div>
+        </aside>
+    </footer>
+    <script type="text/javascript" src="../js/jquery-1.11.1-min.js"></script>
+    <script type="text/javascript" src="../js/leoUi-tools.js"></script>
+    <script type="text/javascript" src="../js/leoUi-grid.js"></script>
+    <script type="text/javascript" src="../js/shCore.js"></script>
+    <script type="text/javascript" src="../js/shBrushJScript.js"></script>
+    <script type="text/javascript">
+    var tableModel = [{
+
+            id: 'name',
+
+            width: 150,
+
+            minWidth: 100,
+
+            fixed: true,
+
+            theadName: 'Name',
+
+            renderCell:function(val){
+
+                return '<div style="color:#008000">' + val + '</div>';
+
+            }
+
+        }, {
+
+            id: 'type',
+
+            width: 70,
+
+            theadName: 'Type'
+
+        }, {
+
+            id: 'default',
+
+            width: 100,
+
+            theadName: 'Default'
+
+        },{
+
+            id: 'explain',
+
+            width: 1000,
+
+            fixed: true,
+
+            align: 'left',
+
+            theadName: 'Explain',
+
+            className:'feedLine'
+
+        }],configData = [{
+
+            'name': 'level',
+
+            'default': 6,
+
+            'type': 'number',
+
+            'explain': '当level等于7,将调试信息打印到控制台或页面'
+
+        }, {
+
+            'name': 'nocache',
+
+            'default': 'null',
+
+            'type': 'boolean',
+
+            'explain': 'true：不启用缓存'
+
+        }, {
+
+            'name': 'baseurl',
+
+            'default': 'null',
+
+            'type': 'string',
+
+            'explain': '配置模块加载时所依赖的全局基础路径，默认为 leoUiLoad.js 加载时的 url'
+
+        }, {
+
+            'name': 'alias',
+
+            'default': 'null',
+
+            'type': 'object',
+
+            'explain': '配置模块的别名，别名可以解决文件名和模块名不同名的问题，以及对模块标识过长进行简化'
+
+        }, {
+
+            'name': 'shim',
+
+            'default': 'null',
+
+            'type': 'object',
+
+            'explain': '为那些没有使用define()来声明依赖关系、设置模块的"浏览器全局变量注入"型脚本做依赖和导出配置'
+
+        }],requireData = [{
+
+            'name': 'list',
+
+            'default': '',
+
+            'type': 'string|array',
+
+            'explain': '依赖列表（可以是路径或者是别名，字符串逗号或者空格分开）'
+
+        }, {
+
+            'name': 'factory（可选）',
+
+            'default': '',
+
+            'type': 'function',
+
+            'explain': '模块加载成功后执行的回调函数，回调函数接受的参数就是模块向外部暴露的 exports 接口，参数顺序就是模块的排列顺序'
+
+        }],defineData = [{
+
+            'name': 'name（可选）',
+
+            'default': '',
+
+            'type': 'string',
+
+            'explain': '模块的名称，该参数定义了该模块的名称。在开发阶段一个文件就是一个模块，而文件名就是一个模块的模块名，建议在开发阶段省略该参数。没有定义模块名的模块就称为匿名模块，匿名模块会在合并的时候通过合并工具自动加上模块名。如果你要定义模块名，那么必须和模块的文件名保持一致'
+
+        }, {
+
+            'name': 'deps（可选）',
+
+            'default': '',
+
+            'type': 'array',
+
+            'explain': '依赖模块列表，可选的 Array 数组参数，该参数定义了该模块需要依赖哪些模块，依赖模块的列表包含的是一个个模块标识'
+
+        }, {
+
+            'name': 'factory',
+
+            'default': '',
+
+            'type': 'function',
+
+            'explain': '模块内容，必须的 Function 函数参数，该函数里面的代码就是模块本身的代码。factory 函数可以使用 return 返回一个值，该值就是该模块的 exports 外部接口，非常简便。factory 函数接受的参数就是依赖模块向外部暴露的 exports 接口，参数顺序就是依赖模块的排列顺序'
+
+        }],gridOptions = {
+
+            dataType: 'data',
+
+            tableModel: tableModel,
+
+            height: false,
+
+            width: false,
+
+            isHover: false,
+
+            boxCheckType: false,
+
+            resizeWidth: false,
+
+            resizeHeight: false,
+
+            isPage: false,
+
+            evenClass: false
+
+        };
+    $('#config-grid').leoGrid($.extend(gridOptions, {gridData: configData}));
+    $('#define-grid').leoGrid($.extend(gridOptions, {gridData: defineData}));
+    $('#require-grid').leoGrid($.extend(gridOptions, {gridData: requireData}));
+    SyntaxHighlighter.all({'toolbar': false});
+    </script>
+</body>
+
+</html>

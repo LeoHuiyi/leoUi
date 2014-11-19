@@ -39,98 +39,79 @@
             <h2 class="tit">plugIn 创建jQuery插件</h2>
             <div class="cont">
                 <p><strong>$.leoTools.plugIn( options, [methods] )</strong>：$.leoTools.plugIn自动创建统一的jQuery插件</p>
-                <p><strong>options</strong>：</p>
+                <p><strong>属性</strong>：</p>
+                <div class="cont">
+                    <p>document: 当前插件的 document</p>
+                    <p>window: 当前插件的 window</p>
+                    <p>$target: 当前插件的选择到的jquery对象</p>
+                    <p>options: 插件实例化后使用选项的对象</p>
+                    <p>version: 插件的字符串版本</p>
+                </div>
+                <p><strong>选项</strong>：</p>
                 <div id="option-grid" class="g-grid"></div>
-                <p><strong>例子</strong>：</p>
-                <pre class="brush: js;">
-                    $.config({
+                <p><strong>事件</strong>：</p>
+                <section class="g-mod g-attr g-block">
+                    <div class="cont">
+                        <p><strong>_init()</strong>：</p>
+                        <div class="cont"><p>创建插件初始化事件</p></div>
+                        <p><strong>arguments</strong>：</p>
+                        <p><strong>returns</strong>：</p>
+                        <p><strong>examples</strong>：</p>
+                        <pre class="brush: js;">
+                            _init:function(){
 
-                        level: 6,
-
-                        nocache: false,
-
-                        baseurl: static/js/,
-
-                        alias: {
-
-                            'leoUiCss': '../css/leoUi.css',//css别名
-
-                            'leoUi-grid': 'leoUi/leoUi-grid',//js别名（可省略.js）
-                        },
-
-                        shim: {
-
-                            jquery: {//别名
-
-                                src: 'lib/jquery-1.11.1-min.js',//路径
-
-                                exports: "$"//输出（可以是函数，return输出变量）
+                                this.$target.hide();
 
                             }
+                        </pre>
+                    </div>
+                </section>
+                <section class="g-mod g-attr g-block">
+                    <div class="cont">
+                        <p><strong>_delay( fn [, delay ] )</strong>：</p>
+                        <div class="cont">
+                            <p>在指定延迟后调用提供的函数。保持 this 上下文正确。</p>
+                        </div>
+                        <p><strong>arguments</strong>：</p>
+                        <div class="cont">
+                            <p>fn (function | string): 要调用的函数。也可以是插件方法的名称。</p>
+                            <p>delay (number): 调用函数前等待的毫秒数，默认为 0。</p>
+                        </div>
+                        <p><strong>returns</strong>：</p>
+                        <div class="cont">
+                            <p>返回 clearTimeout() ID。</p>
+                        </div>
+                        <p><strong>examples</strong>：</p>
+                        <pre class="brush: js;">
+                            this._delay( this._get, 100 );
+                        </pre>
+                    </div>
+                </section>
+                <section class="g-mod g-attr g-block">
+                    <div class="cont">
+                        <p><strong>_on( args [, suppressDisabledCheck ] )</strong>：</p>
+                        <div class="cont">
+                            <p>插件内置绑定事件的方法，同过此方法可：自动添加事件命名空间，调用destroy方法可自动移除事件，设置插件的options.disabledEvent = true可禁用当前实例插件的所有事件，设置了suppressDisabledCheck选项如果事件发生在带有 disableClassName class 的元素上，则不调用事件处理程序。</p>
+                        </div>
+                        <p><strong>arguments</strong>：</p>
+                        <div class="cont">
+                            <p>args (): 与jquery中on事件参数一样。</p>
+                            <p>suppressDisabledCheck (string): 参数为'supportDisabled'时，事件发生在带有 disableClassName class 的元素上，则不调用事件处理程序。</p>
+                        </div>
+                        <p><strong>returns</strong>：</p>
+                        <div class="cont">
+                            <p>返回 当前插件实例对象</p>
+                        </div>
+                        <p><strong>examples</strong>：</p>
+                        <pre class="brush: js;">
+                            this._on( this.$target, 'click.ok', function(event){
 
-                        }
+                                $(this).hide();
 
-                    });
-                </pre>
-            </div>
-        </section>
-        <section class="g-mod g-attr g-block">
-            <h2 class="tit">define 创建模块</h2>
-            <div class="cont">
-                <p><strong>define( [ name, deps ], factory )</strong>：define 是一个全局函数，通过该函数就可以创建一个符合 AMD 规范的模块，然后就可以通过<mark class="defaultvalue">leoUiLoad.require/$.require</mark>方法来加载这个模块。</p>
-                <p><strong>arguments</strong>：</p>
-                <div id="define-grid" class="g-grid"></div>
-            </div>
-        </section>
-        <section class="g-mod g-attr g-block">
-            <h2 class="tit">require 加载模块</h2>
-            <div class="cont">
-                <p><strong>leoUiLoad.require|$.require( list, [ factory ] )</strong>：require 方法是 leoUiLoad 提供的用于加载模块的方法，该模块只要遵循 AMD 的模块化规范，就可以加载。</p>
-                <p><strong>arguments</strong>：</p>
-                <div id="require-grid" class="g-grid"></div>
-            </div>
-        </section>
-        <section class="g-mod g-attr g-block">
-            <h2 class="tit">合并模块</h2>
-            <div class="cont">
-                <p>leoUiLoad.js 提供了一个 leoUiLoadCombo 的合并工具，该合并工具运行在 node.js 的环境中，配置很简单。将下面的代码保存成 build.js：</p>
-                <pre class="brush: js;">
-                    require('./js/leoUiLoadCombo.js').leoUiLoadCombo({
-                        baseUrl : '/js',//是需要合并的模块的基础路径。
-                        uglifyUrl : '../uglify/uglify-js',//是压缩工具 uglify 的路径。
-                        modules: [{//可以传一组待合并的数据。
-                            input: ['src/i_class.js'],//一个或一组待合并的的模块，(多个模块压缩成一个文件就是一组)。
-                            output: 'leo/js/src/i_class.js'//输出合并文件路径
-                        }],
-                        config:{//配置文件可以统一放在这里
-
-                            level: 6,
-
-                            alias: {
-
-                                'leoUiCss': '../css/leoUi.css',
-
-                                'public': 'src/public',
-
-                            },
-
-                            shim: {
-
-                                jquery: {
-
-                                    src: 'lib/jquery-1.11.1-min.js',
-
-                                    exports: "$"
-
-                                }
-
-                            }
-
-                        }
-
-                    });
-                </pre>
-                 <p>配置好后，可以直接在 cmd 中运行命令：node build，当然，前提是你必须安装了 node.js。</p>
+                            }, 'supportDisabled' );
+                        </pre>
+                    </div>
+                </section>
             </div>
         </section>
     </section>
@@ -178,15 +159,17 @@
 
             id: 'default',
 
-            width: 100,
+            width: 300,
 
-            theadName: 'Default'
+            theadName: 'Default',
+
+            className:'feedLine'
 
         },{
 
             id: 'explain',
 
-            width: 1000,
+            width: 800,
 
             fixed: true,
 
@@ -224,7 +207,7 @@
 
             'type': 'string',
 
-            'explain': '插件未提供元素时要使用的元素；默认使用：default.target。'
+            'explain': '默认的$target值；(也可配置插件options中的选项作为$target。)'
 
         }, {
 
@@ -235,16 +218,6 @@
             'type': 'string',
 
             'explain': '要继承的jQuery插件的名称'
-
-        }, {
-
-            'name': 'disabledEvent',
-
-            'default': 'false',
-
-            'type': 'boolean',
-
-            'explain': '设置为true时，禁用本插件下所有用_on添加的事件'
 
         }, {
 
@@ -268,6 +241,16 @@
 
         }, {
 
+            'name': 'defaults',
+
+            'default': '{disabledEvent: false}',
+
+            'type': 'object',
+
+            'explain': '设置为true时，禁用本插件下所有用_on添加的事件'
+
+        }, {
+
             'name': 'disabledEvent',
 
             'default': 'false',
@@ -285,56 +268,6 @@
             'type': 'string',
 
             'explain': '_on添加事件中禁止事件的classname'
-
-        }],requireData = [{
-
-            'name': 'list',
-
-            'default': '',
-
-            'type': 'string|array',
-
-            'explain': '依赖列表（可以是路径或者是别名，字符串逗号或者空格分开）'
-
-        }, {
-
-            'name': 'factory（可选）',
-
-            'default': '',
-
-            'type': 'function',
-
-            'explain': '模块加载成功后执行的回调函数，回调函数接受的参数就是模块向外部暴露的 exports 接口，参数顺序就是模块的排列顺序'
-
-        }],defineData = [{
-
-            'name': 'name（可选）',
-
-            'default': '',
-
-            'type': 'string',
-
-            'explain': '模块的名称，该参数定义了该模块的名称。在开发阶段一个文件就是一个模块，而文件名就是一个模块的模块名，建议在开发阶段省略该参数。没有定义模块名的模块就称为匿名模块，匿名模块会在合并的时候通过合并工具自动加上模块名。如果你要定义模块名，那么必须和模块的文件名保持一致'
-
-        }, {
-
-            'name': 'deps（可选）',
-
-            'default': '',
-
-            'type': 'array',
-
-            'explain': '依赖模块列表，可选的 Array 数组参数，该参数定义了该模块需要依赖哪些模块，依赖模块的列表包含的是一个个模块标识'
-
-        }, {
-
-            'name': 'factory',
-
-            'default': '',
-
-            'type': 'function',
-
-            'explain': '模块内容，必须的 Function 函数参数，该函数里面的代码就是模块本身的代码。factory 函数可以使用 return 返回一个值，该值就是该模块的 exports 外部接口，非常简便。factory 函数接受的参数就是依赖模块向外部暴露的 exports 接口，参数顺序就是依赖模块的排列顺序'
 
         }],gridOptions = {
 
@@ -360,8 +293,6 @@
 
         };
     $('#option-grid').leoGrid($.extend(gridOptions, {gridData: optionsData}));
-    $('#define-grid').leoGrid($.extend(gridOptions, {gridData: defineData}));
-    $('#require-grid').leoGrid($.extend(gridOptions, {gridData: requireData}));
     SyntaxHighlighter.all({'toolbar': false});
     </script>
 </body>

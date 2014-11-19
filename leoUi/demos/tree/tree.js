@@ -1,8 +1,8 @@
 //tree
 
-$.config({
+leoUiLoad.config({
 
-    level:6,
+    debug: true,
 
     baseUrl:'/leoUi/',
 
@@ -26,7 +26,9 @@ $.config({
 
     }
 
-}).require('leoUi-tree,ready', function($) {
+})
+
+leoUiLoad.require('leoUi-tree,ready', function($) {
 
     var zNodes =[
             { name:"父节点1 - 展开", open:true,

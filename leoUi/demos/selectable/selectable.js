@@ -1,8 +1,8 @@
 //selectable
 
-$.config({
+leoUiLoad.config({
 
-    level:6,
+    debug:true,
 
     baseUrl:'/leoUi/',
 
@@ -26,7 +26,9 @@ $.config({
 
     }
 
-}).require('leoUi-selectable,leoCss,ready', function($) {
+})
+
+leoUiLoad.require('leoUi-selectable,leoCss,ready', function($) {
 
     $( "#selectable" ).leoSelectable({
         stop: function(a,b) {

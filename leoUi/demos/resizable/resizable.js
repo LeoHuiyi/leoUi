@@ -1,7 +1,7 @@
 
-$.config({
+leoUiLoad.config({
 
-        level:6,
+        debug: true,
 
         baseUrl:'leoUi/',
 
@@ -25,7 +25,9 @@ $.config({
 
         }
 
-}).require('leoUi-resizable,leoCss,ready', function($) {
+})
+
+leoUiLoad.require('leoUi-resizable,leoCss,ready', function($) {
 
     $('body').leoResizable({
 

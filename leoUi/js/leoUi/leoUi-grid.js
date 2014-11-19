@@ -45,7 +45,7 @@
 
             disabledCheck:false,//禁用选择
 
-            disabledEvent:false,
+            disabledEvent:false,//是否禁用事件
 
             isHover:true,//是否移入变色
 
@@ -705,7 +705,7 @@
 
         setDisabledEvent:function(flag){
 
-            this.$$disabledEvent = !!flag;
+            this.options.disabledEvent = !!flag;
 
         },
 

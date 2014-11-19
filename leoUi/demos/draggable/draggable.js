@@ -1,7 +1,7 @@
 
-$.config({
+leoUiLoad.config({
 
-        level:6,
+        debug: true,
 
         baseUrl:'leoUi/',
 
@@ -25,7 +25,9 @@ $.config({
 
         }
 
-}).require('leoUi-draggable,leoCss,ready', function($) {
+})
+
+leoUiLoad.require('leoUi-draggable,leoCss,ready', function($) {
 
     $('body').leoDraggable({
 

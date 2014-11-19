@@ -949,6 +949,8 @@
 
             defaultsTarget:'target',
 
+            disableClassName:false,
+
             inherit:false,
 
             disabledEvent:false,

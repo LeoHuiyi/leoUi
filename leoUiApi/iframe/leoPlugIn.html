@@ -127,6 +127,7 @@
                             }
 
                         }
+
                     });
                 </pre>
                  <p>配置好后，可以直接在 cmd 中运行命令：node build，当然，前提是你必须安装了 node.js。</p>
@@ -274,6 +275,16 @@
             'type': 'boolean',
 
             'explain': '设置为true时，禁用本插件下所有用_on添加的事件'
+
+        },{
+
+            'name': 'disableClassName',
+
+            'default': 'LeoPlugIn_ + 小部件名称（name）+ _disable',
+
+            'type': 'string',
+
+            'explain': '_on添加事件中禁止事件的classname'
 
         }],requireData = [{
 

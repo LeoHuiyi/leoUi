@@ -14,23 +14,17 @@ var rExistId = /define\(\s*['"][^\[\('"\{]+['"]\s*,?/,
 
 	rRightEnd = /,?\s*(?:(function\s*\(.*|\{.*)|[^\(\["\]]*\))/,
 
-	rPullDeps = /((?:define|require)\(.*)/g,
+	rPullDeps = /((?:define|leoUiLoad\.require)\(.*)/g,
 
-	rDeps = /((?:define|require)\([^\[\(\{]*\[)([^\]]+)/,
+	rDeps = /((?:define|leoUiLoad\.require)\([^\[\(\{]*\[)([^\]]+)/,
 
-	rNames = /((?:define|require)\()[\'\"]([^\[\(\{]*)[\'\"],/,
+	rNames = /((?:define|leoUiLoad\.require)\()[\'\"]([^\[\(\{]*)[\'\"],/,
 
 	rDefine = /define\(/,
 
 	rword = /[^, ]+/g,
 
-	rConfig = /(?:config\([^\)]*\))/g,
-
-	rReConfig = /(?:\.config\([^\)]*\))/g,
-
-	r$Config = /\$\.config/,
-
-	r$Require = /\$\.require/,
+	rConfig = /(?:leoUiLoad\.config\([^\)]*\))/g,
 
 	fs = require('fs'),
 
@@ -38,7 +32,21 @@ var rExistId = /define\(\s*['"][^\[\('"\{]+['"]\s*,?/,
 
 	depsCache = {},
 
-	$ = {
+	hasOwn = Object.prototype.hasOwnProperty,
+
+	define = function(name, deps) {
+
+		if (Array.isArray(name)) {
+
+			deps = name;
+
+		}
+
+		return deps;
+
+	},
+
+	leoUiLoad = {
 
 		require: function(ids) {
 
@@ -50,32 +58,140 @@ var rExistId = /define\(\s*['"][^\[\('"\{]+['"]\s*,?/,
 
 			return obj || {};
 
-		},
-
-		define: function(name, deps) {
-
-			if (Array.isArray(name)) {
-
-				deps = name;
-
-			}
-
-			return deps;
-
 		}
 
 	},
+
+	mix = function minIn(receiver, supplier, deep) {
+
+		var i = 1,key,obj,target;
+
+		for (key in supplier) {
+
+			if (hasOwn.call(supplier, key)) {
+
+				if(!deep){
+
+					receiver[key] = supplier[key];
+
+				}else{
+
+					obj = supplier[key];
+
+					target = receiver[key];
+
+					if(typeof obj === 'object'){
+
+						receiver[key] = minIn(target || {}, obj, deep);
+
+					}else if(Array.isArray(obj)){
+
+						receiver[key] = minIn(target || [], obj, deep);
+
+					}else{
+
+						receiver[key] = supplier[key];
+
+					}
+
+				}
+
+			}
+
+		}
+
+		return receiver;
+	},
+
+	comboConfig = function(configArr, config){
+
+		var i;
+
+		if(configArr && (i = configArr.length)){
+
+			while(i--){
+
+				config = mix(config, eval(configArr[i]), true);
+
+			}
+
+		}
+
+		return config;
+
+	},
+
+	//扫描文件夹名称和文件名
+	scanFolder = function (path, deep){
+
+        var fileList = [],
+
+            folderList = [],
+
+            jsFileList = [],
+
+            walk = function(path, fileList, folderList, jsFileList){
+
+                files = fs.readdirSync(path);
+
+                files.forEach(function(item) {
+
+                    var tmpPath = path + '/' + item,
+
+                        stats = fs.statSync(tmpPath);
+
+                    if(stats.isDirectory()) {
+
+                        !!deep && walk(tmpPath, fileList, folderList, jsFileList);
+
+                        folderList.push(tmpPath);
+
+                    }else{
+
+                    	fileList.push(tmpPath);
+
+                        ~item.indexOf('.js') && jsFileList.push(tmpPath);
+
+                    }
+
+                });
+
+            };
+
+        walk(path, fileList, folderList, jsFileList);
+
+        console.log('扫描' + path +'成功');
+
+        return {
+
+        	'jsFiles': jsFileList,
+
+            'files': fileList,
+
+            'folders': folderList
+
+        }
+
+    },
 
 	// 分析模块的依赖，将依赖模块的模块标识组成一个数组以便合并
 	parseDeps = function(key, mods, encoding, config, baseUrl) {
 
 		var cache = depsCache[key],
+
 			deps = [],
+
 			config = config || {};
 
 		mods.forEach(function(modUrl) {
 
-			var content, literals, alias, shim, strConfig;
+			var content, literals, alias, shim;
+
+			if (~modUrl.indexOf('.css')) {
+
+				return;
+
+			}
 
 			if (!~modUrl.indexOf('.js')) {
 
@@ -101,24 +217,20 @@ var rExistId = /define\(\s*['"][^\[\('"\{]+['"]\s*,?/,
 			// 将define(), require()用正则提取出来
 			literals = content.match(rPullDeps);
 
-			strConfig = content.match(rConfig);
-
-			!strConfig ? strConfig = false : strConfig = strConfig[0];
-
-			config = !strConfig ? config : eval('$.' + strConfig);
+			config = comboConfig(content.match(rConfig) || [], config);
 
 			alias = config.alias;
 
 			shim = config.shim;
 
-			literals.forEach(function(literal) {
+			literals.forEach(function(literal, i) {
 
 				var arr, depsArr = [];
 				// define('hello', ['hello1'], function(){  =>  define('hello', ['hello1'])
 				// require('hello', function(){  =>  require('hello')
 				literal = literal.replace(rRightEnd, ')');
 				// 然后用eval去执行处理过的define和require获取到依赖模块的标识
-				arr = eval('$.' + literal);
+				arr = eval(literal);
 
 				if (arr && arr.length) {
 					// 为依赖模块解析真实的模块路径
@@ -250,7 +362,7 @@ var rExistId = /define\(\s*['"][^\[\('"\{]+['"]\s*,?/,
 
 		function inner(cur) {
 
-			if (!path.existsSync(cur)) { //不存在就创建一个
+			if (!fs.existsSync(cur)) { //不存在就创建一个
 
 				fs.mkdirSync(cur, mode)
 
@@ -286,6 +398,12 @@ var rExistId = /define\(\s*['"][^\[\('"\{]+['"]\s*,?/,
 				modUrl = path.resolve(baseUrl, id),
 				content;
 
+			if (~modUrl.indexOf('.css')) {
+
+				return;
+
+			}
+
 			if (!~modUrl.indexOf('.js')) {
 
 				modUrl += '.js';
@@ -295,7 +413,7 @@ var rExistId = /define\(\s*['"][^\[\('"\{]+['"]\s*,?/,
 			content = fs.readFileSync(modUrl, encoding);
 
 			// 非require()的情况下防止重复合并
-			if (!~content.indexOf('require(')) {
+			if (!~content.indexOf('leoUiLoad\.require(')) {
 
 				if (unique[modUrl]) {
 
@@ -321,21 +439,9 @@ var rExistId = /define\(\s*['"][^\[\('"\{]+['"]\s*,?/,
 
 			}
 
-			if (rReConfig.test(content)) {
+			if (rConfig.test(content)) {
 
-				content = content.replace(rReConfig, "");
-
-			};
-
-			if (r$Config.test(content)) {
-
-				content = content.replace(r$Config, "leoUiLoad.config");
-
-			};
-
-			if (r$Require.test(content)) {
-
-				content = content.replace(r$Require, "leoUiLoad.require");
+				content = content.replace(rConfig, "");
 
 			};
 
@@ -364,13 +470,14 @@ var rExistId = /define\(\s*['"][^\[\('"\{]+['"]\s*,?/,
 	writeFile = function(key, mod, uglifyUrl) {
 
 		var output = mod.output,
+
 			outputDir = output.replace(/\/[^\/]*(?:.js)$/, ''),
 
 			contents = depsCache[key].contents,
 
 			uglify, jsp, pro, ast;
 
-		contents = "leoUiLoad.config.leoUiLoadCombo = true;\n" + contents;
+		contents = "leoUiLoad.config.options.isLeoUiCombo = true;\n" + contents;
 
 		// 压缩文件
 		if (uglifyUrl) {
@@ -427,10 +534,9 @@ var rExistId = /define\(\s*['"][^\[\('"\{]+['"]\s*,?/,
 
 	},
 
-	leoUiLoadCombo = function(options) {
+	modulesCombo = function(modules, options){
 
-		var modules = options.modules,
-			config = options.config,
+		var config = options.config,
 
 			baseUrl = path.resolve() + options.baseUrl;
 
@@ -465,6 +571,50 @@ var rExistId = /define\(\s*['"][^\[\('"\{]+['"]\s*,?/,
 			writeFile(randomKey, mod, options.uglifyUrl);
 
 		});
+
+	},
+
+	leoUiLoadCombo = function(options) {
+
+		var modules = options.modules,files,i,newModules,file,folder,reFile,
+
+		baseUrl = path.resolve() + options.baseUrl,outputSrc;
+
+		if(Array.isArray(modules)){
+
+			modulesCombo(modules, options);
+
+		}
+
+		if(folder = options.folder){
+
+			files = scanFolder(path.resolve(baseUrl, folder.inputSrc), folder.deep).jsFiles;
+
+			i = files.length;
+
+			outputSrc = folder.outputSrc;
+
+			newModules = [];
+
+			reFile = /\/[^\/]*(?:.js)$/;
+
+			while(i--){
+
+				file = files[i];
+
+				newModules.push({
+
+					input:[file],
+
+					output: outputSrc + files[i].match(reFile, '')[0]
+
+				})
+
+			}
+
+			modulesCombo(newModules, options);
+
+		}
 
 	};
 

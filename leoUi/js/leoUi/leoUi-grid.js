@@ -45,6 +45,8 @@
 
             disabledCheck:false,//禁用选择
 
+            disabledEvent:false,
+
             isHover:true,//是否移入变色
 
             hoverClass:'leoUi-state-hover',//移入添加的类名称

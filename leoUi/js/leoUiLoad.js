@@ -8,7 +8,7 @@
 */
 +( function( global, DOC ) {
 
-	var _$ = global.$,_leoUiLoad = global.leoUiLoad,//保存已有同名变量
+	var _leoUiLoad = global.leoUiLoad,//保存已有同名变量
 
 	W3C = DOC.dispatchEvent,//IE9开始支持W3C的事件模型与getComputedStyle取样式值
 
@@ -32,24 +32,7 @@
 
 	readyFn, ready = W3C ? "DOMContentLoaded" : "readystatechange",basepath;
 
-	function $(expr) {
-
-		if ( typeof expr === "function" && expr.call ) { //注意在safari下,typeof nodeList的类型为function,因此必须使用$.type
-
-			return $.require("_leoUi,ready", expr);
-
-		}
-
-	}
-
-	/**
-	 * 糅杂，为一个对象添加更多成员
-	 * @param {Object} receiver 接受者
-	 * @param {Object} supplier 提供者
-	 * @return  {Object} 目标对象
-	 * @api public
-	 */
-	function mix(receiver, supplier) {
+	function extend(receiver, supplier) {
 
 		var args = [].slice.call(arguments),
 
@@ -58,14 +41,6 @@
 			key, //如果最后参数是布尔，判定是否覆写同名属性
 
 			ride = typeof args[args.length - 1] === "boolean" ? args.pop() : true;
-
-		if (args.length === 1) { //处理$.mix(hash)的情形
-
-			receiver = !this.window ? this : {};
-
-			i = 0;
-
-		}
 
 		while ((supplier = args[i++])) {
 
@@ -82,9 +57,53 @@
 		}
 
 		return receiver;
-	}
+	};
 
-	mix($, {
+	function mix(receiver, supplier, deep){
+
+		var i = 1,key,obj,target;
+
+		for (key in supplier) {
+
+			if (hasOwn.call(supplier, key)) {
+
+				if(!deep){
+
+					receiver[key] = supplier[key];
+
+				}else{
+
+					obj = supplier[key];
+
+					target = receiver[key];
+
+					if(typeof obj === 'object'){
+
+						receiver[key] = mix(target || {}, obj, deep);
+
+					}else if(obj.constructor === Array){
+
+						receiver[key] = mix(target || [], obj, deep);
+
+					}else{
+
+						receiver[key] = supplier[key];
+
+					}
+
+				}
+
+			}
+
+		}
+
+		return receiver;
+
+	};
+
+	function leoUiLoad(){}
+
+	extend(leoUiLoad, {
 
 		rword: /[^, ]+/g,
 
@@ -147,21 +166,16 @@
 
 		},
 
-		noConflict: function( deep ) {
+		noConflict: function() {
 
-			if ( global.$ === $ ) {
-
-				global.$ = _$;
-
-			}
-
-			if ( deep && global.leoUiLoad === $ ) {
+			if ( global.leoUiLoad === leoUiLoad ) {
 
 				global.leoUiLoad = _leoUiLoad;
 
 			}
 
 			return this;
+
 		},
 
 		/**
@@ -195,61 +209,27 @@
 		 */
 		unbind: W3C ? function(el, type, fn, phase) {
 
-			el.removeEventListener(type, fn || $.noop, !!phase);
+			el.removeEventListener(type, fn || leoUiLoad.noop, !!phase);
 
 		} : function(el, type, fn) {
 
 			if (el.detachEvent) {
 
-				el.detachEvent("on" + type, fn || $.noop);
+				el.detachEvent("on" + type, fn || leoUiLoad.noop);
 
 			}
 
 		},
 
-		/**
-		 *  将调试信息打印到控制台或页面
-		 *  $.log(str, page, level )
-		 *  @param {Any} str 用于打印的信息，不是字符串将转换为字符串
-		 *  @param {Boolean} page ? 是否打印到页面
-		 *  @param {Number} level ? 通过它来过滤显示到控制台的日志数量。
-		 *          0为最少，只显示最致命的错误；7，则连普通的调试消息也打印出来。
-		 *          显示算法为 level <= $.config.level。
-		 *          这个$.config.level默认为9。下面是level各代表的含义。
-		 *          0 EMERGENCY 致命错误,框架崩溃
-		 *          1 ALERT 需要立即采取措施进行修复
-		 *          2 CRITICAL 危急错误
-		 *          3 ERROR 异常
-		 *          4 WARNING 警告
-		 *          5 NOTICE 通知用户已经进行到方法
-		 *          6 INFO 更一般化的通知
-		 *          7 DEBUG 调试消息
-		 *  @return {String}
-		 *  @api public
-		 */
-		log: function( str, page, level ) {
+		log: function( str, page ) {
 
-			for ( var i = 1, show = true; i < arguments.length; i++ ) {
+			var configOp = leoUiLoad.config.options;
 
-				level = arguments[i];
-
-				if ( typeof level === "number" ) {
-
-					show = level <= $.config.level;
-
-				} else if ( level === true ) {
-
-					page = true;
-
-				}
-
-			}
-
-			if (show) {
+			if (!!configOp && configOp.debug) {
 
 				if (page === true) {
 
-					$.require("ready", function() {
+					leoUiLoad.require("ready", function() {
 
 						var div = DOC.createElement("pre");
 
@@ -261,12 +241,10 @@
 
 					});
 
-				} else if ( window.opera ) {
+				} else if ( global.opera ) {
 
 					opera.postError(str);
 
-					//http://www.cnblogs.com/zoho/archive/2013/01/31/2886651.html
-					//http://www.dotblogs.com.tw/littlebtc/archive/2009/04/06/ie8-ajax-2-debug.aspx
 				} else if ( global.console && console.info && console.log ) {
 
 					console.log(str);
@@ -282,39 +260,11 @@
 		/**
 		 * 配置
 		 * @param  {Object} settings 配置对象
-		 * @return {$}
+		 *
 		 */
 		config: function(settings) {
 
-			var config = $.config;
-
-			config.nocache = !!settings.nocache;
-
-			settings.level && ( config.level = settings.level );
-
-			if ( settings.baseUrl ) {
-
-				basepath = $.mergePath( settings.baseUrl, basepath );
-
-			}
-
-			if ( settings.alias ) {
-
-				!config.alias && (config.alias = {});
-
-				mix( config.alias, settings.alias );
-
-			}
-
-			if ( settings.shim ) {
-
-				!config.shim && (config.shim = {});
-
-				mix( config.shim, settings.shim );
-
-			}
-
-			return this;
+			leoUiLoad.config.options = mix(leoUiLoad.config.defaults, settings, true);
 
 		},
 
@@ -414,17 +364,19 @@
 
 	function init() {
 
-		var i = 0,script, scripts, initMod, initBaseUrl, url ,initCoreLib, configUrl;
+		var i = 0,script, scripts, location,config,
+
+		initMod, initBaseUrl, url , configUrl;
 
         // firefox支持currentScript属性
-        if (document.currentScript) {
+        if (DOC.currentScript) {
 
-            script = document.currentScript;
+            script = DOC.currentScript;
 
         } else {
 
             // 正常情况下，在页面加载时，当前js文件的script标签始终是最后一个
-            scripts = document.getElementsByTagName('script');
+            scripts = DOC.getElementsByTagName('script');
 
             script = scripts[scripts.length - 1];
 
@@ -436,33 +388,23 @@
 
         initBaseUrl = script.getAttribute('data-baseurl');
 
-        initCoreLib = script.getAttribute('data-corelib');
-
         url = script.hasAttribute ? script.src : script.getAttribute('src', 4);
 
-        url = url || window.location.href;
+        location = global.location.href;
 
-		basepath = !!initBaseUrl ? $.mergePath( initBaseUrl, window.location.href ) : url.slice( 0, url.lastIndexOf('/') + 1 );
+        url = url || location;
 
-		$.config.level = 6;
+		basepath = !!initBaseUrl ? leoUiLoad.mergePath( initBaseUrl, location ) : url.slice( 0, url.lastIndexOf('/') + 1 );
 
-		$.config.shim = {
+		leoUiLoad.config.options = leoUiLoad.config.defaults = {
 
-            _leoUi:{
+			debug: false,
 
-                src: initCoreLib || 'jquery/jquery-1.9.1.js',
+			nocache: false,
 
-                exports:function(){
+			isLeoUiCombo: false
 
-                	window.jQuery = null;
-
-                	return window.$.noConflict();
-
-                }
-
-            }　
-
-        }
+		}
 
         if (initMod) {
 
@@ -470,15 +412,15 @@
 
 	        	( configUrl = basepath + config ).indexOf('.js') === -1 && ( configUrl += '.js' );
 
-	        	loadJS( configUrl, function() {
+	        	leoUiLoad.require( configUrl, function() {
 
-					loadJSCSS( initMod, basepath, false, true );
+					leoUiLoad.require(initMod);
 
 				} )
 
 			}else{
 
-				loadJSCSS( initMod, basepath, false, true );
+				leoUiLoad.require(initMod);
 
 			}
 
@@ -502,7 +444,7 @@
 
 			stack = e.stack;
 
-			if (!stack && window.opera) {
+			if (!stack && global.opera) {
 
 				//opera 9没有e.stack,但有e.Backtrace,但不能直接取得,需要对e对象转字符串进行抽取
 				stack = (String(e).match(/of linked script \S+/g) || []).join(" ");
@@ -532,7 +474,7 @@
 
 		}
 
-		var nodes = (base ? document : head).getElementsByTagName("script"); //只在head标签中寻找
+		var nodes = (base ? DOC : head).getElementsByTagName("script"); //只在head标签中寻找
 
 		for (var i = nodes.length, node; node = nodes[--i];) {
 
@@ -606,7 +548,7 @@
 
 			});
 
-			$.log("加载 " + id + " 失败" + onError + " " + ( !!modules[id] && !modules[id].state ), 7);
+			leoUiLoad.log("加载 " + id + " 失败" + onError + " " + ( !!modules[id] && !modules[id].state ));
 
 		} else {
 
@@ -616,7 +558,9 @@
 
 	}
 
-	function loadJSCSS( url, parent, shim, isModules ) {
+	function loadJSCSS( url, parent, shim ) {
+
+		var configOp = leoUiLoad.config.options
 
 		//1. 特别处理ready标识符
 		if (/^ready$/.test(url)) {
@@ -629,9 +573,9 @@
 
 		}
 
-		if ( !!$.config.alias && $.config.alias[url] ) { //别名机制
+		if ( !!configOp.alias && configOp.alias[url] ) { //别名机制
 
-			url = $.config.alias[url];
+			url = configOp.alias[url];
 
 		}
 
@@ -669,7 +613,7 @@
 
 			} else {
 
-				$.error("不符合模块标识规则: " + url);
+				leoUiLoad.error("不符合模块标识规则: " + url);
 
 			}
 
@@ -691,7 +635,7 @@
 
 		}
 
-		if ($.config.nocache) {
+		if (configOp.nocache) {
 
             src += ( src.indexOf("?") === -1 ? "?" : "&" ) + ( new Date - 0 );
 
@@ -702,7 +646,7 @@
 
 			if (!modules[src]) { //如果之前没有加载过
 
-				!isModules && ( modules[src] = {
+				modules[src] = {
 
 					id: src,
 
@@ -712,15 +656,15 @@
 
 					state: 1
 
-				} );
+				};
 
 				if (shim) { //shim机制
 
-					$.require(shim.deps || "", function() {
+					leoUiLoad.require(shim.deps || "", function() {
 
 						loadJS(src, function() {
 
-							modules[src].exports = typeof shim.exports === "function" ?shim.exports() : window[shim.exports];
+							modules[src].exports = typeof shim.exports === "function" ?shim.exports() : global[shim.exports];
 
 							if( modules[src].exports ){
 
@@ -728,7 +672,7 @@
 
 							}else{
 
-								$.log( "shim机制下的" + src + " 无输出", 7 );
+								leoUiLoad.log( "shim机制下的" + src + " 无输出" );
 
 							}
 
@@ -785,7 +729,7 @@
 
 				if ( checkFail( node, false, !W3C ) ) {
 
-					$.log( "已成功加载 " + node.src, 7 );
+					leoUiLoad.log( "已成功加载 " + node.src );
 
 				}
 
@@ -803,7 +747,7 @@
 
 		head.insertBefore(node, head.firstChild); //chrome下第二个参数不能为null
 
-		$.log("正准备加载 " + node.src, 7); //更重要的是IE6下可以收窄getCurrentScript的寻找范围
+		leoUiLoad.log("正准备加载 " + node.src ); //更重要的是IE6下可以收窄getCurrentScript的寻找范围
 
 	}
 
@@ -835,7 +779,7 @@
 	 * @param {String} parent ? 父路径，没有使用种子模块的根路径或配置项
 	 * @api public
 	 */
-	$.require = function(list, factory, parent) {
+	leoUiLoad.require = function(list, factory, parent) {
 
 		// 用于检测它的依赖是否都为2
 		var deps = {},
@@ -849,13 +793,15 @@
 			// 已安装完的模块数
 			cn = 0,
 
-			id = parent || "callback" + setTimeout("1"),url;
+			id = parent || "callback" + setTimeout("1"),url,
+
+			configOp = leoUiLoad.config.options;
 
 		parent = parent || basepath;
 
-		String(list).replace($.rword, function(el) {
+		String(list).replace(leoUiLoad.rword, function(el) {
 
-			if($.config.leoUiLoadCombo === true){
+			if(configOp.isLeoUiCombo === true){
 
 				dn++;
 
@@ -875,9 +821,9 @@
 
 			}else{
 
-				if( !!$.config.shim && $.config.shim[el] ){
+				if( !!configOp.shim && configOp.shim[el] ){
 
-					url = loadJSCSS( el, parent, $.config.shim[el] );
+					url = loadJSCSS( el, parent, configOp.shim[el] );
 
 				}else{
 
@@ -945,11 +891,11 @@
 	 * @param {Function} factory 模块工厂
 	 * @api public
 	 */
-	window.define = $.define = function(id, deps, factory) { //模块名,依赖列表,模块本身
+	global.define = leoUiLoad.define = function(id, deps, factory) { //模块名,依赖列表,模块本身
 
-		var args = $.slice(arguments),
+		var args = leoUiLoad.slice(arguments),
 
-		isLeoUiLoadCombo = $.config.leoUiLoadCombo === true;
+		isLeoUiCombo = leoUiLoad.config.options.isLeoUiCombo === true;
 
 		if (typeof id === "string") {
 
@@ -964,11 +910,11 @@
 		}//现在除了safari外，我们都能直接通过getCurrentScript一步到位得到当前执行的script节点，
 
 		//safari可通过onload+delay闭包组合解决
-		id = modules[id] && modules[id].state >= 1 || isLeoUiLoadCombo === true ? _id : getCurrentScript();
+		id = modules[id] && modules[id].state >= 1 || isLeoUiCombo === true ? _id : getCurrentScript();
 
 		if (!modules[id] && _id) {
 
-			if(isLeoUiLoadCombo === true){
+			if(isLeoUiCombo === true){
 
 				modules[id] = {
 
@@ -1022,7 +968,7 @@
 
 				if (isCycle) {
 
-					$.error( id + "模块与之前的某些模块存在循环依赖" );
+					leoUiLoad.error( id + "模块与之前的某些模块存在循环依赖" );
 
 				}
 
@@ -1030,7 +976,7 @@
 
 			delete factory.delay; //释放内存
 
-			$.require.apply( null, args ); //0,1,2 --> 1,2,0
+			leoUiLoad.require.apply( null, args ); //0,1,2 --> 1,2,0
 
 		};
 
@@ -1046,7 +992,7 @@
 
 	};
 
-	$.define.amd = modules;
+	leoUiLoad.define.amd = modules;
 
 	/**
 	 * 请求模块从modules对象取得依赖列表中的各模块的返回值，执行factory, 完成模块的安装
@@ -1081,7 +1027,11 @@
 
 			}else{
 
-				$.log( "fireFactory中" + id + " 无输出", 7 );
+				module.exports = '';
+
+				module.state = 2;
+
+				leoUiLoad.log( "fireFactory中" + id + " 无输出" );
 
 			}
 
@@ -1101,11 +1051,11 @@
 
 		if (readyFn) {
 
-			$.unbind( DOC, ready, readyFn );
+			leoUiLoad.unbind( DOC, ready, readyFn );
 
 		}
 
-		fireReady = $.noop; //隋性函数，防止IE9二次调用_checkDeps
+		fireReady = leoUiLoad.noop; //隋性函数，防止IE9二次调用_checkDeps
 
 	}
 
@@ -1139,7 +1089,7 @@
 
 	} else {
 
-		$.bind(DOC, ready, readyFn = function() {
+		leoUiLoad.bind(DOC, ready, readyFn = function() {
 
 			if ( W3C || DOC.readyState === "complete" ) {
 
@@ -1177,6 +1127,6 @@
 
 	init();
 
-	global.leoUiLoad = global.$ = $;
+	global.leoUiLoad = leoUiLoad;
 
 })( window, document );

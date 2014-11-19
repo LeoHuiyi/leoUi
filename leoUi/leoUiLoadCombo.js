@@ -396,6 +396,7 @@ var rExistId = /define\(\s*['"][^\[\('"\{]+['"]\s*,?/,
 			var modName = id.match(rModId)[1],
 
 				modUrl = path.resolve(baseUrl, id),
+
 				content;
 
 			if (~modUrl.indexOf('.css')) {
@@ -534,11 +535,9 @@ var rExistId = /define\(\s*['"][^\[\('"\{]+['"]\s*,?/,
 
 	},
 
-	modulesCombo = function(modules, options){
+	modulesCombo = function(modules, baseUrl, options){
 
-		var config = options.config,
-
-			baseUrl = path.resolve() + options.baseUrl;
+		var config = options.config;
 
 		modules.forEach(function(mod) {
 
@@ -582,7 +581,7 @@ var rExistId = /define\(\s*['"][^\[\('"\{]+['"]\s*,?/,
 
 		if(Array.isArray(modules)){
 
-			modulesCombo(modules, options);
+			modulesCombo(modules, baseUrl, options);
 
 		}
 
@@ -612,7 +611,7 @@ var rExistId = /define\(\s*['"][^\[\('"\{]+['"]\s*,?/,
 
 			}
 
-			modulesCombo(newModules, options);
+			modulesCombo(newModules, baseUrl, options);
 
 		}
 

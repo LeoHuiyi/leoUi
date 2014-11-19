@@ -1,6 +1,6 @@
-$.config({
+leoUiLoad.config({
 
-    level: 6,
+    debug: true,
 
     baseUrl: 'leoUi/',
 
@@ -24,7 +24,9 @@ $.config({
 
     }
 
-}).require('leoUi-droppable,leoCss,ready', function($) {
+})
+
+leoUiLoad.require('leoUi-droppable,leoCss,ready', function($) {
 
     $('.portlet').leoDraggable({
         bClone: true,

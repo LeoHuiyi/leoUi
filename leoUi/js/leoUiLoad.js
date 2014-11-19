@@ -264,7 +264,11 @@
 		 */
 		config: function(settings) {
 
-			leoUiLoad.config.options = mix(leoUiLoad.config.defaults, settings, true);
+			var options = leoUiLoad.config.options;
+
+			options= mix(leoUiLoad.config.defaults, settings, true);
+
+			settings.baseUrl && (basepath = leoUiLoad.mergePath( options.baseUrl, basepath ));
 
 		},
 
@@ -402,7 +406,13 @@
 
 			nocache: false,
 
-			isLeoUiCombo: false
+			isLeoUiCombo: false,
+
+			baseUrl: false,
+
+			alias:{},
+
+			shim:{}
 
 		}
 

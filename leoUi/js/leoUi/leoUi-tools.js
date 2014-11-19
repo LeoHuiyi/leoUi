@@ -802,9 +802,7 @@
 
             $[name] = function(options){
 
-                function returnFn( obj ){
-
-                    var instance = obj;
+                function returnFn( instance ){
 
                     function inFn( options ){
 
@@ -812,23 +810,27 @@
 
                         returnValue = instance.$target;
 
-                        if (  !isMethodCall || !instance ) {
+                        if(isMethodCall){
 
-                            return false;
+                            if ( !instance ) {
 
-                        }
+                                return false;
 
-                        if ( !$.isFunction( instance[options] ) || options.charAt( 0 ) === "_" ) {
+                            }
 
-                            return false;
+                            if ( !$.isFunction( instance[options] ) || options.charAt( 0 ) === "_" ) {
 
-                        }
+                                return false;
 
-                        methodValue = instance[ options ].apply( instance, args );
+                            }
 
-                        if ( methodValue !== instance && methodValue !== undefined ) {
+                            methodValue = instance[ options ].apply( instance, args );
 
-                            returnValue = methodValue && methodValue.jquery ? returnValue.pushStack( methodValue.get() ) : methodValue;
+                            if ( methodValue !== instance && methodValue !== undefined ) {
+
+                                returnValue = methodValue && methodValue.jquery ? returnValue.pushStack( methodValue.get() ) : methodValue;
+
+                            }
 
                         }
 
@@ -836,17 +838,19 @@
 
                     }
 
-                    for (var key in obj ) {
+                    for (var key in instance ) {
 
-                        if ( $.isFunction( obj[key] ) && key.charAt( 0 ) !== "_" && key !== 'constructor' ) {
+                        if ( $.isFunction( instance[key] ) && key.charAt( 0 ) !== "_" && key !== 'constructor' ) {
 
                             inFn[key] = function(key){
 
                                 return function(){
 
-                                    ap.unshift.call( arguments, key );
+                                    var arg = aslice.call(arguments);
 
-                                    return inFn.apply( inFn,arguments );
+                                    arg.unshift(key);
+
+                                    return inFn.apply( inFn, arg );
 
                                 }
 
@@ -859,6 +863,10 @@
                     return inFn;
 
                 }
+
+                var args = aslice.call( arguments, 1 );
+
+                options = args.length ? $.leoTools.extend.apply( null, [ options ].concat(args) ) : options;
 
                 return returnFn( new $.leoTools.plugIn[name]['prototype']( options, false, false ) );
 
@@ -897,7 +905,7 @@
 
                         if ( methodValue !== instance && methodValue !== undefined ) {
 
-                            returnValue = methodValue && methodValue.jquery ?returnValue.pushStack( methodValue.get() ) : methodValue;
+                            returnValue = methodValue && methodValue.jquery ? returnValue.pushStack( methodValue.get() ) : methodValue;
 
                             return false;
 
@@ -952,8 +960,6 @@
             disableClassName:false,
 
             inherit:false,
-
-            disabledEvent:false,
 
             addJquery:false,
 
@@ -1067,13 +1073,15 @@
 
                 _create:function(){
 
-                    this.document = $( this.$target[0].style ? this.$target[0].ownerDocument : this.$target[0].document || this.$target[0] );
+                    var target = this.$target[0];
+
+                    this.document = $( target.style ? target.ownerDocument : target.document || target );
 
                     this.window = $( this.document[0].defaultView || this.document[0].parentWindow );
 
                     this._init();
 
-                    this.dataId !== false && $.data( this.$target[0], this.dataId, this );
+                    this.dataId !== false && $.data( target, this.dataId, this );
 
                     this._publicEvent = function(plugIn){
 
@@ -1105,7 +1113,7 @@
 
                 _on:function(){
 
-                    var arg = aslice.call( arguments, 2 ),
+                    var arg = aslice.call( arguments, 2 ),op = this.options,
 
                     $self = $(arguments[0]),self = $self[0],leoUiGuid,
 
@@ -1125,11 +1133,9 @@
 
                                 arg[last] = function(event){
 
-                                    if( This.$$disabledEvent === true || !$( event.target ).closest( "." + This.disableClassName )[0] ){
+                                    if( op.disabledEvent !== true && !$( event.target ).closest( "." + This.disableClassName )[0] ){
 
-                                        if( This.options.disabledEvent === true ){ return; }
-
-                                        oldFn.apply(this,arguments);
+                                        oldFn.apply(this, arguments);
 
                                     }
 
@@ -1141,9 +1147,9 @@
 
                             arg[last] = function(event){
 
-                                if( This.$$disabledEvent === true ){ return; }
+                                if( op.disabledEvent === true ){ return; }
 
-                                oldFn.apply(this,arguments);
+                                oldFn.apply(this, arguments);
 
                             }
 
@@ -1159,13 +1165,15 @@
 
                     }
 
+                    return this;
+
                 },
 
                 _off:function(){
 
                     var arg = aslice.call( arguments, 2 ),
 
-                    $self = $(arguments[0]),originalFn,emptyFn,last,leoUiGuid,
+                    $self = $(arguments[0]),emptyFn,last,leoUiGuid,
 
                     events = arguments[1],eventStr = '',This = this;
 
@@ -1201,6 +1209,8 @@
 
                     }
 
+                    return this;
+
                 },
 
                 _hasPlugIn:function( $self, name ){
@@ -1221,6 +1231,8 @@
 
                     }
 
+                    return this;
+
                 },
 
                 _targetTrigger:function( name, fn, context ){
@@ -1235,27 +1247,37 @@
 
                     }
 
-                },
-
-                _disable:function( $box ){
-
-                    !$box.hasClass( this.disableClassName ) && ( $box.addClass( this.disableClassName ), this.disableIdArr.push( $box[0] ) );
+                    return this;
 
                 },
 
-                _enable:function( $box ){
+                _removeBoxDisableClassName:function( $box ){
 
-                    $box.hasClass( this.disableClassName ) && this.disableIdArr.length > 0 && ( this.disableIdArr = $.grep( this.disableIdArr, function( val, index ) {
+                    var disableClassName = this.disableClassName;
+
+                    !$box.hasClass( disableClassName ) && ( $box.addClass( disableClassName ), this.disableIdArr.push( $box[0] ) );
+
+                    return this;
+
+                },
+
+                _addBoxDisableClassName:function( $box ){
+
+                    var disableClassName = this.disableClassName;
+
+                    $box.hasClass( disableClassName ) && this.disableIdArr.length > 0 && ( this.disableIdArr = $.grep( this.disableIdArr, function( val, index ) {
 
                         return val !== $box[0];
 
-                    } ), $box.removeClass( this.disableClassName ) );
+                    } ), $box.removeClass( disableClassName ) );
+
+                    return this;
 
                 },
 
                 trigger: function(){
 
-                    this._trigger.apply(this,arguments);
+                    this._trigger.apply(this, arguments);
 
                 },
 
@@ -1363,8 +1385,6 @@
 
                     }
 
-                    return this;
-
                 },
 
                 __setOptions: function( options ) {
@@ -1405,7 +1425,7 @@
 
                             if( rKey === lastKey ){
 
-                                options[lastKey] = value
+                                options[lastKey] = value;
 
                                 return options[lastKey] !== undefined;
 

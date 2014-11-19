@@ -237,7 +237,7 @@
 
             if ( this._mouseMoved ) {
 
-                if ($.ui.ie && ( !document.documentMode || document.documentMode < 9 ) && !event.button) {
+                if ($.leoTools.ie && ( !document.documentMode || document.documentMode < 9 ) && !event.button) {
 
                     return this._mouseUp(event);
 

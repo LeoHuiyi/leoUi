@@ -1,7 +1,7 @@
 //tooltip
-$.config({
+leoUiLoad.config({
 
-    level:6,
+    debug: true,
 
     baseUrl:'/leoUi/',
 
@@ -25,7 +25,9 @@ $.config({
 
     }
 
-}).require('leoUi-tooltip,leoCss,ready', function($) {
+})
+
+leoUiLoad.require('leoUi-tooltip,leoCss,ready', function($) {
 
     var a = $.leoTooltip({
 

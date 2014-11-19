@@ -949,7 +949,7 @@
 
     $.leoTools.plugIn = function( options, methods ){
 
-        var defaults = {
+        var plugInDefaults = {
 
             name:'leo',
 
@@ -965,13 +965,19 @@
 
             addJqueryFn:true,
 
+            defaults: {
+
+                disabledEvent:false
+
+            },
+
             _init: $.noop,
 
             _destroy: $.noop,
 
             _setOption :$.noop
 
-        },li = $.extend( {}, defaults, options ),inherit;
+        },li = $.extend( true, {}, plugInDefaults, options ),inherit;
 
         if( typeof li.name !== 'string' ){ return; }
 

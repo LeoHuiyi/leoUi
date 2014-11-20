@@ -11,12 +11,12 @@ var zNodes = [{
 	url: {href: '#!leo#iframe/leoUi-index.html'},
 	children: [{
 			name: "leoUiLoad模块加载器",
-			url: {href: '#!leo#iframe/leoUiLoad.html'},
+			url: {href: '#!leo#iframe/leoUiLoad.html'}
 		}, {
 			name: "leoPlugIn创建jQuery插件",
-			url: {href: '#!leo#iframe/leoPlugIn.html'},
+			url: {href: '#!leo#iframe/leoPlugIn.html'}
 		}]
-	}];
+	}],reHref = /.*#!leo#/;
 
 $('#navigation').leoTree({
 
@@ -32,7 +32,7 @@ $('#navigation').leoTree({
 
     	$iframe = $('#archives');
 
-    	if(!!href && (href = href.replace('#!leo#', ''))){
+    	if(!!href && (href = href.replace(reHref, ''))){
 
     		$iframe.attr('src', href);
 

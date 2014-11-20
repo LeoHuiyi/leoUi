@@ -1153,25 +1153,25 @@
 
         },
 
-        _bottunDisable:function($box){
+        _bottunDisable:function(el){
 
             var This = this;
 
             return function(){
 
-                This._removeBoxDisableClassName($box);
+                This._addElemDisableClassName(el);
 
             }
 
         },
 
-        _bottunEnable:function($box){
+        _bottunEnable:function(el){
 
             var This = this;
 
             return function(){
 
-                This._addBoxDisableClassName($box);
+                This._removeElemDisableClassName(el);
 
             }
 

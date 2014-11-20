@@ -37,7 +37,7 @@
 
             disabled:false,//如果设置为true禁用grid
 
-            tableModel:null,//grid格式见例子
+            tableModel:[],//grid格式见例子
 
             onlyInit:false,//只是初始化
 
@@ -99,7 +99,7 @@
 
             dataType:'ajax',//ajax,data
 
-            gridData:null,//grid的数据
+            gridData:[],//grid的数据
 
             ajax:{
 

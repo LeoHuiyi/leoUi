@@ -37,13 +37,15 @@
 
             disabled:false,//如果设置为true禁用grid
 
-            tableModel:null,//grid格式见例子
+            tableModel:[],//grid格式见例子
 
             onlyInit:false,//只是初始化
 
             trIdKey:'trid',//trIdKey
 
             disabledCheck:false,//禁用选择
+
+            disabledEvent:false,//是否禁用事件
 
             isHover:true,//是否移入变色
 
@@ -97,7 +99,7 @@
 
             dataType:'ajax',//ajax,data
 
-            gridData:null,//grid的数据
+            gridData:[],//grid的数据
 
             ajax:{
 
@@ -703,7 +705,7 @@
 
         setDisabledEvent:function(flag){
 
-            this.$$disabledEvent = !!flag;
+            this.options.disabledEvent = !!flag;
 
         },
 

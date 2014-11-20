@@ -1159,7 +1159,7 @@
 
             return function(){
 
-                This._disable($box);
+                This._removeBoxDisableClassName($box);
 
             }
 
@@ -1171,7 +1171,7 @@
 
             return function(){
 
-                This._enable($box);
+                This._addBoxDisableClassName($box);
 
             }
 

@@ -159,7 +159,7 @@
 
             if( opWidth === 'auto' ){
 
-                $cloneItems = this.$selectItems.clone().hide().appendTo('body');
+                $cloneItems = this.$selectItems.clone().addClass('leoSelect_items_clone').hide().appendTo('body');
 
                 cloneItemsOuterWidth = $cloneItems.outerWidth();
 

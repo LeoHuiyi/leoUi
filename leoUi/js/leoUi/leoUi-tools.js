@@ -1329,7 +1329,7 @@
 
                     var disableClassName = this.disableClassName,
 
-                    nameSpace = this.nameSpace,
+                    nameSpace = '.' + this.nameSpace,
 
                     disableIdArr = this.disableIdArr,offArr = this.offArr;
 
@@ -1341,7 +1341,7 @@
 
                     !!offArr && offArr.length>0 && $.each(offArr, function(index, val) {
 
-                        $(val).off(  '.' + nameSpace );
+                        $(val).off( nameSpace );
 
                     });
 

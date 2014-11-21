@@ -65,5 +65,9 @@ leoUiLoad.require('leoUi-draggable,leoCss,ready', function($) {
 
     });
 
+    $('#botton_1').on('click', function(event) {
+        event.preventDefault();
+        $('body').leoDraggable('destroy');
+    });
 
 });

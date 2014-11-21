@@ -176,7 +176,9 @@ leoUiLoad.require('leoUi-tree,ready', function($) {
 
         },
 
-        isIcon:true
+        isIcon:true,
+
+        dragAndDrop:true
 
     });
 

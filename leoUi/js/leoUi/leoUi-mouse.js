@@ -17,6 +17,7 @@
 
         // Browser globals
         factory(jQuery);
+
     }
 
 }(function($) {
@@ -63,20 +64,6 @@
 
             this._setMouseDownEvent();
 
-            this._on( this.$target, 'click', function(event) {
-
-                if( true === $.data( event.target, that.dataId + ".preventClickEvent" ) ){
-
-                    $.removeData( event.target, that.dataId + ".preventClickEvent" );
-
-                    event.stopImmediatePropagation();
-
-                    return false;
-
-                }
-
-            });
-
             this.started = false;
 
         },
@@ -115,6 +102,20 @@
 
             }
 
+            this._on( this.$target, 'click.mouse', selector, function(event) {
+
+                if( true === $.data( event.target, that.dataId + ".preventClickEvent" ) ){
+
+                    $.removeData( event.target, that.dataId + ".preventClickEvent" );
+
+                    event.stopImmediatePropagation();
+
+                    return false;
+
+                }
+
+            });
+
             this._on( this.$target, 'mousedown.mouse', selector, function(event) {
 
                 event.stopPropagation();
@@ -127,7 +128,7 @@
 
                 }
 
-            })
+            });
 
         },
 
@@ -217,9 +218,9 @@
 
             };
 
-            this._on( this.document, 'mousemove', this._mouseMoveDelegate );
+            this._on( this.document, 'mousemove.mouse', this._mouseMoveDelegate );
 
-            this._on( this.document, 'mouseup', this._mouseUpDelegate );
+            this._on( this.document, 'mouseup.mouse', this._mouseUpDelegate );
 
             this._textselect(true);
 
@@ -277,9 +278,9 @@
 
         _mouseUp: function(event) {
 
-            this._off( this.document, 'mousemove', this._mouseMoveDelegate );
+            this._off( this.document, 'mousemove.mouse', this._mouseMoveDelegate );
 
-            this._off( this.document, 'mouseup', this._mouseUpDelegate );
+            this._off( this.document, 'mouseup.mouse', this._mouseUpDelegate );
 
             this._textselect(false);
 

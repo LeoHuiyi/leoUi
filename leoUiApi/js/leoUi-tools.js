@@ -730,6 +730,34 @@
 
     };
 
+    $.leoTools.htmlencode = function(str){
+
+        var $div = $('<div style="display:none"></div>');
+
+        str = $div.text(str).html() || '';
+
+        $div.remove();
+
+        $div = null;
+
+        return str;
+
+    }
+
+    $.leoTools.htmldecode = function(str){
+
+        var $div = $('<div style="display:none">' + str + '</div>');
+
+        str = $div.text() || '';
+
+        $div.remove();
+
+        $div = null;
+
+        return str;
+
+    }
+
     $.leoTools.ie = !!/msie [\w.]+/.exec( navigator.userAgent.toLowerCase() );
 
     $.leoTools.isSupport__proto__ = ({}).__proto__ == Object.prototype;
@@ -868,7 +896,7 @@
 
                 options = args.length ? $.leoTools.extend.apply( null, [ options ].concat(args) ) : options;
 
-                return returnFn( new $.leoTools.plugIn[name]['prototype']( options, false, false ) );
+                return returnFn( new $.leoTools.plugIn[name]( options, false, false ) );
 
             }
 
@@ -888,6 +916,14 @@
                     this.each(function() {
 
                         var methodValue,instance = $.data( this, fullName );
+
+                        if ( options === "instance" ) {
+
+                            returnValue = instance;
+
+                            return false;
+
+                        }
 
                         if ( !instance ) {
 
@@ -931,7 +967,7 @@
 
                         } else {
 
-                            new $.leoTools.plugIn[name]['prototype']( options, this, fullName );
+                            new $.leoTools.plugIn[name]( options, this, fullName );
 
                         }
 
@@ -955,7 +991,7 @@
 
             version:'1.0',
 
-            defaultsTarget:'target',
+            defaultsTarget:'targetHtml',
 
             disableClassName:false,
 
@@ -967,7 +1003,9 @@
 
             defaults: {
 
-                disabledEvent:false
+                disabledEvent:false,
+
+                targetHtml:'<div></div>'
 
             },
 
@@ -987,7 +1025,7 @@
 
         leoPlugIn = leoToolsFn.plugIn;
 
-        if( !!leoPlugIn[li.inherit] && $.isFunction( inherit = leoPlugIn[li.inherit]['prototype'] ) ){
+        if( !!leoPlugIn[li.inherit] && $.isFunction( inherit = leoPlugIn[li.inherit] ) ){
 
             function PlugIn( hash, target, dataId ){
 
@@ -1011,7 +1049,7 @@
 
             }
 
-            li.defaults = $.extend( true, {}, leoPlugIn[li.inherit]['options'], li.defaults );
+            li.defaults = $.extend( true, {}, leoPlugIn[li.inherit]['prototype']['defaults'], li.defaults );
 
             $.extend( plugInPrototype, li );
 
@@ -1329,7 +1367,7 @@
 
                     var disableClassName = this.disableClassName,
 
-                    nameSpace = this.nameSpace,
+                    nameSpace = '.' + this.nameSpace,
 
                     disableIdArr = this.disableIdArr,offArr = this.offArr;
 
@@ -1341,7 +1379,7 @@
 
                     !!offArr && offArr.length>0 && $.each(offArr, function(index, val) {
 
-                        $(val).off(  '.' + nameSpace );
+                        $(val).off( nameSpace );
 
                     });
 
@@ -1555,7 +1593,7 @@
 
         }
 
-        leoToolsFn.plugIn[li.name] = { prototype: PlugIn, options: li.defaults};
+        leoToolsFn.plugIn[li.name] = PlugIn;
 
         if( li.addJquery === true ){
 

@@ -934,7 +934,7 @@
 
         getTrId:function(tr){
 
-            return this.tableData[tr.id][this.options.trIdKey] || '';
+            return (tr && this.tableData[tr.id][this.options.trIdKey]) || '';
 
         },
 
@@ -2609,7 +2609,7 @@
 
             }else{
 
-                str += value;
+                str += $.leoTools.htmlencode(value);
 
             };
 

@@ -81,6 +81,10 @@
 
                             $('#drag').( 'option', 'a.b.c', '123' );//调用leoDraggable的公开方法
 
+                            $('#drag').leoDraggable('instance')//返回$('#drag').leoDraggable的实例（实例方法专有）
+
+                            $.leoTools.plugIn.leoDraggable.prototype.defaults.data = 'leo';//设置后，所有将来的leoDraggable实例的data将默认为值 'leo'：
+
                             $('#drag').( 'destroy' );//销毁leoDraggable
                         </pre>
                     </div>
@@ -139,6 +143,8 @@
                             $leoDialog( 'option', 'a.b.c', '123' );//调用leoDialog的公开方法
 
                             $leoDialog.option( 'a.b.c', '123' );//调用leoDialog的公开方法
+
+                            $.leoTools.plugIn.leoDialog.prototype.defaults.data = 'leo';//设置后，所有将来的leoDialog实例的data将默认为值 'leo'：
 
                             $leoDialog.destroy();//销毁leoDialog
 
@@ -747,7 +753,7 @@
 
             'name': 'defaults',
 
-            'default': '{disabledEvent: false}',
+            'default': '{disabledEvent: false,targetHtml:"<div></div>"}',
 
             'type': 'object',
 
@@ -763,7 +769,17 @@
 
             'explain': '设置为true时，禁用本插件下所有用_on添加的事件'
 
-        },{
+        }, {
+
+            'name': 'targetHtml',
+
+            'default': '"<div></div>"',
+
+            'type': 'string',
+
+            'explain': '添加为jquery的静态方法默认的targetHtml'
+
+        }, {
 
             'name': 'disableClassName',
 

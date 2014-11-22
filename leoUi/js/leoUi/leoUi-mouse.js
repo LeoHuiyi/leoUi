@@ -134,7 +134,7 @@
 
         _textselect:function(bool) {
 
-            this[bool ? "_on" : "_off"]( this.document, 'selectstart.darg', false );
+            this[bool ? "_on" : "_off"]( this.document, 'selectstart.mouse', false );
 
             this.document.css("-moz-user-select", bool ? "none" : "");
 

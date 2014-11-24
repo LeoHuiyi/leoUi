@@ -156,7 +156,7 @@
                 <div class="cont">
                     <p><strong>document</strong>: 当前插件的 document</p>
                     <p><strong>window</strong>: 当前插件的 window</p>
-                    <p><strong>$target</strong>: 当前插件的选择到的jquery对象</p>
+                    <p><strong>$target</strong>: 当前插件的选择到的jquery对象;（默认为$('<div>')）</p>
                     <p><strong>options</strong>: 插件实例化后使用选项的对象</p>
                     <p><strong>version</strong>: 插件的字符串版本</p>
                 </div>
@@ -693,11 +693,11 @@
 
             'name': 'name',
 
-            'default': 'leo',
+            'default': 'leoUi',
 
             'type': 'string',
 
-            'explain': '插件名称；（$.fn.leo | $.leo）'
+            'explain': '插件名称；（$.fn.leoUi | $.leoUi'
 
         }, {
 
@@ -753,7 +753,7 @@
 
             'name': 'defaults',
 
-            'default': '{disabledEvent: false,targetHtml:"<div></div>"}',
+            'default': '{disabledEvent: false}',
 
             'type': 'object',
 
@@ -768,16 +768,6 @@
             'type': 'boolean',
 
             'explain': '设置为true时，禁用本插件下所有用_on添加的事件'
-
-        }, {
-
-            'name': 'targetHtml',
-
-            'default': '"<div></div>"',
-
-            'type': 'string',
-
-            'explain': '添加为jquery的静态方法默认的targetHtml'
 
         }, {
 

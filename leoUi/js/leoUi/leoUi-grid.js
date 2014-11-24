@@ -2609,7 +2609,7 @@
 
             }else{
 
-                str += $.leoTools.htmlencode(value);
+                str += $.leoTools.htmlEncode(value);
 
             };
 

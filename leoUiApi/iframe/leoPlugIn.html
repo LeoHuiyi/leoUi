@@ -81,7 +81,7 @@
 
                             $('#drag').( 'option', 'a.b.c', '123' );//调用leoDraggable的公开方法
 
-                            $('#drag').leoDraggable('instance')//返回$('#drag').leoDraggable的实例（实例方法专有）
+                            $('#drag').leoDraggable('instance')//返回$('#drag').leoDraggable的实例
 
                             $.leoTools.plugIn.leoDraggable.prototype.defaults.data = 'leo';//设置后，所有将来的leoDraggable实例的data将默认为值 'leo'：
 
@@ -140,9 +140,11 @@
                         <pre class="brush: js;">
                             var $leoDialog = $.leoTools.leoDialog();
 
-                            $leoDialog( 'option', 'a.b.c', '123' );//调用leoDialog的公开方法
+                            $leoDialog( 'option', 'a.b.c', '123' );//调用leoDialog的公开方法(函数方法调用)
 
-                            $leoDialog.option( 'a.b.c', '123' );//调用leoDialog的公开方法
+                            $leoDialog.option( 'a.b.c', '123' );//调用leoDialog的公开方法(属性方法调用)
+
+                            $('#drag').leoDraggable('instance')//返回$$leoDialog的实例
 
                             $.leoTools.plugIn.leoDialog.prototype.defaults.data = 'leo';//设置后，所有将来的leoDialog实例的data将默认为值 'leo'：
 

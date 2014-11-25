@@ -22,19 +22,23 @@
 
 }(function($) {
 
-    var ap = Array.prototype,aslice = ap.slice,expandoId,oproto = Object.prototype,ohasOwn = oproto.hasOwnProperty,jQuery = $;
+    var ap = Array.prototype,aslice = ap.slice,expandoId,oproto = Object.prototype,ohasOwn = oproto.hasOwnProperty,jQuery = $,parseCss;
 
     $.leoTools = $.leoTools || {};
 
     $.leoTools.version = '1.0.0';
 
-    $.leoTools.uuid = 0;
+    $.leoTools.getUuid = (function(){
 
-    $.leoTools.getUuid = function(){
+        var uuid = 0;
 
-        return $.leoTools.uuid++;
+        return function(){
 
-    };
+            return uuid++
+
+        };
+
+    })();
 
     $.leoTools.getId = function(name) {
 
@@ -160,7 +164,7 @@
 
     };
 
-    $.leoTools.parseCss = function( element, property ) {
+    parseCss = $.leoTools.parseCss = function( element, property ) {
 
         return parseFloat( $.css( element, property ), 10 ) || 0;
 
@@ -277,6 +281,42 @@
 
     }
 
+    $.leoTools.keyCode = {
+
+        BACKSPACE: 8,
+
+        COMMA: 188,
+
+        DELETE: 46,
+
+        DOWN: 40,
+
+        END: 35,
+
+        ENTER: 13,
+
+        ESCAPE: 27,
+
+        HOME: 36,
+
+        LEFT: 37,
+
+        PAGE_DOWN: 34,
+
+        PAGE_UP: 33,
+
+        PERIOD: 190,
+
+        RIGHT: 39,
+
+        SPACE: 32,
+
+        TAB: 9,
+
+        UP: 38
+
+    };
+
     $.leoTools.ie = !!/msie [\w.]+/.exec( navigator.userAgent.toLowerCase() );
 
     $.leoTools.isSupport__proto__ = ({}).__proto__ == Object.prototype;
@@ -358,6 +398,12 @@
                         returnValue = instance.$target;
 
                         if(isMethodCall){
+
+                            if ( options === "instance" ) {
+
+                                return instance;
+
+                            }
 
                             if ( !instance ) {
 
@@ -1129,6 +1175,274 @@
         }
 
     }
+
+    $.fn.extend({
+
+        leoUiTextSelection: function(){
+
+            var start, end, t = this[0], val = this.val(),
+
+            selection, re, selRange, range, stored_range, s, e;
+
+            if(arguments.length === 0){
+
+                if(typeof t.selectionStart !== "undefined"){
+
+                    s = t.selectionStart;
+
+                    e = t.selectionEnd;
+
+                }else{
+
+                    try{
+
+                        selection = document.selection;
+
+                        if (t.tagName.toLowerCase() != "textarea"){
+
+                            //this.focus();
+
+                            range = selection.createRange().duplicate();
+
+                            range.moveEnd("character", val.length);
+
+                            s = (range.text === "" ? val.length : val.lastIndexOf(range.text));
+
+                            range = selection.createRange().duplicate();
+
+                            range.moveStart("character", -val.length);
+
+                            e = range.text.length;
+
+                        }else{
+
+                            range = selection.createRange();
+
+                            stored_range = range.duplicate();
+
+                            stored_range.moveToElementText(t);
+
+                            stored_range.setEndPoint('EndToEnd', range);
+
+                            s = stored_range.text.length - range.text.length;
+
+                            e = s + range.text.length;
+
+                        }
+
+                    }catch(e){}
+
+                }
+
+                return {
+
+                    start: s, end: e, text: val.substring(s, e), replace: function (st){
+
+                        return val.substring(0, s) + st + val.substring(e, val.length);
+
+                    }
+
+                };
+
+            }else if(arguments.length === 1){
+
+                if(typeof arguments[0] === "object" && typeof arguments[0].start === "number" && typeof arguments[0].end === "number"){
+
+                    start = arguments[0].start;
+
+                    end = arguments[0].end;
+
+                }else if(typeof arguments[0] === "string"){
+
+                    if ((start = val.indexOf(arguments[0])) > -1) {
+
+                        end = start + arguments[0].length;
+
+                    }
+
+                }else if($.type(arguments[0]) === "regexp") {
+
+                    re = arguments[0].exec(val);
+
+                    if(re != null){
+
+                        start = re.index;
+
+                        end = start + re[0].length;
+
+                    }
+
+                }
+
+            }else if(arguments.length === 2){
+
+                if(typeof arguments[0] === "number" && typeof arguments[1] === "number") {
+
+                    start = arguments[0];
+
+                    end = arguments[1];
+
+                }
+
+            }
+
+            if(typeof start === "undefined"){
+
+                start = 0;
+
+                end = val.length;
+
+            }
+
+            if(typeof t.createTextRange !== "undefined"){
+
+                selRange = t.createTextRange();
+
+                selRange.collapse(true);
+
+                selRange.moveStart('character', start);
+
+                selRange.moveEnd('character', end - start);
+
+                selRange.select();
+
+            }else{
+
+                t.selectionStart = start;
+
+                t.selectionEnd = end;
+
+            }
+
+            return this;
+
+        },
+
+        leftBorderWidth: function(){
+
+            var element = this[0];
+
+            return parseCss(element, 'borderLeftWidth') + parseCss(element, 'paddingLeft') + parseCss(element, 'marginLeft');
+
+        },
+
+        rightBorderWidth: function(){
+
+            var element = this[0];
+
+            return parseCss(element, 'borderRightWidth') + parseCss(element, 'paddingRight') + parseCss(element, 'marginRight');
+
+        },
+
+        topBorderWidth: function(){
+
+            var element = this[0];
+
+            return parseCss(element, 'borderTopWidth') + parseCss(element, 'paddingTop') + parseCss(element, 'marginTop');
+
+        },
+
+        bottomBorderWidth: function(){
+
+            var element = this[0];
+
+            return parseCss(element, 'borderBottomWidth') + parseCss(element, 'paddingBottom') + parseCss(element, 'marginBottom');
+
+        },
+
+        borderSize: function(){
+
+            return {
+
+                width: this.leftBorderWidth() + this.rightBorderWidth(),
+
+                height: this.topBorderWidth() + this.bottomBorderWidth()
+
+            };
+
+        },
+
+        setOuterWidth: function(width){
+
+            return this.width(width - this.leftBorderWidth() - this.rightBorderWidth());
+
+        },
+
+        setOuterHeight: function(height){
+
+            return this.height(height - this.topBorderWidth() - this.bottomBorderWidth());
+
+        },
+
+        focus: (function( orig ){
+
+            return function( delay, fn ){
+
+                return typeof delay === "number" ? this.each(function(){
+                        var elem = this;
+
+                        setTimeout(function(){
+
+                            $( elem ).focus();
+
+                            if ( fn ) {
+
+                                fn.call( elem );
+
+                            }
+
+                        }, delay );
+
+                    }) :
+
+                    orig.apply( this, arguments );
+
+            };
+
+        })( $.fn.focus ),
+
+        zIndex: function( zIndex ){
+
+            if ( zIndex !== undefined ) {
+
+                return this.css( "zIndex", zIndex );
+
+            }
+
+            if ( this.length ) {
+
+                var elem = $( this[ 0 ] ), position, value;
+
+                while ( elem.length && elem[ 0 ] !== document ) {
+
+                    // Ignore z-index if position is set to a value where z-index is ignored by the browser
+                    // This makes behavior of this function consistent across browsers
+                    // WebKit always returns auto if the element is positioned
+                    position = elem.css( "position" );
+
+                    if ( position === "absolute" || position === "relative" || position === "fixed" ) {
+                        // IE returns 0 when zIndex is not specified
+                        // other browsers return a string
+                        // we ignore the case of nested elements with an explicit value of 0
+                        // <div style="z-index: -10;"><div style="z-index: 0;"></div></div>
+                        value = parseInt( elem.css( "zIndex" ), 10 );
+
+                        if ( !isNaN( value ) && value !== 0 ) {
+                            return value;
+                        }
+
+                    }
+
+                    elem = elem.parent();
+
+                }
+
+            }
+
+            return 0;
+        }
+
+    });
 
     return $;
 

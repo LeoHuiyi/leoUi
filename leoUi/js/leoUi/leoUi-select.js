@@ -339,7 +339,7 @@
 
             this.options.showAnimation.call( this.$selectItems, function(){
 
-                This._scrollSelectedToShow();
+                This._scrollIntoView();
 
                 This._selectItemsState = 'open';
 
@@ -347,15 +347,57 @@
 
         },
 
-        _scrollSelectedToShow:function(){
+        _hasHeightScroll: function(){
 
-            var $li = $(this.selectedLi),liWidth = $li.width(),
+            return this.$selectItems.outerHeight() < this.$selectItems.prop( "scrollHeight" );
 
-            $ul = this.$selectItemsUl,index = this.selectedLi.index(),
+        },
 
-            scrollTop = $li.offset().top - $ul.offset().top - ( parseFloat($ul.css('paddingTop')) || 0 ) - ( parseFloat($ul.children('li').filter(":first").css('marginTop')) || 0 );
+        _hasWidthScroll: function(){
 
-            this.$selectItems.animate({'scrollTop': scrollTop}, 200);
+            return this.$selectItems.outerWidth() < this.$selectItems.prop( "scrollWidth" );
+
+        },
+
+        _scrollIntoView: function() {
+
+            var borderTop, paddingTop, offset, scroll, elementHeight, itemHeight,
+
+            $target, parseCss, scrollbarWidth, $item;
+
+            if ( this._hasHeightScroll() ) {
+
+                $target = this.$selectItems;
+
+                parseCss = $.leoTools.parseCss;
+
+                $item = this.selectedLi;
+
+                scrollbarWidth = this._hasWidthScroll() ? $.position.scrollbarWidth() : 0;
+
+                borderTop = parseCss($target[0], "borderTopWidth");
+
+                paddingTop = parseCss($target[0], "paddingTop");
+
+                offset = $item.offset().top - $target.offset().top - borderTop - paddingTop;
+
+                scroll = $target.scrollTop();
+
+                elementHeight = $target.height();
+
+                itemHeight = $item.outerHeight();
+
+                if ( offset < 0 ) {
+
+                    $target.scrollTop( scroll + offset );
+
+                } else if ( offset + itemHeight > elementHeight - scrollbarWidth ) {
+
+                    $target.scrollTop( scroll + offset - elementHeight + itemHeight + scrollbarWidth );
+
+                }
+
+            }
 
         }
 

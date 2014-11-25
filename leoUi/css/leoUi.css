@@ -90,6 +90,13 @@
 .leoSelect_items .leoSelect_items_ul li{color: #666;cursor: pointer;display: block;line-height: 18px;padding: 6px 10px;white-space: nowrap;float:none;margin: 0;height: 20px;}
 .leoSelect_items .leoSelect_items_ul li.select{background: none repeat scroll 0 0 #16a0d3;color: #fff;}
 
+/*leoListMenu*/
+.leoListMenu{border:1px solid #7bbff2;color: #333;overflow: auto;background: none repeat scroll 0 0 #fff;position: relative;height: 200px}
+.leoListMenu .leoListMenu_menuContent{}
+.leoListMenu .leoListMenu_item{color: #666;cursor: pointer;display: block;line-height: 18px;padding: 6px 10px;white-space: nowrap;float:none;margin: 0;height: 20px;}
+.leoListMenu .leoListMenu_hover{background-color: red;color: #fff;}
+.leoListMenu .leoListMenu_select{background-color: #7bbff2;color: #fff;}
+
 /*leoGrid*/
 .leoUi-sort-asc, .leoUi-sort-desc, .leoUi-sort-ndb { width: 16px; height: 16px; line-height: 1; vertical-align: middle; display: -moz-inline-stack; display: inline-block; vertical-align: middle; *vertical-align: auto; zoom: 1; *display: inline; position: relative; cursor: pointer; }
 .leoUi-sort-asc span,.leoUi-sort-desc span,.leoUi-sort-ndb span { position: absolute; top: 0px; left: 4px; }

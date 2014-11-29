@@ -710,7 +710,7 @@
 
                             if(typeof eventName !== 'string' || eventName.charAt( 0 ) === "_"){ return; }
 
-                            return plugIn[eventName].apply(plugIn, aslice.call( arguments, 1 ) );
+                            return !!plugIn[eventName] && plugIn[eventName].apply(plugIn, aslice.call( arguments, 1 ) );
 
                         }
 
@@ -1257,6 +1257,10 @@
                     if ((start = val.indexOf(arguments[0])) > -1) {
 
                         end = start + arguments[0].length;
+
+                    }else if(arguments[0] === 'last'){
+
+                        end = start = val.length;
 
                     }
 

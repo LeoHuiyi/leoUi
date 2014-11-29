@@ -1,6 +1,6 @@
 /**
 +-------------------------------------------------------------------
-* jQuery leoUi--combobox
+* jQuery leoUi--listMenu
 +-------------------------------------------------------------------
 * @version    1.0.0 beta
 * @author     leo
@@ -46,25 +46,25 @@
 
             isHide:false,
 
-        	listMenuHtml:'<div class="leoListMenu"></div>',
+        	listMenuHtml:'<div class="leoListMenu"><div class="leoListMenu_menuContentIn"></div></div>',
 
         	menuContentHtml:'<div class="leoListMenu_menuContent"></div>',
 
-            menuItemHtmlFn:function(data){
+            menuItemHtmlFn:function(data, i){//data._disableItem = true不设置为menuItem
 
-                return '<div class="leoListMenu_item" tabindex="-1"><span>' + data.value + '</span></div>';
+                return '<div tabindex="-1"><span>' + data.value + '</span></div>';
 
             },
 
-            menuItemSelector:'>.leoListMenu_item',
+            menuItemsClass:'leoListMenu_item',
 
-            listMenuHoverClass:'leoListMenu_hover',
+            listMenuDisableClass:'leoListMenu_disable',
+
+            listMenuFocusClass:'leoListMenu_focus',
 
             listMenuSelectClass:'leoListMenu_select',
 
             width: 100,
-
-            listMenuMinHeight:100,
 
 			position: {
 
@@ -82,15 +82,25 @@
 
             showAnimation: function(callBack) {
 
-                this.show( { effect: "bounce", duration: "slow", complete: callBack } );
+                // this.show( { effect: "blind", duration: "slow", complete: callBack} );
+
+                this.show();
+
+                callBack();
 
             },
 
             hideAnimation: function(callBack) {
 
-                this.hide( { effect: "bounce", duration: "slow", complete: callBack } );
+                // this.hide( { effect: "blind", duration: "slow", complete: callBack} );
+
+                this.hide();
+
+                callBack();
 
             },
+
+            blurCackBack:$.noop,
 
             beforeShow:$.noop
 
@@ -99,6 +109,8 @@
         _init: function(){
 
             this.prefix = $.leoTools.getId('ListMenu') + '_';
+
+            this._listMenuState = 'close';
 
             this.scrollbarWidth = this.scrollbarWidth || $.position.scrollbarWidth();
 
@@ -113,6 +125,10 @@
             if( key === 'disabled' ){
 
                 this._setOpDisabled();
+
+            }else if( key === 'width' ){
+
+                !!this.$target && this.$target.setOuterWidth(value);
 
             }
 
@@ -130,13 +146,15 @@
 
         	var op = this.options,datas = datas || $.extend([], op.data),
 
-            datasLen,i = 0,data,prefix = this.prefix,
+            i = 0,data,prefix = this.prefix,itemData,menuData = [],
 
             listMenuData = {},menuItemHtmlFn = op.menuItemHtmlFn,id,
 
-        	$menuContent = this.$menuContent,prevId,firstId,lastId;
+        	$menuContent = this.$menuContent,prevId,firstId,lastId,
 
-        	datasLen = datas.length,last = datasLen - 1;
+        	datasLen = datas.length,last = datasLen - 1,$elem,
+
+            menuItemsClass = op.menuItemsClass,selectElem,focusElem;
 
         	for(; i < datasLen ; i++){
 
@@ -144,35 +162,75 @@
 
                 id = prefix + this.uid++;
 
-                listMenuData[id] = {};
+                data._id = id;
 
-                listMenuData[id].data = data;
+                $elem = $(menuItemHtmlFn(data, i)).attr('id', id).addClass(menuItemsClass).appendTo($menuContent);
 
-                if(!prevId){
+                itemData = listMenuData[id] = {};
 
-                    firstId = listMenuData.firstId = id
+                if(data._disableItem !== true){
+
+                    if(!prevId){
+
+                        firstId = listMenuData.firstId = id
+
+                    }else{
+
+                        itemData.prevId = prevId;
+
+                        listMenuData[prevId].nextId = id;
+
+                    }
+
+                    prevId = lastId = id;
+
+                    if(data._select === true){
+
+                        selectElem = $elem[0];
+
+                    }else if(data._focus === true){
+
+                        focusElem = $elem[0];
+
+                    }
+
+                    delete data._select;
+
+                    delete data._focus;
 
                 }else{
 
-                    listMenuData[id].prevId = prevId;
+                    $elem.addClass(op.listMenuDisableClass);
 
-                    listMenuData[prevId].nextId = id;
+                    itemData._disableItem = true;
 
-                    i === last && (lastId = listMenuData.lastId = id);
+                    delete data._disableItem;
 
                 }
 
-                $(menuItemHtmlFn(data)).attr('id', id).appendTo($menuContent);
+                itemData.data = data;
 
-                prevId = id;
+                menuData.push(data);
 
         	}
 
-            listMenuData[firstId].prevId = lastId;
+            if(lastId && firstId){
 
-            listMenuData[lastId].nextId = firstId;
+                listMenuData.lastId = lastId;
+
+                listMenuData[lastId].nextId = firstId;
+
+                listMenuData[firstId].prevId = lastId;
+
+            }
 
             this.listMenuData = listMenuData;
+
+            this.menuData = menuData;
+
+            this._focus(focusElem);
+
+            this._select(selectElem);
 
         },
 
@@ -188,9 +246,9 @@
 
             op.isHide === true && this.$target.hide();
 
-            this.$target.setOuterWidth(op.width).append(this.$menuContent).appendTo(op.appendTo);
+            this.$menuContentIn = this.$target.find('div.leoListMenu_menuContentIn').append(this.$menuContent);
 
-            this.show();
+            this.$target.appendTo(op.appendTo).setOuterWidth(op.width);
 
         },
 
@@ -202,6 +260,8 @@
 
             this.selectElem = null;
 
+            this.focusElem = null;
+
             this._createMenuItems(datas);
 
         },
@@ -210,121 +270,251 @@
 
         	var This = this,op = this.options,$target = this.$target,
 
-            listMenuHoverClass = op.listMenuHoverClass,
+            listMenuFocusClass = op.listMenuFocusClass,
 
-            menuItemSelector = op.menuItemSelector,
+            $menuContent = this.$menuContent,
 
-            $menuContent = this.$menuContent;
+            listMenuData = this.listMenuData,
 
-        	this._on($menuContent, 'mouseenter', menuItemSelector, function(event){
+            menuItemsClass = '.' + op.menuItemsClass;
+
+        	this._on($menuContent, 'mouseenter', menuItemsClass, function(event){
 
         		event.stopPropagation();
 
-                $(this).addClass(listMenuHoverClass);
+                This._isItem(this) && $(this).addClass(listMenuFocusClass);
 
         	});
 
-            this._on($menuContent, 'mouseleave', menuItemSelector, function(event){
+            this._on($menuContent, 'mouseleave', menuItemsClass, function(event){
 
                 event.stopPropagation();
 
-                $(this).removeClass(listMenuHoverClass);
+                This._isItem(this) && $(this).removeClass(listMenuFocusClass);
 
             });
 
-            this._on($menuContent, 'click', menuItemSelector, function(event){
+            this._on($menuContent, 'mousedown', menuItemsClass, function(event){
 
-                This._selectClass(this);
-
-                console.log(This.getItemData(this.id));
+                This._select(this);
 
             });
 
         },
 
-        _selectClass:function(elem){
+        _isItem:function(elem){
 
-            if( this.options.disabled === true ){ return; }
+            return !!elem && !!this.listMenuData[elem.id] && this.listMenuData[elem.id]._disableItem !== true;
+
+        },
+
+        isFirstItem:function(){
+
+            return !!this.focusElem && (this.listMenuData.firstId === this.focusElem.id);
+
+        },
+
+        isLastItem:function(){
+
+            return !!this.focusElem && (this.listMenuData.lastId === this.focusElem.id);
+
+        },
+
+        focus:function(){
+
+            if(this.focusElem){
+
+                !!this._menuFocus && this._menuFocus(this.getItemData(this.focusElem.id));
+
+            }
+
+        },
+
+        setFocusItem:function(value, valueKey){
+
+            if(value === undefined){return;}
+
+            var menuData = this.menuData,i = menuData.length,id;
+
+            value = value + '';
+
+            while(i--){
+
+                menuData[i][valueKey] === value && (id = menuData[i]._id);
+
+            }
+
+            this._focus(this._getItemElem(id));
+
+        },
+
+        setSelectItem:function(value, valueKey){
+
+            if(value === undefined){return;}
+
+            var menuData = this.menuData,i = menuData.length,id;
+
+            value = value + '';
+
+            while(i--){
+
+                menuData[i][valueKey] === value && (id = menuData[i]._id);
+
+            }
+
+            this._select(this._getItemElem(id));
+
+        },
+
+        _focus:function(elem){
+
+            if( !elem || this.options.disabled === true || !this._isItem(elem) ){ return; }
+
+            var focusElem = this.focusElem,$elem = $(elem),
+
+            listMenuFocusClass = this.options.listMenuFocusClass;
+
+            !!focusElem && $(focusElem).removeClass(listMenuFocusClass);
+
+            $elem.addClass(listMenuFocusClass);
+
+            this.focusElem = elem;
+
+            this._scrollIntoView($elem);
+
+            this.focus();
+
+        },
+
+        blur:function() {
+
+            var focusElem = this.focusElem;
+
+            if(!focusElem){return;}
+
+            $(focusElem).removeClass(this.options.listMenuFocusClass);
+
+            this.focusElem = null;
+
+            this.options.blurCackBack.call(this.$target, { item: this.active });
+
+        },
+
+        select:function(isFocusElem){
+
+            var selectElem,id,op;
+
+            if(isFocusElem && (selectElem = this.focusElem)){
+
+                id = selectElem.id;
+
+                op = this.options;
+
+                $(this.selectElem).removeClass(op.listMenuSelectClass);
+
+                $(this.selectElem = this._getItemElem(id)).removeClass(op.listMenuFocusClass).addClass(op.listMenuSelectClass);
+
+                !!this._menuSelected && this._menuSelected(this.getItemData(id));
+
+                this._scrollIntoView($(this.selectElem));
+
+            }else if(selectElem = this.selectElem){
+
+                id = selectElem.id;
+
+                !!this._menuSelected && this._menuSelected(this.getItemData(id));
+
+                this._scrollIntoView($(this._getItemElem(id)));
+
+            }
+
+        },
+
+        _select:function(elem){
+
+            if( !elem || this.options.disabled === true || !this._isItem(elem) ){ return; }
 
             var selectElem = this.selectElem,$elem = $(elem),
 
-            listMenuSelectClass = this.options.listMenuSelectClass;
+            listMenuSelectClass = this.options.listMenuSelectClass,
+
+            listMenuFocusClass = this.options.listMenuFocusClass;
 
             !!selectElem && $(selectElem).removeClass(listMenuSelectClass);
 
-            $elem.addClass(listMenuSelectClass);
+            $elem.removeClass(listMenuFocusClass).addClass(listMenuSelectClass);
 
             this.selectElem = elem;
 
-            this._scrollIntoView($elem);
+            this.select();
 
         },
 
         getItemData:function(id){
 
-            return (id && this.listMenuData[id].data) || '';
+            return (id && this.listMenuData[id] && this.listMenuData[id].data) || '';
 
         },
 
-        addItem:function(data, item, isBefore){
+        _addMenuData:function(data, id, isBefore){
 
-            if( this.options.disabled === true ){ return; }
+            var menuData = $.extend([], this.menuData),newMenuData = [],
 
-            var op = this.options,data = $.extend({}, data),
+            len = menuData.length,i = 0,itemData,aSush = [].push,flag = false;
 
-            newItemId = this.prefix + this.uid++,itemData,
+            $.type(data) !== 'array' && (data = [data]);
 
-            id,newItemData,doc = this.document[0],
+            for(; i < len; i++){
 
-            menuItemHtmlFn = op.menuItemHtmlFn,firstId,lastId,
+                itemData = menuData[i];
 
-            listMenuData = this.listMenuData;
+                if(itemData._id === id){
 
-            if(!item){
+                    if(!isBefore){
 
-                item = 'last'
+                        newMenuData.push(itemData);
 
-            }else if(typeof item !== 'string'){
+                        aSush.apply(newMenuData, data);
 
-                id = item.id || item;
+                    }else{
 
-                if(listMenuData.lastId === id && !isBefore){
+                        aSush.apply(newMenuData, data);
 
-                    item = 'last'
+                        newMenuData.push(itemData);
 
-                }else if(listMenuData.firstId === id && !!isBefore){
+                    }
 
-                    item = 'first';
+                    flag = true;
+
+                }else{
+
+                    newMenuData.push(itemData);
 
                 }
 
             }
 
+            flag === false && (newMenuData = false);
+
+            return newMenuData;
+
+        },
+
+        addItem:function(data, item, isBefore){
+
+            if( this.options.disabled === true || !data ){ return; }
+
+            var newMenuData,menuData = this.menuData;
+
+            !item && (item = 'last');
+
             switch(item){
 
                 case 'first':
 
-                    if(itemData = listMenuData[firstId = listMenuData.firstId]){
+                    if(newMenuData = this._addMenuData(data, menuData[0]._id, true)){
 
-                        item = doc.getElementById(firstId);
-
-                        $(menuItemHtmlFn(data)).attr('id', newItemId).insertBefore(item);
-
-                        newItemData = {};
-
-                        newItemData.data = data;
-
-                        newItemData.prevId = listMenuData.lastId;
-
-                        newItemData.nextId = firstId;
-
-                        itemData.prevId = newItemId;
-
-                        listMenuData[newItemId] = newItemData;
-
-                        listMenuData.firstId = newItemId;
-
-                        listMenuData[listMenuData.lastId].nextId = newItemId;
+                        this.refresh(newMenuData);
 
                     }
 
@@ -332,27 +522,9 @@
 
                 case 'last':
 
-                    if(itemData = listMenuData[lastId = listMenuData.lastId]){
+                    if(newMenuData = this._addMenuData(data, menuData[menuData.length - 1]._id, false)){
 
-                        item = doc.getElementById(lastId);
-
-                        $(menuItemHtmlFn(data)).attr('id', newItemId).insertAfter(item);
-
-                        newItemData = {};
-
-                        newItemData.data = data;
-
-                        newItemData.prevId = lastId;
-
-                        newItemData.nextId = listMenuData.firstId;
-
-                        itemData.nextId = newItemId;
-
-                        listMenuData[newItemId] = newItemData;
-
-                        listMenuData.lastId = newItemId;
-
-                        listMenuData[listMenuData.firstId].prevId = newItemId;
+                        this.refresh(newMenuData);
 
                     }
 
@@ -360,46 +532,19 @@
 
                 default:
 
-                    if(itemData = listMenuData[id]){
+                    if(newMenuData = this._addMenuData(data, item.id || item, isBefore)){
 
-                        newItemData = {};
-
-                        if(!isBefore){
-
-                            $(menuItemHtmlFn(data)).attr('id', newItemId).insertAfter(item);
-
-                            newItemData.data = data;
-
-                            newItemData.prevId = id;
-
-                            newItemData.nextId = itemData.nextId;
-
-                            listMenuData[itemData.nextId].prevId = newItemId;
-
-                            itemData.nextId = newItemId;
-
-
-                        }else{
-
-                            $(menuItemHtmlFn(data)).attr('id', newItemId).insertBefore(item);
-
-                            newItemData.data = data;
-
-                            newItemData.prevId = itemData.prevId;
-
-                            newItemData.nextId = id;
-
-                            listMenuData[itemData.prevId].nextId = newItemId;
-
-                            itemData.prevId = newItemId;
-
-                        }
-
-                        listMenuData[newItemId] = newItemData;
+                        this.refresh(newMenuData);
 
                     }
 
             }
+
+        },
+
+        _getItemElem:function(id){
+
+            return this.document[0].getElementById(id);
 
         },
 
@@ -409,39 +554,39 @@
 
             var next,listMenuData = this.listMenuData,doc = this.document[0],
 
-            selectElem = this.selectElem,selectElemData;
+            focusElem = this.focusElem,selectElemData,id;
 
-            if(selectElem){
+            if(focusElem){
 
                 if (direction === "first" || direction === "last") {
 
-                    next = doc.getElementById(listMenuData[ direction + "Id" ]);
+                    next = doc.getElementById(id = listMenuData[ direction + "Id" ]);
 
-                }else if(selectElemData = listMenuData[selectElem.id]){
+                }else if(selectElemData = listMenuData[focusElem.id]){
 
-                    next = doc.getElementById(selectElemData[ direction + "Id" ]);
+                    next = doc.getElementById(id = selectElemData[ direction + "Id" ]);
 
                 }
 
             }
 
-            if (!next || !selectElem) {
+            if (!next || !focusElem) {
 
-                next = doc.getElementById(listMenuData[ filter + "Id" ]);
+                next = doc.getElementById(id = listMenuData[ filter + "Id" ]);
 
             }
 
-            this._selectClass(next);
+            this._focus(next);
 
         },
 
-        next: function( event ) {
+        next:function() {
 
             this._move( "next", "first" );
 
         },
 
-        previous: function( event ) {
+        previous:function() {
 
             this._move( "prev", "last" );
 
@@ -473,7 +618,7 @@
 
         },
 
-        show:function(){
+        show:function(callBack, notAnimation){
 
             if( this.options.disabled === true ){ return; }
 
@@ -481,17 +626,29 @@
 
             this._setListMenuPosition();
 
-            this._showFn();
+            if(!notAnimation){
+
+                this._showFn();
+
+            }else{
+
+                this.$target.show();
+
+                this._listMenuState = 'open';
+
+                !!callBack && callBack.call(this);
+
+            }
 
         },
 
-        hide:function(notSelectItemsHideFn){
+        hide:function(callBack, notAnimation){
 
             if( this.options.disabled === true ){ return; }
 
-            if(!notSelectItemsHideFn){
+            if(!notAnimation){
 
-                this._hideFn();
+                this._hideFn(callBack);
 
             }else{
 
@@ -499,35 +656,49 @@
 
                 this._listMenuState = 'close';
 
+                !!callBack && callBack.call(this);
+
             }
 
         },
 
-        _hideFn:function(){
+        _hideFn:function(callBack){
 
-            var This = this;
+            var This = this,op = this.options;
+
+            op.disabledEvent = true;
 
             this._listMenuState = 'closeing';
 
-            this.options.hideAnimation.call( this.$target, function(){
+            op.hideAnimation.call( this.$target, function(){
 
                 This._listMenuState = 'close';
+
+                op.disabledEvent = false;
+
+                !!callBack && callBack.call(This);
 
             } );
 
         },
 
-        _showFn:function(){
+        _showFn:function(callBack){
 
-        	var This = this;
+        	var This = this,op = this.options;
 
             this._listMenuState = 'opening';
 
-            this.options.showAnimation.call( this.$target, function(){
+            op.disabledEvent = true;
 
-                // This._scrollIntoView();
+            op.showAnimation.call( this.$target, function(){
 
                 This._listMenuState = 'open';
+
+                op.disabledEvent = false;
+
+                This._scrollIntoView($(This.selectElem || This.focusElem));
+
+                !!callBack && callBack.call(This);
 
             } );
 
@@ -535,13 +706,13 @@
 
         _hasHeightScroll: function(){
 
-            return this.$target.outerHeight() < this.$target.prop( "scrollHeight" );
+            return this.$menuContentIn.outerHeight() < this.$menuContentIn.prop( "scrollHeight" );
 
         },
 
         _hasWidthScroll: function(){
 
-            return this.$target.width() - this.scrollbarWidth < this.$target.prop( "scrollWidth" );
+            return this.$menuContentIn.width() - this.scrollbarWidth < this.$menuContentIn.prop( "scrollWidth" );
 
         },
 
@@ -549,35 +720,35 @@
 
             var borderTop, paddingTop, offset, scroll, elementHeight, itemHeight,
 
-            $target, parseCss, scrollbarWidth;
+            $menuContentIn, parseCss, scrollbarWidth;
 
-            if ( this._hasHeightScroll() ) {
+            if ( this._listMenuState !== 'close' && $item && $item[0] && this._hasHeightScroll() ) {
 
-                $target = this.$target;
+                $menuContentIn = this.$menuContentIn;
 
                 parseCss = $.leoTools.parseCss;
 
                 scrollbarWidth = this._hasWidthScroll() ? this.scrollbarWidth : 0;
 
-                borderTop = parseCss($target[0], "borderTopWidth");
+                borderTop = parseCss($menuContentIn[0], "borderTopWidth");
 
-                paddingTop = parseCss($target[0], "paddingTop");
+                paddingTop = parseCss($menuContentIn[0], "paddingTop");
 
-                offset = $item.offset().top - $target.offset().top - borderTop - paddingTop;
+                offset = $item.offset().top - $menuContentIn.offset().top - borderTop - paddingTop;
 
-                scroll = $target.scrollTop();
+                scroll = $menuContentIn.scrollTop();
 
-                elementHeight = $target.height();
+                elementHeight = $menuContentIn.height();
 
                 itemHeight = $item.outerHeight();
 
                 if ( offset < 0 ) {
 
-                    $target.scrollTop( scroll + offset );
+                    $menuContentIn.scrollTop( scroll + offset );
 
                 } else if ( offset + itemHeight > elementHeight - scrollbarWidth ) {
 
-                    $target.scrollTop( scroll + offset - elementHeight + itemHeight + scrollbarWidth );
+                    $menuContentIn.scrollTop( scroll + offset - elementHeight + itemHeight + scrollbarWidth );
 
                 }
 

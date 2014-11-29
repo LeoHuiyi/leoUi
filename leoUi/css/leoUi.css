@@ -91,11 +91,17 @@
 .leoSelect_items .leoSelect_items_ul li.select{background: none repeat scroll 0 0 #16a0d3;color: #fff;}
 
 /*leoListMenu*/
-.leoListMenu{border:1px solid #7bbff2;color: #333;overflow: auto;background: none repeat scroll 0 0 #fff;position: relative;height: 200px}
+.leoListMenu{border:1px solid #7bbff2;color: #333;overflow: auto;background: none repeat scroll 0 0 #fff;position: absolute;}
+.leoListMenu .leoListMenu_menuContentIn{overflow: auto;height: 200px}
 .leoListMenu .leoListMenu_menuContent{}
 .leoListMenu .leoListMenu_item{color: #666;cursor: pointer;display: block;line-height: 18px;padding: 6px 10px;white-space: nowrap;float:none;margin: 0;height: 20px;}
-.leoListMenu .leoListMenu_hover{background-color: red;color: #fff;}
+.leoListMenu .leoListMenu_focus{background-color: red;color: #fff;}
 .leoListMenu .leoListMenu_select{background-color: #7bbff2;color: #fff;}
+
+/*leoAutocomplete*/
+.leoAutocomplete{background: none repeat scroll 0 0 #fff;border: 1px solid #d4d4d4;color: #999;font-size: 14px;line-height: 20px;min-height: 20px;vertical-align: middle;width: 200px;height: 28px}
+.leoAutocomplete .leoAutocomplete_input{border: 0 none;color: #555;float: left;height: 18px;line-height: 18px;outline: 0 none;padding: 5px 4px;}
+.leoAutocomplete .leoAutocomplete_button{background: url("../images/leoUi/leoAutocomplete_button.png") no-repeat center;height: 100%;width: 16px;float: right;cursor: pointer;}
 
 /*leoGrid*/
 .leoUi-sort-asc, .leoUi-sort-desc, .leoUi-sort-ndb { width: 16px; height: 16px; line-height: 1; vertical-align: middle; display: -moz-inline-stack; display: inline-block; vertical-align: middle; *vertical-align: auto; zoom: 1; *display: inline; position: relative; cursor: pointer; }

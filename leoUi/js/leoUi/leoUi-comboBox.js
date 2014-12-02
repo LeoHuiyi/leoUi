@@ -38,6 +38,8 @@
 
         pending: 0,
 
+        index:0,
+
         defaults:{
 
             delay:300,
@@ -50,13 +52,19 @@
 
             autoFocus: false,
 
-            comboWropHtml:'<div class="leoAutocomplete leoUi_clearfix"></div>',
+            width:200,
 
-            buttonHtml:'<span class="leoAutocomplete_button"></span>',
+            comboboxWropHtml:'<span class="leoComboBox_wrop"><div class="leoComboBox leoUi_clearfix"></div></span>',
+
+            buttonHtml:'<span class="leoComboBox_button"></span>',
 
             minLength: 0,
 
-            width:210,
+            comboboxHoverClass:'leoComboBox_hover',
+
+            comboboxFocusClass:'leoComboBox_focus',
+
+            minzIndex:1,
 
             position: {
 
@@ -100,15 +108,31 @@
 
             var op = this.options;
 
-            this.$button = $(op.buttonHtml);
-
             $input = this.$input;
 
-            this.$comboWrop = $(op.comboWropHtml).insertAfter($input).append($input.addClass('leoAutocomplete_input')).append(this.$button).width(op.width);
+            this.oldInputWidth = $input.width();
 
-            $input.setOuterWidth(op.width - this.$button.outerWidth());
+            this.$comboboxWrop = $(op.comboboxWropHtml).insertAfter($input);
+
+            this.$combobox = this.$comboboxWrop.children('div.leoComboBox').append($input.addClass('leoComboBox_input')).append(this.$button = $(op.buttonHtml));
+
+            this._setComboboxWidth();
+
+            this.$target.appendTo(this.$comboboxWrop);
 
             this._addComBoxEvent();
+
+        },
+
+        _setComboboxWidth:function(){
+
+        	var op = this.options;
+
+        	this.$combobox.setOuterWidth(op.width);
+
+        	this.$input.setOuterWidth(this.$combobox.width() - this.$button.outerWidth());
+
+        	this.$target.setOuterWidth(this.$combobox.outerWidth());
 
         },
 
@@ -116,7 +140,13 @@
 
             if( key === 'width' ){
 
+            	this._setComboboxWidth();
+
                 return;
+
+            }else if( key === 'appendTo' ){
+
+            	return;
 
             }
 
@@ -126,19 +156,89 @@
 
         _addComBoxEvent:function(){
 
-        	var This = this;
+        	var This = this,
 
-            this._on( this.$button, 'click', function(){
+        	comboboxHoverClass = this.options.comboboxHoverClass;
+
+        	this._on( this.$button, 'mousedown', function(){
+
+                This.cancelBlur = true;
+
+                This._delay(function() {
+
+                    delete this.cancelBlur;
+
+                });
+
+            });
+
+            this._on( this.$button, 'mouseup', function(){
 
                 This.toggle();
 
             });
 
+            this._on( this.$combobox, 'mouseenter', function(){
+
+                $(this).addClass(comboboxHoverClass);
+
+            });
+
+            this._on( this.$combobox, 'mouseleave', function(){
+
+                $(this).removeClass(comboboxHoverClass);
+
+            });
+
+        },
+
+        getSeleteLabel:function(){
+
+        	var selectElem = this.selectElem,val = '';
+
+        	if(selectElem){
+
+        		val = this.listMenuData[selectElem.id].data.label;
+
+        	}
+
+        	return val;
+
         },
 
         _setPosition:function(){
 
-            $.extend(this.options.position, {of: this.$comboWrop});
+            $.extend(this.options.position, {of: this.$combobox});
+
+        },
+
+        open:function(){
+
+            if ( this._listMenuState === 'close' ) {
+
+                this._search('');
+
+                this.$combobox.addClass(this.options.comboboxFocusClass);
+
+            }
+
+        },
+
+        _inputFocus:function(){
+
+        	this.$combobox.addClass(this.options.comboboxFocusClass);
+
+        },
+
+        _afterBlur:function(){
+
+        	this.$combobox.removeClass(this.options.comboboxFocusClass).removeClass(this.options.comboboxHoverClass);
+
+        },
+
+        _beforeShow:function(){
+
+        	this.setIndex(this.options.minzIndex + $.leoTools.getUuid());
 
         },
 
@@ -150,14 +250,19 @@
 
         	}else if(this._listMenuState === 'open'){
 
-        		this.close();
+        		this.$input.blur();
 
         	}
 
         },
 
-        _destroy: function() {
+        _destroy:function(){
 
+        	var op = this.options;
+
+        	this.$input.width(this.oldInputWidth).removeClass('leoComboBox_input').insertBefore(this.$comboboxWrop);
+
+        	this.$comboboxWrop.remove()
 
             this._super();
 

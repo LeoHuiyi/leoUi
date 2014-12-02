@@ -82,21 +82,21 @@
 
             showAnimation: function(callBack) {
 
-                // this.show( { effect: "blind", duration: "slow", complete: callBack} );
+                this.show( { effect: "blind", duration: "slow", complete: callBack} );
 
-                this.show();
+                // this.show();
 
-                callBack();
+                // callBack();
 
             },
 
             hideAnimation: function(callBack) {
 
-                // this.hide( { effect: "blind", duration: "slow", complete: callBack} );
+                this.hide( { effect: "blind", duration: "slow", complete: callBack} );
 
-                this.hide();
+                // this.hide();
 
-                callBack();
+                // callBack();
 
             },
 
@@ -130,6 +130,10 @@
 
                 !!this.$target && this.$target.setOuterWidth(value);
 
+            }else if( key === 'appendTo' ){
+
+                !!this.$target && this.$target.appendTo(this._appentTo());
+
             }
 
         },
@@ -142,7 +146,13 @@
 
         },
 
-        _createMenuItems:function(datas){
+        setIndex:function(index){
+
+            this.$target.css('zIndex', index >> 0);
+
+        },
+
+        _createMenuItems:function(datas, value){
 
         	var op = this.options,datas = datas || $.extend([], op.data),
 
@@ -164,7 +174,7 @@
 
                 data._id = id;
 
-                $elem = $(menuItemHtmlFn(data, i)).attr('id', id).addClass(menuItemsClass).appendTo($menuContent);
+                $elem = $(menuItemHtmlFn(data, i, value)).attr('id', id).addClass(menuItemsClass).appendTo($menuContent);
 
                 itemData = listMenuData[id] = {};
 
@@ -248,11 +258,29 @@
 
             this.$menuContentIn = this.$target.find('div.leoListMenu_menuContentIn').append(this.$menuContent);
 
-            this.$target.appendTo(op.appendTo).setOuterWidth(op.width);
+            this.$target.appendTo(this._appentTo()).setOuterWidth(op.width);
 
         },
 
-        refresh:function(datas){
+        _appentTo:function(){
+
+            var element = this.options.appendTo;
+
+            if ( element ) {
+
+                element = element.jquery || element.nodeType ? $( element ) : this.document.find( element ).eq( 0 );
+            }
+
+            if ( !element.length ) {
+
+                element = this.document[ 0 ].body;
+
+            }
+
+            return element;
+        },
+
+        refresh:function(datas, value){
 
             if( this.options.disabled === true ){ return; }
 
@@ -262,19 +290,15 @@
 
             this.focusElem = null;
 
-            this._createMenuItems(datas);
+            this._createMenuItems(datas, value);
 
         },
 
         _addEvent:function(){
 
-        	var This = this,op = this.options,$target = this.$target,
-
-            listMenuFocusClass = op.listMenuFocusClass,
+        	var This = this,op = this.options,
 
             $menuContent = this.$menuContent,
-
-            listMenuData = this.listMenuData,
 
             menuItemsClass = '.' + op.menuItemsClass;
 
@@ -282,7 +306,7 @@
 
         		event.stopPropagation();
 
-                This._isItem(this) && $(this).addClass(listMenuFocusClass);
+                This._focus(this);
 
         	});
 
@@ -290,7 +314,7 @@
 
                 event.stopPropagation();
 
-                This._isItem(this) && $(this).removeClass(listMenuFocusClass);
+                This.blur();
 
             });
 
@@ -362,13 +386,23 @@
 
             }
 
-            this._select(this._getItemElem(id));
+            if(id){
+
+                this._select(this._getItemElem(id));
+
+                return value;
+
+            }else{
+
+                return null;
+
+            }
 
         },
 
         _focus:function(elem){
 
-            if( !elem || this.options.disabled === true || !this._isItem(elem) ){ return; }
+            if( !elem || this._isAnimated() || this.options.disabled === true || !this._isItem(elem) ){ return; }
 
             var focusElem = this.focusElem,$elem = $(elem),
 
@@ -386,6 +420,12 @@
 
         },
 
+        _isAnimated: function(){
+
+            return !!(this._listMenuState === 'opening' || this._listMenuState === 'closeing');
+
+        },
+
         blur:function() {
 
             var focusElem = this.focusElem;
@@ -396,7 +436,7 @@
 
             this.focusElem = null;
 
-            this.options.blurCackBack.call(this.$target, { item: this.active });
+            this.options.blurCackBack.call(this.$target);
 
         },
 
@@ -432,7 +472,7 @@
 
         _select:function(elem){
 
-            if( !elem || this.options.disabled === true || !this._isItem(elem) ){ return; }
+            if( !elem || this._isAnimated() || this.options.disabled === true || !this._isItem(elem) ){ return; }
 
             var selectElem = this.selectElem,$elem = $(elem),
 
@@ -502,9 +542,9 @@
 
         addItem:function(data, item, isBefore){
 
-            if( this.options.disabled === true || !data ){ return; }
-
             var newMenuData,menuData = this.menuData;
+
+            if( this.options.disabled === true || !data || menuData.length === 0 ){ return; }
 
             !item && (item = 'last');
 
@@ -624,11 +664,13 @@
 
             this.options.beforeShow.call( this.$target );
 
+            !!this._beforeShow && this._beforeShow();
+
             this._setListMenuPosition();
 
             if(!notAnimation){
 
-                this._showFn();
+                this._showFn(callBack);
 
             }else{
 
@@ -666,15 +708,11 @@
 
             var This = this,op = this.options;
 
-            op.disabledEvent = true;
-
             this._listMenuState = 'closeing';
 
             op.hideAnimation.call( this.$target, function(){
 
                 This._listMenuState = 'close';
-
-                op.disabledEvent = false;
 
                 !!callBack && callBack.call(This);
 
@@ -688,13 +726,9 @@
 
             this._listMenuState = 'opening';
 
-            op.disabledEvent = true;
-
             op.showAnimation.call( this.$target, function(){
 
                 This._listMenuState = 'open';
-
-                op.disabledEvent = false;
 
                 This._scrollIntoView($(This.selectElem || This.focusElem));
 

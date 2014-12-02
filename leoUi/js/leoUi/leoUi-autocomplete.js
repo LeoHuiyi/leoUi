@@ -38,25 +38,21 @@
 
         pending: 0,
 
+        menuHtml:'listMenuHtml',
+
         defaults:{
 
             delay:300,
 
             loadingClass:'leoUi_loading',
 
-            labelKey: 'label',
+            labelKey: '',
 
-            valueKey: 'value',
+            valueKey: '',
 
             autoFocus: false,
 
-            comboBoxWropHtml:'<div class="leoAutocomplete leoUi_clearfix"></div>',
-
-            buttonHtml:'<span class="leoAutocomplete_button"></span>',
-
-            minLength: 0,
-
-            width:210,
+            minLength: 1,
 
             position: {
 
@@ -94,7 +90,7 @@
 
             this.$input = this.$target;
 
-            this.$target = $(op[$.leoTools.plugIn.leoListMenu.prototype.defaultsTarget]);
+            this.$target = $(op[this.menuHtml]);
 
             op.isHide = true;
 
@@ -119,10 +115,6 @@
             }else if ( key === "source" ) {
 
                 this._initSource();
-
-            }else if ( key === "appendTo" ) {
-
-                this.$target.appendTo( this.options.appendTo );
 
             }else if ( key === "disabled" && value && this.xhr ) {
 
@@ -150,7 +142,85 @@
 
                 this._search('');
 
-                // this.$input.focus().leoUiTextSelection('last');
+            }
+
+        },
+
+        addItem:function(data, item, isBefore){
+
+            var newMenuData,menuData = this.menuData,op = this.options;
+
+            if( op.disabled === true || !data || menuData.length === 0 ){ return; }
+
+            !item && (item = 'last');
+
+            switch(item){
+
+                case 'first':
+
+                    if(newMenuData = this._addMenuData(data, menuData[0]._id, true)){
+
+                        newMenuData = this.normalize(newMenuData, true);
+
+                        this.refresh(newMenuData);
+
+                        op.source = newMenuData;
+
+                        this._initSource();
+
+                    }
+
+                    break;
+
+                case 'last':
+
+                    if(newMenuData = this._addMenuData(data, menuData[menuData.length - 1]._id, false)){
+
+                        newMenuData = this.normalize(newMenuData, true);
+
+                        this.refresh(newMenuData);
+
+                        op.source = newMenuData;
+
+                        this._initSource();
+
+                    }
+
+                    break;
+
+                default:
+
+                    if(newMenuData = this._addMenuData(data, item.id || item, isBefore)){
+
+                        newMenuData = this.normalize(newMenuData, true);
+
+                        this.refresh(newMenuData);
+
+                        op.source = newMenuData;
+
+                        this._initSource();
+
+                    }
+
+            }
+
+        },
+
+        setInputVal:function(val){
+
+            if(val){
+
+                this.$input.val(val);
+
+                this.term = val;
+
+                this.selectedItemVal = this.setSelectItem(val, 'value');
+
+            }else if(val = this.$input.val()){
+
+                this.term = val;
+
+                this.selectedItemVal = this.setSelectItem(val, 'value');
 
             }
 
@@ -158,7 +228,7 @@
 
         _setPosition:function(){
 
-            $.extend(this.options.position, {of: this.$input});
+            this.options.position = $.extend({of: this.$input}, this.options.position);
 
         },
 
@@ -177,6 +247,8 @@
             this.isMultiLine = isTextarea ? true : isInput ? false : this.element.prop( "isContentEditable" );
 
             this.valueMethod = $input[ isTextarea || isInput ? "val" : "text" ];
+
+            this.setInputVal();
 
             $input.attr( "autocomplete", "off" );
 
@@ -238,13 +310,15 @@
 
                     case keyCode.ESCAPE:
 
-                        if ( $target.is( ":visible" ) ) {
+                        if ( This._listMenuState === 'open' ) {
 
                             if ( !This.isMultiLine ) {
 
-                                This._value( this.term );
+                                This._value( This.term );
 
                             }
+
+                            clearTimeout( This.searching );
 
                             This.close();
 
@@ -272,7 +346,7 @@
 
                     suppressKeyPress = false;
 
-                    if ( !This.isMultiLine || $target.is( ":visible" ) ) {
+                    if ( !This.isMultiLine || This._listMenuState === 'open' ) {
 
                         event.preventDefault();
 
@@ -328,6 +402,8 @@
 
                 This.previousVal = This._value();
 
+                !!This._inputFocus && This._inputFocus();
+
             });
 
             this._on( $input, 'blur', function( event ) {
@@ -345,6 +421,8 @@
                 This._value( This.term );
 
                 This.close();
+
+                !!This._afterBlur && This._afterBlur();
 
                 This._change( event );
 
@@ -408,7 +486,7 @@
 
             if ( $.isArray( source ) ) {
 
-                array = source;
+                array = this.normalize(source, true);
 
                 this.source = function( request, response ) {
 
@@ -550,7 +628,7 @@
 
             if ( content ) {
 
-                content = this._normalize( content );
+                content = this.normalize( content );
 
             }
 
@@ -559,6 +637,8 @@
             if ( !op.disabled && content && content.length && !this.cancelSearch ) {
 
                 this._suggest( content, function(){
+
+                    $input.focus().leoUiTextSelection('last');
 
                     op.open.call($input);
 
@@ -574,45 +654,47 @@
 
         close: function() {
 
-            this.cancelSearch = true;
+            if (this._listMenuState === 'open') {
 
-            this._close();
+                this.cancelSearch = true;
+
+                this._close();
+
+            }
 
         },
 
         _close: function() {
 
-            if (this._listMenuState === 'open') {
+            this.hide(function(){
 
-                this.hide(function(){
+                if ( this.isMenuSelected && this.$target[ 0 ] !== this.document[ 0 ].activeElement ) {
 
-                    if ( this.isMenuSelected && this.$target[ 0 ] !== this.document[ 0 ].activeElement ) {
+                    var previousVal = this.previousVal,
 
-                        var previousVal = this.previousVal,
+                    selectedItemVal = this.selectedItemVal;
 
-                        selectedItemVal = this.selectedItemVal;
+                    this.previousVal = previousVal;
+
+                    this._delay(function() {
 
                         this.previousVal = previousVal;
 
-                        this._delay(function() {
+                        this.selectedItemVal = selectedItemVal;
 
-                            this.previousVal = previousVal;
+                        this.$input.focus().leoUiTextSelection('last');
 
-                            this.selectedItemVal = selectedItemVal;
+                        delete this.isMenuSelected;
 
-                            this.$input.focus().leoUiTextSelection('last');
+                    });
 
-                            delete this.isMenuSelected;
+                }
 
-                        });
+                this.$target.blur();
 
-                    }
+                this.options.close.call(this.$input);
 
-                    this.options.close.call(this.$input);
-
-                });
-
-            }
+            });
 
         },
 
@@ -626,11 +708,11 @@
 
         },
 
-        _normalize: function( items ) {
+        normalize: function( items, must ) {
 
             var labelKey = this.options.labelKey,valueKey = this.options.valueKey;
 
-            if ( items.length && items[ 0 ].label && items[ 0 ].value ) {
+            if((items.length && items[ 0 ].label && items[ 0 ].value) && !must) {
 
                 return items;
 
@@ -664,11 +746,13 @@
 
         _suggest: function( items, callBack ) {
 
-            this.refresh(items);
+            var value = this._value();
 
-            this.setFocusItem(this._value(), 'value');
+            this.refresh(items, value);
 
-            this.setSelectItem(this.selectedItemVal, 'value');
+            this.setFocusItem(value, 'value');
+
+            this.selectedItemVal = this.setSelectItem(this.selectedItemVal, 'value');
 
             delete this.isMenuSelected;
 

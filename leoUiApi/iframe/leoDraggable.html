@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+
+<head>
+    <meta charset="utf-8" />
+    <title>leoDraggable</title>
+    <meta name="description" content="https://github.com/LeoHuiyi" />
+    <meta name="keywords" content="leoUi,jquery插件,jqueryUi" />
+    <meta name="author" content="leo" />
+    <meta name="robots" content="all" />
+    <!--[if lte IE 8]>
+        <script src="../js/html5.js"></script>
+    <![endif]-->
+    <link rel="stylesheet" href="../css/reset.css" />
+    <link rel="stylesheet" href="../css/leoUi-grid.css" />
+    <link rel="stylesheet" href="../css/shCoreDjango.css" />
+    <link rel="stylesheet" href="../css/leoUiApiCssIframe.css" />
+</head>
+
+<body>
+    <nav id="guide" class="g-mod">
+        <div class="from">
+            <span>github:</span>
+            <a href="https://github.com/LeoHuiyi" target="_blank">https://github.com/LeoHuiyi</a>
+        </div>
+    </nav>
+    <header id="hd">
+        <section class="g-mod" id="title">
+            <h1 class="tit">leoDraggable</h1>
+            <div class="g-browser g-clear">
+                <p>leoDraggable拖拽组件</p>
+                <p>引用：leoUi-draggable.js</p>
+                <p>依赖：jQuery, leoUi-tools.js, leoUi-mouse.js</p>
+            </div>
+        </section>
+    </header>
+    <section id="bd">
+        <section class="g-mod g-attr g-block">
+            <h2 class="tit">leoMouse鼠标拖拽基础插件</h2>
+            <div class="cont">
+                <p><strong>$('.leoUi').leoDraggable( options )</strong></p>
+                <p><strong>使用说明</strong>：</p>
+                <section class="g-mod g-attr g-block">
+                    <div class="cont">
+                        <p><strong>examples</strong>：</p>
+                        <pre class="brush: js;">
+                            $('.leoUi').leoDraggable({
+
+                                handle:false, //点击拖拽地区
+
+					            cursor:'move',//拖动时的CSS指针。
+
+					            bClone:true, //是否使用克隆拖拽
+
+					            bCloneAnimate:true, //克隆拖拽是否动画
+
+					            dragBoxReturnToTarget:false,//是否回到target位置
+
+					            refreshPositions:false,//dropBoxs是否时刻刷新（耗性能）
+
+					            duration:400,//动画时间
+
+					            stopMouseWheel:false, //拖拽时候是否关闭滚轮事件
+
+					            revert:false, //如果设置为true, 当拖动停止时元素将返回它的初始位置。
+
+					            revertAnimate:true, //还原是否动画
+
+					            axis:false,//可用值为'x'只能在x方向拖动，设置为y只能在Y方向拖动，为空没有限制
+
+					            cursorAt:false,//设置拖动帮手相对于鼠标光标的偏移量。坐标可被指定为一个散列 使用的组合中的一个或两个键：{ top, left, right, bottom } 。
+
+					            containment:false,  //可以限制draggable只能在指定的元素或区域的边界以内进行拖动。
+					                                // Selector: 可拖动元素将被置于由选择器指定的第一个元素的起界限作用的盒模型中。如果没有找到任何元素，则不会设置界限。
+					                                 // Element: 可拖动的元素将包含该元素的边界框。
+					                                // String:可选值: "parent", "document", "window".
+					                                // Array: 以 [ x1, y1, x2, y2 ] 数组形式定义一个限制区域
+
+					            scroll: true,//如果设置为true, 当拖动时，div盒模型将自动翻滚。
+
+					            scrollSensitivity: 20,//离开可视区域边缘多少距离开始滚动。距离是相对指针进行计算的，而不是被拖到元素本身。如果scroll 选项设置为false，则不滚动。
+
+					            scrollSpeed: 20,//当鼠标指针的值小于scrollSensitivity的值时，窗口滚动的速度。如果scroll选项设置为false，则该参数无效。
+
+					            useDroppable:false,//是否使用Droppable
+
+					            droppableScope:'all',//用来设置拖动（draggle）元素和放置（droppable）对象的集合
+
+					            disabled:false,//当设置为true时停止拖动。
+
+					            grid:false,//拖拽元素时，只能以指定大小的方格进行拖动。数组形式为[ x, y ]。
+
+					            iframeFix:false,//在拖动期间阻止iframe捕捉鼠标移过事件。与cursorAt选项搭配使用时或者当鼠标指针可能不在拖动助手元素之上时，该参数非常有用。
+
+					                            // 支持多种类型:
+
+					                            // Boolean: 当设置为true, 透明层将被放置于页面上的所有iframe之上。
+
+					                            // Selector: 任何由选择器匹配的iframe将被透明层覆盖。
+
+					            proxy:function(source) { //source
+
+					                return $(source).clone().removeAttr('id').css({'opacity': '0.5'}).insertAfter(source);
+
+					            },
+
+					            ...
+
+                            })
+                        </pre>
+                    </div>
+                </section>
+                <p><strong>options </strong>：</p>
+                <div class="cont">
+                    <div id="option-grid" class="g-grid"></div>
+                </div>
+                <p><strong>事件</strong>：</p>
+                <section class="g-mod g-attr g-block">
+                    <div class="cont">
+                        <p><strong>_mouseCapture(/* event */)</strong>：</p>
+                        <div class="cont"><p>确定一个互动是否基于事件目标元素。返回 true；可以继续拖拽</p></div>
+                        <p><strong>arguments</strong>：</p>
+                        <div class="cont">
+                            <p>event:事件对象</p>
+                        </div>
+                        <p><strong>returns(boolean)</strong>：不返回true，将停止之后的事件</p>
+                        <div class="cont">
+                            <p>写插件人判断是否有返回值</p>
+                        </div>
+                        <p><strong>examples</strong>：</p>
+                        <pre class="brush: js;">
+                            _mouseCapture: function(/* event */) { return true; }//内部调用
+                        </pre>
+                    </div>
+                </section>
+                <section class="g-mod g-attr g-block">
+                    <div class="cont">
+                        <p><strong>_mouseStart(/* oldEvent, event */)</strong>：</p>
+                        <div class="cont"><p>准备开始拖拽</p></div>
+                        <p><strong>arguments</strong>：</p>
+                        <div class="cont">
+                            <p>oldEvent:旧的事件对象（delay，distance > 0）</p>
+                            <p>event:事件对象</p>
+                        </div>
+                        <p><strong>returns(boolean)</strong>：返回 false，将停止拖拽</p>
+                        <div class="cont">
+                            <p>写插件人判断是否有返回值</p>
+                        </div>
+                        <p><strong>examples</strong>：</p>
+                        <pre class="brush: js;">
+                            _mouseStart: function(/* event */) {};//内部调用
+                        </pre>
+                    </div>
+                </section>
+                <section class="g-mod g-attr g-block">
+                    <div class="cont">
+                        <p><strong>_mouseDrag(/* event */)</strong>：</p>
+                        <div class="cont"><p>正在拖拽</p></div>
+                        <p><strong>arguments</strong>：</p>
+                        <div class="cont">
+                            <p>event:事件对象</p>
+                        </div>
+                        <p><strong>returns(boolean)</strong>：无</p>
+                        <p><strong>examples</strong>：</p>
+                        <pre class="brush: js;">
+                            _mouseDrag: function(/* event */) {};//内部调用
+                        </pre>
+                    </div>
+                </section>
+                <section class="g-mod g-attr g-block">
+                    <div class="cont">
+                        <p><strong>_mouseStop(/* event */)</strong>：</p>
+                        <div class="cont"><p>结束拖拽拖拽</p></div>
+                        <p><strong>arguments</strong>：</p>
+                        <div class="cont">
+                            <p>event:事件对象</p>
+                        </div>
+                        <p><strong>returns(boolean)</strong>：无</p>
+                        <p><strong>examples</strong>：</p>
+                        <pre class="brush: js;">
+                            _mouseStop: function(/* event */) {};//内部调用
+                        </pre>
+                    </div>
+                </section>
+            </div>
+        </section>
+    </section>
+    <footer id="ft">
+        <aside class="g-mod">
+            <div class="g-browser g-clear">
+                <p>author: leo</p>
+                <p>如有问题请联系：253383559@qq.com</p>
+            </div>
+        </aside>
+    </footer>
+    <script type="text/javascript" src="../js/jquery-1.11.1-min.js"></script>
+    <script type="text/javascript" src="../js/leoUi-tools.js"></script>
+    <script type="text/javascript" src="../js/leoUi-grid.js"></script>
+    <script type="text/javascript" src="../js/shCore.js"></script>
+    <script type="text/javascript" src="../js/shBrushJScript.js"></script>
+    <script type="text/javascript">
+    var tableModel = [{
+
+            id: 'name',
+
+            width: 150,
+
+            minWidth: 100,
+
+            fixed: true,
+
+            theadName: 'Name',
+
+            renderCell:function(val){
+
+            	console.log(val)
+
+                return '<div style="color:#008000">' + val + '</div>';
+
+            }
+
+        }, {
+
+            id: 'type',
+
+            width: 70,
+
+            theadName: 'Type'
+
+        }, {
+
+            id: 'default',
+
+            width: 300,
+
+            theadName: 'Default',
+
+            className:'feedLine'
+
+        },{
+
+            id: 'explain',
+
+            width: 750,
+
+            fixed: true,
+
+            align: 'left',
+
+            theadName: 'Explain',
+
+            className:'feedLine'
+
+        }],optionsData = [{
+
+            'name': 'handle',
+
+            'default': 'false',
+
+            'type': 'selector',
+
+            'explain': '防止在指定元素上开始拖动'
+
+        }, {
+
+            'name': 'delay',
+
+            'default': '0',
+
+            'type': 'number',
+
+            'explain': '时间（以毫秒为单位），当鼠标按下后延迟多少秒激活拖动'
+
+        }, {
+
+            'name': 'distance',
+
+            'default': '0',
+
+            'type': 'number',
+
+            'explain': '当鼠标按下后移动多少px激活拖动'
+
+        }, {
+
+            'name': 'isSetCapture',
+
+            'default': 'false',
+
+            'type': 'boolean',
+
+            'explain': '是否使用setCapture'
+
+        }, {
+
+            'name': 'mouseDownSelector',
+
+            'default': 'false',
+
+            'type': 'selector',
+
+            'explain': '是否使用事件代理'
+
+        }],gridOptions = {
+
+            dataType: 'data',
+
+            tableModel: tableModel,
+
+            height: false,
+
+            width: false,
+
+            isHover: false,
+
+            boxCheckType: false,
+
+            resizeWidth: false,
+
+            resizeHeight: false,
+
+            isPage: false,
+
+            evenClass: false
+
+        };
+    $('#option-grid').leoGrid($.extend(gridOptions, {gridData: optionsData}));
+    SyntaxHighlighter.all({'toolbar': false});
+    </script>
+</body>
+
+</html>

@@ -15,6 +15,12 @@ var zNodes = [{
 		}, {
 			name: "leoPlugIn创建jQuery插件",
 			url: {href: '#!leo#iframe/leoPlugIn.html'}
+		}, {
+			name: "leoMouse鼠标拖拽基础插件",
+			url: {href: '#!leo#iframe/leoMouse.html'}
+		}, {
+			name: "leoDraggable拖拽组件",
+			url: {href: '#!leo#iframe/leoDraggable.html'}
 		}]
 	}],reHref = /.*#!leo#/;
 

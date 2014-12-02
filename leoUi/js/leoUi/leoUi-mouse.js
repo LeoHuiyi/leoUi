@@ -44,13 +44,13 @@
 
             cancel:'input,textarea,button,select,option',//防止在指定元素上开始拖动
 
-            delay:0,//时间（以毫秒为单位），当鼠标按下后直到的互动（interactions）激活。此选项可用来阻止当点击一个元素时可能发生的非期望互动（interactions）行为。
+            delay:0,//时间（以毫秒为单位），当鼠标按下后延迟多少秒激活拖动
 
-            distance:0,//距离在像素的mousedown鼠标交互应该开始之前必须移动。
+            distance:0,//当鼠标按下后移动多少px激活拖动
 
-            isSetCapture:false,//鼠标扑捉
+            isSetCapture:false,//是否使用setCapture
 
-            mouseDownSelector:false//代理
+            mouseDownSelector:false//是否使用事件代理
 
         },
 
@@ -70,7 +70,7 @@
 
         _setOption:function( key, value ){
 
-            if( key === 'selector'){
+            if( key === 'selector' ){
 
                 this._setMouseDownEvent(true);
 
@@ -92,7 +92,13 @@
 
             }
 
-            change === true && this._off( this.$target, 'mousedown.mouse' );
+            if( change === true ){
+
+                this._off( this.$target, 'mousedown.mouse' );
+
+                this._off( this.$target, 'click.mouse' );
+
+            }
 
             if( selector === false ){
 

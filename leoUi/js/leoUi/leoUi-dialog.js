@@ -376,7 +376,7 @@
 
                     }else{
 
-                        This.$target[This.dependsFnName.resizable]( 'trigger', This.$target, 'mouseleave' );
+                        This.hasResizable && This.$target[This.dependsFnName.resizable]( 'trigger', This.$target, 'mouseleave' );
 
                         This._leoDialogMaximize();
 
@@ -1966,9 +1966,9 @@
 
         _destroy:function(){
 
-            this.$target[this.dependsFnName.draggable]('destroy');
+            this.hasDraggable && this.$target[this.dependsFnName.draggable]('destroy');
 
-            this.$target[this.dependsFnName.resizable]('destroy');
+            this.hasResizable && this.$target[this.dependsFnName.resizable]('destroy');
 
             this._destoryIframe();
 

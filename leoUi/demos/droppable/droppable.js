@@ -34,7 +34,7 @@ leoUiLoad.require('leoUi-droppable,leoCss,ready', function($) {
         revertAnimate: true,
         bCloneAnimate: true,
         dragBoxReturnToTarget: true,
-        useDroppable: true,
+        useLeoDroppable: true,
         // cursorAt:{top:10,left:10},
 
         stopMouseWheel: false,
@@ -80,11 +80,11 @@ leoUiLoad.require('leoUi-droppable,leoCss,ready', function($) {
 
                 if ($(this).parent()[0] !== $(source).parent()[0] || $(this).index() < $(source).index()) {
 
-                    $(source).insertBefore(this);
+                    $(source).insertBefore(this).leoDraggable('setDropsProp');
 
                 } else {
 
-                    $(source).insertAfter(this);
+                    $(source).insertAfter(this).leoDraggable('setDropsProp');
 
                 }
 

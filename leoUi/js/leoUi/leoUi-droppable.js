@@ -36,7 +36,7 @@
 
             accept:'*',//决定哪个可拖动元素将会被接收。
 
-            toleranceType:'intersect',//fit,intersect,pointer,touch
+            tolerance:'intersect',//fit,intersect,pointer,touch
 
             scope:'all',//用来设置拖动（draggle）元素和放置（droppable）对象的集合
 
@@ -293,7 +293,7 @@
 
         checkPosition:function( event, draggable, first ){
 
-            var dragProp = this._getDragSize(draggable),
+            var dragProp = this._getDragSize(draggable),op,
 
             proportions,intersected,drop,notFirst = !first;
 
@@ -307,25 +307,27 @@
 
                 drop = this.$target[0];
 
-                intersected = this._intersect( dragProp, proportions, this.options.toleranceType  );
+                op = this.options;
 
-                this.options.checkFirst === true && ( notFirst = true );
+                intersected = this._intersect( dragProp, proportions, op.tolerance );
+
+                op.checkFirst === true && ( notFirst = true );
 
                 if( intersected === true ){
 
                     if( this.entered === false ){
 
-                        notFirst && !!this.options.onDragEnter && this.options.onDragEnter.call( drop, event, proportions, dragProp);
+                        notFirst && !!op.onDragEnter && op.onDragEnter.call( drop, event, proportions, dragProp);
 
                         this.entered = true;
 
                     }
 
-                    !!this.options.onDragOver && this.options.onDragOver.call( drop, event, proportions, dragProp);
+                    !!op.onDragOver && op.onDragOver.call( drop, event, proportions, dragProp);
 
-                }else if(  intersected === false  && this.entered === true ){
+                }else if( intersected === false && this.entered === true ){
 
-                    notFirst && !!this.options.onDragLeave && this.options.onDragLeave.call( drop, event, proportions, dragProp);
+                    notFirst && !!op.onDragLeave && op.onDragLeave.call( drop, event, proportions, dragProp);
 
                     this.entered = false;
 
@@ -339,7 +341,7 @@
 
             var dragProp = this._getDragSize(draggable),
 
-            proportions,drop,droped;
+            proportions,drop,droped,op;
 
             $.each( this._getArrays( draggable.scope ) || [], function() {
 
@@ -351,9 +353,11 @@
 
                 drop = this.$target[0];
 
-                if( this._intersect( dragProp, proportions, this.options.toleranceType  ) === true ){
+                op = this.options;
 
-                    !!this.options.onDrop && ( droped = this.options.onDrop.call( drop, event, proportions, dragProp) );
+                if( this._intersect( dragProp, proportions, op.tolerance ) === true ){
+
+                    !!op.onDrop && ( droped = op.onDrop.call( drop, event, proportions, dragProp) );
 
                     this.entered = false;
 

@@ -150,13 +150,15 @@
 
         _dragArea:function(){
 
-            this.opMaxWidth = this.options.maxWidth;
+            var op = this.options;
 
-            this.opMaxHeight = this.options.maxHeight;
+            this.opMaxWidth = op.maxWidth;
 
-            this.opMinWidth = $.leoTools.range( this.options.minWidth, 0, this.opMaxWidth )
+            this.opMaxHeight = op.maxHeight;
 
-            this.opMinHeight = $.leoTools.range( this.options.minHeight, 0, this.opMaxHeight );
+            this.opMinWidth = $.leoTools.range( op.minWidth, 0, this.opMaxWidth )
+
+            this.opMinHeight = $.leoTools.range( op.minHeight, 0, this.opMaxHeight );
 
         },
 
@@ -166,15 +168,17 @@
 
                 event.preventDefault();
 
-                var $this = $(node),offset = $this.offset(),top = offset.top,left = offset.left,
+                var $this = $(node),offset = $this.offset(),top = offset.top,
+
+                left = offset.left,op = this.options,
 
                 outerW = $this.outerWidth(),outerH = $this.outerHeight();
 
-                if( event.pageY <= top + this.options.edge ){
+                if( event.pageY <= top + op.edge ){
 
                     this.flag_NS = 'N';
 
-                }else if( event.pageY >= top+outerH - this.options.edge ){
+                }else if( event.pageY >= top + outerH - op.edge ){
 
                     this.flag_NS = 'S';
 
@@ -184,11 +188,11 @@
 
                 };
 
-                if( event.pageX >= left+outerW - this.options.edge ){
+                if( event.pageX >= left + outerW - op.edge ){
 
                     this.flag_EW = 'E';
 
-                }else if( event.pageX <= left + this.options.edge ){
+                }else if( event.pageX <= left + op.edge ){
 
                     this.flag_EW = 'W';
 
@@ -210,13 +214,13 @@
 
                         this.cursor = this.boxCur;
 
-                        !!this.options.mouseMoveCurOut && this.options.mouseMoveCurOut.call( $this, this.cursor );
+                        !!op.mouseMoveCurOut && op.mouseMoveCurOut.call( $this, this.cursor );
 
                     }else{
 
                         this.cursor = this.cur+'-resize';
 
-                        !!this.options.mouseMoveCurIn && this.options.mouseMoveCurIn.call( $this, this.cursor );
+                        !!op.mouseMoveCurIn && op.mouseMoveCurIn.call( $this, this.cursor );
 
                     }
 
@@ -234,11 +238,11 @@
 
             this.iframeBlocks = this.document.find( iframeFix === true ? "iframe" : iframeFix ).map( function() {
 
-                var iframe = $( this );
+                var $iframe = $( this );
 
                 if( drag === this || $.contains( drag, this ) ){ return null; }
 
-                return $( "<div>" ).css( { position: "absolute", width: iframe.outerWidth(), height: iframe.outerHeight(), opacity: 0,'backgroundColor':'#fff'} ).insertBefore( this ).offset( iframe.offset() )[0];
+                return $( "<div>" ).css( { position: "absolute", width: $iframe.outerWidth(), height: $iframe.outerHeight(), opacity: 0,'backgroundColor':'#fff'} ).insertBefore( this ).offset( $iframe.offset() )[0];
 
             });
 
@@ -482,7 +486,7 @@
 
             if ( o.bClone ) {
 
-                this.$dragBox = o.proxy.call( null, this.$target[0] ).offset({ left: offset.left,top: offset.top});
+                this.$dragBox = o.proxy( this.$target[0] ).offset({ left: offset.left,top: offset.top});
 
                 this.bClone = true;
 

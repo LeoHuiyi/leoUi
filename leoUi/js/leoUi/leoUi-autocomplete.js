@@ -244,7 +244,7 @@
 
             isInput = nodeName === "input";
 
-            this.isMultiLine = isTextarea ? true : isInput ? false : this.element.prop( "isContentEditable" );
+            this.isMultiLine = isTextarea ? true : isInput ? false : $input.prop( "isContentEditable" );
 
             this.valueMethod = $input[ isTextarea || isInput ? "val" : "text" ];
 

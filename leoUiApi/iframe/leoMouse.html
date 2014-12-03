@@ -60,7 +60,7 @@
                         </pre>
                     </div>
                 </section>
-                <p><strong>options </strong>：</p>
+                <p><strong>options </strong></p>
                 <div class="cont">
                     <div id="option-grid" class="g-grid"></div>
                 </div>
@@ -153,9 +153,9 @@
 
             id: 'name',
 
-            width: 150,
+            width: 200,
 
-            minWidth: 100,
+            minWidth: 150,
 
             fixed: true,
 
@@ -163,7 +163,7 @@
 
             renderCell:function(val){
 
-            	console.log(val)
+                console.log(val)
 
                 return '<div style="color:#008000">' + val + '</div>';
 
@@ -173,7 +173,13 @@
 
             id: 'type',
 
-            width: 70,
+            width: 200,
+
+            fixed: true,
+
+            minWidth: 100,
+
+            className:'feedLine',
 
             theadName: 'Type'
 
@@ -181,11 +187,9 @@
 
             id: 'default',
 
-            width: 300,
+            width: 70,
 
-            theadName: 'Default',
-
-            className:'feedLine'
+            theadName: 'Default'
 
         },{
 

@@ -199,7 +199,7 @@
 
                 dragBoxReturnToTarget: true,
 
-                useDroppable: true,
+                useLeoDroppable: true,
 
                 cursorAt:{top:4,left:4},
 
@@ -271,7 +271,7 @@
 
             this.$dropDivs = $dropDivs.leoDroppable({
 
-                toleranceType:'pointer',
+                tolerance:'pointer',
 
                 scope:'tree',
 

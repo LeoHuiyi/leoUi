@@ -59,16 +59,25 @@ leoUiLoad.require('leoUi-resizable,leoCss,ready', function($) {
 
                         // Selector: 任何由选择器匹配的iframe将被透明层覆盖。
 
-        aspectRatio:false//等比例缩放,为长与高之比
+        aspectRatio:false,//等比例缩放,为长与高之比
+
+        minWidth:0,//缩放的最小宽度（大于0的数）
+
+        minHeight:0,//缩放的最小高度（大于0的数）
+
+        maxWidth:'max',
+
+        maxHeight:'max',
 
     })
 
     $('#botton_1').click(function(event) {
             $('body').leoResizable('option',{
 
-                selector:false
+                mouseDownSelector:false
 
             });
+            // console.log($.fn.leoResizable.getCursorChange();
     });
 
 

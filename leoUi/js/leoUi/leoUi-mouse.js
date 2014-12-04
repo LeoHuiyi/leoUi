@@ -56,8 +56,6 @@
 
         _init: function(){
 
-            var that = this;
-
             this.isSetCapture = this.options.isSetCapture ? 'setCapture' in this.document[0].documentElement : false;
 
             this._lockDrag = false;
@@ -70,7 +68,7 @@
 
         _setOption:function( key, value ){
 
-            if( key === 'selector' ){
+            if( key === 'mouseDownSelector' ){
 
                 this._setMouseDownEvent(true);
 
@@ -80,7 +78,7 @@
 
         _setMouseDownEvent:function(change){
 
-            var that = this,selector = this.options.mouseDownSelector;
+            var This = this,selector = this.options.mouseDownSelector;
 
             if( !this._$target ){
 
@@ -104,15 +102,21 @@
 
                 selector = '';
 
+                delete this.isDelegatSelector;
+
                 delete this._$target;
+
+            }else{
+
+                this.isDelegatSelector = true;
 
             }
 
             this._on( this.$target, 'click.mouse', selector, function(event) {
 
-                if( true === $.data( event.target, that.dataId + ".preventClickEvent" ) ){
+                if( true === $.data( event.target, This.dataId + ".preventClickEvent" ) ){
 
-                    $.removeData( event.target, that.dataId + ".preventClickEvent" );
+                    $.removeData( event.target, This.dataId + ".preventClickEvent" );
 
                     event.stopImmediatePropagation();
 
@@ -126,11 +130,11 @@
 
                 event.stopPropagation();
 
-                if( !that._lockDrag ){
+                if( !This._lockDrag ){
 
-                    event.delegateTarget !== this && ( that.$target = $(this), that.isDelegatSelector = true );
+                    event.delegateTarget !== this && ( This.$target = $(this) );
 
-                    return that._mouseDown(event);
+                    return This._mouseDown(event);
 
                 }
 
@@ -170,7 +174,7 @@
 
             this._mouseDownEvent = event;
 
-            var that = this,btnIsLeft = ( event.which === 1 ),
+            var This = this,btnIsLeft = ( event.which === 1 ),
 
             elIsCancel = ( typeof this.options.cancel === "string" && event.target.nodeName ? $( event.target ).closest( this.options.cancel ).length : false );
 
@@ -186,7 +190,7 @@
 
                 this._mouseDelayTimer = setTimeout(function() {
 
-                    that.mouseDelayMet = true;
+                    This.mouseDelayMet = true;
 
                 }, this.options.delay);
 
@@ -214,13 +218,13 @@
 
             this._mouseMoveDelegate = function(event) {
 
-                return that._mouseMove(event);
+                return This._mouseMove(event);
 
             };
 
             this._mouseUpDelegate = function(event) {
 
-                return that._mouseUp(event);
+                return This._mouseUp(event);
 
             };
 

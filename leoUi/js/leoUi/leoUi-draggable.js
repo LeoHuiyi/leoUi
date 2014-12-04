@@ -104,15 +104,15 @@
 
             },//克隆拖拽返回的克隆对象（必须为jquery对象）
 
-            onBeforeDrag:$.noop, //source,event
+            onBeforeDrag:$.noop, //开始拖拽之前回调，返回false，取消拖拽。（this: target, arguments: event）
 
-            onStartDrag:$.noop, //source,event,dragBox
+            onStartDrag:$.noop, //开始拖拽回调（this: target, arguments: event, dragBox）
 
-            onDrag:$.noop, //source,event,dragBox
+            onDrag:$.noop, //拖拽中回调（this: target, arguments: event, dragBox）
 
-            onBeforeStopDrag:$.noop, //source,event,dragBox
+            onBeforeStopDrag:$.noop, // 拖拽结束前回调（this: target, arguments: event, dragBox）
 
-            onStopDrag:$.noop//source,event
+            onStopDrag:$.noop//拖拽结束回调（this: target, arguments: event）
 
         },
 
@@ -120,13 +120,37 @@
 
             this.$body = this.document.find('body');
 
-            this.$target.css('position') === "static" && ( this.$target[0].style.position = "relative" );
-
             this.hasClone = false;
+
+            this._super();
 
             this._getContainment(true);
 
-            this._super();
+            this._changeStatic();
+
+        },
+
+        _changeStatic:function(){
+
+            var $target = this.$target,
+
+            mouseDownSelector = this.options.mouseDownSelector;
+
+            if(mouseDownSelector === false){
+
+                $target.css('position') === "static" && $target.css('position', 're') ;
+
+            }else{
+
+                $target.find(mouseDownSelector).each(function(index, el) {
+
+                    var $el = $(el);
+
+                    $el.css('position') === "static" && $el.css('position', 'relative') ;
+
+                });
+
+            }
 
         },
 
@@ -144,9 +168,11 @@
 
             }
 
-            if( key === 'selector' ){
+            if( key === 'mouseDownSelector' ){
 
                 this._super( key, value );
+
+                this._getContainment(true);
 
             }
 
@@ -190,7 +216,7 @@
 
             var op = this.options;
 
-            if( op.disabled === true || op.onBeforeDrag.call( this.$target[0], event ) === false || this._getHandle(event) === false ){
+            if( this.hasClone === true || op.disabled === true || op.onBeforeDrag.call( this.$target[0], event ) === false || this._getHandle(event) === false ){
 
                 return false;
 
@@ -202,7 +228,7 @@
 
         _getContainment:function(init){
 
-            if( !( init === true || this.isDelegatSelector === true ) ){ return; }
+            if( ( init === true && this.isDelegatSelector === true ) || ( !init && !this.isDelegatSelector ) ){ return; }
 
             var op = this.options,oc = op.containment,
 
@@ -340,13 +366,13 @@
 
                 this.borderWidths = {
 
-                    left: parseCss(  this.$containment[0] ,'borderLeftWidth' ),
+                    left: parseCss( this.$containment[0] ,'borderLeftWidth' ),
 
-                    top: parseCss(  this.$containment[0] ,'borderTopWidth' ),
+                    top: parseCss( this.$containment[0] ,'borderTopWidth' ),
 
-                    right: parseCss(  this.$containment[0] ,'borderRightWidth' ),
+                    right: parseCss( this.$containment[0] ,'borderRightWidth' ),
 
-                    bottom: parseCss(  this.$containment[0] ,'borderBottomWidth' )
+                    bottom: parseCss( this.$containment[0] ,'borderBottomWidth' )
 
                 };
 
@@ -371,12 +397,6 @@
             var offset,op = this.options,$target = this.$target,
 
             parseCss = $.leoTools.parseCss;
-
-            if( this.hasClone === true ){
-
-                return;
-
-            }
 
             this.$dragBox = $target;
 

@@ -36,15 +36,21 @@
 
         defaults:{
 
-            disabled:false,//如果设置为true将禁止缩放。
+            disabled:false,//如果设置为true将禁止缩放
 
-            bClone:true,//克隆对象
+            bClone:true,//是否使用克隆缩放
 
-            bCloneAnimate:true, //克隆拖拽是否动画
+            bCloneAnimate:true, //克隆缩放是否有动画
 
             duration:400,//动画时间
 
-            containment:false,//使用指定的元素强制性限制大小调整的界限.
+            containment:false,//使用指定的元素强制性限制大小调整的界限
+
+                              //Selector:resizable元素将被限制在该选择器匹配的第一个元素的边界内。 如果没有匹配的元素，那么设置将不起作用。
+
+                              //Element: resizable元素将被限制在这个元素的边界内。
+
+                              //String: 可能的值： "parent", "document", "window"
 
             stopMouseWheel: false, //拖拽时候是否关闭滚轮事件
 
@@ -52,9 +58,9 @@
 
             edge:4,//mouse的cursor的变化宽度
 
-            grid:false,//拖拽元素时，只能以指定大小的方格进行拖动。数组形式为[ x, y ]。
+            grid:false,//缩放元素时，只能以指定大小的方格进行拖动。数组形式为[ x, y ]
 
-            iframeFix:false,//在拖动期间阻止iframe捕捉鼠标移过事件。与cursorAt选项搭配使用时或者当鼠标指针可能不在拖动助手元素之上时，该参数非常有用。
+            iframeFix:false,//在拖动期间阻止iframe捕捉鼠标移过事件。
 
                             // 支持多种类型:
 
@@ -62,35 +68,39 @@
 
                             // Selector: 任何由选择器匹配的iframe将被透明层覆盖。
 
-            aspectRatio:false,//等比例缩放,为长与高之比
+            aspectRatio:false,//强制元素调整大小时保持一个特定的宽高比
 
-            minWidth:0,
+            minWidth:0,//缩放的最小宽度（大于0的数）
 
-            minHeight:0,
+            minHeight:0,//缩放的最小高度（大于0的数）
 
-            maxWidth:'max',
+            maxWidth:'max',//缩放的最大宽度，如果有containment限制哪个更小取哪个（大于0的数，"max": 无限大）
 
-            maxHeight:'max',
+            maxHeight:'max',//缩放的最大高度，如果有containment限制哪个更小取哪个（大于0的数，"max": 无限大）
 
-            proxy:function(source){//source
+            proxy:function(source){
 
                 return $(source).clone().removeAttr('id').css({'opacity': '0.5'}).insertAfter(source);
 
-            },
+            },//克隆缩放返回的克隆对象（必须为jquery对象）（ arguments: target）
 
-            initCallback: $.noop, //source
+            initCallback: $.noop, //构建leoResizable完成后回调。（this: target）
 
-            mouseMoveCurIn:$.noop,
+            mouseMoveCurIn:$.noop,//mouse进去能缩放区域的回调。（this: target, arguments: cursor）
 
-            mouseMoveCurOut:$.noop,
+            mouseMoveCurOut:$.noop,//mouse离开能缩放区域的回调。（this: target, arguments: cursor）
 
-            onStartResize: $.noop, //source,event
+            onBeforeResize:$.noop,//开始缩放之前回调，返回false，取消拖拽。（this: target, arguments: event）
 
-            onResize: $.noop, //source,event
+            onStartResize: $.noop, //开始缩放回调（this: target, arguments: event, dragBox, width, height）
 
-            onStopResize: $.noop,//source,event
+            onResize: $.noop, //缩放中回调（this: target, arguments: event, dragBox, width, height）
 
-            onStopAnimateResize:$.noop
+            onBeforeStopResize: $.noop,//缩放结束前回调（this: target, arguments: event, dragBox, width, height）
+
+            onStopResize: $.noop,//缩放结束回调（this: target, arguments: event, width, height）
+
+            onAnimateStepResize:$.noop//缩放克隆动画中step回调（this: target, arguments: event, fx）
 
         },
 
@@ -100,31 +110,55 @@
 
             this._handleInit();
 
-            this.$target.css('position') === "static" && ( this.$target[0].style.position = "relative" );
-
             this._dragArea();
 
-            this._getContainment(true);
-
-            this.bClone = false;
+            this.hasClone = false;
 
             this.cur = '';
 
-            !! this.options.initCallback && this.options.initCallback.call(this.$target[0]);
-
             this._super();
 
-            this._boxEventBind();
+            this._getContainment(true);
+
+            this._changeStatic();
+
+            this._boxEventBind(true);
+
+            this.options.initCallback.call(this.$target[0]);
+
+        },
+
+        _changeStatic:function(){
+
+            var $target = this.$target,
+
+            mouseDownSelector = this.options.mouseDownSelector;
+
+            if(mouseDownSelector === false){
+
+                $target.css('position') === "static" && $target.css('position', 'relative') ;
+
+            }else{
+
+                $target.find(mouseDownSelector).each(function(index, el) {
+
+                    var $el = $(el);
+
+                    $el.css('position') === "static" && $el.css('position', 'relative') ;
+
+                });
+
+            }
 
         },
 
         _handleInit:function(){
 
-            var This = this;
+            var This = this,op = this.options;
 
-            if(typeof this.options.handles ==='string'){
+            if(typeof op.handles ==='string'){
 
-                if( $.trim( this.options.handles ).toUpperCase() === 'ALL'){
+                if( $.trim( op.handles ).toUpperCase() === 'ALL'){
 
                     this.handles = true;
 
@@ -132,7 +166,7 @@
 
                     this.handles = {};
 
-                    this.options.handles.replace($.leoTools.rword, function(name) {
+                    op.handles.replace($.leoTools.rword, function(name) {
 
                         This.handles[name.toUpperCase()] = true;
 
@@ -214,17 +248,17 @@
 
                         this.cursor = this.boxCur;
 
-                        !!op.mouseMoveCurOut && op.mouseMoveCurOut.call( $this, this.cursor );
+                        op.mouseMoveCurOut.call( $this[0], this.cursor );
 
                     }else{
 
                         this.cursor = this.cur+'-resize';
 
-                        !!op.mouseMoveCurIn && op.mouseMoveCurIn.call( $this, this.cursor );
+                        op.mouseMoveCurIn.call( $this[0], this.cursor );
 
                     }
 
-                    $this.css('cursor',this.cursor);
+                    $this.css( 'cursor', this.cursor );
 
                 }
 
@@ -260,43 +294,43 @@
 
         },
 
-        _boxEventBind:function(){
+        _boxEventBind:function(init){
 
-            var This = this,$box = this.$target,boxCur = this.$target.css('cursor'),
+            var This = this,$target = this.$target,
 
-            selector = this.options.mouseDownSelector,$selector;
+            boxCur = this.boxCur = $target.css('cursor'),
 
-            this.boxCur = boxCur;
+            op = this.options,
+
+            selector = op.mouseDownSelector;
 
             selector === false && ( selector = '' );
 
-            this._off( $box,'mouseenter.resize' );
+            if(!init){
 
-            this._off( $box,'mousemove.resize' );
+                $target = this._$target;
 
-            this._off( $box,'mouseleave.resize' );
+                this._off( $target, 'mouseenter.resize' )._off( $target, 'mousemove.resize' )._off( $target, 'mouseleave.resize' );
 
-            this._on( $box,'mouseenter.resize', selector, function(event){
+            }
 
-                This._mouseCur( event, this );
-
-            })
-
-            this._on( $box,'mousemove.resize', selector, function(event){
+            this._on( $target, 'mouseenter.resize', selector, function(event){
 
                 This._mouseCur( event, this );
 
-            });
+            })._on( $target, 'mousemove.resize', selector, function(event){
 
-            this._on( $box,'mouseleave.resize', selector, function(event){
+                This._mouseCur( event, this );
 
-                if( This._getCursorChange() === true && This.options.disabled === false ){
+            })._on( $target, 'mouseleave.resize', selector, function(event){
+
+                if( This._getCursorChange() === true && op.disabled === false ){
 
                     event.preventDefault();
 
-                    !!This.options.mouseMoveCurOut && This.options.mouseMoveCurOut.call( $selector = $(this), boxCur );
+                    op.mouseMoveCurOut.call( this , boxCur );
 
-                    $selector.css('cursor',boxCur);
+                    $(this).css( 'cursor', boxCur );
 
                     This.cur = '';
 
@@ -308,7 +342,7 @@
 
         _mouseCapture:function(event){
 
-            if( event.which!==1 || !this.cur || this.options.disabled === true ){
+            if( this.hasClone === true || !this.cur || this.options.disabled === true || this.options.onBeforeResize.call( this.$target[0], event ) === false ){
 
                 return false;
 
@@ -320,11 +354,11 @@
 
         _getContainment:function(init){
 
-            if( !( init === true || this.isDelegatSelector === true ) ){ return; }
+            if( ( init === true && this.isDelegatSelector === true ) || ( !init && !this.isDelegatSelector ) ){ return; }
 
-            var oc = this.options.containment,el = this.$target,
+            var oc = this.options.containment,
 
-            ce = ( oc instanceof $ ) ? oc.get( 0 ) : ( oc === 'parent' ) ? el.parent().get( 0 ) : oc;
+            ce = ( oc instanceof $ ) ? oc.get( 0 ) : ( oc === 'parent' ) ? this.$target.parent().get( 0 ) : oc;
 
             if(!ce){
 
@@ -396,7 +430,9 @@
 
             withinOffset = within.isDocument ? { left: 0, top: 0 } : within.isWindow ? { left: within.scrollLeft, top: within.scrollTop } : within.offset,
 
-            containmentDifT,containmentDifL,containmentDifB,containmentDifR;
+            containmentDifT,containmentDifL,containmentDifB,containmentDifR,
+
+            range = $.leoTools.range,mathMin = Math.min;
 
             difT = dragBoxOffset.top - withinOffset.top;
 
@@ -410,25 +446,27 @@
 
             containmentDifL = difL + this.width - this.borderWidths.left;
 
-            this.SEMaxWidth = this.opMaxWidth === 'max' ? containmentDifR : $.leoTools.range( this.opMaxWidth, 0, containmentDifR );
+            this.SEMaxWidth = this.opMaxWidth === 'max' ? containmentDifR : range( this.opMaxWidth, 0, containmentDifR );
 
-            this.SEMinWidth = Math.min( this.SEMaxWidth, this.opMinWidth );
+            this.SEMinWidth = mathMin( this.SEMaxWidth, this.opMinWidth );
 
-            this.SEMaxHeight = this.opMaxHeight === 'max' ? containmentDifB : $.leoTools.range( this.opMaxHeight, 0, containmentDifB );
+            this.SEMaxHeight = this.opMaxHeight === 'max' ? containmentDifB : range( this.opMaxHeight, 0, containmentDifB );
 
-            this.SEMinHeight = Math.min( this.SEMaxHeight, this.opMinHeight );
+            this.SEMinHeight = mathMin( this.SEMaxHeight, this.opMinHeight );
 
-            this.NWMaxWidth = this.opMaxWidth === 'max' ? containmentDifL : containmentDifL > 0 ? $.leoTools.range( this.opMaxWidth, 0, containmentDifL ) : 0;
+            this.NWMaxWidth = this.opMaxWidth === 'max' ? containmentDifL : containmentDifL > 0 ? range( this.opMaxWidth, 0, containmentDifL ) : 0;
 
-            this.NWMinWidth = Math.min( this.NWMaxWidth, this.opMinWidth );
+            this.NWMinWidth = mathMin( this.NWMaxWidth, this.opMinWidth );
 
-            this.NWMaxHeight = this.opMaxHeight === 'max' ? containmentDifT : containmentDifT > 0 ? $.leoTools.range( this.opMaxHeight, 0, containmentDifT ) : 0;
+            this.NWMaxHeight = this.opMaxHeight === 'max' ? containmentDifT : containmentDifT > 0 ? range( this.opMaxHeight, 0, containmentDifT ) : 0;
 
-            this.NWMinHeight = Math.min( this.NWMaxHeight, this.opMinHeight );
+            this.NWMinHeight = mathMin( this.NWMaxHeight, this.opMinHeight );
 
         },
 
         _getBorderWidths:function(no) {
+
+            var parseCss;
 
             if(no){
 
@@ -446,15 +484,17 @@
 
             }else{
 
+                parseCss = $.leoTools.parseCss;
+
                 this.borderWidths = {
 
-                    left: $.leoTools.parseCss(  this.$containment[0] ,'borderLeftWidth' ),
+                    left: parseCss( this.$containment[0] ,'borderLeftWidth' ),
 
-                    top: $.leoTools.parseCss(  this.$containment[0] ,'borderTopWidth' ),
+                    top: parseCss( this.$containment[0] ,'borderTopWidth' ),
 
-                    right: $.leoTools.parseCss(  this.$containment[0] ,'borderRightWidth' ),
+                    right: parseCss( this.$containment[0] ,'borderRightWidth' ),
 
-                    bottom: $.leoTools.parseCss(  this.$containment[0] ,'borderBottomWidth' )
+                    bottom: parseCss( this.$containment[0] ,'borderBottomWidth' )
 
                 };
 
@@ -476,35 +516,33 @@
 
         _mouseStart:function(event) {
 
-            var offset,o = this.options;
+            var offset,op = this.options,$target = this.$target;
 
-            this.$dragBox = this.$target;
+            this.$dragBox = $target;
 
-            isFixed = this.$dragBox.position();
+            offset = $target.offset();
 
-            offset = this.$target.offset();
+            if ( op.bClone ) {
 
-            if ( o.bClone ) {
+                this.$dragBox = op.proxy( $target[0] ).offset({ left: offset.left,top: offset.top});
 
-                this.$dragBox = o.proxy( this.$target[0] ).offset({ left: offset.left,top: offset.top});
-
-                this.bClone = true;
+                this.hasClone = true;
 
             }
 
             this.isFixed = this.$dragBox.css('position') === 'fixed';
 
-            !o.stopMouseWheel && ( this.scrollParents = $.leoTools.scrollParents( this.$dragBox ) );
+            !op.stopMouseWheel && ( this.scrollParents = $.leoTools.scrollParents( this.$dragBox ) );
 
             this._stopOnMouseWheel();
 
-            this.startLeft = this.left = $.leoTools.parseCss( this.$dragBox[0],'left' );
+            this.startLeft = this.left = $.leoTools.parseCss( this.$dragBox[0], 'left' );
 
-            this.startTop = this.top = $.leoTools.parseCss( this.$dragBox[0],'top' );
+            this.startTop = this.top = $.leoTools.parseCss( this.$dragBox[0], 'top' );
 
-            this.startWidth = this.width = this.$target.width();
+            this.startWidth = this.width = $target.width();
 
-            this.startHeight = this.height = this.$target.height();
+            this.startHeight = this.height = $target.height();
 
             this._getContainment();
 
@@ -514,13 +552,13 @@
 
             this.startX =  this.isFixed ? event.clientX : event.pageX;
 
-            this.startY = !o.stopMouseWheel ? event.clientY + $.leoTools.getScrollParentsTop( this.scrollParents ) : this.isFixed ? event.clientY : event.pageY;
+            this.startY = !op.stopMouseWheel ? event.clientY + $.leoTools.getScrollParentsTop( this.scrollParents ) : this.isFixed ? event.clientY : event.pageY;
 
-            this.$body.css( 'cursor',this.cursor );
+            this.$body.css( 'cursor', this.cursor );
 
             this._blockFrames();
 
-            !! o.onStartResize && o.onStartResize.call(this.$target[0],event,this.$dragBox,this.startWidth,this.startHeight);
+            op.onStartResize.call(this.$target[0], event, this.$dragBox, this.startWidth, this.startHeight);
 
             this._setCursorChange(false);
 
@@ -804,13 +842,13 @@
 
         _setGrid:function( moveX, moveY ){
 
-            var o = this.options;
+            var op = this.options;
 
-            if( o.grid ){
+            if( op.grid ){
 
-                moveY = o.grid[1] ? Math.round( moveY / o.grid[1] ) * o.grid[1] : moveY;
+                moveY = op.grid[1] ? Math.round( moveY / op.grid[1] ) * op.grid[1] : moveY;
 
-                moveX = o.grid[0] ? Math.round( moveX / o.grid[0] ) * o.grid[0] : moveX;
+                moveX = op.grid[0] ? Math.round( moveX / op.grid[0] ) * op.grid[0] : moveX;
 
             }
 
@@ -820,7 +858,13 @@
 
         _mouseDrag:function(event) {
 
-            var cur = this.cur,moveX = ( this.isFixed ? event.clientX : event.pageX ) - this.startX,moveY = !this.options.stopMouseWheel ? event.clientY - this.startY + $.leoTools.getScrollParentsTop( this.scrollParents ) : ( this.isFixed ? event.clientY : event.pageY ) - this.startY,grid = this._setGrid( moveX, moveY );
+            var cur = this.cur,op = this.options,
+
+            moveX = ( this.isFixed ? event.clientX : event.pageX ) - this.startX,
+
+            moveY = !op.stopMouseWheel ? event.clientY - this.startY + $.leoTools.getScrollParentsTop( this.scrollParents ) : ( this.isFixed ? event.clientY : event.pageY ) - this.startY,
+
+            grid = this._setGrid( moveX, moveY );
 
             this._getContainmentRange();
 
@@ -828,7 +872,7 @@
 
             moveY = grid.moveY;
 
-            if( !!this.options.aspectRatio ){
+            if( !!op.aspectRatio ){
 
                 this._getAspectRatio( moveX, moveY );
 
@@ -896,31 +940,45 @@
 
             }
 
-            this.options.onResize.call( this.$target[0], event, this.$dragBox, this.width, this.height );
+            this.$dragBox.css( { height: this.height, width: this.width, top: this.top, left: this.left } );
 
-            this.$dragBox.css( { height: this.height,width: this.width,top: this.top,left: this.left } );
+            op.onResize.call( this.$target[0], event, this.$dragBox, this.width, this.height );
 
         },
 
         _mouseStop:function(event) {
 
-            var dragBoxOffset = this.$dragBox.offset(),o = this.options,This = this;
+            var dragBoxOffset = this.$dragBox.offset(),
+
+            op = this.options,This = this,$target = this.$target,
+
+            width = this.width,height = this.height;
 
             this._stopOffMouseWheel();
 
-            if( this.bClone ){
+            op.onBeforeStopResize.call( $target[0], event, width, height );
 
-                $.offset.setOffset( this.$target[0], { top: dragBoxOffset.top,left: dragBoxOffset.left, using: function(prop){
+            if( this.hasClone ){
 
-                    if( !o.bCloneAnimate ){
+                this.$dragBox.remove();
 
-                        This.$target.css( { height: This.height, width: This.width, top: prop.top, left: prop.left } );
+                $.offset.setOffset( $target[0], { top: dragBoxOffset.top,left: dragBoxOffset.left, using: function(prop){
+
+                    if( !op.bCloneAnimate ){
+
+                        $target.css( { height: height, width: width, top: prop.top, left: prop.left } );
+
+                        op.onStopResize.call( $target[0], event, width, height );
 
                     }else{
 
-                        This.$target.animate( { height: This.height, width: This.width, top: prop.top, left: prop.left}, { duration: o.duration, complete:function(){
+                        $target.animate( { height: height, width: width, top: prop.top, left: prop.left}, { duration: op.duration, step: function(now, fx){
 
-                            !! o.onStopAnimateResize && o.onStopAnimateResize.call( This.$target[0], event, This.$dragBox, This.width, This.height );
+                            op.onAnimateStepResize.call( $target[0], event, fx );
+
+                        },complete:function(){
+
+                            op.onStopResize.call( $target[0], event, width, height );
 
                         }});
 
@@ -928,17 +986,17 @@
 
                 }})
 
-                this.$dragBox.remove()
+            }else{
+
+                op.onStopResize.call( $target[0], event, width, height );
 
             }
-
-            !! o.onStopResize && o.onStopResize.call( this.$target[0], event, this.width, this.height );
 
             this.$body.css('cursor','');
 
             this._unblockFrames();
 
-            this.bClone = false;
+            this.hasClone = false;
 
             this._setCursorChange(true);
 
@@ -964,11 +1022,13 @@
 
             }
 
-            if( key === 'selector'){
-
-                this._super( key,value );
+            if( key === 'mouseDownSelector'){
 
                 this._boxEventBind();
+
+                this._super( key, value );
+
+                this._getContainment(true);
 
             }
 
@@ -1002,6 +1062,6 @@
 
     });
 
-	return $;
+    return $;
 
 }));

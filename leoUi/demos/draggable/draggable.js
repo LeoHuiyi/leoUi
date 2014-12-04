@@ -59,7 +59,7 @@ leoUiLoad.require('leoUi-draggable,leoCss,ready', function($) {
                     'z-index': 1,
                     width: $(source).width(),
                     position: 'relative'
-                }).insertAfter(source);
+                }).removeAttr('id').insertAfter(source);
 
             }
 
@@ -67,7 +67,13 @@ leoUiLoad.require('leoUi-draggable,leoCss,ready', function($) {
 
     $('#botton_1').on('click', function(event) {
         event.preventDefault();
-        $('body').leoDraggable('destroy');
+        // $('body').leoDraggable('destroy');
+
+        $('body').leoDraggable('option',{
+
+                mouseDownSelector:false
+
+            });
     });
 
 });

@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+
+<head>
+    <meta charset="utf-8" />
+    <title>leoDialog</title>
+    <meta name="description" content="https://github.com/LeoHuiyi" />
+    <meta name="keywords" content="leoUi,jquery组件,jqueryUi" />
+    <meta name="author" content="leo" />
+    <meta name="robots" content="all" />
+    <!--[if lte IE 8]>
+        <script src="../js/html5.js"></script>
+    <![endif]-->
+    <link rel="stylesheet" href="../css/reset.css" />
+    <link rel="stylesheet" href="../css/leoUi-grid.css" />
+    <link rel="stylesheet" href="../css/shCoreDjango.css" />
+    <link rel="stylesheet" href="../css/leoUiApiCssIframe.css" />
+</head>
+
+<body>
+    <nav id="guide" class="g-mod">
+        <div class="from">
+            <span>github:</span>
+            <a href="https://github.com/LeoHuiyi" target="_blank">https://github.com/LeoHuiyi</a>
+        </div>
+    </nav>
+    <header id="hd">
+        <section class="g-mod" id="title">
+            <h1 class="tit">leoDialog</h1>
+            <div class="g-browser g-clear">
+                <p>leoDialog对话框组件</p>
+                <p>引用：leoUi-resizable.js</p>
+                <p>依赖：jQuery, leoUi-tools.js, leoUi-position.js, jquery-mousewheel.js, leoUi-mouse.js, leoUi-draggable.js, leoUi-resizable.js, leoUi-effects.js</p>
+            </div>
+        </section>
+    </header>
+    <section id="bd">
+        <section class="g-mod g-attr g-block">
+            <h2 class="tit">leoDialog对话框组件</h2>
+            <div class="cont">
+                <p><strong>$('.leoUi').leoDroppable( options )</strong></p>
+                <p><strong>使用说明</strong>：</p>
+                <section class="g-mod g-attr g-block">
+                    <div class="cont">
+                        <p><strong>examples</strong>：</p>
+                        <pre class="brush: js;">
+                            $('.leoUi').leoDroppable({
+
+                                accept:'*',//控制可拖动的元素被拖放接受。支持多种类型：Selector: Function: 函数将被调用页面上的每一个可拖动的（传递给函数的第一个参数）。该函数必须返回true，如果可拖动应该接受。
+
+					            tolerance:'intersect',//指定使用那种模式来测试一个拖动(draggable)元素"经过"一个放置（droppable）对象。 允许使用的值:"fit": 拖动(draggable)元素 完全重叠到放置（droppable）对象。"intersect": 拖动(draggable)元素 和放置（droppable）对象至少重叠50%。"pointer": 鼠标重叠到放置（droppable）对象上。"touch": 拖动(draggable)元素 和放置（droppable）对象的任意重叠
+
+					            scope:'all',//用来设置拖动（leoDraggle）元素和放置（leoDroppable）对象的集合, 除了leoDroppable中的accept属性必须和leoDroppable中的droppableScope属性一直才能被允许碰撞检测
+
+					            disabled:false,//当设置为true时停止leoDroppable
+
+					            checkFirst:true,//是否触发第一次的onDragEnter或者onDragLeave回调
+
+					            ...
+
+                            })
+                        </pre>
+                    </div>
+                </section>
+                <p><strong>options </strong></p>
+                <div class="cont">
+                    <div id="option-grid" class="g-grid"></div>
+                </div>
+                <p><strong>事件</strong>：</p>
+                <section class="g-mod g-attr g-block">
+                    <div class="cont">
+                        <p><strong>destroy()</strong>：销毁组件</p>
+                        <p><strong>arguments</strong>：无</p>
+                        <p><strong>returns</strong>：无</p>
+                        <p><strong>examples</strong>：</p>
+                        <pre class="brush: js;">
+                            $( ".leoUi" ).leoDroppable( "destroy" );
+                        </pre>
+                    </div>
+                </section>
+                <section class="g-mod g-attr g-block">
+                    <div class="cont">
+                        <p><strong>option(arguments)</strong>：设置或者获取组件选项的值</p>
+                        <p><strong>arguments</strong>：参考leoPlugIn中的option方法</p>
+                        <p><strong>returns</strong>：参考leoPlugIn中的option方法</p>
+                        <p><strong>examples</strong>：</p>
+                        <pre class="brush: js;">
+                            $( ".leoUi" ).leoDroppable( "a.b.c", 500 );
+                        </pre>
+                    </div>
+                </section>
+            </div>
+        </section>
+    </section>
+    <footer id="ft">
+        <aside class="g-mod">
+            <div class="g-browser g-clear">
+                <p>author: leo</p>
+                <p>如有问题请联系：253383559@qq.com</p>
+            </div>
+        </aside>
+    </footer>
+    <script type="text/javascript" src="../js/jquery-1.11.1-min.js"></script>
+    <script type="text/javascript" src="../js/leoUi-tools.js"></script>
+    <script type="text/javascript" src="../js/leoUi-grid.js"></script>
+    <script type="text/javascript" src="../js/shCore.js"></script>
+    <script type="text/javascript" src="../js/shBrushJScript.js"></script>
+    <script type="text/javascript">
+    var tableModel = [{
+
+            id: 'name',
+
+            width: 200,
+
+            minWidth: 150,
+
+            fixed: true,
+
+            theadName: 'Name',
+
+            renderCell:function(val){
+
+                return '<div style="color:#008000">' + val + '</div>';
+
+            }
+
+        }, {
+
+            id: 'type',
+
+            width: 300,
+
+            fixed: true,
+
+            minWidth: 200,
+
+            className:'feedLine',
+
+            theadName: 'Type'
+
+        }, {
+
+            id: 'default',
+
+            width: 300,
+
+            className:'feedLine',
+
+            theadName: 'Default'
+
+        },{
+
+            id: 'explain',
+
+            width: 750,
+
+            fixed: true,
+
+            align: 'left',
+
+            theadName: 'Explain',
+
+            className:'feedLine'
+
+        }],optionsData = [{
+
+            'name': 'accept',
+
+            'default': '*',
+
+            'type': 'selector or function',
+
+            'explain': '控制可拖动的元素被拖放接受。支持多种类型：Selector: Function: 函数将被调用页面上的每一个可拖动的（传递给函数的第一个参数）。该函数必须返回true，如果可拖动应该接受。'
+
+        }, {
+
+            'name': 'tolerance',
+
+            'default': 'intersect',
+
+            'type': 'string',
+
+            'explain': '指定使用那种模式来测试一个拖动(draggable)元素"经过"一个放置（droppable）对象。 允许使用的值:"fit": 拖动(draggable)元素 完全重叠到放置（droppable）对象。"intersect": 拖动(draggable)元素 和放置（droppable）对象至少重叠50%。"pointer": 鼠标重叠到放置（droppable）对象上。"touch": 拖动(draggable)元素 和放置（droppable）对象的任意重叠'
+
+        }, {
+
+            'name': 'scope',
+
+            'default': 'all',
+
+            'type': 'string',
+
+            'explain': '用来设置拖动（leoDraggle）元素和放置（leoDroppable）对象的集合, leoDroppable中的accept属性必须和leoDroppable中的droppableScope属性一直才能被允许碰撞检测'
+
+        }, {
+
+            'name': 'disabled',
+
+            'default': 'false',
+
+            'type': 'boolean',
+
+            'explain': '当设置为true时停止leoDroppable'
+
+        }, {
+
+            'name': 'checkFirst',
+
+            'default': 'true',
+
+            'type': 'boolean',
+
+            'explain': '是否触发第一次的onDragEnter或者onDragLeave回调'
+
+        }, {
+
+            'name': 'onDragEnter',
+
+            'default': 'false',
+
+            'type': 'function',
+
+            'explain': '当可拖动元素被拖入目标容器的时候触发（ this: drop, arguments: event, proportions（drop的prop）, dragProp（drag的prop））'
+
+        }, {
+
+            'name': 'onDragOver',
+
+            'default': 'false',
+
+            'type': 'function',
+
+            'explain': '当可拖动元素被拖至某个元素之上的时候触发（ this: drop, arguments: event, proportions（drop的prop）, dragProp（drag的prop））'
+
+        }, {
+
+            'name': 'onDragLeave',
+
+            'default': 'false',
+
+            'type': 'function',
+
+            'explain': '当可拖动元素被拖离目标容器的时候触发（ this: drop, arguments: event, proportions（drop的prop）, dragProp（drag的prop））'
+
+        },{
+
+            'name': 'onDrop',
+
+            'default': 'false',
+
+            'type': 'function',
+
+            'explain': '当可拖动元素被拖入目标容器并放置的时候触发，当返回true就不会触发leoDraggable组件的onStopDrag回调（ this: drop, arguments: event, proportions（drop的prop）, dragProp（drag的prop））'
+
+        }],gridOptions = {
+
+            dataType: 'data',
+
+            tableModel: tableModel,
+
+            height: false,
+
+            width: false,
+
+            isHover: false,
+
+            boxCheckType: false,
+
+            resizeWidth: false,
+
+            resizeHeight: false,
+
+            isPage: false,
+
+            evenClass: false
+
+        };
+    $('#option-grid').leoGrid($.extend(gridOptions, {gridData: optionsData}));
+    SyntaxHighlighter.all({'toolbar': false});
+    </script>
+</body>
+
+</html>

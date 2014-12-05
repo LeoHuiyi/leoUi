@@ -67,7 +67,7 @@ leoUiLoad.require('leoUi-resizable,leoCss,ready', function($) {
 
         maxWidth:'max',
 
-        maxHeight:'max',
+        maxHeight:'max'
 
     })
 

@@ -5,7 +5,7 @@
     <meta charset="utf-8" />
     <title>leoPlugIn</title>
     <meta name="description" content="https://github.com/LeoHuiyi" />
-    <meta name="keywords" content="leoUi,jquery插件,jqueryUi" />
+    <meta name="keywords" content="leoUi,jquery组件,jqueryUi" />
     <meta name="author" content="leo" />
     <meta name="robots" content="all" />
     <!--[if lte IE 8]>
@@ -28,7 +28,7 @@
         <section class="g-mod" id="title">
             <h1 class="tit">leoPlugIn</h1>
             <div class="g-browser g-clear">
-                <p>抽象化来创建有状态的 jQuery 插件</p>
+                <p>抽象化来创建有状态的 jQuery 组件</p>
                 <p>引用：leoUi-tools.js</p>
                 <p>依赖：jQuery</p>
             </div>
@@ -36,9 +36,9 @@
     </header>
     <section id="bd">
         <section class="g-mod g-attr g-block">
-            <h2 class="tit">plugIn 创建jQuery插件</h2>
+            <h2 class="tit">plugIn 创建jQuery组件</h2>
             <div class="cont">
-                <p><strong>$.leoTools.plugIn( options, [methods] )</strong>：$.leoTools.plugIn自动创建统一的jQuery插件</p>
+                <p><strong>$.leoTools.plugIn( options, [methods] )</strong>：$.leoTools.plugIn自动创建统一的jQuery组件</p>
                 <p><strong>使用说明</strong>：</p>
                 <section class="g-mod g-attr g-block">
                     <div class="cont">
@@ -47,11 +47,11 @@
                         <pre class="brush: js;">
                             $.leoTools.plugIn({
 
-                                name:'leoDraggable',//插件名称
+                                name:'leoDraggable',//组件名称
 
-                                version:'1.0',//插件版本号
+                                version:'1.0',//组件版本号
 
-                                inherit:'leoMouse',//要继承的父插件名称
+                                inherit:'leoMouse',//要继承的父组件名称
 
                                 addJquery:false,//添加为jquery的静态方法
 
@@ -96,11 +96,11 @@
                         <pre class="brush: js;">
                             $.leoTools.plugIn({
 
-                                name:'leoDialog',//插件名称
+                                name:'leoDialog',//组件名称
 
-                                version:'1.0',//插件版本号
+                                version:'1.0',//组件版本号
 
-                                inherit:'leoMouse',//要继承的父插件名称
+                                inherit:'leoMouse',//要继承的父组件名称
 
                                 defaultsTarget:'dialogHtml',//defaults中作为$target的默认名称
 
@@ -156,11 +156,11 @@
                 </section>
                 <p><strong>属性</strong>：</p>
                 <div class="cont">
-                    <p><strong>document</strong>: 当前插件的 document</p>
-                    <p><strong>window</strong>: 当前插件的 window</p>
-                    <p><strong>$target</strong>: 当前插件的选择到的jquery对象;（默认为$('<div>')）</p>
-                    <p><strong>options</strong>: 插件实例化后使用选项的对象</p>
-                    <p><strong>version</strong>: 插件的字符串版本</p>
+                    <p><strong>document</strong>: 当前组件的 document</p>
+                    <p><strong>window</strong>: 当前组件的 window</p>
+                    <p><strong>$target</strong>: 当前组件的选择到的jquery对象;（默认为$('<div>')）</p>
+                    <p><strong>options</strong>: 组件实例化后使用选项的对象</p>
+                    <p><strong>version</strong>: 组件的字符串版本</p>
                 </div>
                 <p><strong>$.leoTools.plugIn参数</strong>：</p>
                 <div class="cont">
@@ -168,18 +168,18 @@
                     <div id="option-grid" class="g-grid"></div>
                 </div>
                 <div class="cont">
-                    <p><strong>methods(object)</strong>: 同一插件名称下的全局方法</p>
+                    <p><strong>methods(object)</strong>: 同一组件名称下的全局方法</p>
                     <p><strong>添加私有方法</strong>: 函数名称必须以_开头</p>
                     <pre class="brush: js;">
                         $.leoTools.plugIn({
 
-                            name:'leoDialog',//插件名称
+                            name:'leoDialog',//组件名称
 
                             ...
 
                         },{
 
-                            _initElements:function(fn){//fn为插件创建方法（$.leoDialog | $.fn.leoDialog）
+                            _initElements:function(fn){//fn为组件创建方法（$.leoDialog | $.fn.leoDialog）
 
                                 var _cursorChange = true;//leoDialog下的全局私有变量
 
@@ -187,7 +187,7 @@
 
                                     return _cursorChange;
 
-                                }//$.leoDialog.getCursorChange | $.fn.leoDialog.getCursorChange，其中this指代插件的原型对象（实例化后this指向每个实例）
+                                }//$.leoDialog.getCursorChange | $.fn.leoDialog.getCursorChange，其中this指代组件的原型对象（实例化后this指向每个实例）
 
                                 fn.setCursorChange = this._setCursorChange = function(flag){
 
@@ -206,7 +206,7 @@
                     <pre class="brush: js;">
                         $.leoTools.plugIn({
 
-                            name:'leoDialog',//插件名称
+                            name:'leoDialog',//组件名称
 
                             ...
 
@@ -220,7 +220,7 @@
 
                                 fn.select = true;//$.leoDialog.setDropsProp =true | $.fn.leoDialog.setDropsProp = true
 
-                            },其中this指代插件的原型对象（实例化后this指向每个实例,fn为实际传进参数的最后一项）
+                            },其中this指代组件的原型对象（实例化后this指向每个实例,fn为实际传进参数的最后一项）
 
                             ...
 
@@ -233,14 +233,14 @@
                 <section class="g-mod g-attr g-block">
                     <div class="cont">
                         <p><strong>_init()</strong>：</p>
-                        <div class="cont"><p>创建插件初始化事件</p></div>
+                        <div class="cont"><p>创建组件初始化事件</p></div>
                         <p><strong>arguments</strong>：</p>
                         <div class="cont">
                             <p>无</p>
                         </div>
                         <p><strong>returns</strong>：</p>
                         <div class="cont">
-                            <p>写插件人判断是否有返回值</p>
+                            <p>写组件人判断是否有返回值</p>
                         </div>
                         <p><strong>examples</strong>：</p>
                         <pre class="brush: js;">
@@ -260,7 +260,7 @@
                         </div>
                         <p><strong>arguments</strong>：</p>
                         <div class="cont">
-                            <p>fn (function | string): 要调用的函数。也可以是插件方法的名称。</p>
+                            <p>fn (function | string): 要调用的函数。也可以是组件方法的名称。</p>
                             <p>delay (number): 调用函数前等待的毫秒数，默认为 0。</p>
                         </div>
                         <p><strong>returns</strong>：</p>
@@ -277,7 +277,7 @@
                     <div class="cont">
                         <p><strong>_on( args [, suppressDisabledCheck ] )</strong>：</p>
                         <div class="cont">
-                            <p>插件内置绑定事件的方法，同过此方法可：自动添加事件命名空间，调用destroy方法可自动移除事件，设置插件的options.disabledEvent = true可禁用当前实例插件的所有事件，设置了suppressDisabledCheck选项如果事件发生在带有 disableClassName class 的元素上，则不调用事件处理程序。</p>
+                            <p>组件内置绑定事件的方法，同过此方法可：自动添加事件命名空间，调用destroy方法可自动移除事件，设置组件的options.disabledEvent = true可禁用当前实例组件的所有事件，设置了suppressDisabledCheck选项如果事件发生在带有 disableClassName class 的元素上，则不调用事件处理程序。</p>
                         </div>
                         <p><strong>arguments</strong>：</p>
                         <div class="cont">
@@ -286,7 +286,7 @@
                         </div>
                         <p><strong>returns</strong>：</p>
                         <div class="cont">
-                            <p>返回 当前插件实例对象</p>
+                            <p>返回 当前组件实例对象</p>
                         </div>
                         <p><strong>examples</strong>：</p>
                         <pre class="brush: js;">
@@ -310,7 +310,7 @@
                         </div>
                         <p><strong>returns</strong>：</p>
                         <div class="cont">
-                            <p>返回 当前插件实例对象</p>
+                            <p>返回 当前组件实例对象</p>
                         </div>
                         <p><strong>examples</strong>：</p>
                         <pre class="brush: js;">
@@ -322,12 +322,12 @@
                     <div class="cont">
                         <p><strong>hasLeoPlugIn( el, name )</strong>：</p>
                         <div class="cont">
-                            <p>改元素是否绑定插件实例（静态方法无效）</p>
+                            <p>改元素是否绑定组件实例（静态方法无效）</p>
                         </div>
                         <p><strong>arguments</strong>：</p>
                         <div class="cont">
                             <p>el (jquery | element): 要检查元素的jquery对象或者元素。</p>
-                            <p>name (string): 插件名称。（通过leoPlugIn构建的插件实例）</p>
+                            <p>name (string): 组件名称。（通过leoPlugIn构建的组件实例）</p>
                         </div>
                         <p><strong>returns</strong>：</p>
                         <div class="cont">
@@ -353,7 +353,7 @@
                         </div>
                         <p><strong>returns</strong>：</p>
                         <div class="cont">
-                            <p>返回 当前插件实例对象</p>
+                            <p>返回 当前组件实例对象</p>
                         </div>
                         <p><strong>examples</strong>：</p>
                         <pre class="brush: js;">
@@ -373,7 +373,7 @@
                         </div>
                         <p><strong>returns</strong>：</p>
                         <div class="cont">
-                            <p>返回 当前插件实例对象</p>
+                            <p>返回 当前组件实例对象</p>
                         </div>
                         <p><strong>examples</strong>：</p>
                         <pre class="brush: js;">
@@ -393,7 +393,7 @@
                         </div>
                         <p><strong>returns</strong>：</p>
                         <div class="cont">
-                            <p>返回 当前插件实例对象</p>
+                            <p>返回 当前组件实例对象</p>
                         </div>
                         <p><strong>examples</strong>：</p>
                         <pre class="brush: js;">
@@ -425,7 +425,7 @@
                     <div class="cont">
                         <p><strong>destroy()</strong>：</p>
                         <div class="cont">
-                            <p>销毁插件方法，移除_on绑定的事件和_addElemDisableClassName添加的class，再调用_destroy方法</p>
+                            <p>销毁组件方法，移除_on绑定的事件和_addElemDisableClassName添加的class，再调用_destroy方法</p>
                         </div>
                         <p><strong>arguments</strong>：</p>
                         <div class="cont">
@@ -485,7 +485,7 @@
                     <div class="cont">
                         <p><strong>option()</strong>：</p>
                         <div class="cont">
-                            <p> 获取一个包含键/值对的对象，键/值对表示当前插件哈希。该方法不接受任何参数。</p>
+                            <p> 获取一个包含键/值对的对象，键/值对表示当前组件哈希。该方法不接受任何参数。</p>
                         </div>
                         <p><strong>arguments</strong>：</p>
                         <div class="cont">
@@ -508,7 +508,7 @@
                     <div class="cont">
                         <p><strong>option( optionName, value )</strong>：</p>
                         <div class="cont">
-                            <p>设置与指定的 optionName 关联的插件选项的值。</p>
+                            <p>设置与指定的 optionName 关联的组件选项的值。</p>
                         </div>
                         <p><strong>arguments</strong>：</p>
                         <div class="cont">
@@ -529,7 +529,7 @@
                     <div class="cont">
                         <p><strong>option( option )</strong>：</p>
                         <div class="cont">
-                            <p>为插件设置一个或多个选项。</p>
+                            <p>为组件设置一个或多个选项。</p>
                         </div>
                         <p><strong>arguments</strong>：</p>
                         <div class="cont">
@@ -552,21 +552,21 @@
                     <div class="cont">
                         <p><strong>_super( [arg ] [, ... ] )</strong>：</p>
                         <div class="cont">
-                            <p>从父插件中调用相同名称的方法，带有任意指定的参数。本质上是.call()。</p>
+                            <p>从父组件中调用相同名称的方法，带有任意指定的参数。本质上是.call()。</p>
                         </div>
                         <p><strong>arguments</strong>：</p>
                         <div class="cont">
-                            <p>arg (object): 要传递给父插件的方法的零到多个参数。</p>
+                            <p>arg (object): 要传递给父组件的方法的零到多个参数。</p>
                         </div>
                         <p><strong>returns</strong>：</p>
                         <div class="cont">
-                            <p>写插件人判断是否有返回值</p>
+                            <p>写组件人判断是否有返回值</p>
                         </div>
                         <p><strong>examples</strong>：</p>
                         <pre class="brush: js;">
                             _init:function(){
 
-                                this._setOption()._super.call(this, key, option);//调用_setOption的方法的父插件的同名方法（_setOption方法必须覆盖父_setOption方法才有_super）
+                                this._setOption()._super.call(this, key, option);//调用_setOption的方法的父组件的同名方法（_setOption方法必须覆盖父_setOption方法才有_super）
 
                                 this._super();
 
@@ -578,21 +578,21 @@
                     <div class="cont">
                         <p><strong>_superApply( arguments  )</strong>：</p>
                         <div class="cont">
-                            <p>从父插件中调用相同名称的方法，带有任意指定的参数。本质上是.apply()。</p>
+                            <p>从父组件中调用相同名称的方法，带有任意指定的参数。本质上是.apply()。</p>
                         </div>
                         <p><strong>arguments</strong>：</p>
                         <div class="cont">
-                            <p>arguments (array): 要传递给父插件的方法的参数数组。</p>
+                            <p>arguments (array): 要传递给父组件的方法的参数数组。</p>
                         </div>
                         <p><strong>returns</strong>：</p>
                         <div class="cont">
-                            <p>写插件人判断是否有返回值</p>
+                            <p>写组件人判断是否有返回值</p>
                         </div>
                         <p><strong>examples</strong>：</p>
                         <pre class="brush: js;">
                             _init:function(){
 
-                                this._setOption()._superApply.call(this, [key, option]);//调用_setOption的方法的父插件的同名方法（_setOption方法必须覆盖父_setOption方法才有_super）
+                                this._setOption()._superApply.call(this, [key, option]);//调用_setOption的方法的父组件的同名方法（_setOption方法必须覆盖父_setOption方法才有_super）
 
                                 this._superApply();
 
@@ -604,7 +604,7 @@
                     <div class="cont">
                         <p><strong>_publicEvent( eventName  )</strong>：</p>
                         <div class="cont">
-                            <p>调用插件公开方法(不带以_开头的方法)</p>
+                            <p>调用组件公开方法(不带以_开头的方法)</p>
                         </div>
                         <p><strong>arguments</strong>：</p>
                         <div class="cont">
@@ -699,7 +699,7 @@
 
             'type': 'string',
 
-            'explain': '插件名称；（$.fn.leoUi | $.leoUi）'
+            'explain': '组件名称；（$.fn.leoUi | $.leoUi）'
 
         }, {
 
@@ -709,7 +709,7 @@
 
             'type': 'string',
 
-            'explain': '插件版本号'
+            'explain': '组件版本号'
 
         }, {
 
@@ -719,7 +719,7 @@
 
             'type': 'string',
 
-            'explain': '默认的$target值；(也可配置插件options中的选项作为$target。)'
+            'explain': '默认的$target值；(也可配置组件options中的选项作为$target。)'
 
         }, {
 
@@ -729,7 +729,7 @@
 
             'type': 'string',
 
-            'explain': '要继承的jQuery插件的名称'
+            'explain': '要继承的jQuery组件的名称'
 
         }, {
 
@@ -759,7 +759,7 @@
 
             'type': 'object',
 
-            'explain': '设置为true时，禁用本插件下所有用_on添加的事件'
+            'explain': '设置为true时，禁用本组件下所有用_on添加的事件'
 
         }, {
 
@@ -769,7 +769,7 @@
 
             'type': 'boolean',
 
-            'explain': '设置为true时，禁用本插件下所有用_on添加的事件'
+            'explain': '设置为true时，禁用本组件下所有用_on添加的事件'
 
         }, {
 

@@ -45,7 +45,7 @@ leoUiLoad.require('leoUi-droppable,leoCss,ready', function($) {
                 'z-index': 1,
                 width: $(source).width(),
                 position: 'fixed'
-            }).insertAfter(source);
+            }).removeAttr('id').insertAfter(source);
 
         },
 
@@ -72,9 +72,17 @@ leoUiLoad.require('leoUi-droppable,leoCss,ready', function($) {
 
         // accept:'#leo',
 
+        checkFirst:false,
+
         onDragEnter: function( e, drop, dargBox ) {
 
             var source = dargBox.box;
+
+            // console.log(drop)
+
+            // console.log(dargBox)
+
+            // console.log(source !== this)
 
             if (source !== this) {
 
@@ -104,6 +112,8 @@ leoUiLoad.require('leoUi-droppable,leoCss,ready', function($) {
 
         // accept:'#leo',
 
+        checkFirst:false,
+
         onDragEnter: function( e, drop, dargBox ) {
 
             var source = dargBox.box;
@@ -115,6 +125,74 @@ leoUiLoad.require('leoUi-droppable,leoCss,ready', function($) {
             }
 
         }
+
+    });
+
+    $('#scroll').leoDraggable({
+        bClone: true,
+        revert: false,
+        revertAnimate: true,
+        bCloneAnimate: true,
+        dragBoxReturnToTarget: true,
+        droppableScope:'scroll',
+        useLeoDroppable: true,
+        // cursorAt:{top:10,left:10},
+
+        stopMouseWheel: false,
+
+        proxy: function(source) { //source
+
+            return $(source).clone().css({
+                'z-index': 1,
+                width: $(source).width(),
+                position: 'fixed'
+            }).removeAttr('id').insertAfter(source);
+
+        },
+
+        onStartDrag: function(e, darg) {
+
+            $(this).css({
+                'opacity': '0.5'
+            })
+
+
+        },
+        onStopDrag: function() {
+
+            $(this).css('opacity', '1');
+
+            // $('.portlet').leoRizeBox('destroy');
+
+            // $('.portlet').leoDroppable('destroy')
+
+        }
+    })
+
+    $('#scroll_drop').leoDroppable({
+
+        accept:'#scroll',
+
+        scope:'scroll',
+
+        onDragEnter: function( e, drop, dargBox ) {
+
+            // console.log(drop)
+
+            // console.log(dargBox)
+
+
+            alert('碰撞')
+
+        }
+    })
+
+    $('#botton_1').on('click', function(event) {
+        event.preventDefault();
+
+        $('.portlet').leoDroppable('option','scope','leo');
+
+        $('.column').leoDroppable('destroy');
 
     });
 

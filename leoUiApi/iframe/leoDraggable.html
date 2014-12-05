@@ -5,7 +5,7 @@
     <meta charset="utf-8" />
     <title>leoDraggable</title>
     <meta name="description" content="https://github.com/LeoHuiyi" />
-    <meta name="keywords" content="leoUi,jquery插件,jqueryUi" />
+    <meta name="keywords" content="leoUi,jquery组件,jqueryUi" />
     <meta name="author" content="leo" />
     <meta name="robots" content="all" />
     <!--[if lte IE 8]>
@@ -30,7 +30,7 @@
             <div class="g-browser g-clear">
                 <p>leoDraggable拖拽组件</p>
                 <p>引用：leoUi-draggable.js</p>
-                <p>依赖：jQuery, leoUi-tools.js, leoUi-mouse.js(继承)</p>
+                <p>依赖：jQuery, leoUi-tools.js, leoUi-position.js, jquery-mousewheel.js, leoUi-mouse.js(继承)</p>
             </div>
         </section>
     </header>
@@ -86,9 +86,9 @@
 
 					            scrollSpeed: 20,//当鼠标指针的值小于scrollSensitivity的值时，窗口滚动的速度。如果scroll选项设置为false，则该参数无效
 
-					            useLeoDroppable:false,//是否使用leoDroppable插件
+					            useLeoDroppable:false,//是否使用leoDroppable组件
 
-					            droppableScope:'all',//用来设置拖动（draggle）元素和放置（droppable）对象的集合,配合droppable使用
+					            droppableScope:'all',//用来设置拖动（leoDraggable）元素和放置（leoDroppable）对象的集合,配合leoDroppable使用
 
 					            disabled:false,//当设置为true时禁止拖动
 
@@ -123,7 +123,7 @@
                     <div class="cont">
                         <p><strong>setScrollParents()</strong>：重新获取box的可滚动的祖先</p>
                         <p><strong>arguments</strong>：无</p>
-                        <p><strong>returns(boolean)</strong>：无</p>
+                        <p><strong>returns</strong>：无</p>
                         <p><strong>examples</strong>：</p>
                         <pre class="brush: js;">
                             $( ".leoUi" ).leoDraggable( "setScrollParents" );
@@ -134,7 +134,7 @@
                     <div class="cont">
                         <p><strong>setDropsProp()</strong>：重新条用leoDroppable的setDropsProp</p>
                         <p><strong>arguments</strong>：无</p>
-                        <p><strong>returns(boolean)</strong>：无</p>
+                        <p><strong>returns</strong>：无</p>
                         <p><strong>examples</strong>：</p>
                         <pre class="brush: js;">
                             $( ".leoUi" ).leoDraggable( "setDropsProp" );
@@ -143,20 +143,20 @@
                 </section>
                 <section class="g-mod g-attr g-block">
                     <div class="cont">
-                        <p><strong>destroy()</strong>：销毁插件</p>
+                        <p><strong>destroy()</strong>：销毁组件</p>
                         <p><strong>arguments</strong>：无</p>
-                        <p><strong>returns(boolean)</strong>：无</p>
+                        <p><strong>returns</strong>：无</p>
                         <p><strong>examples</strong>：</p>
                         <pre class="brush: js;">
-                            $( ".leoUi" ).leoDraggable( "setDropsProp" );
+                            $( ".leoUi" ).leoDraggable( "destroy" );
                         </pre>
                     </div>
                 </section>
                 <section class="g-mod g-attr g-block">
                     <div class="cont">
-                        <p><strong>option(arguments)</strong>：设置或者获取插件选项的值</p>
+                        <p><strong>option(arguments)</strong>：设置或者获取组件选项的值</p>
                         <p><strong>arguments</strong>：参考leoPlugIn中的option方法</p>
-                        <p><strong>returns(boolean)</strong>：参考leoPlugIn中的option方法</p>
+                        <p><strong>returns</strong>：参考leoPlugIn中的option方法</p>
                         <p><strong>examples</strong>：</p>
                         <pre class="brush: js;">
                             $( ".leoUi" ).leoDraggable( "a.b.c", 500 );
@@ -193,8 +193,6 @@
             theadName: 'Name',
 
             renderCell:function(val){
-
-            	console.log(val)
 
                 return '<div style="color:#008000">' + val + '</div>';
 
@@ -304,7 +302,7 @@
 
             'default': '400',
 
-            'type': 'numvber',
+            'type': 'number',
 
             'explain': '动画时间'
 
@@ -406,7 +404,7 @@
 
             'type': 'boolean',
 
-            'explain': '是否使用leoDroppable插件'
+            'explain': '是否使用leoDroppable组件'
 
         }, {
 
@@ -416,7 +414,7 @@
 
             'type': 'string',
 
-            'explain': '用来设置拖动（draggle）元素和放置（droppable）对象的集合,配合droppable使用'
+            'explain': '用来设置拖动（leoDraggable）元素和放置（leoDroppable）对象的集合,配合leoDroppable使用'
 
         }, {
 
@@ -466,7 +464,7 @@
 
             'type': 'function',
 
-            'explain': '开始拖拽之前回调，返回false，取消拖拽。（this: target, arguments: event, dragBox）'
+            'explain': '开始拖拽之前回调，返回false，取消拖拽。（this: target, arguments: event）'
 
         }, {
 
@@ -476,7 +474,7 @@
 
             'type': 'function',
 
-            'explain': '开始拖拽回调（this: target, arguments: event）'
+            'explain': '开始拖拽回调（this: target, arguments: event, dragBox）'
 
         }, {
 

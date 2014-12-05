@@ -354,7 +354,7 @@
 
         _getContainment:function(init){
 
-            if( ( init === true && this.isDelegatSelector === true ) || ( !init && !this.isDelegatSelector ) ){ return; }
+            if( !init === !this.isDelegatSelector ){ return; }
 
             var oc = this.options.containment,
 

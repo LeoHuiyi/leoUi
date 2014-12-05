@@ -100,14 +100,15 @@
 @keyframes a
 {
 0%   {margin-left: 0px;}
-50%  {margin-left: 50px;}
+50%  {margin-left: 30px;}
 100% {margin-left: 0;}
 }
 .leoListMenu .leoListMenu_select{background-color: #7bbff2;color: #fff;}
 
 /*leoComboBox*/
 .leoComboBox_wrop .leoComboBox{background: none repeat scroll 0 0 #fff;border: 1px solid #d4d4d4;color: #999;font-size: 14px;line-height: 20px;min-height: 20px;vertical-align: middle;width: 200px;height: 30px;}
-.leoComboBox_wrop .leoComboBox_input{border: 0 none;color: #555;float: left;height: 18px;line-height: 18px;outline: 0 none;padding: 5px 4px;}
+.leoComboBox_wrop .leoComboBox_input{border: 0 none;color: #999;float: left;height: 18px;line-height: 20px;outline: 0 none;padding: 5px 4px;font-size: 14px;min-height: 20px;vertical-align: middle;background: none repeat scroll 0 0 #fff;}
+.leoComboBox_wrop .leoComboBox_input:focus{background: none repeat scroll 0 0 #fffbde;color: #333;border-color: #7bbff2;}
 .leoComboBox_wrop .leoComboBox_button{background: url("../images/leoUi/leoComboBox_button.png") no-repeat center;height: 100%;width: 16px;float: right;cursor: pointer;}
 .leoComboBox_wrop .leoComboBox_hover{border:1px solid #7bbff2;}
 .leoComboBox_wrop .leoComboBox_focus{border:1px solid #7bbff2;}

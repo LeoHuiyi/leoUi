@@ -5,7 +5,7 @@
     <meta charset="utf-8" />
     <title>leoMouse</title>
     <meta name="description" content="https://github.com/LeoHuiyi" />
-    <meta name="keywords" content="leoUi,jquery插件,jqueryUi" />
+    <meta name="keywords" content="leoUi,jquery组件,jqueryUi" />
     <meta name="author" content="leo" />
     <meta name="robots" content="all" />
     <!--[if lte IE 8]>
@@ -28,7 +28,7 @@
         <section class="g-mod" id="title">
             <h1 class="tit">leoMouse</h1>
             <div class="g-browser g-clear">
-                <p>leoMouse鼠标拖拽基础插件</p>
+                <p>leoMouse鼠标拖拽基础组件</p>
                 <p>引用：leoUi-mouse.js</p>
                 <p>依赖：jQuery, leoUi-tools.js</p>
             </div>
@@ -36,7 +36,7 @@
     </header>
     <section id="bd">
         <section class="g-mod g-attr g-block">
-            <h2 class="tit">leoMouse鼠标拖拽基础插件</h2>
+            <h2 class="tit">leoMouse鼠标拖拽基础组件</h2>
             <div class="cont">
                 <p><strong>$('.leoUi').leoMouse( options )</strong></p>
                 <p><strong>使用说明</strong>：</p>
@@ -75,7 +75,7 @@
                         </div>
                         <p><strong>returns(boolean)</strong>：不返回true，将停止之后的事件</p>
                         <div class="cont">
-                            <p>写插件人判断是否有返回值</p>
+                            <p>写组件人判断是否有返回值</p>
                         </div>
                         <p><strong>examples</strong>：</p>
                         <pre class="brush: js;">
@@ -94,7 +94,7 @@
                         </div>
                         <p><strong>returns(boolean)</strong>：返回 false，将停止拖拽</p>
                         <div class="cont">
-                            <p>写插件人判断是否有返回值</p>
+                            <p>写组件人判断是否有返回值</p>
                         </div>
                         <p><strong>examples</strong>：</p>
                         <pre class="brush: js;">
@@ -110,7 +110,7 @@
                         <div class="cont">
                             <p>event:事件对象</p>
                         </div>
-                        <p><strong>returns(boolean)</strong>：无</p>
+                        <p><strong>returns</strong>：无</p>
                         <p><strong>examples</strong>：</p>
                         <pre class="brush: js;">
                             _mouseDrag: function(/* event */) {};//内部调用
@@ -125,7 +125,7 @@
                         <div class="cont">
                             <p>event:事件对象</p>
                         </div>
-                        <p><strong>returns(boolean)</strong>：无</p>
+                        <p><strong>returns</strong>：无</p>
                         <p><strong>examples</strong>：</p>
                         <pre class="brush: js;">
                             _mouseStop: function(/* event */) {};//内部调用
@@ -162,8 +162,6 @@
             theadName: 'Name',
 
             renderCell:function(val){
-
-                console.log(val)
 
                 return '<div style="color:#008000">' + val + '</div>';
 

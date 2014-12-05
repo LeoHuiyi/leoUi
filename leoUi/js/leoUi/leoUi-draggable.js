@@ -84,7 +84,7 @@
 
             useLeoDroppable:false,//是否使用leoDroppable插件
 
-            droppableScope:'all',//用来设置拖动（draggle）元素和放置（droppable）对象的集合,配合droppable使用
+            droppableScope:'all',//用来设置拖动（leoDraggable）元素和放置（leoDroppable）对象的集合,配合leoDroppable使用
 
             disabled:false,//当设置为true时禁止拖动
 
@@ -138,7 +138,7 @@
 
             if(mouseDownSelector === false){
 
-                $target.css('position') === "static" && $target.css('position', 're') ;
+                $target.css('position') === "static" && $target.css('position', 'relative') ;
 
             }else{
 
@@ -228,7 +228,7 @@
 
         _getContainment:function(init){
 
-            if( ( init === true && this.isDelegatSelector === true ) || ( !init && !this.isDelegatSelector ) ){ return; }
+            if( !init === !this.isDelegatSelector ){ return; }
 
             var op = this.options,oc = op.containment,
 

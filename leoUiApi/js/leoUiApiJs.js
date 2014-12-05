@@ -13,10 +13,10 @@ var zNodes = [{
 			name: "leoUiLoad模块加载器",
 			url: {href: '#!leo#iframe/leoUiLoad.html'}
 		}, {
-			name: "leoPlugIn创建jQuery插件",
+			name: "leoPlugIn创建jQuery组件",
 			url: {href: '#!leo#iframe/leoPlugIn.html'}
 		}, {
-			name: "leoMouse鼠标拖拽基础插件",
+			name: "leoMouse鼠标拖拽基础组件",
 			url: {href: '#!leo#iframe/leoMouse.html'}
 		}, {
 			name: "leoDraggable拖拽组件",
@@ -24,6 +24,9 @@ var zNodes = [{
 		}, {
 			name: "leoResizable缩放组件",
 			url: {href: '#!leo#iframe/leoResizable.html'}
+		}, {
+			name: "leoDroppable缩放组件",
+			url: {href: '#!leo#iframe/leoDroppable.html'}
 		}]
 	}],reHref = /.*#!leo#/;
 

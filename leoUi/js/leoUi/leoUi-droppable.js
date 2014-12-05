@@ -34,23 +34,23 @@
 
         defaults:{
 
-            accept:'*',//决定哪个可拖动元素将会被接收。
+            accept:'*',//控制可拖动的元素被拖放接受。支持多种类型：Selector: Function: 函数将被调用页面上的每一个可拖动的（传递给函数的第一个参数）。该函数必须返回true，如果可拖动应该接受。
 
-            tolerance:'intersect',//fit,intersect,pointer,touch
+            tolerance:'intersect',//指定使用那种模式来测试一个拖动(draggable)元素"经过"一个放置（droppable）对象。 允许使用的值:"fit": 拖动(draggable)元素 完全重叠到放置（droppable）对象。"intersect": 拖动(draggable)元素 和放置（droppable）对象至少重叠50%。"pointer": 鼠标重叠到放置（droppable）对象上。"touch": 拖动(draggable)元素 和放置（droppable）对象的任意重叠
 
-            scope:'all',//用来设置拖动（draggle）元素和放置（droppable）对象的集合
+            scope:'all',//用来设置拖动（leoDraggle）元素和放置（leoDroppable）对象的集合, 除了leoDroppable中的accept属性必须和leoDroppable中的droppableScope属性一直才能被允许碰撞检测
 
-            disabled:false,//当设置为true时停止。
+            disabled:false,//当设置为true时停止leoDroppable
 
-            checkFirst:true,//是否检查第一次。
+            checkFirst:true,//是否触发第一次的onDragEnter或者onDragLeave回调
 
-            onDragEnter: false, //drop,e,dropprop,dragBoxprop 当可拖动元素被拖入目标容器的时候触发，参数source是被拖动的DOM元素。
+            onDragEnter: false, //当可拖动元素被拖入目标容器的时候触发（ this: drop, arguments: event, proportions（drop的prop）, dragProp（drag的prop））
 
-            onDragOver: false,//drop,e,dropprop,dragBoxprop 当可拖动元素被拖至某个元素之上的时候触发，参数source是被拖动的DOM元素。
+            onDragOver: false,//当可拖动元素被拖至某个元素之上的时候触发（ this: drop, arguments: event, proportions（drop的prop）, dragProp（drag的prop））
 
-            onDragLeave: false,//drop,e,dropprop,dragBoxprop 当可拖动元素被拖离目标容器的时候触发，参数source是被拖动的DOM元素。
+            onDragLeave: false,//当可拖动元素被拖离目标容器的时候触发（ this: drop, arguments: event, proportions（drop的prop）, dragProp（drag的prop））
 
-            onDrop: false//drop,e,dropprop,dragBoxprop  当可拖动元素被拖入目标容器并放置的时候触发，参数source是被拖动的DOM元素。
+            onDrop: false//当可拖动元素被拖入目标容器并放置的时候触发，当返回true就不会触发leoDraggable组件的onStopDrag回调（ this: drop, arguments: event, proportions（drop的prop）, dragProp（drag的prop））
 
         },
 
@@ -78,9 +78,9 @@
 
             return{
 
-                box:draggable.box[0],
+                box: draggable.box[0],
 
-                dragBox:draggable.dragBox[0],
+                dragBox: draggable.dragBox[0],
 
                 width : outerW,
 
@@ -94,7 +94,7 @@
 
                 right : left + outerW,
 
-                pageX :draggable.pageX,
+                pageX : draggable.pageX,
 
                 pageY : draggable.pageY
 
@@ -255,37 +255,47 @@
 
                 }
 
-                var arrays = _arrays[scope] ,length = arrays.length,arrays = this.$target[0];
+                var arrays = _arrays[scope] ,i = arrays.length,
 
-                for (var i = 0; i < length; i++) {
+                element = this.$target[0];
 
-                    if(arrays[i] === this){
+                while(i--){
 
-                        elements.splice( i, 1 );
+                    if(arrays[i].$target[0] === element){
+
+                        arrays.splice( i, 1 );
 
                     }
 
-                };
+                }
+
+                if(arrays.length === 0){
+
+                    delete _arrays[scope];
+
+                }
 
             }
 
         },
 
-        setDropsProp:function( scope, $target ){
+        setDropsProp:function( scope, $draggable ){
 
-            var i,m = this._getArrays(scope) || [],length = m.length;
+            var i,m = this._getArrays(scope) || [],length = m.length,child;
 
             for ( i = 0; i < length; i++ ) {
 
-                m[ i ].proportions = null;
+                child = m[i];
 
-                if ( m[ i ].options.disabled ||  !m[ i ]._accept($target) || !( m[ i ].visible = ( m[ i ].$target.is( ":visible" ) ) ) ) {
+                child.proportions = null;
+
+                if ( child.options.disabled ||  !child._accept($draggable) || !( child.visible = ( child.$target.is( ":visible" ) ) ) ) {
 
                     continue;
 
                 }
 
-                m[ i ].proportions = this._getDropsSize( m[ i ].$target );
+                child.proportions = this._getDropsSize( child.$target );
 
             }
 
@@ -293,21 +303,19 @@
 
         checkPosition:function( event, draggable, first ){
 
-            var dragProp = this._getDragSize(draggable),op,
-
-            proportions,intersected,drop,notFirst = !first;
+            var dragProp = this._getDragSize(draggable),notFirst = !first;
 
             $.each( this._getArrays( draggable.scope ) || [], function() {
 
-                if ( this.options.disabled || !( proportions = this.proportions ) ) {
+                var drop,op = this.options,proportions,intersected;
+
+                if ( op.disabled || !( proportions = this.proportions ) ) {
 
                     return;
 
                 }
 
                 drop = this.$target[0];
-
-                op = this.options;
 
                 intersected = this._intersect( dragProp, proportions, op.tolerance );
 
@@ -339,21 +347,19 @@
 
         drop:function( event, draggable ){
 
-            var dragProp = this._getDragSize(draggable),
-
-            proportions,drop,droped,op;
+            var dragProp = this._getDragSize(draggable),droped;
 
             $.each( this._getArrays( draggable.scope ) || [], function() {
 
-                if ( this.options.disabled || !( proportions = this.proportions ) ) {
+                var drop,op = this.options,proportions;
+
+                if ( op.disabled || !( proportions = this.proportions ) ) {
 
                     return;
 
                 }
 
                 drop = this.$target[0];
-
-                op = this.options;
 
                 if( this._intersect( dragProp, proportions, op.tolerance ) === true ){
 

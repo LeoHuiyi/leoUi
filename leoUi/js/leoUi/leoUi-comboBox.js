@@ -80,6 +80,8 @@
 
             source: null,
 
+            beforeCreateCombobox:$.noop,
+
             change: $.noop,
 
             close: $.noop,
@@ -119,6 +121,8 @@
             this._setComboboxWidth();
 
             this.$target.appendTo(this.$comboboxWrop);
+
+            op.beforeCreateCombobox(this.$input);
 
             this._addComBoxEvent();
 

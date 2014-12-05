@@ -1710,13 +1710,11 @@
 
         _destroyOverlay:function(){
 
-            var $modal;
+            if( this.$modal ){
 
-            if( $modal = this.$modal ){
+                this.$modal.remove();
 
-                $modal.remove();
-
-                $modal = false;
+                this.$modal = false;
 
                 delete this.modalState;
 

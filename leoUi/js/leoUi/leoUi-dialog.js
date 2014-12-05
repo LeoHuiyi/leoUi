@@ -288,22 +288,6 @@
 
             var op = this.options;
 
-            this._createDialog();
-
-            this._appentTo();
-
-            this._createCaptionButtons();
-
-            this._createOkButton();
-
-            this._createCancelButton();
-
-            this._setButton();
-
-            this._dialogEventBind();
-
-            this._setInnerIframe();
-
             this.originalSize = {
 
                 width:op.width,
@@ -330,13 +314,29 @@
 
             this.hasDraggable = false;
 
-            this._makeDraggable(true);
+            this._createDialog();
 
-            this._makeResizable(true);
+            this._setInnerIframe();
+
+            this._createCaptionButtons();
+
+            this._createOkButton();
+
+            this._createCancelButton();
+
+            this._setButton();
+
+            this._dialogToTopEvent();
+
+            this._createDblclick();
 
             this._setElements( this.scope = op.scope );
 
-            this._createDblclick();
+            this._appentTo();
+
+            this._makeDraggable(true);
+
+            this._makeResizable(true);
 
             op.initCallBack.call( this.$target );
 
@@ -438,7 +438,7 @@
 
                 this.$ok.eventBind = false;
 
-                this.$ok.element = null;
+                delete this.$ok;
 
             }
 
@@ -490,7 +490,7 @@
 
                 this._off( this.$cancel.element, 'click.cancel' );
 
-                this.$cancel.eventBind = false;
+                delete this.$cancel;
 
             }
 
@@ -498,7 +498,7 @@
 
         _createCaptionButtons:function(){
 
-            var o = this.options,i,buttonArrLength,This = this,buttonArr = [],
+            var o = this.options,i,buttonArrLength,buttonArr = [],
 
             buttons = {
 
@@ -620,21 +620,27 @@
 
             var buttonObject,beforeElement,length,index,
 
-            info = buttonHash.info,name = buttonHash.button,createNotAppendToHeader = false,
+            info = buttonHash.info,name = buttonHash.button,
 
-            buttonCss = 'leoDialog_' + name,This = this,deleteNotAppendToHeader = false,
+            createNotAppendToHeader = false,
+
+            buttonCss = 'leoDialog_' + name,
+
+            buttons = this.buttons,
+
+            This = this,deleteNotAppendToHeader = false,
 
             button = uiDialogTitlebar.find( 'a.' + buttonCss ),
 
             floatHideClass = info.floatClass || info.hideClass;
 
-            !!info.notAppendToHeader && ( !!this.buttons[name] ? deleteNotAppendToHeader = ( !this.buttons.minimize && !this.buttons.maximize ) : createNotAppendToHeader = ( !!this.buttons.minimize || !!this.buttons.maximize ) );
+            !!info.notAppendToHeader && ( !!buttons[name] ? deleteNotAppendToHeader = ( !buttons.minimize && !buttons.maximize ) : createNotAppendToHeader = ( !!buttons.minimize || !!buttons.maximize ) );
 
             if( info.visible ){
 
                 if( deleteNotAppendToHeader ){
 
-                    delete this.buttons[name];
+                    delete buttons[name];
 
                     return;
 
@@ -702,7 +708,7 @@
 
                         }else{
 
-                            beforeElement = this.buttons[index[length-1]].element;
+                            beforeElement = buttons[index[length-1]].element;
 
                             !!beforeElement && buttonObject.insertAfter(beforeElement);
 
@@ -712,7 +718,7 @@
 
                     }
 
-                    this.buttons[name] = $.extend( { element: buttonObject[0] }, info );
+                    buttons[name] = $.extend( { element: buttonObject[0] }, info );
 
                 }
 
@@ -722,13 +728,13 @@
 
                 name === 'maximize' && this._off( this.window, 'resize.maximize' );
 
-                delete this.buttons[name];
+                delete buttons[name];
 
             }
 
         },
 
-        _dialogEventBind:function(){
+        _dialogToTopEvent:function(){
 
             var This = this;
 
@@ -1357,6 +1363,8 @@
 
                         cancel:'[ role = "button" ]',
 
+                        mouseDownSelector:false,
+
                         onStartDrag:function(){
 
                             This._handleIframeMask(true);
@@ -1420,6 +1428,10 @@
                     this.resizableDefault = {
 
                         bClone:false,
+
+                        cancel:'[ role = "button" ]',
+
+                        mouseDownSelector:false,
 
                         onStartResize:function(){
 
@@ -1676,17 +1688,19 @@
 
         _createOverlay:function(){
 
-            if( this.options.modal && !this.$modal ){
+            var op = this.options, This;
 
-                var This = this;
+            if( op.modal && !this.$modal ){
 
-                this.$modal = this.options.makeModel.call( null, this.$target[0] );
+                This = this;
+
+                this.$modal = op.makeModel.call( null, this.$target[0] );
 
                 this.modalState = 'close';
 
-                !!this.options.quickClose && this._on( this.$modal, 'click', function(){
+                !!op.quickClose && this._on( this.$modal, 'click', function(){
 
-                    This.modalState === 'open' && This._dialogState === 'open' && ( This.options.quickCloseCallBack.call( This, this ), This.clickCallBackName = 'quickCloseCallBack', This.modalDialogHide() );
+                    This.modalState === 'open' && This._dialogState === 'open' && ( op.quickCloseCallBack.call( This, this ), This.clickCallBackName = 'quickCloseCallBack', This.modalDialogHide() );
 
                 } );
 
@@ -1696,11 +1710,13 @@
 
         _destroyOverlay:function(){
 
-            if( this.$modal ){
+            var $modal;
 
-                this.$modal.remove();
+            if( $modal = this.$modal ){
 
-                this.$modal = false;
+                $modal.remove();
+
+                $modal = false;
 
                 delete this.modalState;
 
@@ -1718,7 +1734,9 @@
 
             if( this.options.isMoveToTop === false ){ return; }
 
-            var arr = this._getElements( this.options.getScope, true ),arrLength = arr.length,
+            var arr = this._getElements( this.options.getScope, true ),
+
+            arrLength = arr.length,$target = this.$target,
 
             zIndicies = [],zIndexMax,i;
 
@@ -1732,7 +1750,7 @@
 
                 zIndexMax = Math.max.apply( null, zIndicies );
 
-                zIndexMax >= + this.$target.css( "z-index" ) && this.$target.css( "z-index", zIndexMax + 1 );
+                zIndexMax >= + $target.css( "z-index" ) && $target.css( "z-index", zIndexMax + 1 );
 
             }
 

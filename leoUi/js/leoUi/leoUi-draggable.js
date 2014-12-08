@@ -160,11 +160,15 @@
 
                 this._getContainment(true);
 
+                return;
+
             }
 
             if( key === 'droppableScope' || key === 'useLeoDroppable' ){
 
                 this.setDropsProp();
+
+                return;
 
             }
 
@@ -173,6 +177,8 @@
                 this._super( key, value );
 
                 this._getContainment(true);
+
+                return;
 
             }
 

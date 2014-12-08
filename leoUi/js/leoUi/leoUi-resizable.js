@@ -1008,17 +1008,23 @@
 
                 this._handleInit();
 
+                return;
+
             }
 
             if( key === 'containment'){
 
                 this._getContainment(true);
 
+                return;
+
             }
 
             if( key === 'maxWidth' || key === 'maxHeight' || key === 'minWidth' || key === 'minHeight'){
 
                 this._dragArea();
+
+                return;
 
             }
 
@@ -1029,6 +1035,8 @@
                 this._super( key, value );
 
                 this._getContainment(true);
+
+                return;
 
             }
 

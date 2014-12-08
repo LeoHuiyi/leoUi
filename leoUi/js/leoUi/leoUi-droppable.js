@@ -211,11 +211,15 @@
 
                 this.scope = value;
 
+                return;
+
             }
 
             if( key === 'accept') {
 
                 this._setAccepted();
+
+                return;
 
             }
 

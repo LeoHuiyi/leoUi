@@ -1,6 +1,6 @@
 leoUiLoad.config({
 
-    debug: true,
+    debug: false,
 
     baseUrl: 'leoUi/',
 
@@ -48,7 +48,9 @@ leoUiLoad.require('leoUi-dialog,leoCss,ready', function($) {
 
         },
 
-        quickClose: false,
+        quickClose: true,
+
+        isMoveToTop:true,
 
         draggableOption: {
 
@@ -57,6 +59,8 @@ leoUiLoad.require('leoUi-dialog,leoCss,ready', function($) {
             stopMouseWheel: false
 
         },
+
+        // disabled:true,
 
         initDraggable: true,
 
@@ -80,9 +84,13 @@ leoUiLoad.require('leoUi-dialog,leoCss,ready', function($) {
             refresh: true
         },
 
+        isMoveToTop:true,
+
         width: 600,
 
         height: 300,
+
+        // disabled:true,
 
         showAnimation: function(callBack) {
 
@@ -141,7 +149,7 @@ leoUiLoad.require('leoUi-dialog,leoCss,ready', function($) {
 
                 toggle: false,
 
-                minimize: false,
+                minimize: true,
 
                 maximize: false,
 
@@ -177,17 +185,26 @@ leoUiLoad.require('leoUi-dialog,leoCss,ready', function($) {
 
         a.option('cancelCallBack', function(event, disabled, enable) {
 
-            a.destroy();
-
-            a = null;
+            // a.option('disable', true);
 
         })
     })
 
+    var flag = false;
+
     $('#botton_2').on('click', function() {
 
-
         b.dialogShow();
+
+        b.option('disabled', flag);
+
+        // a.destroy();
+
+        // b.destroy();
+
+        // b.option({width:200,height:500,contentHtml:'<div>'})
+
+        flag = !flag;
 
 
     })

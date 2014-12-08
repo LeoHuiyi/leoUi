@@ -49,7 +49,7 @@
 
             dialogHtml: '<div class="leoDialog">'
             +               '<div class="leoDialog_titlebar leoUi_clearfix">'
-            +                   '<span class="leoDialog_title">标 题</span>'
+            +                   '<span class="leoDialog_title"></span>'
             +               '</div>'
             +               '<div class="leoDialog_content">'
             +               '</div>'
@@ -70,9 +70,11 @@
 
             modal:true,
 
+            title:'标 题',
+
             quickClose: false,// 是否支持快捷关闭（点击遮罩层自动关闭）
 
-            disable:false,
+            disabled:false,
 
             titlebarDblclickMax:true,//双击标题栏最大化
 
@@ -166,8 +168,6 @@
 
             },
 
-            fixIframeMask:false,
-
             initResizable:true,
 
             resizableOption:{
@@ -204,7 +204,7 @@
 
             },
 
-            modalShowAnimation: function(callback)  {
+            modalShowAnimation: function(callBack)  {
 
                 this.css({
                     "display": 'block',
@@ -212,11 +212,15 @@
                     "opacity": 0
                 }).animate({
                     "opacity": 0.8
-                }, 500, callback);
+                }, 500, callBack);
+
+                // this.css("opacity", 0.8).show();
+
+                // callBack();
 
             },
 
-            modalHideAnimation: function(callback) {
+            modalHideAnimation: function(callBack) {
 
                 this.css({
                     "display": 'block',
@@ -224,7 +228,11 @@
                     "opacity": 0.8
                 }).animate({
                     "opacity": 0
-                }, 500, callback);
+                }, 500, callBack);
+
+                // this.hide();
+
+                // callBack();
 
             },
 
@@ -232,11 +240,20 @@
 
                 this.show( { effect: "clip", duration: "slow", complete: callBack } );
 
+                // this.show();
+
+                // callBack();
+
+
             },
 
             hideAnimation: function(callBack) {
 
                 this.hide( { effect: "explode", duration: "slow", complete: callBack } );
+
+                // this.hide();
+
+                // callBack();
 
             },
 
@@ -316,7 +333,9 @@
 
             this._createDialog();
 
-            this._setInnerIframe();
+            this._setContent();
+
+            this.setDialogTitle();
 
             this._createCaptionButtons();
 
@@ -337,6 +356,8 @@
             this._makeDraggable(true);
 
             this._makeResizable(true);
+
+            this._handleDisabledOption();
 
             op.initCallBack.call( this.$target );
 
@@ -372,7 +393,7 @@
 
                         This._leoDialogRestor();
 
-                    }else{
+                    }else if( !This.isMinimize ){
 
                         This.hasResizable && This.$target[This.dependsFnName.resizable]( 'trigger', This.$target, 'mouseleave' );
 
@@ -394,13 +415,13 @@
 
         _createOkButton:function(){
 
-            var okHandle = this.options.okHandle,This = this;
+            var okHandle = this.options.okHandle,This = this,$ok;
 
             if( okHandle === false ){return;}
 
             if( !this.$ok ){
 
-                this.$ok = {
+                $ok = this.$ok = {
 
                     element:this.$target.find( okHandle ),
 
@@ -410,13 +431,15 @@
 
             }else{
 
-                this.$ok.element = this.$target.find( okHandle );
+                $ok = this.$ok;
+
+                $ok.element = this.$target.find( okHandle );
 
             }
 
-            if( this.$ok.element && this.$ok.eventBind === false ){
+            if( $ok.element && $ok.eventBind === false ){
 
-                this._on( this.$ok.element, 'click.ok', function(event){
+                this._on( $ok.element, 'click.ok', function(event){
 
                     This.options.okCallBack.call( this, event, This._bottunDisable( $(this) ) ,This._bottunEnable( $(this) ) );
 
@@ -424,7 +447,7 @@
 
                 }, 'supportDisabled' );
 
-                this.$ok.eventBind = true;
+                $ok.eventBind = true;
 
             }
 
@@ -432,11 +455,11 @@
 
         _destroyOkButton:function(){
 
-            if( this.$ok.element && this.$ok.eventBind === true ){
+            var $ok = this.$ok;
 
-                this._off( this.$ok.element, 'click.ok' );
+            if( $ok.element && $ok.eventBind === true ){
 
-                this.$ok.eventBind = false;
+                this._off( $ok.element, 'click.ok' );
 
                 delete this.$ok;
 
@@ -446,13 +469,13 @@
 
         _createCancelButton:function(){
 
-            var cancelHandle = this.options.cancelHandle,This = this;
+            var cancelHandle = this.options.cancelHandle,This = this,$cancel;
 
             if( cancelHandle === false ){return;}
 
             if( !this.$cancel ){
 
-                this.$cancel = {
+                $cancel = this.$cancel = {
 
                     element:this.$target.find( cancelHandle ),
 
@@ -462,13 +485,15 @@
 
             }else{
 
-                this.$cancel.element = this.$target.find( cancelHandle );
+                $cancel = this.$cancel;
+
+                $cancel.element = this.$target.find( cancelHandle );
 
             }
 
-            if( this.$cancel.element && this.$cancel.eventBind === false ){
+            if( $cancel.element && $cancel.eventBind === false ){
 
-                this._on( this.$cancel.element, 'click.cancel', function(event){
+                this._on( $cancel.element, 'click.cancel', function(event){
 
                     This.options.cancelCallBack.call( this, event, This._bottunDisable( $(this) ) ,This._bottunEnable( $(this) ) );
 
@@ -476,9 +501,7 @@
 
                 }, 'supportDisabled' );
 
-                this.$cancel.eventBind = true;
-
-                this.$cancel.element = null;
+                $cancel.eventBind = true;
 
             }
 
@@ -486,7 +509,9 @@
 
         _destroyCancelButton:function(){
 
-            if( this.$cancel.element && this.$cancel.eventBind === true ){
+            var $cancel = this.$cancel;
+
+            if( $cancel.element && $cancel.eventBind === true ){
 
                 this._off( this.$cancel.element, 'click.cancel' );
 
@@ -496,15 +521,21 @@
 
         },
 
+        setDialogTitle:function(text){
+
+            this.$target.find('.leoDialog_title').text(text || this.options.title || '');
+
+        },
+
         _createCaptionButtons:function(){
 
-            var o = this.options,i,buttonArrLength,buttonArr = [],
+            var op = this.options,i,buttonArrLength,buttonArr = [],
 
             buttons = {
 
                 pin: {
 
-                    visible: !!o.captionButtons.pin,
+                    visible: !!op.captionButtons.pin,
 
                     click: '_leoDialogPin',
 
@@ -518,7 +549,7 @@
 
                 refresh: {
 
-                    visible: !!o.captionButtons.refresh,
+                    visible: !!op.captionButtons.refresh,
 
                     click: '_leoDialogRefresh',
 
@@ -530,7 +561,7 @@
 
                 toggle: {
 
-                    visible: !!o.captionButtons.toggle,
+                    visible: !!op.captionButtons.toggle,
 
                     click: '_leoDialogToggle',
 
@@ -544,7 +575,7 @@
 
                 minimize: {
 
-                    visible: !!o.captionButtons.minimize,
+                    visible: !!op.captionButtons.minimize,
 
                     click: '_leoDialogMinimize',
 
@@ -556,7 +587,7 @@
 
                 maximize: {
 
-                    visible: !!o.captionButtons.maximize,
+                    visible: !!op.captionButtons.maximize,
 
                     click: '_leoDialogMaximize',
 
@@ -568,7 +599,7 @@
 
                 close: {
 
-                    visible: !!o.captionButtons.close,
+                    visible: !!op.captionButtons.close,
 
                     click: 'modalDialogHide',
 
@@ -594,7 +625,7 @@
 
             },
 
-            uiDialogTitlebar = this.$uiDialogTitlebar = this.$target.find('div.leoDialog_titlebar');
+            uiDialogTitlebar = this.$uiDialogTitlebar = this.$target.find('.leoDialog_titlebar');
 
             !this.buttons && ( this.buttons = {} );
 
@@ -624,9 +655,9 @@
 
             createNotAppendToHeader = false,
 
-            buttonCss = 'leoDialog_' + name,
+            buttonCss = 'leoDialog_' + name,time,
 
-            buttons = this.buttons,
+            buttons = this.buttons,$window = this.window,
 
             This = this,deleteNotAppendToHeader = false,
 
@@ -668,9 +699,7 @@
 
                     if( name === 'maximize' ){
 
-                        var time = null;
-
-                        this._on( this.window, 'resize.maximize', function(){
+                        this._on( $window, 'resize.maximize', function(){
 
                             !!time && clearTimeout(time);
 
@@ -680,11 +709,11 @@
 
                                     This._getBorderWidths();
 
-                                    var window = This.window,height,
+                                    var height,
 
-                                    width = window.width() - This.borderWidths.left - This.borderWidths.right;
+                                    width = $window.width() - This.borderWidths.left - This.borderWidths.right;
 
-                                    !!This.contentHide ? height = 'auto' : height = window.height() - This.borderWidths.top - This.borderWidths.bottom;
+                                    !!This.contentHide ? height = 'auto' : height = $window.height() - This.borderWidths.top - This.borderWidths.bottom;
 
                                     This._setSizes( { width: width, height : height, cssPosition: 'fixed', top: 0, left: 0 } );
 
@@ -726,7 +755,7 @@
 
                 button.remove();
 
-                name === 'maximize' && this._off( this.window, 'resize.maximize' );
+                name === 'maximize' && this._off( $window, 'resize.maximize' );
 
                 delete buttons[name];
 
@@ -746,25 +775,45 @@
 
         },
 
-        _handleDisabledOption:function( disabled ){
+        _handleDisabledOption:function(){
 
-            if ( disabled ){
+            if ( this.options.disabled ){
 
                 if ( !this.disabledDiv ){
 
-                    this.disabledDiv = $('<div style = " width: 100%; height: 100%; position: absolute;top: 0; left: 0; z-index: 1 " ></div>')
+                    this.disabledDiv = $('<div style = " width: 100%; height: 100%; position: absolute;top: 0; left: 0; z-index: 1; opacity:0; " ></div>');
 
                 }
 
-                this.disabledDiv.show().prependTo( this.$target );
+                this.disabledDiv.prependTo( this.$target );
 
-                this._setResizableDisabled(true);
+                this.hasResizable && this.$target[this.dependsFnName.resizable]( 'option','disabled', true );
+
+                if(this.innerIframe && this.isMinimize){
+
+                    if ( !this.disabledMinDiv){
+
+                        this.disabledMinDiv = $('<div style = " width: 100%; height: 100%; position: absolute;top: 0; left: 0; z-index: 1; opacity:0; " ></div>');
+
+                    }
+
+                    this.$minimizeBar.append(this.disabledDiv);
+
+                }
 
             }else if( this.disabledDiv ){
 
                 this.disabledDiv.detach();
 
                 this._setResizableDisabled(false);
+
+                if(this.disabledMinDiv && this.innerIframe && this.isMinimize){
+
+                    this.disabledMinDiv.remove();
+
+                    delete this.disabledMinDiv;
+
+                }
 
             }
 
@@ -774,6 +823,8 @@
 
             if( this.disabledDiv ){
 
+                this._setResizableDisabled(false);
+
                 this.disabledDiv.remove();
 
                 this.disabledDiv = null;
@@ -782,50 +833,19 @@
 
         },
 
-        _handleIframeMask: function(flag) {
+        _handleIframeMask:function(flag) {
 
             if( !this.innerIframe ){return;}
 
             if ( flag === true ) {
 
-                !this.mask && ( this.mask = $('<div style = " width: 100%; height: 100%; position: absolute;top: 0; left: 0; z-index: 1 " ></div>') );
+                !this.mask && ( this.mask = $('<div style = " width: 100%; height: 100%; position: absolute;top: 0; left: 0; z-index: 1;  opacity:0; " ></div>') );
 
                 this.mask.show().prependTo( this.$content );
 
             }else if( flag === false ){
 
                 !!this.mask && this.mask.detach();
-
-            }
-
-        },
-
-        _setInnerIframe:function(){
-
-            if( this.options.fixIframeMask ){
-
-                var $content = this.$content,$iframe = $content.find('iframe'),
-
-                iframeLoadCallBack = this.options.iframeLoadCallBack;
-
-                if( $iframe[0] ){
-
-                    this.innerIframe = $iframe[0];
-
-                    this._on( $iframe, 'load', function(event){
-
-                        !!iframeLoadCallBack && iframeLoadCallBack.call( $content, event );
-
-                    } );
-
-                }else{
-
-                    this.innerIframe = false;
-                }
-
-            }else{
-
-                this.innerIframe = false;
 
             }
 
@@ -852,6 +872,8 @@
                 (/msie/.test(navigator.userAgent.toLowerCase())) && CollectGarbage();
 
                 $iframe.remove();
+
+                delete this.innerIframe;
 
             }
 
@@ -883,11 +905,13 @@
 
         _leoDialogMinimize:function(){
 
-            !this.$minimizeBar && ( this.$minimizeBar = $('<div style="position:fixed;bottom:0;left:0;padding:0;margin:0">') );
+            var buttons = this.buttons;
+
+            !this.$minimizeBar && ( this.$minimizeBar = $('<div style="position:fixed;bottom:0;left:0;padding:0;margin:0;">') );
 
             if( this.isMaximize ){
 
-                !!this.buttons.maximize && $( this.buttons.maximize.element ).show();
+                !!buttons.maximize && $( buttons.maximize.element ).show();
 
                 this.isMaximize = false;
 
@@ -903,7 +927,7 @@
 
             this.isMinimize = true;
 
-            this._leoDialogRestoreAdd( $( this.buttons.minimize.element ) );
+            this._leoDialogRestoreAdd( $( buttons.minimize.element ) );
 
             this._wrapMinimize();
 
@@ -911,9 +935,9 @@
 
         _wrapMinimize:function(){
 
-            this.$target.find('.leoDialog_titlebar_button_float').css( 'float', 'left' ).end().find('.leoDialog_titlebar_button_hide').hide();
-
             var zIndex;
+
+            this.$target.find('.leoDialog_titlebar_button_float').css( 'float', 'left' ).end().find('.leoDialog_titlebar_button_hide').hide();
 
             !this.$modal ? zIndex = this.options.zIndex : zIndex = this.$modal.css('zIndex') + 1;
 
@@ -921,13 +945,17 @@
 
                 this.$target.hide();
 
-                this.$minimizeBar.css( 'zIndex', zIndex ).append( this.$uiDialogTitlebar.clone( true ) ).appendTo('body');
+                this.$minimizeBar.css( 'zIndex', zIndex ).append( this.$uiDialogTitlebar.clone( true ).css('cursor', 'default') ).appendTo('body');
 
             }else{
 
                 this.$content.hide();
 
-                this.$target.css( { width: 'auto', height: 'auto', position: 'static', float: 'left'} ).wrap( this.$minimizeBar.css( 'zIndex', zIndex ) );
+                this.uiDialogTitlebarCursor = this.$uiDialogTitlebar.css('cursor');
+
+                this.$uiDialogTitlebar.css('cursor', 'default');
+
+                this.$target.css( { width: 'auto', height: 'auto', position: 'static', float: 'left' } ).wrap( this.$minimizeBar.css( 'zIndex', zIndex ) );
 
             }
 
@@ -943,9 +971,17 @@
 
                 this.$minimizeBar.empty();
 
+                if(this.disabledMinDiv){
+
+                    delete this.disabledMinDiv;
+
+                }
+
             }else{
 
                 !this.contentHide && this.$content.show();
+
+                this.$uiDialogTitlebar.css('cursor', this.uiDialogTitlebarCursor);
 
                 this.$target.unwrap();
 
@@ -975,11 +1011,11 @@
 
             this._getBorderWidths();
 
-            var window = this.window,height,
+            var $window = this.window,height,
 
-            width = window.width() - this.borderWidths.left - this.borderWidths.right;
+            width = $window.width() - this.borderWidths.left - this.borderWidths.right;
 
-            !!this.contentHide ? height = 'auto' : height = window.height() - this.borderWidths.top - this.borderWidths.bottom;
+            !!this.contentHide ? height = 'auto' : height = $window.height() - this.borderWidths.top - this.borderWidths.bottom;
 
             this._setSizes( { width: width, height : height, cssPosition: 'fixed', top: 0, left: 0 } );
 
@@ -993,7 +1029,7 @@
 
             var $span = $( this.buttons.toggle.element ).find('.leoDialog_titlebar_button_span'),
 
-            classOff = this.buttons.toggle.iconClassOff ,
+            classOff = this.buttons.toggle.iconClassOff,
 
             isOff = $span.hasClass(classOff);
 
@@ -1065,15 +1101,17 @@
 
         _getBorderWidths:function() {
 
+            var parseCss = $.leoTools.parseCss,target = this.$target[0];
+
             this.borderWidths = {
 
-                left: $.leoTools.parseCss(  this.$target[0] ,'borderLeftWidth' ),
+                left: parseCss( target, 'borderLeftWidth' ),
 
-                top: $.leoTools.parseCss(  this.$target[0] ,'borderTopWidth' ),
+                top: parseCss( target, 'borderTopWidth' ),
 
-                right: $.leoTools.parseCss(  this.$target[0] ,'borderRightWidth' ),
+                right: parseCss( target, 'borderRightWidth' ),
 
-                bottom: $.leoTools.parseCss(  this.$target[0] ,'borderBottomWidth' )
+                bottom: parseCss( target, 'borderBottomWidth' )
 
             };
 
@@ -1081,13 +1119,15 @@
 
         _saveOldSize:function(key){
 
-            var offset = this.$target.offset();
+            var $target = this.$target,
+
+            offset = $target.offset();
 
             if( key === 'offset' ){
 
                 this.oldSize.offset = { top:offset.top, left:offset.left };
 
-                this.oldSize.postion = this.$target.css('position');
+                this.oldSize.postion = $target.css('position');
 
                 return;
 
@@ -1095,13 +1135,13 @@
 
             this.oldSize = {
 
-                width:this.$target.width(),
+                width: $target.width(),
 
-                height:this.$target.height(),
+                height: $target.height(),
 
-                cssPosition:this.$target.css('position'),
+                cssPosition: $target.css('position'),
 
-                offset:{ top:offset.top, left:offset.left }
+                offset:{ top: offset.top, left: offset.left }
 
             }
 
@@ -1117,7 +1157,9 @@
 
         _leoDialogRestor:function(){
 
-            var size = $.extend( {}, this.oldSize );
+            var size = $.extend( {}, this.oldSize ),
+
+            buttons = this.buttons;
 
             if( this.isMinimize ){
 
@@ -1129,7 +1171,7 @@
 
             if( this.isMaximize ){
 
-                !!this.buttons.maximize && $( this.buttons.maximize.element ).show();
+                !!buttons.maximize && $( buttons.maximize.element ).show();
 
                 this.isMaximize = false;
 
@@ -1153,7 +1195,7 @@
 
             this.options.resize.call(this.$target[0]);
 
-            $( this.buttons.restore.element ).detach();
+            $( buttons.restore.element ).detach();
 
         },
 
@@ -1183,13 +1225,39 @@
 
         _createDialog:function(){
 
-            this.$content = this.$target.hide().css( 'z-index', this.options.zIndex ).find( '.leoDialog_content' ).append( this.options.contentHtml );
+            this.$content = this.$target.hide().attr('tabIndex', -1).css( 'z-index', this.options.zIndex ).find( '.leoDialog_content' );
+
+        },
+
+        _setContent:function(){
+
+            if(!this.$content){return;}
+
+            this._destoryIframe();
+
+            var $content = this.$content.append(this.options.contentHtml),
+
+            $iframe = $content.find('iframe'),
+
+            iframeLoadCallBack = this.options.iframeLoadCallBack;
+
+            if( $iframe[0] ){
+
+                this._on( $iframe, 'load', function(event){
+
+                    !!iframeLoadCallBack && iframeLoadCallBack.call( $content, event );
+
+                } );
+
+                this.innerIframe = $iframe[0];
+
+            }
 
         },
 
         _appentTo:function(){
 
-            this.$target.appendTo(  this.options.appendTo );
+            this.$target.appendTo( this.options.appendTo );
 
         },
 
@@ -1201,9 +1269,9 @@
 
                 width = op.width,height = op.height,
 
-                $target = this.$target,$content = this.$content;
+                $target = this.$target,
 
-                $content.css( 'width', 'auto' );
+                $content = this.$content.css( 'width', 'auto' );
 
                 $target.css({  height: 'auto', width: width, top: -1999, left: -1999 }).show();
 
@@ -1239,7 +1307,7 @@
 
         _setSize:function( key, value ){
 
-            var $target = this.$target,This = this,$content = this.$content,
+            var $target = this.$target,$content = this.$content,
 
             isVisible = $target.is( ":visible" );
 
@@ -1357,7 +1425,7 @@
 
                 if( init === true && this.hasDraggable === false ){
 
-                    var This = this;
+                    This = this;
 
                     this.draggableDefault = {
 
@@ -1394,6 +1462,8 @@
             }else if( !op.initDraggable && init === false && this.hasDraggable === true ){
 
                 $target[dependsFnName.draggable]('destroy');
+
+                this.hasResizable && $target[dependsFnName.resizable].setCursorChange(true);
 
                 this.hasDraggable = false;
 
@@ -1503,7 +1573,7 @@
 
         _setResizableDisabled:function(flag){
 
-            this.hasResizable && !this.isMinimize && !this.isMaximize && !this.contentHide && this.$target[this.dependsFnName.resizable]( 'option','disabled', flag );
+            this.hasResizable && !this.options.disabled && !this.isMinimize && !this.isMaximize && !this.contentHide && this.$target[this.dependsFnName.resizable]( 'option','disabled', flag );
 
         },
 
@@ -1525,9 +1595,17 @@
 
             }
 
-            if( key === 'disable' ){
+            if( key === 'title' ){
 
-               this._handleDisabledOption(value);
+                this.setDialogTitle();
+
+                return;
+
+            }
+
+            if( key === 'disabled' ){
+
+               this._handleDisabledOption();
 
                return;
 
@@ -1551,9 +1629,9 @@
 
             }
 
-            if( key === 'fixIframeMask' ){
+            if( key === 'contentHtml') {
 
-                this._setInnerIframe();
+                this._setContent();
 
                 return;
 
@@ -1620,14 +1698,6 @@
             if( key === 'zIndex') {
 
                 this._setZindex();
-
-                return;
-
-            }
-
-            if( key === 'contentHtml') {
-
-                this._setContent();
 
                 return;
 
@@ -1730,7 +1800,7 @@
 
         _moveToTop:function() {
 
-            if( this.options.isMoveToTop === false ){ return; }
+            if( this.options.isMoveToTop === false || this.options.disabled ){ return; }
 
             var arr = this._getElements( this.options.getScope, true ),
 
@@ -1842,7 +1912,9 @@
 
                     function(){
 
-                        This._dialogState = 'open'
+                        This._dialogState = 'open';
+
+                        This._foucsDialog();
 
                         !!callback && callback.call(This);
 
@@ -1928,6 +2000,26 @@
 
         },
 
+        _foucsDialog:function(){
+
+            this.oldFoucs = $( this.document[ 0 ].activeElement );
+
+            this.$target.focus();
+
+        },
+
+        _blurDialog:function(){
+
+            if(this.oldFoucs){
+
+                this.oldFoucs.focus();
+
+                delete this.oldFoucs;
+
+            }
+
+        },
+
         _dialogHide:function(callback){
 
             this._delay( function(){
@@ -1951,6 +2043,8 @@
                     function(){
 
                         This._dialogState = 'close';
+
+                        This._blurDialog();
 
                         !!callback && callback.call(This);
 
@@ -1985,6 +2079,8 @@
         },
 
         _destroy:function(){
+
+            this._blurDialog();
 
             this.hasDraggable && this.$target[this.dependsFnName.draggable]('destroy');
 
@@ -2048,17 +2144,25 @@
 
                 }
 
-                var elements = _elements[scope] ,length = elements.length,element = this.$target[0];
+                var elements = _elements[scope] ,i = elements.length,
 
-                for (var i = 0; i < length; i++) {
+                element = this.$target[0];
+
+                while(i--){
 
                     if(elements[i] === element){
 
-                        elements.splice(i,1);
+                        elements.splice( i, 1 );
 
                     }
 
-                };
+                }
+
+                if(elements.length === 0){
+
+                    delete _elements[scope];
+
+                }
 
             }
 

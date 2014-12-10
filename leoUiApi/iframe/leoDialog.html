@@ -164,23 +164,153 @@
 
         }],optionsData = [{
 
-            'name': 'accept',
+            'name': 'dialogHtml',
 
-            'default': '*',
-
-            'type': 'selector or function',
-
-            'explain': '控制可拖动的元素被拖放接受。支持多种类型：Selector: Function: 函数将被调用页面上的每一个可拖动的（传递给函数的第一个参数）。该函数必须返回true，如果可拖动应该接受。'
-
-        }, {
-
-            'name': 'tolerance',
-
-            'default': 'intersect',
+            'default': '<div class="leoDialog"><div class="leoDialog_titlebar leoUi_clearfix"><span class="leoDialog_title"></span></div><div class="leoDialog_content"></div></div>',
 
             'type': 'string',
 
-            'explain': '指定使用那种模式来测试一个拖动(draggable)元素"经过"一个放置（droppable）对象。 允许使用的值:"fit": 拖动(draggable)元素 完全重叠到放置（droppable）对象。"intersect": 拖动(draggable)元素 和放置（droppable）对象至少重叠50%。"pointer": 鼠标重叠到放置（droppable）对象上。"touch": 拖动(draggable)元素 和放置（droppable）对象的任意重叠'
+            'explain': 'dialog的基础html标签，其中leoDialog_titlebar为标题栏className，leoDialog_title为标题className，leoDialog_content为内容contentHtml的className，这几个className是必须的。'
+
+        }, {
+
+            'name': 'contentHtml',
+
+            'default': '<div id="delete_image"><div class="send_content clearfix"><div class="text"><span class="icon"></span><span class="title">标题内容</span></div><div class="send_bottom clearfix"><input class="send_submit" type="submit" value="确定" name="submit" /><input class="send_off" type="submit" value="取消" name="submit" /></div></div></div>',
+
+            'type': 'string',
+
+            'explain': 'leoDialog_content中的html标签'
+
+        }, {
+
+            'name': 'modal',
+
+            'default': 'true',
+
+            'type': 'boolean',
+
+            'explain': '是否使用遮罩层'
+
+        }, {
+
+            'name': 'title',
+
+            'default': '标 题',
+
+            'type': 'string',
+
+            'explain': 'dialog标题的内容'
+
+        }, {
+
+            'name': 'quickClose',
+
+            'default': 'false',
+
+            'type': 'boolean',
+
+            'explain': '是否支持快捷关闭（点击遮罩层自动关闭）'
+
+        }, {
+
+            'name': 'titlebarDblclickMax',
+
+            'default': 'false',
+
+            'type': 'boolean',
+
+            'explain': '是否支持双击标题栏最大化'
+
+        }, {
+
+            'name': 'appendTo',
+
+            'default': 'body',
+
+            'type': 'selector',
+
+            'explain': 'dialog应该被appendTo到哪个元素'
+
+        }, {
+
+            'name': 'modalShowDelay',
+
+            'default': '0',
+
+            'type': 'number',
+
+            'explain': '打开遮罩层延迟的时间'
+
+        }, {
+
+            'name': 'modalHideDelay',
+
+            'default': '0',
+
+            'type': 'number',
+
+            'explain': '关闭遮罩层延迟的时间'
+
+        }, {
+
+            'name': 'showDelay',
+
+            'default': '0',
+
+            'type': 'number',
+
+            'explain': '打开dialog延迟的时间'
+
+        }, {
+
+            'name': 'hideDelay',
+
+            'default': '0',
+
+            'type': 'number',
+
+            'explain': '关闭dialog延迟的时间'
+
+        }, {
+
+            'name': 'width',
+
+            'default': 'false',
+
+            'type': 'number or string',
+
+            'explain': '设置dialog的宽度（数值或者auto）'
+
+        }, {
+
+            'name': 'height',
+
+            'default': 'false',
+
+            'type': 'number or string',
+
+            'explain': '设置dialog的高度（数值或者auto）'
+
+        }, {
+
+            'name': 'zIndex',
+
+            'default': '1000',
+
+            'type': 'string',
+
+            'explain': '设置dialog的z-index'
+
+        }, {
+
+            'name': 'isMoveToTop',
+
+            'default': 'false',
+
+            'type': 'boolean',
+
+            'explain': '保持当前的的dialog在最上面，一个页面2个以上dialog建议开启'
 
         }, {
 
@@ -190,47 +320,87 @@
 
             'type': 'string',
 
-            'explain': '用来设置拖动（leoDraggle）元素和放置（leoDroppable）对象的集合, leoDroppable中的accept属性必须和leoDroppable中的droppableScope属性一直才能被允许碰撞检测'
+            'explain': '用来设置MoveToTop的leoDialog对象的集合'
 
         }, {
 
-            'name': 'disabled',
+            'name': 'getScope',
+
+            'default': 'all',
+
+            'type': 'string',
+
+            'explain': '用来取得MoveToTop的leoDialog对象的集合'
+
+        }, {
+
+            'name': 'okButtonClassName',
+
+            'default': '.send_submit',
+
+            'type': 'selector',
+
+            'explain': '找到okButton的className的selector'
+
+        }, {
+
+            'name': 'cancelButtonClassName',
+
+            'default': '.send_off',
+
+            'type': 'selector',
+
+            'explain': '找到cancelButton的className的selector'
+
+        }, {
+
+            'name': 'restore',
 
             'default': 'false',
 
             'type': 'boolean',
 
-            'explain': '当设置为true时停止leoDroppable'
+            'explain': '是否每次打开dialog都重新设定'
 
         }, {
 
-            'name': 'checkFirst',
+            'name': 'getScope',
 
-            'default': 'true',
+            'default': 'all',
 
-            'type': 'boolean',
+            'type': 'string',
 
-            'explain': '是否触发第一次的onDragEnter或者onDragLeave回调'
-
-        }, {
-
-            'name': 'onDragEnter',
-
-            'default': 'false',
-
-            'type': 'function',
-
-            'explain': '当可拖动元素被拖入目标容器的时候触发（ this: drop, arguments: event, proportions（drop的prop）, dragProp（drag的prop））'
+            'explain': '用来取得MoveToTop的leoDialog对象的集合'
 
         }, {
 
-            'name': 'onDragOver',
+            'name': 'getScope',
 
-            'default': 'false',
+            'default': 'all',
 
-            'type': 'function',
+            'type': 'string',
 
-            'explain': '当可拖动元素被拖至某个元素之上的时候触发（ this: drop, arguments: event, proportions（drop的prop）, dragProp（drag的prop））'
+            'explain': '用来取得MoveToTop的leoDialog对象的集合'
+
+        }, {
+
+            'name': 'getScope',
+
+            'default': 'all',
+
+            'type': 'string',
+
+            'explain': '用来取得MoveToTop的leoDialog对象的集合'
+
+        }, {
+
+            'name': 'getScope',
+
+            'default': 'all',
+
+            'type': 'string',
+
+            'explain': '用来取得MoveToTop的leoDialog对象的集合'
 
         }, {
 

@@ -35,7 +35,17 @@ leoUiLoad.require('leoUi-dialog,leoCss,ready', function($) {
         contentHtml: '<div id="delete_image">' + '<div class="send_content clearfix">' + '<div class="text">' + '<span class="icon"></span>' + '<span class="title">标题内容</span>' + '</div>' + '<div class="send_bottom clearfix">' + '<input class="send_submit" type="submit" value="改变按钮" name="submit" />' + '<input class="send_off" type="submit" value="取消" name="submit" />' + '</div>' + '</div>' + '</div>',
 
         captionButtons: {
-            refresh: false
+            pin: true,
+
+            refresh:false,
+
+            toggle: true,
+
+            minimize: true,
+
+            maximize: false,
+
+            close: true
         },
 
         height: 190,
@@ -66,7 +76,13 @@ leoUiLoad.require('leoUi-dialog,leoCss,ready', function($) {
 
         restore: false,
 
-        modal: true
+        modal: true,
+
+        dialogFocus:function($target){
+
+            $target.find('input').focus();
+
+        }
 
     });
 
@@ -77,8 +93,6 @@ leoUiLoad.require('leoUi-dialog,leoCss,ready', function($) {
         dialogHtml: '<div class="leoDialog">' + '<div class="leoDialog_titlebar leoUi_clearfix">' + '<span class="leoDialog_title">标 题</span>' + '</div>' + '<div class="leoDialog_content leoDialog_content_iframe">' + '</div>' + '</div>',
 
         contentHtml: '<iframe style="width:100%;height:100%;" frameborder="0" src="http://baidu.com"></iframe>',
-
-        fixIframeMask: true,
 
         captionButtons: {
             refresh: true
@@ -124,7 +138,13 @@ leoUiLoad.require('leoUi-dialog,leoCss,ready', function($) {
 
         restore: false,
 
-        modal: false
+        modal: false,
+
+        dialogFocus:function($target){
+
+            $target.find('iframe').focus();
+
+        }
 
     });
 
@@ -145,7 +165,7 @@ leoUiLoad.require('leoUi-dialog,leoCss,ready', function($) {
 
             a.option('captionButtons', {
 
-                pin: false,
+                pin: true,
 
                 toggle: false,
 
@@ -186,6 +206,7 @@ leoUiLoad.require('leoUi-dialog,leoCss,ready', function($) {
         a.option('cancelCallBack', function(event, disabled, enable) {
 
             // a.option('disable', true);
+           a.option('okButtonClassName', '.send_off');
 
         })
     })
@@ -196,7 +217,7 @@ leoUiLoad.require('leoUi-dialog,leoCss,ready', function($) {
 
         b.dialogShow();
 
-        b.option('disabled', flag);
+        // a.option('disabled', flag);
 
         // a.destroy();
 

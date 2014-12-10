@@ -466,7 +466,7 @@
 
         _getBorderWidths:function(no) {
 
-            var parseCss;
+            var $containment;
 
             if(no){
 
@@ -484,17 +484,17 @@
 
             }else{
 
-                parseCss = $.leoTools.parseCss;
+                $containment = this.$containment;
 
                 this.borderWidths = {
 
-                    left: parseCss( this.$containment[0] ,'borderLeftWidth' ),
+                    left: $containment.leftBorderWidth(),
 
-                    top: parseCss( this.$containment[0] ,'borderTopWidth' ),
+                    top: $containment.topBorderWidth(),
 
-                    right: parseCss( this.$containment[0] ,'borderRightWidth' ),
+                    right: $containment.rightBorderWidth(),
 
-                    bottom: parseCss( this.$containment[0] ,'borderBottomWidth' )
+                    bottom: $containment.bottomBorderWidth()
 
                 };
 

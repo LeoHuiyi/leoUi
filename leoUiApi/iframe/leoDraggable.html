@@ -86,6 +86,8 @@
 
 					            scrollSpeed: 20,//当鼠标指针的值小于scrollSensitivity的值时，窗口滚动的速度。如果scroll选项设置为false，则该参数无效
 
+                                closestScrollParent:false,//从最近的可滚动的祖先开始，在DOM 树上逐级向上的可滚动的祖先匹配，如果匹配到了break，没匹配到则默认到document，如果scroll选项设置为false，则该参数无效（document不算在内,false为不匹配）
+
 					            useLeoDroppable:false,//是否使用leoDroppable组件
 
 					            droppableScope:'all',//用来设置拖动（leoDraggable）元素和放置（leoDroppable）对象的集合,配合leoDroppable使用
@@ -395,6 +397,16 @@
             'type': 'number',
 
             'explain': '当鼠标指针的值小于scrollSensitivity的值时，窗口滚动的速度。如果scroll选项设置为false，则该参数无效'
+
+        }, {
+
+            'name': 'closestScrollParent',
+
+            'default': 'false',
+
+            'type': 'selector or jQuery object or element',
+
+            'explain': '从最近的可滚动的祖先开始，在DOM 树上逐级向上的可滚动的祖先匹配，如果匹配到了break，没匹配到则默认到document，如果scroll选项设置为false，则该参数无效（document不算在内,false为不匹配）'
 
         }, {
 

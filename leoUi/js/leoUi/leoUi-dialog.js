@@ -100,15 +100,11 @@
 
             getScope:'all',//用来取得leoDialog对象的集合
 
-            okHandle:'.send_submit',
+            okButtonClassName:'.send_submit',
 
-            cancelHandle:'.send_off',
+            cancelButtonClassName:'.send_off',
 
             restore:false,//是否每次都回到初始值
-
-            okCallBack:$.noop,
-
-            cancelCallBack:$.noop,
 
             captionButtons:{
 
@@ -180,7 +176,7 @@
 
                 containment:'document',
 
-                minWidth:210,
+                minWidth:220,
 
                 minHeight:190,
 
@@ -193,6 +189,26 @@
                 stopMouseWheel:false
 
             },
+
+            initCallBack:$.noop,
+
+            beforeShow:$.noop,
+
+            okCallBack:$.noop,
+
+            cancelCallBack:$.noop,
+
+            closeCallBack:$.noop,
+
+            quickCloseCallBack:$.noop,
+
+            iframeLoadCallBack:$.noop,
+
+            resize:$.noop,
+
+            dialogFocus:$.noop,
+
+            dialogBlur:$.noop,
 
             makeModel:function(target){
 
@@ -269,18 +285,6 @@
 
             },
 
-            initCallBack: $.noop,
-
-            beforeShow:$.noop,
-
-            closeCallBack:$.noop,
-
-            quickCloseCallBack:$.noop,
-
-            iframeLoadCallBack:$.noop,
-
-            resize: $.noop,
-
             dialogShowCallBack: function(clickCallBackName){
 
                 // this.dialogHide();
@@ -304,16 +308,6 @@
         _init:function(){
 
             var op = this.options;
-
-            this.originalSize = {
-
-                width:op.width,
-
-                height:op.height,
-
-                position:$.extend( {}, op.position )
-
-            }
 
             this._dialogState = 'close';
 
@@ -415,31 +409,27 @@
 
         _createOkButton:function(){
 
-            var okHandle = this.options.okHandle,This = this,$ok;
+            var okButtonClassName = this.options.okButtonClassName,
 
-            if( okHandle === false ){return;}
+            This = this,$ok,element;
+
+            if( okButtonClassName === false || !(element = this.$target.find( okButtonClassName )[0])){return;}
 
             if( !this.$ok ){
 
                 $ok = this.$ok = {
 
-                    element:this.$target.find( okHandle ),
+                    element:element,
 
                     eventBind:false
 
                 };
 
-            }else{
-
-                $ok = this.$ok;
-
-                $ok.element = this.$target.find( okHandle );
-
             }
 
-            if( $ok.element && $ok.eventBind === false ){
+            if( $ok.eventBind === false ){
 
-                this._on( $ok.element, 'click.ok', function(event){
+                this._on( element, 'click.ok', function(event){
 
                     This.options.okCallBack.call( this, event, This._bottunDisable( $(this) ) ,This._bottunEnable( $(this) ) );
 
@@ -457,7 +447,7 @@
 
             var $ok = this.$ok;
 
-            if( $ok.element && $ok.eventBind === true ){
+            if( $ok && $ok.element && $ok.eventBind === true ){
 
                 this._off( $ok.element, 'click.ok' );
 
@@ -469,31 +459,27 @@
 
         _createCancelButton:function(){
 
-            var cancelHandle = this.options.cancelHandle,This = this,$cancel;
+            var cancelButtonClassName = this.options.cancelButtonClassName,
 
-            if( cancelHandle === false ){return;}
+            This = this,$cancel,element;
+
+            if( cancelButtonClassName === false || !(element = this.$target.find( cancelButtonClassName )[0])){return;}
 
             if( !this.$cancel ){
 
                 $cancel = this.$cancel = {
 
-                    element:this.$target.find( cancelHandle ),
+                    element:element,
 
                     eventBind:false
 
                 };
 
-            }else{
-
-                $cancel = this.$cancel;
-
-                $cancel.element = this.$target.find( cancelHandle );
-
             }
 
-            if( $cancel.element && $cancel.eventBind === false ){
+            if( $cancel.eventBind === false ){
 
-                this._on( $cancel.element, 'click.cancel', function(event){
+                this._on( element, 'click.cancel', function(event){
 
                     This.options.cancelCallBack.call( this, event, This._bottunDisable( $(this) ) ,This._bottunEnable( $(this) ) );
 
@@ -511,7 +497,7 @@
 
             var $cancel = this.$cancel;
 
-            if( $cancel.element && $cancel.eventBind === true ){
+            if( $cancel && $cancel.element && $cancel.eventBind === true ){
 
                 this._off( this.$cancel.element, 'click.cancel' );
 
@@ -529,7 +515,13 @@
 
         _createCaptionButtons:function(){
 
-            var op = this.options,i,buttonArrLength,buttonArr = [],
+            var op = this.options,i,buttonArrLength,buttonArr = [],buttons,
+
+            $uiDialogTitlebar = this.$target.find('.leoDialog_titlebar');
+
+            if(!$uiDialogTitlebar[0]){return;}
+
+            this.$uiDialogTitlebar = $uiDialogTitlebar;
 
             buttons = {
 
@@ -591,8 +583,6 @@
 
                     click: '_leoDialogMaximize',
 
-                    floatClass:'leoDialog_titlebar_button_float',
-
                     iconClassOn: "leoDialog_maximize_span"
 
                 },
@@ -602,8 +592,6 @@
                     visible: !!op.captionButtons.close,
 
                     click: 'modalDialogHide',
-
-                    floatClass:'leoDialog_titlebar_button_float',
 
                     iconClassOn: "leoDialog_close_span"
 
@@ -617,15 +605,11 @@
 
                     click: '_leoDialogRestor',
 
-                    floatClass:'leoDialog_titlebar_button_float',
-
                     iconClassOn: "leoDialog_restore_span"
 
                 }
 
-            },
-
-            uiDialogTitlebar = this.$uiDialogTitlebar = this.$target.find('.leoDialog_titlebar');
+            };
 
             !this.buttons && ( this.buttons = {} );
 
@@ -639,7 +623,7 @@
 
             for ( i = 0, buttonArrLength = buttonArr.length; i < buttonArrLength; i++ ) {
 
-                this._createCaptionButton( buttonArr[i], uiDialogTitlebar );
+                this._createCaptionButton( buttonArr[i], $uiDialogTitlebar );
 
             }
 
@@ -647,7 +631,7 @@
 
         },
 
-        _createCaptionButton:function( buttonHash, uiDialogTitlebar ){
+        _createCaptionButton:function( buttonHash, $uiDialogTitlebar ){
 
             var buttonObject,beforeElement,length,index,
 
@@ -661,9 +645,9 @@
 
             This = this,deleteNotAppendToHeader = false,
 
-            button = uiDialogTitlebar.find( 'a.' + buttonCss ),
+            button = $uiDialogTitlebar.find( 'a.' + buttonCss ),
 
-            floatHideClass = info.floatClass || info.hideClass;
+            hideClass = info.hideClass || '';
 
             !!info.notAppendToHeader && ( !!buttons[name] ? deleteNotAppendToHeader = ( !buttons.minimize && !buttons.maximize ) : createNotAppendToHeader = ( !!buttons.minimize || !!buttons.maximize ) );
 
@@ -679,7 +663,7 @@
 
                 if ( !button[0] || createNotAppendToHeader ){
 
-                    buttonObject = $('<a href="###"></a>').append( $("<span></span>").addClass(' leoDialog_titlebar_button_span ' + info.iconClassOn ).text( buttonHash.button ) ).addClass( buttonCss + " leoDialog_titlebar_button " + floatHideClass ).attr("role", "button");
+                    buttonObject = $('<a href="###"></a>').append( $("<span></span>").addClass(' leoDialog_titlebar_button_span ' + info.iconClassOn ).text( buttonHash.button ) ).addClass( buttonCss + " leoDialog_titlebar_button " + hideClass ).attr("role", "button");
 
                     this._on( buttonObject, 'click.' + name, function(event){
 
@@ -733,7 +717,7 @@
 
                         if( length === 0 ){
 
-                            buttonObject.appendTo( uiDialogTitlebar );
+                            buttonObject.appendTo( $uiDialogTitlebar );
 
                         }else{
 
@@ -789,7 +773,7 @@
 
                 this.hasResizable && this.$target[this.dependsFnName.resizable]( 'option','disabled', true );
 
-                if(this.innerIframe && this.isMinimize){
+                if(this.isMinimize){
 
                     if ( !this.disabledMinDiv){
 
@@ -807,7 +791,7 @@
 
                 this._setResizableDisabled(false);
 
-                if(this.disabledMinDiv && this.innerIframe && this.isMinimize){
+                if(this.disabledMinDiv && this.isMinimize){
 
                     this.disabledMinDiv.remove();
 
@@ -907,7 +891,7 @@
 
             var buttons = this.buttons;
 
-            !this.$minimizeBar && ( this.$minimizeBar = $('<div style="position:fixed;bottom:0;left:0;padding:0;margin:0;">') );
+            !this.$minimizeBar && ( this.$minimizeBar = $('<div style="position:fixed;bottom:0;left:0;padding:0;margin:0;white-space:nowrap">') );
 
             if( this.isMaximize ){
 
@@ -937,53 +921,31 @@
 
             var zIndex;
 
-            this.$target.find('.leoDialog_titlebar_button_float').css( 'float', 'left' ).end().find('.leoDialog_titlebar_button_hide').hide();
+            this.$target.find('.leoDialog_titlebar_button_hide').hide();
 
-            !this.$modal ? zIndex = this.options.zIndex : zIndex = this.$modal.css('zIndex') + 1;
+            !this.$modal ? zIndex = this.options.zIndex : zIndex = + this.$modal.css('zIndex') + 1;
 
-            if( this.innerIframe ){
+            this.$target.hide();
 
-                this.$target.hide();
-
-                this.$minimizeBar.css( 'zIndex', zIndex ).append( this.$uiDialogTitlebar.clone( true ).css('cursor', 'default') ).appendTo('body');
-
-            }else{
-
-                this.$content.hide();
-
-                this.uiDialogTitlebarCursor = this.$uiDialogTitlebar.css('cursor');
-
-                this.$uiDialogTitlebar.css('cursor', 'default');
-
-                this.$target.css( { width: 'auto', height: 'auto', position: 'static', float: 'left' } ).wrap( this.$minimizeBar.css( 'zIndex', zIndex ) );
-
-            }
+            this.$minimizeBar.css( 'zIndex', zIndex ).append( this.$uiDialogTitlebar.clone( true ).css({'cursor': 'default', 'display': 'flex'}) ).appendTo('body');
 
         },
 
         _unWrapMinimize:function(){
 
-            this.$target.find('.leoDialog_titlebar_button_float').css( 'float', '' ).end().find('.leoDialog_titlebar_button_hide').show();
+            var $target = this.$target;
 
-            if( this.innerIframe ){
+            $target.find('.leoDialog_titlebar_button_hide').show();
 
-                this.$target.show();
+            this._dialogState === 'open' && $target.show();
 
-                this.$minimizeBar.empty();
+            this.$minimizeBar.remove();
 
-                if(this.disabledMinDiv){
+            delete this.$minimizeBar;
 
-                    delete this.disabledMinDiv;
+            if(this.disabledMinDiv){
 
-                }
-
-            }else{
-
-                !this.contentHide && this.$content.show();
-
-                this.$uiDialogTitlebar.css('cursor', this.uiDialogTitlebarCursor);
-
-                this.$target.unwrap();
+                delete this.disabledMinDiv;
 
             }
 
@@ -1011,13 +973,15 @@
 
             this._getBorderWidths();
 
+            this._setSize('cssPosition', 'fixed');
+
             var $window = this.window,height,
 
             width = $window.width() - this.borderWidths.left - this.borderWidths.right;
 
             !!this.contentHide ? height = 'auto' : height = $window.height() - this.borderWidths.top - this.borderWidths.bottom;
 
-            this._setSizes( { width: width, height : height, cssPosition: 'fixed', top: 0, left: 0 } );
+            this._setSizes( { width: width, height : height, top: 0, left: 0 } );
 
             this._leoDialogRestoreAdd( $( this.buttons.maximize.element ) );
 
@@ -1101,17 +1065,17 @@
 
         _getBorderWidths:function() {
 
-            var parseCss = $.leoTools.parseCss,target = this.$target[0];
+            var $target = this.$target;
 
             this.borderWidths = {
 
-                left: parseCss( target, 'borderLeftWidth' ),
+                left: $target.leftBorderWidth(),
 
-                top: parseCss( target, 'borderTopWidth' ),
+                top: $target.topBorderWidth(),
 
-                right: parseCss( target, 'borderRightWidth' ),
+                right: $target.rightBorderWidth(),
 
-                bottom: parseCss( target, 'borderBottomWidth' )
+                bottom: $target.bottomBorderWidth()
 
             };
 
@@ -1225,7 +1189,7 @@
 
         _createDialog:function(){
 
-            this.$content = this.$target.hide().attr('tabIndex', -1).css( 'z-index', this.options.zIndex ).find( '.leoDialog_content' );
+            this.$content = this.$target.hide().css( 'z-index', this.options.zIndex ).find( '.leoDialog_content' );
 
         },
 
@@ -1235,7 +1199,7 @@
 
             this._destoryIframe();
 
-            var $content = this.$content.append(this.options.contentHtml),
+            var $content = this.$content.empty().append(this.options.contentHtml),
 
             $iframe = $content.find('iframe'),
 
@@ -1269,11 +1233,9 @@
 
                 width = op.width,height = op.height,
 
-                $target = this.$target,
+                $content = this.$content.css( 'width', 'auto' ),
 
-                $content = this.$content.css( 'width', 'auto' );
-
-                $target.css({  height: 'auto', width: width, top: -1999, left: -1999 }).show();
+                $target = this.$target.css({  height: 'auto', width: width, top: -1999, left: -1999 }).show();
 
                 this.reHeight = $target.height() - $content.height();
 
@@ -1309,7 +1271,7 @@
 
             var $target = this.$target,$content = this.$content,
 
-            isVisible = $target.is( ":visible" );
+            isVisible = this._dialogState === 'open';
 
             !isVisible && $target.show();
 
@@ -1365,13 +1327,39 @@
 
         _setButton:function(){
 
-            this.$target.find( this.options.cancelHandle + ',' + this.options.okHandle ).attr( 'role','button' );
+            this.$target.find( this.options.cancelButtonClassName + ',' + this.options.okButtonClassName ).attr( 'role','button' );
 
         },
 
         _restore:function(){
 
-            this.firstTime === false && this.options.restore === true && this._setSizes( this.originalSize );
+            var op = this.options;
+
+            if(this.firstTime === false && op.restore === true){
+
+                if(this.isMaximize || this.isMinimize){
+
+                    this._leoDialogRestor();
+
+                }
+
+                if( this.contentHide === true ){
+
+                    this._leoDialogToggle();
+
+                }
+
+                this._setSizes( {
+
+                    width:op.width,
+
+                    height:op.height,
+
+                    position:op.position
+
+                } );
+
+            }
 
         },
 
@@ -1383,7 +1371,7 @@
 
                 this._setFirstGialogSize();
 
-                this._moveToTop();
+                this._moveToTop(true);
 
                 this._createOverlay();
 
@@ -1451,13 +1439,13 @@
 
                     }
 
-                    $target[dependsFnName.draggable]( $.extend( op.draggableOption, this.draggableDefault ) );
+                    $target[dependsFnName.draggable]( $.extend({}, op.draggableOption, this.draggableDefault ) );
 
                     this.hasDraggable = true;
 
                 }
 
-                $target[dependsFnName.draggable]( 'option', $.extend( op.draggableOption, this.draggableDefault ) );
+                $target[dependsFnName.draggable]( 'option', $.extend({}, op.draggableOption, this.draggableDefault ) );
 
             }else if( !op.initDraggable && init === false && this.hasDraggable === true ){
 
@@ -1551,13 +1539,13 @@
 
                     }
 
-                    $target[dependsFnName.resizable]( $.extend( op.resizableOption, this.resizableDefault ) );
+                    $target[dependsFnName.resizable]( $.extend({}, op.resizableOption, this.resizableDefault ) );
 
                     this.hasResizable = true;
 
                 }
 
-                $target[dependsFnName.resizable]( 'option', $.extend( op.resizableOption, this.resizableDefault ) );
+                $target[dependsFnName.resizable]( 'option', $.extend({}, op.resizableOption, this.resizableDefault ) );
 
             }else if( !op.initResizable && init === false && this.hasResizable === true ){
 
@@ -1637,37 +1625,21 @@
 
             }
 
-            if( key === 'okHandle' ){
+            if( key === 'okButtonClassName' ){
 
-                if( value === false ){
+                this._destroyOkButton();
 
-                    this._destroyOkButton();
-
-                }else{
-
-                    this._destroyOkButton();
-
-                    this._createOkButton();
-
-                }
+                this._createOkButton();
 
                 return;
 
             }
 
-            if( key === 'cancelHandle' ){
+            if( key === 'cancelButtonClassName' ){
 
-                if( value === false ){
+                this._destroyCancelButton();
 
-                    this._destroyCancelButton();
-
-                }else{
-
-                    this._destroyCancelButton();
-
-                    this._createCancelButton();
-
-                }
+                this._createCancelButton();
 
                 return;
 
@@ -1681,7 +1653,7 @@
 
             }
 
-            if( key === 'cancelHandle' || key === 'okHandle' ) {
+            if( key === 'cancelButtonClassName' || key === 'okButtonClassName' ) {
 
                 this._setButton();
 
@@ -1798,7 +1770,7 @@
 
         },
 
-        _moveToTop:function() {
+        _moveToTop:function(notFocus) {
 
             if( this.options.isMoveToTop === false || this.options.disabled ){ return; }
 
@@ -1808,7 +1780,7 @@
 
             zIndicies = [],zIndexMax,i;
 
-            if( arrLength > 1 ){
+            if( arrLength > 0 ){
 
                 for ( i = 0; i < arrLength; i++ ) {
 
@@ -1816,9 +1788,13 @@
 
                 }
 
-                zIndexMax = Math.max.apply( null, zIndicies );
+                if((zIndexMax = Math.max.apply( null, zIndicies )) >= + $target.css( "z-index" )){
 
-                zIndexMax >= + $target.css( "z-index" ) && $target.css( "z-index", zIndexMax + 1 );
+                    $target.css( "z-index", zIndexMax + 1 );
+
+                    !notFocus && this._focusDialog();
+
+                }
 
             }
 
@@ -1904,7 +1880,7 @@
 
                 var This = this,$target = this.$target;
 
-                !!this.innerIframe && !!this.isMinimize && ( $target = this.$minimizeBar );
+                !!this.$minimizeBar && !!this.isMinimize && ( $target = this.$minimizeBar );
 
                 this._dialogState = 'opening';
 
@@ -1914,7 +1890,7 @@
 
                         This._dialogState = 'open';
 
-                        This._foucsDialog();
+                        This._focusDialog();
 
                         !!callback && callback.call(This);
 
@@ -2000,23 +1976,15 @@
 
         },
 
-        _foucsDialog:function(){
+        _focusDialog:function(){
 
-            this.oldFoucs = $( this.document[ 0 ].activeElement );
-
-            this.$target.focus();
+            this.options.dialogFocus(this.$target);
 
         },
 
         _blurDialog:function(){
 
-            if(this.oldFoucs){
-
-                this.oldFoucs.focus();
-
-                delete this.oldFoucs;
-
-            }
+            this.options.dialogBlur(this.$target);
 
         },
 
@@ -2032,7 +2000,7 @@
 
                 var This = this,$target = this.$target;
 
-                !!this.innerIframe && !!this.isMinimize && ( $target = this.$minimizeBar );
+                !!this.$minimizeBar && !!this.isMinimize && ( $target = this.$minimizeBar );
 
                 this._beforeDialogHideCallback.call(this);
 
@@ -2090,7 +2058,7 @@
 
             this.$target.remove();
 
-            !!this.buttons.restore && $( this.buttons.restore.element ).remove();
+            !!this.buttons && !!this.buttons.restore && $( this.buttons.restore.element ).remove();
 
             !!this.$minimizeBar && this.$minimizeBar.remove();
 
@@ -2112,15 +2080,27 @@
 
             this._getElements = function( scope, isVisible ){
 
-                if( !_elements[scope] || !isVisible ){ return _elements[scope] || []; }
+                if(!_elements[scope]){
 
-                var arr = [],i = _elements[scope].length,el;
+                    return [];
+
+                }
+
+                if(!isVisible){
+
+                    return _elements[scope].slice();
+
+                }
+
+                var arr = [],elements = _elements[scope],
+
+                i = elements.length,el,element = this.$target[0];
 
                  while( i-- ){
 
-                    el = _elements[scope][i];
+                    el = elements[i];
 
-                    $(el).is(':visible') === true && arr.push(el)
+                    element !== el && $(el).is(':visible') === true && arr.push(el)
 
                 }
 

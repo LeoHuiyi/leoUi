@@ -25,7 +25,7 @@ var zNodes = [{
 			name: "leoResizable缩放组件",
 			url: {href: '#!leo#iframe/leoResizable.html'}
 		}, {
-			name: "leoDroppable缩放组件",
+			name: "leoDroppable拖放组件",
 			url: {href: '#!leo#iframe/leoDroppable.html'}
 		}, {
 			name: "leoDialog对话框组件",

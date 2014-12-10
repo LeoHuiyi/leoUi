@@ -173,7 +173,7 @@
     //返回所有滚动的父集合
     $.leoTools.scrollParents = function( $box, all ){
 
-        var scrollParent,i=0,position = $box.css( "position" ),
+        var scrollParent,i = 0,position = $box.css( "position" ),
 
         excludeStaticParent = position === "absolute",doc =  $box[ 0 ].ownerDocument || document;
 

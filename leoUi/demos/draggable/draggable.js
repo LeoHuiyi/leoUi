@@ -53,6 +53,8 @@ leoUiLoad.require('leoUi-draggable,leoCss,ready', function($) {
 
             revertAnimate:true ,//还原是否动画
 
+            closestScrollParent:'#abc',//从最近的可滚动的祖先开始，在DOM 树上逐级向上的可滚动的祖先匹配，如果匹配到了break，没匹配到则默认到document，如果scroll选项设置为false，则该参数无效（document不算在内,false为不匹配）
+
             proxy: function(source) { //source
 
                 return $(source).clone().css({

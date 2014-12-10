@@ -82,6 +82,8 @@
 
             scrollSpeed: 20,//当鼠标指针的值小于scrollSensitivity的值时，窗口滚动的速度。如果scroll选项设置为false，则该参数无效
 
+            closestScrollParent:false,//从最近的可滚动的祖先开始，在DOM 树上逐级向上的可滚动的祖先匹配，如果匹配到了break，没匹配到则默认到document，如果scroll选项设置为false，则该参数无效（document不算在内,false为不匹配）
+
             useLeoDroppable:false,//是否使用leoDroppable插件
 
             droppableScope:'all',//用来设置拖动（leoDraggable）元素和放置（leoDroppable）对象的集合,配合leoDroppable使用
@@ -350,7 +352,7 @@
 
         _getBorderWidths:function(no) {
 
-            var parseCss;
+            var $containment;
 
             if(no){
 
@@ -368,17 +370,17 @@
 
             }else{
 
-                parseCss = $.leoTools.parseCss;
+                $containment = this.$containment;
 
                 this.borderWidths = {
 
-                    left: parseCss( this.$containment[0] ,'borderLeftWidth' ),
+                    left: $containment.leftBorderWidth(),
 
-                    top: parseCss( this.$containment[0] ,'borderTopWidth' ),
+                    top: $containment.topBorderWidth(),
 
-                    right: parseCss( this.$containment[0] ,'borderRightWidth' ),
+                    right: $containment.rightBorderWidth(),
 
-                    bottom: parseCss( this.$containment[0] ,'borderBottomWidth' )
+                    bottom: $containment.bottomBorderWidth()
 
                 };
 
@@ -695,7 +697,9 @@
 
             var scrollParents = this.scrollParents,i = scrollParents.length,
 
-            $doc = this.document,$win = this.window,op = this.options;
+            $doc = this.document,$win = this.window,op = this.options,
+
+            scrollParent,closestScrollParent = op.closestScrollParent;
 
             this.isWinScrollLeftlockMin = false;
 
@@ -707,7 +711,13 @@
 
             while( i-- ){
 
-                this._scroll( event, scrollParents[i], op, $doc, $win );
+                this._scroll( event, scrollParent = scrollParents[i], op, $doc, $win );
+
+                if(closestScrollParent !== false && scrollParent !== $doc[0] && $(scrollParent).is(closestScrollParent)){
+
+                    break;
+
+                }
 
             }
 

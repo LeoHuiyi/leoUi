@@ -8,9 +8,9 @@
  *
  * http://api.jqueryui.com/category/effects-core/
  *
- * Explode,Clip特效:leoUi:修复没有加上margin的bug；
+ * leoUi: Clip特效: 修复没有加上margin的bug;top值为auto;
  *
- * Explode：没有加上zIndex的bug；
+ * leoUi: Explode特效：没有加上zIndex的bug；
  */
 ;(function(factory) {
 
@@ -1565,6 +1565,8 @@
 		// Create Animation Object:
 		animation[size] = show ? distance : 0;
 		animation[position] = show ? offset : offset + distance / 2;
+
+		if(animate.css(position) === 'auto'){animate.css(position, offset);}
 
 		// Animate
 		animate.animate(animation, {

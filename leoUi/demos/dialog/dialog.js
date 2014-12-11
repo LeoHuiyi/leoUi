@@ -74,7 +74,7 @@ leoUiLoad.require('leoUi-dialog,leoCss,ready', function($) {
 
         initDraggable: true,
 
-        restore: false,
+        restore: true,
 
         modal: true,
 
@@ -90,9 +90,9 @@ leoUiLoad.require('leoUi-dialog,leoCss,ready', function($) {
 
         appendTo: 'body',
 
-        dialogHtml: '<div class="leoDialog">' + '<div class="leoDialog_titlebar leoUi_clearfix">' + '<span class="leoDialog_title">标 题</span>' + '</div>' + '<div class="leoDialog_content leoDialog_content_iframe">' + '</div>' + '</div>',
+        dialogHtml: '<div class="leoDialog">' + '<div class="leoDialog_titlebar leoUi_clearfix" style="z-index:-1">' + '<span class="leoDialog_title">标 题</span>' + '</div>' + '<div class="leoDialog_content leoDialog_content_iframe" style="z-index:0">' + '</div>' + '</div>',
 
-        contentHtml: '<iframe style="width:100%;height:100%;" frameborder="0" src="http://baidu.com"></iframe>',
+        contentHtml: '<iframe style="width:50%;height:100%;" frameborder="0" src="http://www.w3school.com.cn/"></iframe><iframe style="width:50%;height:100%;" frameborder="0" src="http://www.bootcss.com/"></iframe>',
 
         captionButtons: {
             refresh: true
@@ -209,6 +209,8 @@ leoUiLoad.require('leoUi-dialog,leoCss,ready', function($) {
            a.option('okButtonClassName', '.send_off');
 
         })
+
+        b.option('contentHtml', '<iframe style="width:100%;height:100%;" frameborder="0" src="http://www.w3school.com.cn"></iframe>');
     })
 
     var flag = false;
@@ -217,7 +219,9 @@ leoUiLoad.require('leoUi-dialog,leoCss,ready', function($) {
 
         b.dialogShow();
 
-        // a.option('disabled', flag);
+        b.option('disabled',flag)
+
+        a.option('disabled',flag)
 
         // a.destroy();
 

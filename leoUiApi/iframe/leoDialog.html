@@ -214,6 +214,16 @@
 
         }, {
 
+            'name': 'disabled',
+
+            'default': 'false',
+
+            'type': 'boolean',
+
+            'explain': '是否禁止dialog'
+
+        }, {
+
             'name': 'titlebarDblclickMax',
 
             'default': 'false',
@@ -340,7 +350,7 @@
 
             'type': 'selector',
 
-            'explain': '找到okButton的className的selector'
+            'explain': 'okButton的className的selector'
 
         }, {
 
@@ -350,7 +360,7 @@
 
             'type': 'selector',
 
-            'explain': '找到cancelButton的className的selector'
+            'explain': 'cancelButton的className的selector'
 
         }, {
 
@@ -360,67 +370,247 @@
 
             'type': 'boolean',
 
-            'explain': '是否每次打开dialog都重新设定'
+            'explain': '是否每次打开dialog还原状态（使用options中的width，height，position设置打开）'
 
         }, {
 
-            'name': 'getScope',
+            'name': 'captionButtons',
 
-            'default': 'all',
+            'default': '参考源码',
 
-            'type': 'string',
+            'type': 'object',
 
-            'explain': '用来取得MoveToTop的leoDialog对象的集合'
-
-        }, {
-
-            'name': 'getScope',
-
-            'default': 'all',
-
-            'type': 'string',
-
-            'explain': '用来取得MoveToTop的leoDialog对象的集合'
+            'explain': '标题栏的按键属性（没有.leoDialog_titlebar则设置无效）'
 
         }, {
 
-            'name': 'getScope',
+            'name': 'pin',
 
-            'default': 'all',
+            'default': 'true',
 
-            'type': 'string',
+            'type': 'boolean',
 
-            'explain': '用来取得MoveToTop的leoDialog对象的集合'
-
-        }, {
-
-            'name': 'getScope',
-
-            'default': 'all',
-
-            'type': 'string',
-
-            'explain': '用来取得MoveToTop的leoDialog对象的集合'
+            'explain': '是否定固定dialog位置，对于initDraggable = true有效（属于captionButtons）'
 
         }, {
 
-            'name': 'onDragLeave',
+            'name': 'refresh',
 
             'default': 'false',
 
+            'type': 'boolean',
+
+            'explain': '刷新content中所有iframe的内容（属于captionButtons）'
+
+        }, {
+
+            'name': 'toggle',
+
+            'default': 'true',
+
+            'type': 'boolean',
+
+            'explain': '点击展开或者关闭content（属于captionButtons）'
+
+        }, {
+
+            'name': 'minimize',
+
+            'default': 'true',
+
+            'type': 'boolean',
+
+            'explain': '最小化dialog（属于captionButtons）'
+
+        }, {
+
+            'name': 'maximize',
+
+            'default': 'true',
+
+            'type': 'boolean',
+
+            'explain': '最大化dialog（属于captionButtons）'
+
+        }, {
+
+            'name': 'close',
+
+            'default': 'true',
+
+            'type': 'boolean',
+
+            'explain': '关闭dialog（属于captionButtons）'
+
+        }, {
+
+            'name': 'position',
+
+            'default': '参考源码',
+
+            'type': 'object',
+
+            'explain': '参考jqueryUi的API（其中of属性设置成“window”或者“document”使用当前框架的window或者document）'
+
+        }, {
+
+            'name': 'initDraggable',
+
+            'default': 'true',
+
+            'type': 'boolean',
+
+            'explain': '是否使用拖拽组件(leoDraggable)'
+
+        }, {
+
+            'name': 'draggableOption',
+
+            'default': '参考源码',
+
+            'type': 'object',
+
+            'explain': '拖拽组件的options（参考leoDraggable）'
+
+        }, {
+
+            'name': 'initResizable',
+
+            'default': 'true',
+
+            'type': 'boolean',
+
+            'explain': '是否使用缩放组件(leoResizable)'
+
+        }, {
+
+            'name': 'draggableOption',
+
+            'default': '参考源码',
+
+            'type': 'object',
+
+            'explain': '缩放组件的options（参考leoResizable）'
+
+        }, {
+
+            'name': 'initCallBack',
+
+            'default': '$.noop',
+
             'type': 'function',
 
-            'explain': '当可拖动元素被拖离目标容器的时候触发（ this: drop, arguments: event, proportions（drop的prop）, dragProp（drag的prop））'
+            'explain': 'dialog组件初始化回调（ this: $target ）'
 
-        },{
+        }, {
 
-            'name': 'onDrop',
+            'name': 'beforeShow',
 
-            'default': 'false',
+            'default': '$.noop',
 
             'type': 'function',
 
-            'explain': '当可拖动元素被拖入目标容器并放置的时候触发，当返回true就不会触发leoDraggable组件的onStopDrag回调（ this: drop, arguments: event, proportions（drop的prop）, dragProp（drag的prop））'
+            'explain': 'dialog组件显示之前回调（ this: $target ）'
+
+        }, {
+
+            'name': 'okCallBack',
+
+            'default': '$.noop',
+
+            'type': 'function',
+
+            'explain': '点击ok按钮回调（ this: $target, arguments: event, bottunDisable, bottunEnable））'
+
+        }, {
+
+            'name': 'cancelCallBack',
+
+            'default': '$.noop',
+
+            'type': 'function',
+
+            'explain': '点击cancel按钮回调（ this: $target, arguments: event, bottunDisable, bottunEnable））'
+
+        }, {
+
+            'name': 'closeCallBack',
+
+            'default': '$.noop',
+
+            'type': 'function',
+
+            'explain': 'dialog组件显示之前回调（ this: $target, arguments: event, proportions（drop的prop）, dragProp（drag的prop））'
+
+        }, {
+
+            'name': 'beforeShow',
+
+            'default': '$.noop',
+
+            'type': 'function',
+
+            'explain': 'dialog组件显示之前回调（ this: $target, arguments: event, proportions（drop的prop）, dragProp（drag的prop））'
+
+        }, {
+
+            'name': 'beforeShow',
+
+            'default': '$.noop',
+
+            'type': 'function',
+
+            'explain': 'dialog组件显示之前回调（ this: $target, arguments: event, proportions（drop的prop）, dragProp（drag的prop））'
+
+        }, {
+
+            'name': 'beforeShow',
+
+            'default': '$.noop',
+
+            'type': 'function',
+
+            'explain': 'dialog组件显示之前回调（ this: $target, arguments: event, proportions（drop的prop）, dragProp（drag的prop））'
+
+        }, {
+
+            'name': 'beforeShow',
+
+            'default': '$.noop',
+
+            'type': 'function',
+
+            'explain': 'dialog组件显示之前回调（ this: $target, arguments: event, proportions（drop的prop）, dragProp（drag的prop））'
+
+        }, {
+
+            'name': 'beforeShow',
+
+            'default': '$.noop',
+
+            'type': 'function',
+
+            'explain': 'dialog组件显示之前回调（ this: $target, arguments: event, proportions（drop的prop）, dragProp（drag的prop））'
+
+        }, {
+
+            'name': 'beforeShow',
+
+            'default': '$.noop',
+
+            'type': 'function',
+
+            'explain': 'dialog组件显示之前回调（ this: $target, arguments: event, proportions（drop的prop）, dragProp（drag的prop））'
+
+        }, {
+
+            'name': 'beforeShow',
+
+            'default': '$.noop',
+
+            'type': 'function',
+
+            'explain': 'dialog组件显示之前回调（ this: $target, arguments: event, proportions（drop的prop）, dragProp（drag的prop））'
 
         }],gridOptions = {
 

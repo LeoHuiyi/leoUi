@@ -53,7 +53,7 @@
             +               '</div>'
             +               '<div class="leoDialog_content">'
             +               '</div>'
-            +           '</div>',
+            +           '</div>',//dialog的基础html标签，其中leoDialog_titlebar为标题栏className，leoDialog_title为标题className，leoDialog_content为内容contentHtml的className，这几个className是必须的。
 
             contentHtml :'<div id="delete_image">'
             +       '<div class="send_content clearfix">'
@@ -66,89 +66,77 @@
             +               '<input class="send_off" type="submit" value="取消" name="submit" />'
             +           '</div>'
             +       '</div>'
-            +   '</div>',
+            +   '</div>',//leoDialog_content中的html标签
 
-            modal:true,
+            modal:true,//是否使用遮罩层
 
-            title:'标 题',
+            title:'标 题',//dialog标题的内容
 
             quickClose: false,// 是否支持快捷关闭（点击遮罩层自动关闭）
 
-            disabled:false,
+            disabled:false,//是否禁止dialog
 
-            titlebarDblclickMax:true,//双击标题栏最大化
+            titlebarDblclickMax:true,//是否支持双击标题栏最大化
 
-            appendTo: 'body',
+            appendTo: 'body',//dialog应该被appendTo到哪个元素
 
-            modalShowDelay: 0,
+            modalShowDelay: 0,//打开遮罩层延迟的时间
 
-            modalHideDelay: 0,
+            modalHideDelay: 0,//关闭遮罩层延迟的时间
 
-            showDelay:0,
+            showDelay:0,//打开dialog延迟的时间
 
-            hideDelay:0,
+            hideDelay:0,//关闭dialog延迟的时间
 
-            width:400,
+            width:400,//设置dialog的宽度（数值或者auto）
 
-            height:'auto',
+            height:'auto',//设置dialog的高度（数值或者auto）
 
-            zIndex:1000,
+            zIndex:1000,//设置dialog的z-index
 
-            isMoveToTop:false,//是否在最上面
+            isMoveToTop:false,//保持当前的的dialog在最上面，一个页面2个以上dialog建议开启
 
-            scope:'all',//用来设置leoDialog对象的集合
+            scope:'all',//用来设置MoveToTop的leoDialog对象的集合
 
-            getScope:'all',//用来取得leoDialog对象的集合
+            getScope:'all',//用来取得MoveToTop的leoDialog对象的集合
 
-            okButtonClassName:'.send_submit',
+            okButtonClassName:'.send_submit',//okButton的className的selector
 
-            cancelButtonClassName:'.send_off',
+            cancelButtonClassName:'.send_off',//cancelButton的className的selector
 
-            restore:false,//是否每次都回到初始值
+            restore:false,//是否每次打开dialog还原状态（使用options中的width，height，position设置打开）
 
-            captionButtons:{
+            captionButtons:{//标题栏的按键属性（没有.leoDialog_titlebar则设置无效）
 
-                pin: true,
+                pin: true,//是否定固定dialog位置，对于initDraggable = true有效
 
-                refresh:false,
+                refresh:false,//刷新content中所有iframe的内容
 
-                toggle: true,
+                toggle: true,//点击展开或者关闭content
 
-                minimize: true,
+                minimize: true,//最小化dialog
 
-                maximize: true,
+                maximize: true,//最大化dialog
 
-                close: true
+                close: true//关闭dialog
 
             },
 
-            position: {
+            position: {//参考jqueryUi的API（其中of属性设置成“window”或者“document”使用当前框架的window或者document）
 
                 my: "center",
 
                 at: "center",
 
-                of: window,
+                of: 'window',
 
-                collision: "fit",
-
-                using: function(pos) {
-
-                    var topOffset = $(this).css(pos).offset().top;
-
-                    if (topOffset < 0) {
-
-                        $(this).css("top", pos.top - topOffset);
-
-                    }
-
-                }
+                collision: "fit"
 
             },
 
-            initDraggable: true,
+            initDraggable: true,//是否使用拖拽组件(leoDraggable)
 
-            draggableOption:{
+            draggableOption:{//拖拽组件的options（参考leoDraggable）
 
                 distance:1,
 
@@ -164,9 +152,9 @@
 
             },
 
-            initResizable:true,
+            initResizable:true,//是否使用缩放组件(leoResizable)
 
-            resizableOption:{
+            resizableOption:{//缩放组件的options（参考leoResizable）
 
                 distance:0,
 
@@ -325,6 +313,8 @@
 
             this.hasDraggable = false;
 
+            this._changePosition();
+
             this._createDialog();
 
             this._setContent();
@@ -354,6 +344,22 @@
             this._handleDisabledOption();
 
             op.initCallBack.call( this.$target );
+
+        },
+
+        _changePosition:function(){
+
+            var position = this.options.position;
+
+            if(position.of === 'window'){
+
+                position.of = this.window;
+
+            }else if(position.of === 'document'){
+
+                position.of = this.document;
+
+            }
 
         },
 
@@ -761,11 +767,36 @@
 
         _handleDisabledOption:function(){
 
+            var ie = $.leoTools.ie;
+
             if ( this.options.disabled ){
 
                 if ( !this.disabledDiv ){
 
-                    this.disabledDiv = $('<div style = " width: 100%; height: 100%; position: absolute;top: 0; left: 0; z-index: 1; opacity:0; " ></div>');
+                    if(!ie){
+
+                        this.disabledDiv = $('<div style = " width: 100%; height: 100%; position: absolute;top: 0; left: 0; z-index: 1; opacity:0;outline: none;overflow:hidden;" tabindex = "-1" ></div>');
+
+                    }else{
+
+                        this.disabledDiv = $('<iframe frameborder="0" scrolling="no" tabindex="-1" src="about:blank" allowtransparency="true" style="width: 100%; height: 100%; position: absolute;top: 0; left: 0; z-index: 1; opacity:0;overflow:hidden"/>');
+
+                    }
+
+
+                }
+
+                !!ie && !this.disabledDivIe && (this.disabledDivIe = this.disabledDiv.clone().prependTo( this.$content ));
+
+                if(this.isMinimize){
+
+                    if ( !this.disabledMinDiv ){
+
+                        this.disabledMinDiv = this.disabledDiv.clone();
+
+                    }
+
+                    this.$minimizeBar.append(this.disabledMinDiv);
 
                 }
 
@@ -773,17 +804,8 @@
 
                 this.hasResizable && this.$target[this.dependsFnName.resizable]( 'option','disabled', true );
 
-                if(this.isMinimize){
+                this.hasDraggable && this.$target[this.dependsFnName.draggable]( 'option','disabled', true );
 
-                    if ( !this.disabledMinDiv){
-
-                        this.disabledMinDiv = $('<div style = " width: 100%; height: 100%; position: absolute;top: 0; left: 0; z-index: 1; opacity:0; " ></div>');
-
-                    }
-
-                    this.$minimizeBar.append(this.disabledDiv);
-
-                }
 
             }else if( this.disabledDiv ){
 
@@ -791,11 +813,21 @@
 
                 this._setResizableDisabled(false);
 
+                this._setDraggableDisabled(false);
+
                 if(this.disabledMinDiv && this.isMinimize){
 
                     this.disabledMinDiv.remove();
 
                     delete this.disabledMinDiv;
+
+                }
+
+                if(this.disabledDivIe){
+
+                    this.disabledDivIe.remove();
+
+                    delete this.disabledDivIe;
 
                 }
 
@@ -809,7 +841,17 @@
 
                 this._setResizableDisabled(false);
 
+                this._setDraggableDisabled(false);
+
                 this.disabledDiv.remove();
+
+                if(this.disabledDivIe){
+
+                    this.disabledDivIe.remove();
+
+                    delete this.disabledDivIe;
+
+                }
 
                 this.disabledDiv = null;
 
@@ -819,7 +861,7 @@
 
         _handleIframeMask:function(flag) {
 
-            if( !this.innerIframe ){return;}
+            if( !this.$innerIframe ){return;}
 
             if ( flag === true ) {
 
@@ -837,27 +879,29 @@
 
         _destoryIframe:function(){
 
-            if( this.innerIframe ){
+            if( this.$innerIframe ){
 
-                var iframe = this.innerIframe,$iframe = $( this.innerIframe );
+                this.$innerIframe.each(function(index, el) {
 
-                this._off( $iframe, 'load' );
+                    var $iframe = $(el);
 
-                $iframe.attr('src', 'about:blank');
+                    $iframe.attr('src', 'about:blank');
 
-                try{
+                    try{
 
-                    iframe.contentWindow.document.write('');
+                        el.contentWindow.document.write('');
 
-                    iframe.contentWindow.document.close();
+                        el.contentWindow.document.close();
 
-                }catch(e){};
+                    }catch(e){};
 
-                (/msie/.test(navigator.userAgent.toLowerCase())) && CollectGarbage();
+                    (/msie/.test(navigator.userAgent.toLowerCase())) && CollectGarbage();
 
-                $iframe.remove();
+                    $iframe.remove();
 
-                delete this.innerIframe;
+                });
+
+                delete this.$innerIframe;
 
             }
 
@@ -865,7 +909,7 @@
 
         _destoryIframeMask: function() {
 
-            if ( this.innerIframe && this.mask ) {
+            if ( this.mask ) {
 
                 this.mask.remove();
 
@@ -877,11 +921,15 @@
 
         _leoDialogRefresh:function(){
 
-            if ( this.innerIframe ) {
+            if ( this.$innerIframe ) {
 
-                var $fr = $( this.innerIframe );
+                this.$innerIframe.each(function(index, el) {
 
-                $fr.attr( "src", $fr.attr("src") );
+                    var $el = $(el);
+
+                    $el.attr( "src", $el.attr("src") );
+
+                });
 
             }
 
@@ -919,15 +967,7 @@
 
         _wrapMinimize:function(){
 
-            var zIndex;
-
-            this.$target.find('.leoDialog_titlebar_button_hide').hide();
-
-            !this.$modal ? zIndex = this.options.zIndex : zIndex = + this.$modal.css('zIndex') + 1;
-
-            this.$target.hide();
-
-            this.$minimizeBar.css( 'zIndex', zIndex ).append( this.$uiDialogTitlebar.clone( true ).css({'cursor': 'default', 'display': 'flex'}) ).appendTo('body');
+            this.$minimizeBar.css( 'zIndex', this.$target.hide().find('.leoDialog_titlebar_button_hide').hide().end().css('z-index') ).append( this.$uiDialogTitlebar.clone( true ).css({'cursor': 'default', 'display': 'flex'}) ).insertAfter(this.$target);
 
         },
 
@@ -983,7 +1023,7 @@
 
             this._setSizes( { width: width, height : height, top: 0, left: 0 } );
 
-            this._leoDialogRestoreAdd( $( this.buttons.maximize.element ) );
+            !!this.buttons.maximize && this._leoDialogRestoreAdd( $( this.buttons.maximize.element ) );
 
             this.options.resize.call(this.$target[0]);
 
@@ -1209,11 +1249,11 @@
 
                 this._on( $iframe, 'load', function(event){
 
-                    !!iframeLoadCallBack && iframeLoadCallBack.call( $content, event );
+                    !!iframeLoadCallBack && iframeLoadCallBack.call( $content, event, this );
 
                 } );
 
-                this.innerIframe = $iframe[0];
+                this.$innerIframe = $iframe;
 
             }
 
@@ -1461,7 +1501,7 @@
 
         _setDraggableDisabled:function(flag){
 
-            this.hasDraggable && !this.draggableDisabled && !this.isMinimize && !this.isMaximize && this.$target[this.dependsFnName.draggable]( 'option','disabled', flag );
+            this.hasDraggable && !this.options.disabled && !this.draggableDisabled && !this.isMinimize && !this.isMaximize && this.$target[this.dependsFnName.draggable]( 'option','disabled', flag );
 
         },
 
@@ -1705,6 +1745,8 @@
 
             if ( key.indexOf('position') === 0 ) {
 
+                this._changePosition();
+
                 this._setSize( 'position', this.options.position );
 
                 return;
@@ -1772,7 +1814,7 @@
 
         _moveToTop:function(notFocus) {
 
-            if( this.options.isMoveToTop === false || this.options.disabled ){ return; }
+            if( this.options.isMoveToTop === false || (this.options.disabled && !notFocus) ){ return; }
 
             var arr = this._getElements( this.options.getScope, true ),
 
@@ -2100,7 +2142,7 @@
 
                     el = elements[i];
 
-                    element !== el && $(el).is(':visible') === true && arr.push(el)
+                    element !== el && arr.push(el);
 
                 }
 

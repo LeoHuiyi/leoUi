@@ -8,7 +8,7 @@
  *
  * http://api.jqueryui.com/position/
  *
- * leoUI：修改getDimensions()，加上borders；
+ * leoUI：修改getDimensions()，加上borders；flip.top中的bug
  *
  */
 ;(function(factory) {

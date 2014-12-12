@@ -100,6 +100,8 @@
 
                             // Selector: 任何由选择器匹配的iframe将被透明层覆盖
 
+                            // function: 返回所有透明层jquery对象（arguments: darg, this.document[0]）
+
             proxy:function(source) { //source
 
                 return $(source).clone().removeAttr('id').css({'opacity': '0.5'}).insertAfter(source);
@@ -196,15 +198,23 @@
 
             var iframeFix = this.options.iframeFix,drag = this.$dragBox[0];
 
-            this.iframeBlocks = this.document.find( iframeFix === true ? "iframe" : iframeFix ).map( function() {
+            if($.type(iframeFix) === 'function'){
 
-                var $iframe = $( this );
+                this.iframeBlocks = iframeFix(drag, this.document[0]);
 
-                if( drag === this || $iframe.is(':hidden') ){ return null; }
+            }else{
 
-                return $( "<div>" ).css( { position: "absolute", width: $iframe.outerWidth(), height: $iframe.outerHeight(), opacity: 0,'backgroundColor':'#fff'} ).insertBefore( this ).offset( $iframe.offset() )[0];
+                this.iframeBlocks = this.document.find( iframeFix === true ? "iframe" : iframeFix ).map( function() {
 
-            });
+                    var $iframe = $( this );
+
+                    if( drag === this || $iframe.is(':hidden') ){ return null; }
+
+                    return $( "<div>" ).css( { position: "absolute", width: $iframe.outerWidth(), height: $iframe.outerHeight(), opacity: 0,'backgroundColor':'#fff', 'overflow': 'hidden', 'z-index': $iframe.css('z-index'), 'visibility': 'visible', 'display': 'block', 'padding': 0, 'margin': 0, 'border': 0, 'outline': 'none' } ).insertAfter( this ).offset( $iframe.offset() )[0];
+
+                });
+
+            }
 
         },
 

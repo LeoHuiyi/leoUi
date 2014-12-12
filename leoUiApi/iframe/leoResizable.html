@@ -78,6 +78,8 @@
 
 					                            // Selector: 任何由选择器匹配的iframe将被透明层覆盖。
 
+                                                // function: 返回所有透明层jquery对象（arguments: darg, this.document[0]）
+
 					            aspectRatio:false,//强制元素调整大小时保持一个特定的宽高比
 
 					            minWidth:0,//缩放的最小宽度（大于0的数）
@@ -320,7 +322,7 @@
 
             'type': 'boolean or selector',
 
-            'explain': '在缩放期间阻止iframe捕捉鼠标移过事件。支持多种类型:Boolean: 当设置为true, 透明层将被放置于页面上的所有iframe之上。Selector: 任何由选择器匹配的iframe将被透明层覆盖'
+            'explain': '在缩放期间阻止iframe捕捉鼠标移过事件。支持多种类型:Boolean: 当设置为true, 透明层将被放置于页面上的所有iframe之上。Selector: 任何由选择器匹配的iframe将被透明层覆盖。function: 返回所有透明层jquery对象（arguments: darg, this.document[0]）'
 
         }, {
 

@@ -56,7 +56,7 @@ body{height: 1000px;width: 2000px;}
 /*leoDialog*/
 .leoDialog{padding:0;border-radius: 3px;overflow: hidden;position:absolute;border: 1px solid #A8A8A8;box-shadow: 0 5px 10px rgba(0, 0, 0, 0.8);background-color: #ffffff;color: #4F4F4F;font-family: Arial,sans-serif;font-size: 100%;}
 .leoDialog_inherit .leoDialog_titlebar{cursor: inherit !important}
-.leoDialog_titlebar{border-left: medium none;border-radius: 0;border-right: medium none;border-top: medium none;background: url("../img/leoUi-bg_highlight-soft_100_c0c0c0_1x100.png") repeat-x scroll center top #C0C0C0;position:relative;overflow: hidden;cursor: move;padding: 0.5em 1em 0.3em;text-align: right;text-shadow: 0 1px 0 rgba(255, 255, 255, 0.7);border-bottom: 1px solid #A8A8A8;}
+.leoDialog_titlebar{border-left: medium none;border-radius: 0;border-right: medium none;border-top: medium none;background: url("../img/leoUi-bg_highlight-soft_100_c0c0c0_1x100.png") repeat-x scroll center top #C0C0C0;position:relative;overflow: hidden;cursor: move;padding: 0.5em 1em 0.3em;text-align: right;text-shadow: 0 1px 0 rgba(255, 255, 255, 0.7);border-bottom: 1px solid #A8A8A8;z-index:0;}
 .leoDialog_title{color: #333333;font-weight: bold;float: left;width: auto; margin: 0.1em 16px 0.2em 0;font-size: 18px}
 .leoDialog_titlebar_button{display: inline-block;height: 18px;outline: medium none;padding: 1px;text-align: left;width: 19px;border-radius: 3px;text-decoration: none;color: #4F4F4F;}
 .leoDialog_titlebar_button:hover{background: url("../img/leoUi-bg_highlight-soft_100_83b0ca_1x100.png") repeat-x scroll center top #83B0CA;box-shadow: 0 0 3px #85B2CB;border: 1px solid #8AB0C6;padding:0;}
@@ -71,7 +71,7 @@ body{height: 1000px;width: 2000px;}
 .leoDialog_pin_span_off{background-position: -144px -144px; }
 .leoDialog_restore_span{background-position: -48px -80px; }
 .leoDialog_refresh_span{background-position: -64px -80px; }
-.leoDialog_content{overflow: auto;display: block;border: 0 none;padding: 0.5em 1em;position: relative;margin:0 3px 3px 3px;}
+.leoDialog_content{overflow: auto;display: block;border: 0 none;padding: 0.5em 1em;position: relative;margin:0 3px 3px 3px;z-index: 0;}
 .leoDialog_content_iframe{overflow: hidden;padding:0;}
 
 /*leoDialog content*/

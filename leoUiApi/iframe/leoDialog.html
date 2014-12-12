@@ -38,23 +38,60 @@
         <section class="g-mod g-attr g-block">
             <h2 class="tit">leoDialog对话框组件</h2>
             <div class="cont">
-                <p><strong>$('.leoUi').leoDroppable( options )</strong></p>
+                <p><strong>$('.leoUi').leoDialog( options )</strong></p>
                 <p><strong>使用说明</strong>：</p>
                 <section class="g-mod g-attr g-block">
                     <div class="cont">
                         <p><strong>examples</strong>：</p>
                         <pre class="brush: js;">
-                            $('.leoUi').leoDroppable({
+                            $('.leoUi').leoDialog({
 
-                                accept:'*',//控制可拖动的元素被拖放接受。支持多种类型：Selector: Function: 函数将被调用页面上的每一个可拖动的（传递给函数的第一个参数）。该函数必须返回true，如果可拖动应该接受。
+                                 dialogHtml: '<div class="leoDialog">'
+					            +               '<div class="leoDialog_titlebar leoUi_clearfix">'
+					            +                   '<span class="leoDialog_title"></span>'
+					            +               '</div>'
+					            +               '<div class="leoDialog_content">'
+					            +               '</div>'
+					            +           '</div>',//dialog的基础html标签，其中leoDialog_titlebar为标题栏className，leoDialog_title为标题className，leoDialog_content为内容contentHtml的className，这几个className是必须的。
 
-					            tolerance:'intersect',//指定使用那种模式来测试一个拖动(draggable)元素"经过"一个放置（droppable）对象。 允许使用的值:"fit": 拖动(draggable)元素 完全重叠到放置（droppable）对象。"intersect": 拖动(draggable)元素 和放置（droppable）对象至少重叠50%。"pointer": 鼠标重叠到放置（droppable）对象上。"touch": 拖动(draggable)元素 和放置（droppable）对象的任意重叠
+					            contentHtml :'<div id="delete_image">'
+					            +       '<div class="send_content clearfix">'
+					            +           '<div class="text">'
+					            +               '<span class="icon"></span>'
+					            +               '<span class="title">标题内容</span>'
+					            +           '</div>'
+					            +           '<div class="send_bottom clearfix">'
+					            +               '<input class="send_submit" type="submit" value="确定" name="submit" />'
+					            +               '<input class="send_off" type="submit" value="取消" name="submit" />'
+					            +           '</div>'
+					            +       '</div>'
+					            +   '</div>',//leoDialog_content中的html标签
 
-					            scope:'all',//用来设置拖动（leoDraggle）元素和放置（leoDroppable）对象的集合, 除了leoDroppable中的accept属性必须和leoDroppable中的droppableScope属性一直才能被允许碰撞检测
+					            modal:true,//是否使用遮罩层
 
-					            disabled:false,//当设置为true时停止leoDroppable
+					            title:'标 题',//dialog标题的内容
 
-					            checkFirst:true,//是否触发第一次的onDragEnter或者onDragLeave回调
+					            quickClose: false,// 是否支持快捷关闭（点击遮罩层自动关闭）
+
+					            disabled:false,//是否禁止dialog
+
+					            titlebarDblclickMax:true,//是否支持双击标题栏最大化
+
+					            appendTo: 'body',//dialog应该被appendTo到哪个元素
+
+					            modalShowDelay: 0,//打开遮罩层延迟的时间
+
+					            modalHideDelay: 0,//关闭遮罩层延迟的时间
+
+					            showDelay:0,//打开dialog延迟的时间
+
+					            hideDelay:0,//关闭dialog延迟的时间
+
+					            width:400,//设置dialog的宽度（数值或者auto）
+
+					            height:'auto',//设置dialog的高度（数值或者auto）
+
+					            zIndex:1000,//设置dialog的z-index
 
 					            ...
 
@@ -74,7 +111,7 @@
                         <p><strong>returns</strong>：无</p>
                         <p><strong>examples</strong>：</p>
                         <pre class="brush: js;">
-                            $( ".leoUi" ).leoDroppable( "destroy" );
+                            $( ".leoUi" ).leoDialog( "destroy" );
                         </pre>
                     </div>
                 </section>
@@ -85,7 +122,7 @@
                         <p><strong>returns</strong>：参考leoPlugIn中的option方法</p>
                         <p><strong>examples</strong>：</p>
                         <pre class="brush: js;">
-                            $( ".leoUi" ).leoDroppable( "a.b.c", 500 );
+                            $( ".leoUi" ).leoDialog( "a.b.c", 500 );
                         </pre>
                     </div>
                 </section>
@@ -500,7 +537,7 @@
 
             'type': 'function',
 
-            'explain': 'dialog组件初始化回调（ this: $target ）'
+            'explain': 'dialog组件初始化回调（ this: this, arguments: target ）'
 
         }, {
 
@@ -510,7 +547,7 @@
 
             'type': 'function',
 
-            'explain': 'dialog组件显示之前回调（ this: $target ）'
+            'explain': 'dialog组件显示之前回调（ this: this, arguments: target ）'
 
         }, {
 
@@ -520,7 +557,7 @@
 
             'type': 'function',
 
-            'explain': '点击ok按钮回调（ this: $target, arguments: event, bottunDisable, bottunEnable））'
+            'explain': '点击ok按钮回调（ this: this, arguments: event, bottunDisable, bottunEnable））'
 
         }, {
 
@@ -530,7 +567,7 @@
 
             'type': 'function',
 
-            'explain': '点击cancel按钮回调（ this: $target, arguments: event, bottunDisable, bottunEnable））'
+            'explain': '点击cancel按钮回调（ this: this, arguments: event, bottunDisable, bottunEnable））'
 
         }, {
 
@@ -540,77 +577,167 @@
 
             'type': 'function',
 
-            'explain': 'dialog组件显示之前回调（ this: $target, arguments: event, proportions（drop的prop）, dragProp（drag的prop））'
+            'explain': '点击close按钮回调（this: this, arguments: event, close）'
 
         }, {
 
-            'name': 'beforeShow',
+            'name': 'quickCloseCallBack',
 
             'default': '$.noop',
 
             'type': 'function',
 
-            'explain': 'dialog组件显示之前回调（ this: $target, arguments: event, proportions（drop的prop）, dragProp（drag的prop））'
+            'explain': '点击罩盖层按钮回调（this: this, arguments: event, modal）'
 
         }, {
 
-            'name': 'beforeShow',
+            'name': 'iframeLoadCallBack',
 
             'default': '$.noop',
 
             'type': 'function',
 
-            'explain': 'dialog组件显示之前回调（ this: $target, arguments: event, proportions（drop的prop）, dragProp（drag的prop））'
+            'explain': 'iframe load结束回调（this: this, arguments: event, iframe）'
 
         }, {
 
-            'name': 'beforeShow',
+            'name': 'resize',
 
             'default': '$.noop',
 
             'type': 'function',
 
-            'explain': 'dialog组件显示之前回调（ this: $target, arguments: event, proportions（drop的prop）, dragProp（drag的prop））'
+            'explain': 'dialog大小调整回调（this: this, arguments: target）'
 
         }, {
 
-            'name': 'beforeShow',
+            'name': 'dialogFocus',
 
             'default': '$.noop',
 
             'type': 'function',
 
-            'explain': 'dialog组件显示之前回调（ this: $target, arguments: event, proportions（drop的prop）, dragProp（drag的prop））'
+            'explain': 'dialog聚焦（this: this, arguments: target）'
 
         }, {
 
-            'name': 'beforeShow',
+            'name': 'dialogBlur',
 
             'default': '$.noop',
 
             'type': 'function',
 
-            'explain': 'dialog组件显示之前回调（ this: $target, arguments: event, proportions（drop的prop）, dragProp（drag的prop））'
+            'explain': 'dialog丢失焦点（this: this, arguments: target）'
 
         }, {
 
-            'name': 'beforeShow',
+            'name': 'makeModel',
+
+            'default': '查看源码',
+
+            'type': 'function',
+
+            'explain': '创建罩盖层,必须返回elem或者jquery对象（this: this, arguments: event, target）'
+
+        }, {
+
+            'name': 'makeDisabledDiv',
+
+            'default': '查看源码',
+
+            'type': 'function',
+
+            'explain': '创建disabled===true的罩盖层, appendTo->dialog,必须返回elem或者jquery对象（this: this, arguments: event, target）'
+
+        }, {
+
+            'name': 'modalShowAnimation',
+
+            'default': '查看源码',
+
+            'type': 'function',
+
+            'explain': 'modal显示的回调，可自定义动画等，在显示完毕必须调用callBack（this: target, arguments: callBack）'
+
+        }, {
+
+            'name': 'modalHideAnimation',
+
+            'default': '查看源码',
+
+            'type': 'function',
+
+            'explain': 'modal关闭的回调，可自定义动画等，在显示完毕必须调用callBack（this: target, arguments: callBack）'
+
+        }, {
+
+            'name': 'showAnimation',
+
+            'default': '查看源码',
+
+            'type': 'function',
+
+            'explain': 'dialog显示的回调，可自定义动画等，在显示完毕必须调用callBack（this: target, arguments: callBack）'
+
+        }, {
+
+            'name': 'hideAnimation',
+
+            'default': '查看源码',
+
+            'type': 'function',
+
+            'explain': 'dialog关闭的回调，可自定义动画等，在显示完毕必须调用callBack（this: target, arguments: callBack）'
+
+        }, {
+
+            'name': 'makeModelDialogShow',
+
+            'default': '查看源码',
+
+            'type': 'function',
+
+            'explain': '调整modal，dialog显示调用顺序（this: target, arguments: modelShowFn, dialogShowFn）'
+
+        }, {
+
+            'name': 'makeModelDialogHide',
+
+            'default': '查看源码',
+
+            'type': 'function',
+
+            'explain': '调整modal，dialog关闭调用顺序（this: modelShowFn, arguments: modelHideFn, dialogHideFn）'
+
+        }, {
+
+            'name': 'dialogShowCallBack',
+
+            'default': '查看源码',
+
+            'type': 'function',
+
+            'explain': 'dialog显示完毕回调（this: this, arguments: event, target）'
+
+        }, {
+
+            'name': 'dialogHideCallBack',
+
+            'default': '查看源码',
+
+            'type': 'function',
+
+            'explain': 'dialog关闭完成回调，clickCallBackName：okCallBack, cancelCallBack, closeCallBack, quickCloseCallBack。（this: this, arguments: event, clickCallBackName）'
+
+        }, {
+
+            'name': 'modalDialogHideCallBack',
 
             'default': '$.noop',
 
             'type': 'function',
 
-            'explain': 'dialog组件显示之前回调（ this: $target, arguments: event, proportions（drop的prop）, dragProp（drag的prop））'
-
-        }, {
-
-            'name': 'beforeShow',
-
-            'default': '$.noop',
-
-            'type': 'function',
-
-            'explain': 'dialog组件显示之前回调（ this: $target, arguments: event, proportions（drop的prop）, dragProp（drag的prop））'
+            'explain': 'dialog和Model关闭完成回调，clickCallBackName：okCallBack, cancelCallBack, closeCallBack, quickCloseCallBack。（this: this, arguments: event, clickCallBackName）'
 
         }],gridOptions = {
 

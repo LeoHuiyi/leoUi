@@ -104,6 +104,8 @@
 
 					                            // Selector: 任何由选择器匹配的iframe将被透明层覆盖
 
+                                                // function: 返回所有透明层jquery对象（arguments: darg, this.document[0]）
+
 					            proxy:function(source) { //source
 
 					                return $(source).clone().removeAttr('id').css({'opacity': '0.5'}).insertAfter(source);
@@ -456,7 +458,7 @@
 
             'type': 'boolean or selector',
 
-            'explain': '在拖动期间阻止iframe捕捉鼠标移过事件。与cursorAt选项搭配使用时或者当鼠标指针可能不在拖动助手元素之上时，该参数非常有用。支持多种类型:Boolean: 当设置为true, 透明层将被放置于页面上的所有iframe之上。Selector: 任何由选择器匹配的iframe将被透明层覆盖'
+            'explain': '在拖动期间阻止iframe捕捉鼠标移过事件。与cursorAt选项搭配使用时或者当鼠标指针可能不在拖动助手元素之上时，该参数非常有用。支持多种类型:Boolean: 当设置为true, 透明层将被放置于页面上的所有iframe之上。Selector: 任何由选择器匹配的iframe将被透明层覆盖。function: 返回所有透明层jquery对象（arguments: darg, this.document[0]）'
 
         }, {
 

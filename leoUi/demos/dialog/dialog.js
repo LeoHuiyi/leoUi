@@ -78,9 +78,71 @@ leoUiLoad.require('leoUi-dialog,leoCss,ready', function($) {
 
         modal: true,
 
-        dialogFocus:function($target){
+        dialogFocus:function(target){
 
-            $target.find('input').focus();
+            $(target).find('input').focus();
+
+        }
+
+    });
+
+var c = $.leoDialog({
+
+        appendTo: 'body',
+
+        contentHtml: '<div id="delete_image">' + '<div class="send_content clearfix">' + '<div class="text">' + '<span class="icon"></span>' + '<span class="title">标题内容</span>' + '</div>' + '<div class="send_bottom clearfix">' + '<input class="send_submit" type="submit" value="改变按钮" name="submit" />' + '<input class="send_off" type="submit" value="取消" name="submit" />' + '</div>' + '</div>' + '</div>',
+
+        title:'C',
+
+        captionButtons: {
+            pin: true,
+
+            refresh:false,
+
+            toggle: true,
+
+            minimize: true,
+
+            maximize: false,
+
+            close: true
+        },
+
+        height: 190,
+
+        // showDelay:1000,
+
+        resizableOption: {
+
+            containment: 'parent',
+
+            stopMouseWheel: true
+
+        },
+
+        quickClose: true,
+
+        isMoveToTop:true,
+
+        draggableOption: {
+
+            containment: 'parent',
+
+            stopMouseWheel: false
+
+        },
+
+        // disabled:true,
+
+        initDraggable: false,
+
+        restore: false,
+
+        modal: false,
+
+        dialogFocus:function(target){
+
+            $(target).find('input').focus();
 
         }
 
@@ -90,9 +152,9 @@ leoUiLoad.require('leoUi-dialog,leoCss,ready', function($) {
 
         appendTo: 'body',
 
-        dialogHtml: '<div class="leoDialog">' + '<div class="leoDialog_titlebar leoUi_clearfix" style="z-index:-1">' + '<span class="leoDialog_title">标 题</span>' + '</div>' + '<div class="leoDialog_content leoDialog_content_iframe" style="z-index:0">' + '</div>' + '</div>',
+        dialogHtml: '<div class="leoDialog">' + '<div class="leoDialog_titlebar leoUi_clearfix">' + '<span class="leoDialog_title">标 题</span>' + '</div>' + '<div class="leoDialog_content leoDialog_content_iframe">' + '</div>' + '</div>',
 
-        contentHtml: '<iframe style="width:50%;height:100%;" frameborder="0" src="http://www.w3school.com.cn/"></iframe><iframe style="width:50%;height:100%;" frameborder="0" src="http://www.bootcss.com/"></iframe>',
+        contentHtml: '<iframe style="width:50%;height:100%;position:relative;z-index:998" frameborder="0" src="http://www.w3school.com.cn/"></iframe><iframe style="width:50%;height:100%;position:relative;z-index:999" frameborder="0" src="http://www.bootcss.com/"></iframe>',
 
         captionButtons: {
             refresh: true
@@ -140,9 +202,9 @@ leoUiLoad.require('leoUi-dialog,leoCss,ready', function($) {
 
         modal: false,
 
-        dialogFocus:function($target){
+        dialogFocus:function(target){
 
-            $target.find('iframe').focus();
+            $(target).find('iframe').focus();
 
         }
 
@@ -208,7 +270,9 @@ leoUiLoad.require('leoUi-dialog,leoCss,ready', function($) {
             // a.option('disable', true);
            a.option('okButtonClassName', '.send_off');
 
-        })
+        });
+
+        c.option('initDraggable', true);
 
         b.option('contentHtml', '<iframe style="width:100%;height:100%;" frameborder="0" src="http://www.w3school.com.cn"></iframe>');
     })
@@ -219,6 +283,8 @@ leoUiLoad.require('leoUi-dialog,leoCss,ready', function($) {
 
         b.dialogShow();
 
+        c.dialogShow();
+
         b.option('disabled',flag)
 
         a.option('disabled',flag)
@@ -226,6 +292,8 @@ leoUiLoad.require('leoUi-dialog,leoCss,ready', function($) {
         // a.destroy();
 
         // b.destroy();
+
+        // c.destroy();
 
         // b.option({width:200,height:500,contentHtml:'<div>'})
 

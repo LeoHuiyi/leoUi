@@ -393,6 +393,8 @@
 
                     function inFn( options ){
 
+                        if(!instance){return;}
+
                         var isMethodCall = typeof options === "string",args = aslice.call( arguments, 1 ),
 
                         returnValue = instance.$target;
@@ -418,6 +420,14 @@
                             }
 
                             methodValue = instance[ options ].apply( instance, args );
+
+                            if(options === 'destroy'){
+
+                                instance = null;
+
+                                return false;
+
+                            }
 
                             if ( methodValue !== instance && methodValue !== undefined ) {
 

@@ -622,7 +622,7 @@
 
             }
 
-            li.defaults = $.extend( true, {}, leoPlugIn[li.inherit]['prototype']['defaults'], li.defaults );
+            li.defaults = leoToolsFn.extend( {}, leoPlugIn[li.inherit]['prototype']['defaults'], li.defaults );
 
             $.extend( plugInPrototype, li );
 
@@ -680,7 +680,7 @@
 
             function PlugIn( hash, target, dataId ){
 
-                this.options = $.extend( true, {}, this.defaults, hash );
+                this.options = leoToolsFn.extend( {}, this.defaults, hash );
 
                 this.$target = $( target || this.options[this.defaultsTarget] || '<div>' );
 

@@ -106,21 +106,7 @@
 
             restore:false,//是否每次打开dialog还原状态（使用options中的width，height，position设置打开）
 
-            captionButtons:{//标题栏的按键属性（没有.leoDialog_titlebar则设置无效）
-
-                pin: true,//是否定固定dialog位置，对于initDraggable = true有效
-
-                refresh:false,//刷新content中所有iframe的内容
-
-                toggle: true,//点击展开或者关闭content
-
-                minimize: true,//最小化dialog
-
-                maximize: true,//最大化dialog
-
-                close: true//关闭dialog
-
-            },
+            captionButtons:['pin', 'refresh', 'toggle', 'minimize', 'maximize', 'close'],//是否使用按钮，有'pin', 'refresh', 'toggle', 'minimize', 'maximize', 'close'可选，按照顺序显示，不用按钮可用false标示
 
             position: {//参考jqueryUi的API（其中of属性设置成“window”或者“document”使用当前框架的window或者document）
 
@@ -210,15 +196,7 @@
 
             makeDisabledDiv:function(target){
 
-                if(!$.leoTools.ie){
-
-                    return $('<div style = " width: 100%; height: 100%; position: absolute;top: 0; left: 0; z-index: 1; opacity:0;outline: none;overflow:hidden;visibility: visible;display: block;padding: 0;margin: 0;border: 0" tabindex = "-1" ></div>')[0];
-
-                }else{
-
-                    return $('<iframe frameborder="0" scrolling="no" tabindex="-1" src="about:blank" allowtransparency="true" style="width: 100%; height: 100%; position: absolute;top: 0; left: 0; z-index: 1; opacity:0;overflow:hidden;visibility: visible;display: block;padding: 0;margin: 0;border: 0"/>')[0];
-
-                }
+                return $( "<div>" ).css( { position: "absolute", width: '100%', height: '100%', opacity: 0, 'backgroundColor':'#fff', 'overflow': 'hidden', 'visibility': 'visible', 'display': 'block', 'top': 0, 'left': 0, 'padding': 0, 'margin': 0, 'border': 0, 'outline': 'none' } )[0];
 
             },//创建disabled===true的罩盖层, appendTo->dialog,必须返回elem或者jquery对象（this: this, arguments: event, target）
 
@@ -327,6 +305,8 @@
 
             this.hasDraggable = false;
 
+            this.buttons = {};
+
             this._changePosition();
 
             this._createDialog();
@@ -419,11 +399,15 @@
 
             });
 
+            this._createWinResizeMax();
+
         },
 
         _destroyDblclick:function(){
 
             this._off( this.$uiDialogTitlebar, 'dblclick.max' );
+
+            this._destroyWinResizeMax();
 
         },
 
@@ -535,17 +519,17 @@
 
         _createCaptionButtons:function(){
 
-            if(!this.$uiDialogTitlebar){return;}
+            if(!this.$uiDialogTitlebar || !this.options.captionButtons || !this.options.captionButtons.length){return;}
 
-            var op = this.options,i,buttonArrLength,buttonArr = [],buttons,
+            var i,$uiDialogTitlebar = this.$uiDialogTitlebar,
 
-            $uiDialogTitlebar = this.$uiDialogTitlebar;
+            captionButtons = $.extend([], this.options.captionButtons),
+
+            captionButtonsLength,
 
             buttons = {
 
                 pin: {
-
-                    visible: !!op.captionButtons.pin,
 
                     click: '_leoDialogPin',
 
@@ -559,8 +543,6 @@
 
                 refresh: {
 
-                    visible: !!op.captionButtons.refresh,
-
                     click: '_leoDialogRefresh',
 
                     hideClass:'leoDialog_titlebar_button_hide',
@@ -570,8 +552,6 @@
                 },
 
                 toggle: {
-
-                    visible: !!op.captionButtons.toggle,
 
                     click: '_leoDialogToggle',
 
@@ -585,8 +565,6 @@
 
                 minimize: {
 
-                    visible: !!op.captionButtons.minimize,
-
                     click: '_leoDialogMinimize',
 
                     hideClass:'leoDialog_titlebar_button_hide',
@@ -597,8 +575,6 @@
 
                 maximize: {
 
-                    visible: !!op.captionButtons.maximize,
-
                     click: '_leoDialogMaximize',
 
                     iconClassOn: "leoDialog_maximize_span"
@@ -606,8 +582,6 @@
                 },
 
                 close: {
-
-                    visible: !!op.captionButtons.close,
 
                     click: 'modalDialogHide',
 
@@ -617,7 +591,7 @@
 
                 restore:{
 
-                    visible:true,
+                    deps:['minimize', 'maximize'],
 
                     notAppendToHeader:true,
 
@@ -629,139 +603,151 @@
 
             };
 
-            !this.buttons && ( this.buttons = {} );
+            this.buttons = {};
 
-            this.index = [];
+            if(this._namesInArray(buttons.restore.deps, captionButtons)){
 
-            $.each( buttons, function ( name, value ) {
-
-                buttonArr.push( { button: name, info: value } );
-
-            });
-
-            for ( i = 0, buttonArrLength = buttonArr.length; i < buttonArrLength; i++ ) {
-
-                this._createCaptionButton( buttonArr[i], $uiDialogTitlebar );
+                captionButtons.push('restore');
 
             }
 
-            delete this.index;
+            for ( i = 0, captionButtonsLength = captionButtons.length; i < captionButtonsLength; i++ ){
+
+                this._createCaptionButton( buttons[captionButtons[i]], $uiDialogTitlebar, captionButtons[i] );
+
+            }
+
+            this._createWinResizeMax();
 
         },
 
-        _createCaptionButton:function( buttonHash, $uiDialogTitlebar ){
+        _namesInArray:function(names, arr){
 
-            var buttonObject,beforeElement,length,index,
+            if($.type(names) !== 'array' || $.type(arr) !== 'array'){
 
-            info = buttonHash.info,name = buttonHash.button,
+                return false;
 
-            createNotAppendToHeader = false,
+            }
 
-            buttonCss = 'leoDialog_' + name,time,
+            var re = new RegExp("(?:" + names.join("|") + ")");
 
-            buttons = this.buttons,$window = this.window,
+            return re.test(arr.join(""));
 
-            This = this,deleteNotAppendToHeader = false,
+        },
 
-            button = $uiDialogTitlebar.find( 'a.' + buttonCss ),
+        _createCaptionButton:function( info, $uiDialogTitlebar, name ){
+
+            if(!info){return;}
+
+            var buttonObject,deps = info.deps,This = this,
+
+            buttonCss = 'leoDialog_' + name,
+
+            buttons = this.buttons,
 
             hideClass = info.hideClass || '';
 
-            !!info.notAppendToHeader && ( !!buttons[name] ? deleteNotAppendToHeader = ( !buttons.minimize && !buttons.maximize ) : createNotAppendToHeader = ( !!buttons.minimize || !!buttons.maximize ) );
+            if ( !buttons[name] ){
 
-            if( info.visible ){
+                buttonObject = $('<a href="###"></a>').append( $("<span></span>").addClass(' leoDialog_titlebar_button_span ' + info.iconClassOn ).text( name ) ).addClass( buttonCss + " leoDialog_titlebar_button " + hideClass ).attr("role", "button");
 
-                if( deleteNotAppendToHeader ){
+                this._on( buttonObject, 'click.' + name, function(event){
 
-                    delete buttons[name];
+                    event.preventDefault();
 
-                    return;
+                    event.stopPropagation();
 
-                }
+                    if( This._dialogState === 'open' ){
 
-                if ( !button[0] || createNotAppendToHeader ){
+                        name === 'close' && ( This.options.closeCallBack.call( This, event, this ), This.clickCallBackName = 'closeCallBack' );
 
-                    buttonObject = $('<a href="###"></a>').append( $("<span></span>").addClass(' leoDialog_titlebar_button_span ' + info.iconClassOn ).text( buttonHash.button ) ).addClass( buttonCss + " leoDialog_titlebar_button " + hideClass ).attr("role", "button");
-
-                    this._on( buttonObject, 'click.' + name, function(event){
-
-                        event.preventDefault();
-
-                        event.stopPropagation();
-
-                        if( This._dialogState === 'open' ){
-
-                            name === 'close' && ( This.options.closeCallBack.call( This, event, this ), This.clickCallBackName = 'closeCallBack' );
-
-                            This[info.click]();
-
-                        }
-
-                    });
-
-                    if( name === 'maximize' ){
-
-                        this._on( $window, 'resize.maximize', function(){
-
-                            !!time && clearTimeout(time);
-
-                            time = setTimeout( function(){
-
-                                if( This.isMaximize ){
-
-                                    This._getBorderWidths();
-
-                                    var height,
-
-                                    width = $window.width() - This.borderWidths.left - This.borderWidths.right;
-
-                                    !!This.contentHide ? height = 'auto' : height = $window.height() - This.borderWidths.top - This.borderWidths.bottom;
-
-                                    This._setSizes( { width: width, height : height, cssPosition: 'fixed', top: 0, left: 0 } );
-
-                                }
-
-                            }, 100 );
-
-                        })
+                        This[info.click]();
 
                     }
 
-                    if( !info.notAppendToHeader ){
+                });
 
-                        index = this.index;
+                if( !info.notAppendToHeader ){
 
-                        length = index.length;
-
-                        if( length === 0 ){
-
-                            buttonObject.appendTo( $uiDialogTitlebar );
-
-                        }else{
-
-                            beforeElement = buttons[index[length-1]].element;
-
-                            !!beforeElement && buttonObject.insertAfter(beforeElement);
-
-                        }
-
-                        index.push( name );
-
-                    }
-
-                    buttons[name] = $.extend( { element: buttonObject[0] }, info );
+                    buttonObject.appendTo( $uiDialogTitlebar );
 
                 }
 
-            }else if( !!button[0] ){
-
-                button.remove();
-
-                name === 'maximize' && this._off( $window, 'resize.maximize' );
-
-                delete buttons[name];
+                buttons[name] = $.extend( { element: buttonObject[0] }, info );
 
             }
+
+        },
+
+        _createWinResizeMax:function(){
+
+            if(!this.resizeMaximize && (!!this.buttons.maximize || !!this.options.titlebarDblclickMax)){
+
+                var $window = this.window,This = this,time;
+
+                this._on( $window, 'resize.maximize', function(){
+
+                    !!time && clearTimeout(time);
+
+                    time = setTimeout( function(){
+
+                        if( This.isMaximize ){
+
+                            This._getBorderWidths();
+
+                            var height,
+
+                            width = $window.width() - This.borderWidths.left - This.borderWidths.right;
+
+                            !!This.contentHide ? height = 'auto' : height = $window.height() - This.borderWidths.top - This.borderWidths.bottom;
+
+                            This._setSizes( { width: width, height : height,  top: 0, left: 0 } );
+
+                        }
+
+                    }, 100 );
+
+                });
+
+                this.resizeMaximize = true;
+
+            }
+
+        },
+
+        _destroyWinResizeMax:function(){
+
+            if(this.resizeMaximize && !this.buttons.maximize && !this.options.titlebarDblclickMax){
+
+                this._off( this.window, 'resize.maximize' );
+
+                delete this.resizeMaximize;
+
+            }
+
+        },
+
+        _destroyCaptionButton:function(){
+
+            var buttons = this.buttons,prop;
+
+            if(buttons){
+
+                for(prop in buttons){
+
+                    if(Object.prototype.hasOwnProperty.call(buttons, prop)){
+
+                        $(buttons[prop].element).remove();
+
+                    }
+
+                }
+
+                this.buttons = {};
+
+            }
+
+            this._destroyWinResizeMax();
 
         },
 
@@ -850,7 +836,7 @@
 
             if ( flag === true ) {
 
-                !this.mask && ( this.mask = $('<div style = " width: 100%; height: 100%; position: absolute;top: 0; left: 0; z-index: 1;  opacity:0;visibility: visible;display: block; outline: none; padding: 0;margin: 0;border: 0" ></div>') );
+                !this.mask && ( this.mask = $( "<div>" ).css( { position: "absolute", width: '100%', height: '100%', opacity: 0, 'backgroundColor':'#fff', 'overflow': 'hidden', 'visibility': 'visible', 'display': 'block', 'top': 0, 'left': 0, 'padding': 0, 'margin': 0, 'border': 0, 'outline': 'none' } ) );
 
                 this.mask.css('z-index', this._maxIframeZindex()).appendTo( this.$content );
 
@@ -1088,7 +1074,7 @@
 
         _leoDialogPin:function(on){
 
-            if(!this.buttons){return;}
+            if(!this.buttons.pin){return;}
 
             var $span = $( this.buttons.pin.element ).find('.leoDialog_titlebar_button_span'),
 
@@ -1214,7 +1200,7 @@
 
             this.options.resize.call(this, this.$target[0]);
 
-            $( buttons.restore.element ).detach();
+            !!buttons.restore && $( buttons.restore.element ).detach();
 
         },
 
@@ -1809,6 +1795,8 @@
             }
 
             if ( key.indexOf('captionButtons') === 0 ) {
+
+                this._destroyCaptionButton();
 
                 this._createCaptionButtons();
 

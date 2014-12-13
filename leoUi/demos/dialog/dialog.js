@@ -34,19 +34,11 @@ leoUiLoad.require('leoUi-dialog,leoCss,ready', function($) {
 
         contentHtml: '<div id="delete_image">' + '<div class="send_content clearfix">' + '<div class="text">' + '<span class="icon"></span>' + '<span class="title">标题内容</span>' + '</div>' + '<div class="send_bottom clearfix">' + '<input class="send_submit" type="submit" value="改变按钮" name="submit" />' + '<input class="send_off" type="submit" value="取消" name="submit" />' + '</div>' + '</div>' + '</div>',
 
-        captionButtons: {
-            pin: true,
+        captionButtons: false,
 
-            refresh:false,
+        titlebarDblclickMax:false,
 
-            toggle: true,
-
-            minimize: true,
-
-            maximize: false,
-
-            close: true
-        },
+        title:'A',
 
         height: 190,
 
@@ -54,7 +46,9 @@ leoUiLoad.require('leoUi-dialog,leoCss,ready', function($) {
 
             containment: 'parent',
 
-            stopMouseWheel: true
+            stopMouseWheel: true,
+
+            iframeFix:true
 
         },
 
@@ -66,7 +60,9 @@ leoUiLoad.require('leoUi-dialog,leoCss,ready', function($) {
 
             containment: 'parent',
 
-            stopMouseWheel: false
+            stopMouseWheel: false,
+
+            iframeFix:true
 
         },
 
@@ -86,7 +82,7 @@ leoUiLoad.require('leoUi-dialog,leoCss,ready', function($) {
 
     });
 
-var c = $.leoDialog({
+    var c = $.leoDialog({
 
         appendTo: 'body',
 
@@ -94,19 +90,7 @@ var c = $.leoDialog({
 
         title:'C',
 
-        captionButtons: {
-            pin: true,
-
-            refresh:false,
-
-            toggle: true,
-
-            minimize: true,
-
-            maximize: false,
-
-            close: true
-        },
+        captionButtons: ['maximize', 'close', 'minimize', 'pin'],
 
         height: 190,
 
@@ -116,7 +100,9 @@ var c = $.leoDialog({
 
             containment: 'parent',
 
-            stopMouseWheel: true
+            stopMouseWheel: true,
+
+            iframeFix:true
 
         },
 
@@ -128,7 +114,9 @@ var c = $.leoDialog({
 
             containment: 'parent',
 
-            stopMouseWheel: false
+            stopMouseWheel: false,
+
+            iframeFix:true
 
         },
 
@@ -156,9 +144,7 @@ var c = $.leoDialog({
 
         contentHtml: '<iframe style="width:50%;height:100%;position:relative;z-index:998" frameborder="0" src="http://www.w3school.com.cn/"></iframe><iframe style="width:50%;height:100%;position:relative;z-index:999" frameborder="0" src="http://www.bootcss.com/"></iframe>',
 
-        captionButtons: {
-            refresh: true
-        },
+        title:'B',
 
         isMoveToTop:true,
 
@@ -173,6 +159,8 @@ var c = $.leoDialog({
             this.show(500, callBack);
 
         },
+
+        titlebarDblclickMax:false,
 
         hideAnimation: function(callBack) {
 
@@ -225,19 +213,9 @@ var c = $.leoDialog({
 
         a.option('okCallBack', function(event, disabled, enable) {
 
-            a.option('captionButtons', {
+            b.option({'captionButtons': [], titlebarDblclickMax:true});
 
-                pin: true,
-
-                toggle: false,
-
-                minimize: true,
-
-                maximize: false,
-
-                close: true
-
-            });
+            a.option('captionButtons', ['close', 'toggle', 'pin']);
             // a.option('draggableOption.stopMouseWheel', true)
             // a.option('scope','all' );
             // a.option({width:200,height:500,'position':{

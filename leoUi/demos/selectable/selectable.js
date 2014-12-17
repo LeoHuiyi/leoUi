@@ -2,7 +2,7 @@
 
 leoUiLoad.config({
 
-    debug:true,
+    debug:false,
 
     baseUrl:'/leoUi/',
 
@@ -31,17 +31,21 @@ leoUiLoad.config({
 leoUiLoad.require('leoUi-selectable,leoCss,ready', function($) {
 
     $( "#selectable" ).leoSelectable({
-        stop: function(a,b) {
+        stop: function(event, $selected) {
 
             var result = $( "#select-result" ).empty();
-            $( ".leoUi-selected", this ).each(function() {
+
+            $selected.each(function() {
                 var index = $( "#selectable li" ).index( this );
                 result.append( " #" + ( index + 1 ) );
             });
         }
     });
 
+    $( "#selectable1" ).leoSelectable();
+
     $("#botton_1").click(function(event) {
+        $( "#selectable" ).leoSelectable('destroy');
         $( "#selectable" ).leoSelectable('option','disabled',true);
 
     });

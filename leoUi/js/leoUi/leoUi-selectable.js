@@ -1,6 +1,6 @@
 /**
 +-------------------------------------------------------------------
-* jQuery leoUi--selectable
+* jQuery leoUi--selectable//参考jqueryUi
 +-------------------------------------------------------------------
 * @version    1.0.0 beta
 * @author     leo
@@ -36,36 +36,40 @@
 
         defaults:{
 
-            appendTo: "body",//选择帮手（套索） 应追加到哪个元素 。
+            appendTo: "body",//选择帮手（套索） 应追加到哪个元素
 
-			autoRefresh: true,//这个选项确定每个选择操作开始时如何刷新(重新计算)每个选择项的位置和大小. 如果你有很多很多选择项, 你应当设置此项为false并且手动调用refresh() 方法.
+			autoRefresh: true,//这个选项确定每个选择操作开始时如何刷新(重新计算)每个选择项的位置和大小. 如果你有很多很多选择项, 你应当设置此项为false并且手动调用refresh() 方法
 
-			distance: 0,//定义需要移动多少个像素选择才会开始. 如果指定了该项, 选择不会马上开始,而是会在鼠标移动了指定像素的距离之后才会开始.
+			distance: 0,//定义需要移动多少个像素选择才会开始. 如果指定了该项, 选择不会马上开始,而是会在鼠标移动了指定像素的距离之后才会开始
 
-			filter: "*",//匹配子元素中那些符合条件的元素才可以被选择.
+			filter: "*",//匹配子元素中那些符合条件的元素才可以被选择
 
-			tolerance: "touch",//指定那种模式，用来测试套索是否应该选择一个项目。允许使用的值:"fit": 套索完全重叠的项目。"touch": 套索重叠的项目任何部分。
+			tolerance: "touch",//指定那种模式，用来测试套索是否应该选择一个项目。允许使用的值:"fit": 套索完全重叠的项目。"touch": 套索重叠的项目任何部分
 
-			disabled:false,//如果设置为 true 将禁止selectable。
+			disabled:false,//如果设置为 true 将禁止selectable
 
-			helperClassName:"leoUi_selectable_helper",//助手ClassName
+			helperClassName:"leoUi_selectable_helper",//助手的ClassName
 
-			selectedClassName:"leoUi_selected",//选中的ClassName
+			selectedClassName:"leoUi_selected",//选中的select的ClassName
 
-			selectingClassName:"leoUi_selecting",//正在选择的ClassName
+			selectingClassName:"leoUi_selecting",//正在选择的select的ClassName
+
+			unselectingClassName:"leoUi_unselecting",//移除的select的ClassName
+
+			selecteeClassName:"leoUi_selectee",//能被选着的select的ClassName
 
 			// callbacks
-			selected: $.noop,//此事件会在选择操作结束时，在添加到选择的每个元素上触发。
+			selected: $.noop,//此事件会在选择操作结束时，在添加到选择的每个元素上触发（ this: target, arguments: event, selected ）
 
-			selecting: $.noop,//此事件会在选择操作过程中，在添加到选择的每个元素上触发。
+			selecting: $.noop,//此事件会在选择操作过程中，在添加到选择的每个元素上触发（ this: target, arguments: event, selecting ）
 
-			start: $.noop,//这个事件将在选择操作开始时触发。
+			start: $.noop,//这个事件将在选择操作开始时触发（ this: target, arguments: event ）
 
-			stop: $.noop,//这个事件将在选择操作结束后触发。
+			stop: $.noop,//这个事件将在选择操作结束后触发（ this: target, arguments: event, $selected ）
 
-			unselected: $.noop,//此事件会在选择操作结束时，在从选择元素集合中每个元素上触发。
+			unselected: $.noop,//此事件会在选择操作结束时，在从选择元素集合中每个元素上触发（ this: target, arguments: event, unselected ）
 
-			unselecting: $.noop//此事件会在选择操作过程中，在从选择元素集合中移除的每个元素上触发。
+			unselecting: $.noop//此事件会在选择操作过程中，在从选择元素集合中移除的每个元素上触发（ this: target, arguments: event, unselecting ）
 
         },
 
@@ -73,15 +77,13 @@
 
             var selectees,that = this,options = this.options;
 
-			this.dragged = false;
-
-			this.dataName = "leoUi_selectee_" + this.dataId;
+			this.dataName = this.dataId + "_uid_" + $.leoTools.getUuid();
 
 			this.refresh = function() {
 
 				selectees = $( options.filter, that.$target[0] );
 
-				selectees.addClass("leoUi_selectee");
+				selectees.addClass(options.selecteeClassName);
 
 				selectees.each( function() {
 
@@ -107,7 +109,7 @@
 
 						selecting: $this.hasClass(options.selectingClassName),
 
-						unselecting: $this.hasClass("leoUi_unselecting")
+						unselecting: $this.hasClass(options.unselectingClassName)
 
 					});
 
@@ -117,7 +119,7 @@
 
 			this.refresh();
 
-			this.selectees = selectees.addClass("leoUi_selectee");
+			this.selectees = selectees.addClass(options.selecteeClassName);
 
 			this.helper = $("<div class=' " + options.helperClassName + " '></div>");
 
@@ -127,21 +129,27 @@
 
         _destroy:function() {
 
-            this.selectees.removeClass("leoUi_selectee").removeData(this.dataName);
+        	var options = this.options;
+
+            this.selectees.removeClass(options.selectedClassName + " " + options.selecteeClassName + " " + options.selectingClassName).removeData(this.dataName);
+
+            this.helper.remove();
+
+            delete this.helper;
 
         },
 
         _mouseStart: function(event) {
 
-			var that = this,options = this.options;
+			var that = this,options = this.options,target = this.$target[0];
 
 			this.opos = [event.pageX, event.pageY];
 
 			if ( options.disabled ){ return; }
 
-			this.selectees = $( options.filter, this.$target[0] );
+			this.selectees = $( options.filter, target );
 
-			options.start.call( this.$target[0], event );
+			options.start.call( target, event );
 
 			$( options.appendTo ).append( this.helper );
 
@@ -159,7 +167,7 @@
 
 			!!options.autoRefresh && this.refresh();
 
-			this.selectees.filter(".leoUi_selected").each(function() {
+			this.selectees.filter("." + options.selectedClassName).each(function() {
 
 				var selectee = $.data(this, that.dataName);
 
@@ -171,11 +179,11 @@
 
 					selectee.selected = false;
 
-					selectee.$element.addClass("leoUi_unselecting");
+					selectee.$element.addClass(options.unselectingClassName);
 
 					selectee.unselecting = true;
 
-					options.unselecting.call( that.$target[0], event, {
+					options.unselecting.call( target, event, {
 
 						unselecting: selectee.element
 
@@ -193,7 +201,7 @@
 
 					doSelect = (!event.metaKey && !event.ctrlKey) || !selectee.$element.hasClass(options.selectedClassName);
 
-					selectee.$element.removeClass(doSelect ? "leoUi_unselecting" : options.selectedClassName).addClass(doSelect ? options.selectingClassName : "leoUi_unselecting");
+					selectee.$element.removeClass(doSelect ? options.unselectingClassName : options.selectedClassName).addClass(doSelect ? options.selectingClassName : options.unselectingClassName);
 
 					selectee.unselecting = !doSelect;
 
@@ -203,7 +211,7 @@
 
 					if (doSelect) {
 
-						options.selecting.call( that.$target[0], event, {
+						options.selecting.call( target, event, {
 
 							selecting: selectee.element
 
@@ -211,7 +219,7 @@
 
 					} else {
 
-						options.unselecting.call( that.$target[0], event, {
+						options.unselecting.call( target, event, {
 
 							unselecting: selectee.element
 
@@ -229,13 +237,11 @@
 
 		_mouseDrag: function(event) {
 
-			this.dragged = true;
-
 			if (this.options.disabled) {return;}
 
 			var tmp,that = this,options = this.options,x1 = this.opos[0],
 
-			y1 = this.opos[1],x2 = event.pageX,y2 = event.pageY;
+			y1 = this.opos[1],x2 = event.pageX,y2 = event.pageY,target = this.$target[0];
 
 			if (x1 > x2) {
 
@@ -273,7 +279,7 @@
 
 				var selectee = $.data(this, that.dataName),hit = false;
 
-				if (!selectee || selectee.element === that.$target[0]) {
+				if (!selectee || selectee.element === target) {
 
 					return;
 
@@ -301,7 +307,7 @@
 
 					if (selectee.unselecting) {
 
-						selectee.$element.removeClass("leoUi_unselecting");
+						selectee.$element.removeClass(options.unselectingClassName);
 
 						selectee.unselecting = false;
 
@@ -313,7 +319,7 @@
 
 						selectee.selecting = true;
 
-						that.options.selecting.call( that.$target[0], event, {
+						that.options.selecting.call( target, event, {
 
 							selecting: selectee.element
 
@@ -343,13 +349,13 @@
 
 							if (selectee.startselected) {
 
-								selectee.$element.addClass("leoUi_unselecting");
+								selectee.$element.addClass(options.unselectingClassName);
 
 								selectee.unselecting = true;
 
 							}
 
-							that.options.unselecting.call( that.$target[0], event, {
+							that.options.unselecting.call( target, event, {
 
 								unselecting: selectee.element
 
@@ -358,6 +364,7 @@
 						}
 
 					}
+
 					if (selectee.selected) {
 
 						if (!event.metaKey && !event.ctrlKey && !selectee.startselected) {
@@ -366,11 +373,11 @@
 
 							selectee.selected = false;
 
-							selectee.$element.addClass("leoUi_unselecting");
+							selectee.$element.addClass(options.unselectingClassName);
 
 							selectee.unselecting = true;
 
-							that.options.unselecting.call( that.$target[0], event, {
+							that.options.unselecting.call( target, event, {
 
 								unselecting: selectee.element
 
@@ -389,21 +396,21 @@
 
 		_mouseStop: function(event) {
 
-			var that = this,options = this.options;
+			var that = this,options = this.options,$selected,
 
-			this.dragged = false;
+			target = this.$target[0];
 
-			$(".leoUi_unselecting", this.$target[0]).each(function() {
+			$("." + options.unselectingClassName, target).each(function() {
 
 				var selectee = $.data(this, that.dataName);
 
-				selectee.$element.removeClass("leoUi_unselecting");
+				selectee.$element.removeClass(options.unselectingClassName);
 
 				selectee.unselecting = false;
 
 				selectee.startselected = false;
 
-				options.unselected.call( that.$target[0], event, {
+				options.unselected.call( target, event, {
 
 					unselected: selectee.element
 
@@ -411,7 +418,7 @@
 
 			});
 
-			$(".leoUi_selecting", this.$target[0]).each(function() {
+			$selected = $("." + options.selectingClassName, target).each(function() {
 
 				var selectee = $.data(this, that.dataName);
 
@@ -423,7 +430,7 @@
 
 				selectee.startselected = true;
 
-				options.selected.call( that.$target[0], event, {
+				options.selected.call( target, event, {
 
 					selected: selectee.element
 
@@ -431,7 +438,7 @@
 
 			});
 
-			options.stop.call( this.$target[0], event );
+			options.stop.call( target, event, $selected.add("." + options.selectedClassName, target) );
 
 			this.helper.remove();
 

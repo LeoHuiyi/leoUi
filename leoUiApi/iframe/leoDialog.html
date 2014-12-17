@@ -38,15 +38,15 @@
         <section class="g-mod g-attr g-block">
             <h2 class="tit">leoDialog对话框组件</h2>
             <div class="cont">
-                <p><strong>$('.leoUi').leoDialog( options )</strong></p>
+                <p><strong>$.leoDialog( options )</strong></p>
                 <p><strong>使用说明</strong>：</p>
                 <section class="g-mod g-attr g-block">
                     <div class="cont">
                         <p><strong>examples</strong>：</p>
                         <pre class="brush: js;">
-                            $('.leoUi').leoDialog({
+                            var $leoDialog = $.leoDialog({
 
-                                 dialogHtml: '<div class="leoDialog">'
+                                dialogHtml: '<div class="leoDialog">'
 					            +               '<div class="leoDialog_titlebar leoUi_clearfix">'
 					            +                   '<span class="leoDialog_title"></span>'
 					            +               '</div>'
@@ -95,7 +95,9 @@
 
 					            ...
 
-                            })
+                            });
+
+                            $leoDialog.dialogShow();
                         </pre>
                     </div>
                 </section>
@@ -111,7 +113,8 @@
                         <p><strong>returns</strong>：无</p>
                         <p><strong>examples</strong>：</p>
                         <pre class="brush: js;">
-                            $( ".leoUi" ).leoDialog( "destroy" );
+                            $.leoDialog( "destroy" );
+                            $.leoDialog.destroy();
                         </pre>
                     </div>
                 </section>
@@ -122,7 +125,122 @@
                         <p><strong>returns</strong>：参考leoPlugIn中的option方法</p>
                         <p><strong>examples</strong>：</p>
                         <pre class="brush: js;">
-                            $( ".leoUi" ).leoDialog( "a.b.c", 500 );
+                            $.leoDialog( "option" "a.b.c", 500 );
+                            $.leoDialog.option( "a.b.c", 500 );
+                        </pre>
+                    </div>
+                </section>
+                <section class="g-mod g-attr g-block">
+                    <div class="cont">
+                        <p><strong>setDialogTitle(text)</strong>：设置都dialog标题</p>
+                        <p><strong>arguments</strong>：</p>
+                        <div class="cont">
+                            <p>text(string): 标题文本</p>
+                        </div>
+                        <p><strong>returns</strong>：无</p>
+                        <p><strong>examples</strong>：</p>
+                        <pre class="brush: js;">
+                            $.leoDialog( "setDialogTitle" "标题" );
+                            $.leoDialog.setDialogTitle( "标题" );
+                        </pre>
+                    </div>
+                </section>
+                <section class="g-mod g-attr g-block">
+                    <div class="cont">
+                        <p><strong>clearDialogTimeout(id)</strong>：清除dialog和遮罩层的延时定时器</p>
+                        <p><strong>arguments</strong>：</p>
+                        <div class="cont">
+                            <p>id(string): 可以有"all", "modalShow", "modalHide", "dialogShow", "dialogHide",后面四个可以写一起写，以空格或者逗号隔开（比如：modalShow,dialogShow）</p>
+                        </div>
+                        <p><strong>returns</strong>：无</p>
+                        <p><strong>examples</strong>：</p>
+                        <pre class="brush: js;">
+                            $.leoDialog( "clearDialogTimeout" "modalShow,dialogShow" );
+                            $.leoDialog.clearDialogTimeout( "all" );
+                        </pre>
+                    </div>
+                </section>
+                <section class="g-mod g-attr g-block">
+                    <div class="cont">
+                        <p><strong>dialogShow()</strong>：显示dialog和遮罩层</p>
+                        <p><strong>arguments</strong>：无</p>
+                        <p><strong>returns</strong>：无</p>
+                        <p><strong>examples</strong>：</p>
+                        <pre class="brush: js;">
+                            $.leoDialog( "dialogShow" );
+                            $.leoDialog.dialogShow();
+                        </pre>
+                    </div>
+                </section>
+                <section class="g-mod g-attr g-block">
+                    <div class="cont">
+                        <p><strong>modalDialogHide()</strong>：关闭dialog和遮罩层</p>
+                        <p><strong>arguments</strong>：无</p>
+                        <p><strong>returns</strong>：无</p>
+                        <p><strong>examples</strong>：</p>
+                        <pre class="brush: js;">
+                            $.leoDialog( "modalDialogHide" );
+                            $.leoDialog.modalDialogHide();
+                        </pre>
+                    </div>
+                </section>
+                <section class="g-mod g-attr g-block">
+                    <div class="cont">
+                        <p><strong>moveToTop()</strong>：移动当前的的dialog到最上面（isMoveToTop = true 才有效）</p>
+                        <p><strong>arguments</strong>：无</p>
+                        <p><strong>returns</strong>：无</p>
+                        <p><strong>examples</strong>：</p>
+                        <pre class="brush: js;">
+                            $.leoDialog( "moveToTop" );
+                            $.leoDialog.moveToTop();
+                        </pre>
+                    </div>
+                </section>
+                <section class="g-mod g-attr g-block">
+                    <div class="cont">
+                        <p><strong>modalState()</strong>：遮罩层的状态</p>
+                        <p><strong>arguments</strong>：无</p>
+                        <p><strong>returns</strong>：返回'open','close','opening','closeing'4中状态</p>
+                        <p><strong>examples</strong>：</p>
+                        <pre class="brush: js;">
+                            $.leoDialog( "modalState" );
+                            $.leoDialog.modalState();
+                        </pre>
+                    </div>
+                </section>
+                <section class="g-mod g-attr g-block">
+                    <div class="cont">
+                        <p><strong>dialogState()</strong>：dialog的状态</p>
+                        <p><strong>arguments</strong>：无</p>
+                        <p><strong>returns</strong>：返回'open','close','opening','closeing'4中状态</p>
+                        <p><strong>examples</strong>：</p>
+                        <pre class="brush: js;">
+                            $.leoDialog( "dialogState" );
+                            $.leoDialog.dialogState();
+                        </pre>
+                    </div>
+                </section>
+                <section class="g-mod g-attr g-block">
+                    <div class="cont">
+                        <p><strong>modalHide()</strong>：关闭遮罩层</p>
+                        <p><strong>arguments</strong>：无</p>
+                        <p><strong>returns</strong>：无</p>
+                        <p><strong>examples</strong>：</p>
+                        <pre class="brush: js;">
+                            $.leoDialog( "modalHide" );
+                            $.leoDialog.modalHide();
+                        </pre>
+                    </div>
+                </section>
+                <section class="g-mod g-attr g-block">
+                    <div class="cont">
+                        <p><strong>dialogHide()</strong>：关闭dialog</p>
+                        <p><strong>arguments</strong>：无</p>
+                        <p><strong>returns</strong>：无</p>
+                        <p><strong>examples</strong>：</p>
+                        <pre class="brush: js;">
+                            $.leoDialog( "dialogHide" );
+                            $.leoDialog.dialogHide();
                         </pre>
                     </div>
                 </section>
@@ -413,71 +531,11 @@
 
             'name': 'captionButtons',
 
-            'default': '参考源码',
+            'default': '["pin", "refresh", "toggle", "minimize", "maximize", "close"]',
 
             'type': 'object',
 
-            'explain': '标题栏的按键属性（没有.leoDialog_titlebar则设置无效）'
-
-        }, {
-
-            'name': 'pin',
-
-            'default': 'true',
-
-            'type': 'boolean',
-
-            'explain': '是否定固定dialog位置，对于initDraggable = true有效（属于captionButtons）'
-
-        }, {
-
-            'name': 'refresh',
-
-            'default': 'false',
-
-            'type': 'boolean',
-
-            'explain': '刷新content中所有iframe的内容（属于captionButtons）'
-
-        }, {
-
-            'name': 'toggle',
-
-            'default': 'true',
-
-            'type': 'boolean',
-
-            'explain': '点击展开或者关闭content（属于captionButtons）'
-
-        }, {
-
-            'name': 'minimize',
-
-            'default': 'true',
-
-            'type': 'boolean',
-
-            'explain': '最小化dialog（属于captionButtons）'
-
-        }, {
-
-            'name': 'maximize',
-
-            'default': 'true',
-
-            'type': 'boolean',
-
-            'explain': '最大化dialog（属于captionButtons）'
-
-        }, {
-
-            'name': 'close',
-
-            'default': 'true',
-
-            'type': 'boolean',
-
-            'explain': '关闭dialog（属于captionButtons）'
+            'explain': '是否使用按钮，有"pin", "refresh", "toggle", "minimize", "maximize", "close"可选，按照顺序显示，不用按钮可用false标示'
 
         }, {
 
@@ -537,7 +595,7 @@
 
             'type': 'function',
 
-            'explain': 'dialog组件初始化回调（ this: this, arguments: target ）'
+            'explain': 'dialog组件初始化回调（ this: publicMethods, arguments: target ）'
 
         }, {
 
@@ -547,7 +605,7 @@
 
             'type': 'function',
 
-            'explain': 'dialog组件显示之前回调（ this: this, arguments: target ）'
+            'explain': 'dialog组件显示之前回调（ this: publicMethods, arguments: target ）'
 
         }, {
 
@@ -557,7 +615,7 @@
 
             'type': 'function',
 
-            'explain': '点击ok按钮回调（ this: this, arguments: event, bottunDisable, bottunEnable））'
+            'explain': '点击ok按钮回调（ this: publicMethods, arguments: event, bottunDisable, bottunEnable））'
 
         }, {
 
@@ -567,7 +625,7 @@
 
             'type': 'function',
 
-            'explain': '点击cancel按钮回调（ this: this, arguments: event, bottunDisable, bottunEnable））'
+            'explain': '点击cancel按钮回调（ this: publicMethods, arguments: event, bottunDisable, bottunEnable））'
 
         }, {
 
@@ -577,7 +635,7 @@
 
             'type': 'function',
 
-            'explain': '点击close按钮回调（this: this, arguments: event, close）'
+            'explain': '点击close按钮回调（this: publicMethods, arguments: event, close）'
 
         }, {
 
@@ -587,7 +645,7 @@
 
             'type': 'function',
 
-            'explain': '点击罩盖层按钮回调（this: this, arguments: event, modal）'
+            'explain': '点击罩盖层按钮回调（this: publicMethods, arguments: event, modal）'
 
         }, {
 
@@ -597,7 +655,7 @@
 
             'type': 'function',
 
-            'explain': 'iframe load结束回调（this: this, arguments: event, iframe）'
+            'explain': 'iframe load结束回调（this: publicMethods, arguments: event, iframe）'
 
         }, {
 
@@ -607,7 +665,7 @@
 
             'type': 'function',
 
-            'explain': 'dialog大小调整回调（this: this, arguments: target）'
+            'explain': 'dialog大小调整回调（this: publicMethods, arguments: target）'
 
         }, {
 
@@ -617,7 +675,7 @@
 
             'type': 'function',
 
-            'explain': 'dialog聚焦（this: this, arguments: target）'
+            'explain': 'dialog聚焦（this: publicMethods, arguments: target）'
 
         }, {
 
@@ -627,7 +685,7 @@
 
             'type': 'function',
 
-            'explain': 'dialog丢失焦点（this: this, arguments: target）'
+            'explain': 'dialog丢失焦点（this: publicMethods, arguments: target）'
 
         }, {
 
@@ -637,7 +695,7 @@
 
             'type': 'function',
 
-            'explain': '创建罩盖层,必须返回elem或者jquery对象（this: this, arguments: event, target）'
+            'explain': '创建罩盖层,必须返回elem或者jquery对象（this: publicMethods, arguments: target）'
 
         }, {
 
@@ -647,7 +705,7 @@
 
             'type': 'function',
 
-            'explain': '创建disabled===true的罩盖层, appendTo->dialog,必须返回elem或者jquery对象（this: this, arguments: event, target）'
+            'explain': '创建disabled===true的罩盖层, appendTo->dialog,必须返回elem或者jquery对象（this: publicMethods, arguments: target）'
 
         }, {
 
@@ -657,7 +715,7 @@
 
             'type': 'function',
 
-            'explain': 'modal显示的回调，可自定义动画等，在显示完毕必须调用callBack（this: target, arguments: callBack）'
+            'explain': 'modal显示的回调，可自定义动画等，在显示完毕必须调用callBack（this: $modal, arguments: callBack, publicEvent）'
 
         }, {
 
@@ -667,7 +725,7 @@
 
             'type': 'function',
 
-            'explain': 'modal关闭的回调，可自定义动画等，在显示完毕必须调用callBack（this: target, arguments: callBack）'
+            'explain': 'modal关闭的回调，可自定义动画等，在显示完毕必须调用callBack（this: $modal, arguments: callBack, publicEvent）'
 
         }, {
 
@@ -677,7 +735,7 @@
 
             'type': 'function',
 
-            'explain': 'dialog显示的回调，可自定义动画等，在显示完毕必须调用callBack（this: target, arguments: callBack）'
+            'explain': 'dialog显示的回调，可自定义动画等，在显示完毕必须调用callBack（this: $target, arguments: callBack, publicEvent）'
 
         }, {
 
@@ -687,7 +745,7 @@
 
             'type': 'function',
 
-            'explain': 'dialog关闭的回调，可自定义动画等，在显示完毕必须调用callBack（this: target, arguments: callBack）'
+            'explain': 'dialog关闭的回调，可自定义动画等，在显示完毕必须调用callBack（this: $target, arguments: callBack, publicEvent）'
 
         }, {
 
@@ -697,7 +755,7 @@
 
             'type': 'function',
 
-            'explain': '调整modal，dialog显示调用顺序（this: target, arguments: modelShowFn, dialogShowFn）'
+            'explain': '调整modal，dialog显示调用顺序（this: publicMethods, arguments: modelShowFn, dialogShowFn）'
 
         }, {
 
@@ -707,7 +765,7 @@
 
             'type': 'function',
 
-            'explain': '调整modal，dialog关闭调用顺序（this: modelShowFn, arguments: modelHideFn, dialogHideFn）'
+            'explain': '调整modal，dialog关闭调用顺序（this: publicMethods, arguments: modelHideFn, dialogHideFn）'
 
         }, {
 
@@ -717,7 +775,7 @@
 
             'type': 'function',
 
-            'explain': 'dialog显示完毕回调（this: this, arguments: event, target）'
+            'explain': 'dialog显示完毕回调（this: publicMethods, arguments: target）'
 
         }, {
 
@@ -727,7 +785,7 @@
 
             'type': 'function',
 
-            'explain': 'dialog关闭完成回调，clickCallBackName：okCallBack, cancelCallBack, closeCallBack, quickCloseCallBack。（this: this, arguments: event, clickCallBackName）'
+            'explain': 'dialog关闭完成回调，clickCallBackName：okCallBack, cancelCallBack, closeCallBack, quickCloseCallBack。（this: publicMethods, arguments: clickCallBackName）'
 
         }, {
 
@@ -737,7 +795,7 @@
 
             'type': 'function',
 
-            'explain': 'dialog和Model关闭完成回调，clickCallBackName：okCallBack, cancelCallBack, closeCallBack, quickCloseCallBack。（this: this, arguments: event, clickCallBackName）'
+            'explain': 'dialog和Model关闭完成回调，clickCallBackName：okCallBack, cancelCallBack, closeCallBack, quickCloseCallBack。（this: publicMethods, arguments: clickCallBackName）'
 
         }],gridOptions = {
 

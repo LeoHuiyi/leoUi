@@ -423,6 +423,8 @@
 
                             if(options === 'destroy'){
 
+                                deleteObj(instance);
+
                                 instance = null;
 
                                 return false;
@@ -441,27 +443,73 @@
 
                     }
 
-                    for (var key in instance ) {
+                    function deleteObj(obj){
 
-                        if ( $.isFunction( instance[key] ) && key.charAt( 0 ) !== "_" && key !== 'constructor' ) {
+                        if(obj){
 
-                            inFn[key] = function(key){
+                            for(var prop in obj){
+
+                                obj[prop] = null;
+
+                            }
+
+                        }
+
+                    };
+
+                    function updateInFnMethods(instance, methodArr){
+
+                        deleteObj(inFn);
+
+                        var key,i = methodArr.length,method;
+
+                        for ( key in instance ) {
+
+                            if ( $.isFunction( instance[key] ) && key.charAt( 0 ) !== "_" && key !== 'constructor' ) {
+
+                                inFn[key] = function(key){
+
+                                    return function(){
+
+                                        var arg = aslice.call(arguments);
+
+                                        arg.unshift(key);
+
+                                        return inFn.apply( inFn, arg );
+
+                                    }
+
+                                }( key );
+
+                            }
+
+                        }
+
+                        while(i--){
+
+                            method = methodArr[i];
+
+                            inFn[method] = function(method){
 
                                 return function(){
 
                                     var arg = aslice.call(arguments);
 
-                                    arg.unshift(key);
+                                    arg.unshift(method);
 
                                     return inFn.apply( inFn, arg );
 
                                 }
 
-                            }( key );
+                            }( method );
 
                         }
 
                     }
+
+                    updateInFnMethods(instance, ['instance']);
+
+                    instance.__updateInFnMethods = updateInFnMethods;
 
                     return inFn;
 
@@ -710,8 +758,6 @@
 
                     this.window = $( this.document[0].defaultView || this.document[0].parentWindow );
 
-                    this._init();
-
                     this.dataId !== false && $.data( target, this.dataId, this );
 
                     this._publicEvent = function(plugIn){
@@ -725,6 +771,70 @@
                         }
 
                     }(this);
+
+                    !!this._updatePublicMethods && this._updatePublicMethods();
+
+                    this._init();
+
+                },
+
+                _deletePublicEventObj:function(){
+
+                    var _publicMethods = this._publicMethods,prop;
+
+                    if(_publicMethods){
+
+                        for(prop in _publicMethods){
+
+                            if(Object.prototype.hasOwnProperty.call(_publicMethods, prop)){
+
+                                _publicMethods[prop] = null;
+
+                            }
+
+                        }
+
+                        this._publicMethods = null;
+
+                    }
+
+                    return this;
+
+                },
+
+                _updatePublicMethods:function(){
+
+                    this._deletePublicEventObj();
+
+                    this._publicMethods = function(plugIn){
+
+                        var _publicMethods = {},key;
+
+                        for ( key in plugIn ) {
+
+                            if ( $.isFunction( plugIn[key] ) && key.charAt( 0 ) !== "_" && key !== 'constructor' ) {
+
+                                _publicMethods[key] = function( plugIn, key ){
+
+                                    return function(){
+
+                                        return plugIn[key].apply( plugIn, arguments );
+
+                                    }
+
+                                }( plugIn, key );
+
+                            }
+
+                        }
+
+                        return _publicMethods;
+
+                    }(this);
+
+                    !!this.__updateInFnMethods && this.__updateInFnMethods(this, ['instance']);
+
+                    return this;
 
                 },
 
@@ -764,7 +874,7 @@
 
                                 arg[last] = function(event){
 
-                                    if( op.disabledEvent !== true && !$( event.target ).closest( "." + This.disableClassName )[0] ){
+                                    if( op.disabledEvent === false && !$( event.target ).closest( "." + This.disableClassName )[0] ){
 
                                         oldFn.apply(this, arguments);
 

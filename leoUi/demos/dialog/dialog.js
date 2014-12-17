@@ -28,19 +28,27 @@ leoUiLoad.config({
 
 leoUiLoad.require('leoUi-dialog,leoCss,ready', function($) {
 
+    var flag = false;
+
     var a = $.leoDialog({
 
         appendTo: 'body',
 
         contentHtml: '<div id="delete_image">' + '<div class="send_content clearfix">' + '<div class="text">' + '<span class="icon"></span>' + '<span class="title">标题内容</span>' + '</div>' + '<div class="send_bottom clearfix">' + '<input class="send_submit" type="submit" value="改变按钮" name="submit" />' + '<input class="send_off" type="submit" value="取消" name="submit" />' + '</div>' + '</div>' + '</div>',
 
-        captionButtons: false,
+        captionButtons: ['close'],
 
         titlebarDblclickMax:false,
 
         title:'A',
 
         height: 190,
+
+        showDelay:1000,
+
+        hideDelay:1000,
+
+        modalHideDelay:1000,
 
         resizableOption: {
 
@@ -78,17 +86,61 @@ leoUiLoad.require('leoUi-dialog,leoCss,ready', function($) {
 
             $(target).find('input').focus();
 
+        },
+
+        makeModelDialogShow:function( modelShowFn, dialogShowFn ){
+
+            // dialogShowFn(!!flag && modelShowFn);
+
+           // modelShowFn(!!flag && dialogShowFn);
+
+           modelShowFn(dialogShowFn);
+
+        },//调整modal，dialog显示调用顺序（this: publicMethods, arguments: modelShowFn, dialogShowFn）
+
+        makeModelDialogHide:function( modelHideFn, dialogHideFn ){
+
+            // if(this.modalState() === 'close'){
+
+            //     this.destroyOverlay()
+
+            //     dialogHideFn();
+            // }else{
+
+            //     dialogHideFn(modelHideFn);
+
+            // }
+
+            if(this.dialogState() === 'close'){
+
+                modelHideFn();
+
+            }else{
+
+                dialogHideFn(modelHideFn);
+
+                this.clearDialogTimeout('modalShow,dialogShow'); 
+
+            }
+
+        },
+
+        modalDialogHideCallBack:function(){
+
+
+            console.log(this)
+
         }
 
     });
 
-    var c = $.leoDialog({
+    var cDialog = $.leoDialog({
 
         appendTo: 'body',
 
         contentHtml: '<div id="delete_image">' + '<div class="send_content clearfix">' + '<div class="text">' + '<span class="icon"></span>' + '<span class="title">标题内容</span>' + '</div>' + '<div class="send_bottom clearfix">' + '<input class="send_submit" type="submit" value="改变按钮" name="submit" />' + '<input class="send_off" type="submit" value="取消" name="submit" />' + '</div>' + '</div>' + '</div>',
 
-        title:'C',
+        title:'cDialog',
 
         captionButtons: ['maximize', 'close', 'minimize', 'pin'],
 
@@ -210,6 +262,28 @@ leoUiLoad.require('leoUi-dialog,leoCss,ready', function($) {
             a.dialogHide();
         }
 
+        console.log(a.dialogState())
+
+        // console.log(b.instance().abc)
+
+        //  console.log(b.abc)
+
+        // console.log(b.instance().abc = 12312321)
+
+        //  console.log(b.instance().dialogShow)
+
+        // console.log(b.instance().dialogShow = null)
+
+        // console.log(b.instance().dialogShow)
+
+        // b.instance()._updatePublicMethods();
+
+        // console.log(b.dialogShow)
+
+        //  console.log(b.abc)
+
+        // console.log(b.instance().abc)
+
 
         a.option('okCallBack', function(event, disabled, enable) {
 
@@ -250,18 +324,18 @@ leoUiLoad.require('leoUi-dialog,leoCss,ready', function($) {
 
         });
 
-        c.option('initDraggable', true);
+        cDialog.option('initDraggable', true);
 
         b.option('contentHtml', '<iframe style="width:100%;height:100%;" frameborder="0" src="http://www.w3school.com.cn"></iframe>');
     })
 
-    var flag = false;
-
     $('#botton_2').on('click', function() {
+
+        // console.log(b.dialogShow())
 
         b.dialogShow();
 
-        c.dialogShow();
+        cDialog.dialogShow();
 
         b.option('disabled',flag)
 
@@ -271,7 +345,7 @@ leoUiLoad.require('leoUi-dialog,leoCss,ready', function($) {
 
         // b.destroy();
 
-        // c.destroy();
+        // cDialog.destroy();
 
         // b.option({width:200,height:500,contentHtml:'<div>'})
 

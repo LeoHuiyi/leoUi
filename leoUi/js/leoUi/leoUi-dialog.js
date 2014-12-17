@@ -47,7 +47,7 @@
 
         defaults:{
 
-            dialogHtml: '<div class="leoDialog">'
+            dialogHtml:'<div class="leoDialog">'
             +               '<div class="leoDialog_titlebar leoUi_clearfix">'
             +                   '<span class="leoDialog_title"></span>'
             +               '</div>'
@@ -55,7 +55,7 @@
             +               '</div>'
             +           '</div>',//dialog的基础html标签，其中leoDialog_titlebar为标题栏className，leoDialog_title为标题className，leoDialog_content为内容contentHtml的className，这几个className是必须的。
 
-            contentHtml :'<div id="delete_image">'
+            contentHtml:'<div id="delete_image">'
             +       '<div class="send_content clearfix">'
             +           '<div class="text">'
             +               '<span class="icon"></span>'
@@ -78,11 +78,11 @@
 
             titlebarDblclickMax:true,//是否支持双击标题栏最大化
 
-            appendTo: 'body',//dialog应该被appendTo到哪个元素
+            appendTo:'body',//dialog应该被appendTo到哪个元素
 
-            modalShowDelay: 0,//打开遮罩层延迟的时间
+            modalShowDelay:0,//打开遮罩层延迟的时间
 
-            modalHideDelay: 0,//关闭遮罩层延迟的时间
+            modalHideDelay:0,//关闭遮罩层延迟的时间
 
             showDelay:0,//打开dialog延迟的时间
 
@@ -108,15 +108,15 @@
 
             captionButtons:['pin', 'refresh', 'toggle', 'minimize', 'maximize', 'close'],//是否使用按钮，有'pin', 'refresh', 'toggle', 'minimize', 'maximize', 'close'可选，按照顺序显示，不用按钮可用false标示
 
-            position: {//参考jqueryUi的API（其中of属性设置成“window”或者“document”使用当前框架的window或者document）
+            position:{//参考jqueryUi的API（其中of属性设置成“window”或者“document”使用当前框架的window或者document）
 
-                my: "center",
+                my:"center",
 
-                at: "center",
+                at:"center",
 
-                of: 'window',
+                of:'window',
 
-                collision: "fit"
+                collision:"fit"
 
             },
 
@@ -164,25 +164,25 @@
 
             },
 
-            initCallBack:$.noop,//dialog组件初始化回调（ this: this, arguments: target ）
+            initCallBack:$.noop,//dialog组件初始化回调（ this: publicMethods, arguments: target ）
 
-            beforeShow:$.noop,//dialog组件显示之前回调（ this: this, arguments: target ）
+            beforeShow:$.noop,//dialog组件显示之前回调（ this: publicMethods, arguments: target ）
 
-            okCallBack:$.noop,//点击ok按钮回调（ this: this, arguments: event, bottunDisable, bottunEnable））
+            okCallBack:$.noop,//点击ok按钮回调（ this: publicMethods, arguments: event, bottunDisable, bottunEnable））
 
-            cancelCallBack:$.noop,//点击cancel按钮回调（ this: this, arguments: event, bottunDisable, bottunEnable））
+            cancelCallBack:$.noop,//点击cancel按钮回调（ this: publicMethods, arguments: event, bottunDisable, bottunEnable））
 
-            closeCallBack:$.noop,//点击close按钮回调（this: this, arguments: event, close）
+            closeCallBack:$.noop,//点击close按钮回调（this: publicMethods, arguments: event, close）
 
-            quickCloseCallBack:$.noop,//点击罩盖层按钮回调（this: this, arguments: event, modal）
+            quickCloseCallBack:$.noop,//点击罩盖层按钮回调（this: publicMethods, arguments: event, modal）
 
-            iframeLoadCallBack:$.noop,//iframe load结束回调（this: this, arguments: event, iframe）
+            iframeLoadCallBack:$.noop,//iframe load结束回调（this: publicMethods, arguments: event, iframe）
 
-            resize:$.noop,//dialog大小调整回调（this: this, arguments: target）
+            resize:$.noop,//dialog大小调整回调（this: publicMethods, arguments: target）
 
-            dialogFocus:$.noop,//dialog聚焦（this: this, arguments: target）
+            dialogFocus:$.noop,//dialog聚焦（this: publicMethods, arguments: target）
 
-            dialogBlur:$.noop,//dialog丢失焦点（this: this, arguments: target）
+            dialogBlur:$.noop,//dialog丢失焦点（this: publicMethods, arguments: target）
 
             makeModel:function(target){
 
@@ -190,17 +190,17 @@
 
                 zIndex > 1 && ( zIndex = zIndex -1 );
 
-                return $('<div style = "position: fixed;top: 0px; left: 0px;width:100%;height:100%;background-color:black;overflow:hidden;z-index: '+ zIndex +';"></div>').hide().appendTo('body');
+                return $('<div style = "position: fixed;top: 0px; left: 0px;width:100%;height:100%;background-color:black;overflow:hidden;z-index: '+ zIndex +';"></div>').hide().appendTo('body')[0];
 
-            },//创建罩盖层,必须返回elem或者jquery对象（this: this, arguments: event, target）
+            },//创建罩盖层,必须返回elem或者jquery对象（this: publicMethods, arguments: target）
 
             makeDisabledDiv:function(target){
 
                 return $( "<div>" ).css( { position: "absolute", width: '100%', height: '100%', opacity: 0, 'backgroundColor':'#fff', 'overflow': 'hidden', 'visibility': 'visible', 'display': 'block', 'top': 0, 'left': 0, 'padding': 0, 'margin': 0, 'border': 0, 'outline': 'none' } )[0];
 
-            },//创建disabled===true的罩盖层, appendTo->dialog,必须返回elem或者jquery对象（this: this, arguments: event, target）
+            },//创建disabled===true的罩盖层, appendTo->dialog,必须返回elem或者jquery对象（this: publicMethods, arguments: target）
 
-            modalShowAnimation: function(callBack)  {
+            modalShowAnimation:function(callBack, publicEvent)  {
 
                 this.css({
                     "display": 'block',
@@ -214,15 +214,11 @@
 
                 // callBack();
 
-            },//modal显示的回调，可自定义动画等，在显示完毕必须调用callBack（this: target, arguments: callBack）
+            },//modal显示的回调，可自定义动画等，在显示完毕必须调用callBack（this: $modal, arguments: callBack, publicEvent）
 
-            modalHideAnimation: function(callBack) {
+            modalHideAnimation:function(callBack, publicEvent) {
 
-                this.css({
-                    "display": 'block',
-                    "position": "fixed",
-                    "opacity": 0.8
-                }).animate({
+                this.animate({
                     "opacity": 0
                 }, 500, callBack);
 
@@ -230,9 +226,9 @@
 
                 // callBack();
 
-            },//modal关闭的回调，可自定义动画等，在显示完毕必须调用callBack（this: target, arguments: callBack）
+            },//modal关闭的回调，可自定义动画等，在显示完毕必须调用callBack（this: $modal, arguments: callBack, publicEvent）
 
-            showAnimation: function(callBack) {
+            showAnimation:function(callBack, publicEvent) {
 
                 this.show( { effect: "clip", duration: "slow", complete: callBack } );
 
@@ -241,9 +237,9 @@
                 // callBack();
 
 
-            },//dialog显示的回调，可自定义动画等，在显示完毕必须调用callBack（this: target, arguments: callBack）
+            },//dialog显示的回调，可自定义动画等，在显示完毕必须调用callBack（this: $target, arguments: callBack, publicEvent）
 
-            hideAnimation: function(callBack) {
+            hideAnimation:function(callBack, publicEvent) {
 
                 this.hide( { effect: "explode", duration: "slow", complete: callBack } );
 
@@ -251,37 +247,37 @@
 
                 // callBack();
 
-            },//dialog关闭的回调，可自定义动画等，在显示完毕必须调用callBack（this: target, arguments: callBack）
+            },//dialog关闭的回调，可自定义动画等，在显示完毕必须调用callBack（this: $target, arguments: callBack, publicEvent）
 
             makeModelDialogShow:function( modelShowFn, dialogShowFn ){
 
                 modelShowFn(dialogShowFn);
 
-            },//调整modal，dialog显示调用顺序（this: target, arguments: modelShowFn, dialogShowFn）
+            },//调整modal，dialog显示调用顺序（this: publicMethods, arguments: modelShowFn, dialogShowFn）
 
             makeModelDialogHide:function( modelHideFn, dialogHideFn ){
 
                 dialogHideFn(modelHideFn);
 
-            },//调整modal，dialog关闭调用顺序（this: modelShowFn, arguments: modelHideFn, dialogHideFn）
+            },//调整modal，dialog关闭调用顺序（this: publicMethods, arguments: modelHideFn, dialogHideFn）
 
-            dialogShowCallBack: function(target){
+            dialogShowCallBack:function(target){
 
                 // this.dialogHide();
 
-            },//dialog显示完毕回调（this: this, arguments: event, target）
+            },//dialog显示完毕回调（this: publicMethods, arguments: target）
 
-            dialogHideCallBack: function(clickCallBackName){
+            dialogHideCallBack:function(clickCallBackName){
 
                 // this.modalHide();
 
-            },//dialog关闭完成回调，clickCallBackName：okCallBack, cancelCallBack, closeCallBack, quickCloseCallBack。（this: this, arguments: event, clickCallBackName）
+            },//dialog关闭完成回调，clickCallBackName：okCallBack, cancelCallBack, closeCallBack, quickCloseCallBack。（this: publicMethods, arguments: clickCallBackName）
 
             modalDialogHideCallBack:function(clickCallBackName){
 
                 // console.log(this)
 
-            }//dialog和Model关闭完成回调，clickCallBackName：okCallBack, cancelCallBack, closeCallBack, quickCloseCallBack。（this: this, arguments: event, clickCallBackName）
+            }//dialog和Model关闭完成回调，clickCallBackName：okCallBack, cancelCallBack, closeCallBack, quickCloseCallBack。（this: publicMethods, arguments: clickCallBackName）
 
         },
 
@@ -321,8 +317,6 @@
 
             this._createCancelButton();
 
-            this._setButton();
-
             this._dialogToTopEvent();
 
             this._createDblclick();
@@ -337,7 +331,7 @@
 
             this._handleDisabledOption();
 
-            op.initCallBack.call( this, this.$target[0] );
+            op.initCallBack.call( this._publicMethods, this.$target[0] );
 
         },
 
@@ -411,6 +405,12 @@
 
         },
 
+        _setButton:function(element){
+
+            $(element).attr( 'role', 'button' );
+
+        },
+
         _createOkButton:function(){
 
             var okButtonClassName = this.options.okButtonClassName,
@@ -431,11 +431,13 @@
 
             }
 
+            this._setButton(element);
+
             if( $ok.eventBind === false ){
 
                 this._on( element, 'click.ok', function(event){
 
-                    This.options.okCallBack.call( This, event, This._bottunDisable( $(this) ) ,This._bottunEnable( $(this) ) );
+                    This.options.okCallBack.call( This._publicMethods, event, This._bottunDisable( $(this) ) ,This._bottunEnable( $(this) ) );
 
                     This.clickCallBackName = 'okCallBack';
 
@@ -481,11 +483,13 @@
 
             }
 
+            this._setButton(element);
+
             if( $cancel.eventBind === false ){
 
                 this._on( element, 'click.cancel', function(event){
 
-                    This.options.cancelCallBack.call( This, event, This._bottunDisable( $(this) ) ,This._bottunEnable( $(this) ) );
+                    This.options.cancelCallBack.call( This._publicMethods, event, This._bottunDisable( $(this) ) ,This._bottunEnable( $(this) ) );
 
                     This.clickCallBackName = 'cancelCallBack';
 
@@ -659,7 +663,7 @@
 
                     if( This._dialogState === 'open' ){
 
-                        name === 'close' && ( This.options.closeCallBack.call( This, event, this ), This.clickCallBackName = 'closeCallBack' );
+                        name === 'close' && ( This.options.closeCallBack.call( This._publicMethods, event, this ), This.clickCallBackName = 'closeCallBack' );
 
                         This[info.click]();
 
@@ -739,6 +743,8 @@
 
                         $(buttons[prop].element).remove();
 
+                        buttons[prop] = null;
+
                     }
 
                 }
@@ -771,7 +777,7 @@
 
                 if ( !this.disabledDiv ){
 
-                    this.disabledDiv = $(this.options.makeDisabledDiv.call(this, $target));
+                    this.disabledDiv = $(this.options.makeDisabledDiv.call(this._publicMethods, $target));
 
                 }
 
@@ -1022,7 +1028,7 @@
 
             !!this.buttons.maximize && this._leoDialogRestoreAdd( $( this.buttons.maximize.element ) );
 
-            this.options.resize.call(this, this.$target[0]);
+            this.options.resize.call(this._publicMethods, this.$target[0]);
 
         },
 
@@ -1198,7 +1204,7 @@
 
             this.$target.offset( size.offset );
 
-            this.options.resize.call(this, this.$target[0]);
+            this.options.resize.call(this._publicMethods, this.$target[0]);
 
             !!buttons.restore && $( buttons.restore.element ).detach();
 
@@ -1250,13 +1256,13 @@
 
             if( $iframe[0] ){
 
-                target = this;
+                This = this;
 
                 iframeLoadCallBack = this.options.iframeLoadCallBack;
 
                 this._on( $iframe, 'load', function(event){
 
-                    !!iframeLoadCallBack && iframeLoadCallBack.call( This, event, this );
+                    !!iframeLoadCallBack && iframeLoadCallBack.call( This._publicMethods, event, this );
 
                 } );
 
@@ -1372,12 +1378,6 @@
 
         },
 
-        _setButton:function(){
-
-            this.$target.find( this.options.cancelButtonClassName + ',' + this.options.okButtonClassName ).attr( 'role','button' );
-
-        },
-
         _restore:function(){
 
             var op = this.options;
@@ -1412,23 +1412,15 @@
 
         dialogShow:function(){
 
-            if( this._dialogState === 'close' && !this.$modal ){
-
-                this._restore();
-
-                this._setFirstGialogSize();
+            if( this.options.disabled === false && this._dialogState === 'close' && !this.$modal ){
 
                 this._moveToTop(true);
 
                 this._createOverlay();
 
-                this._setDraggableDisabled(true);
+                this.options.beforeShow.call( this._publicMethods, this.$target[0] );
 
-                this._setResizableDisabled(true);
-
-                this.options.beforeShow.call( this, this.$target[0] );
-
-                !this.$modal ? this._dialogShow() : this.options.makeModelDialogShow.call( this, this._modalShowFn(), this._dialogShowFn() );
+                !this.$modal ? this._dialogShow() : this.options.makeModelDialogShow.call( this._publicMethods, this._modalShowFn(), this._dialogShowFn() );
 
             }
 
@@ -1440,7 +1432,7 @@
 
             this._setResizableDisabled(false);
 
-            this.options.dialogShowCallBack.call( this, this.$target[0] );
+            this.options.dialogShowCallBack.call( this._publicMethods, this.$target[0] );
 
         },
 
@@ -1586,7 +1578,7 @@
 
                             })
 
-                            op.resize.call(This, $target[0]);
+                            op.resize.call(This._publicMethods, $target[0]);
 
                         },
 
@@ -1734,14 +1726,6 @@
 
             }
 
-            if( key === 'cancelButtonClassName' || key === 'okButtonClassName' ) {
-
-                this._setButton();
-
-                return;
-
-            }
-
             if( key === 'initDraggable') {
 
                 this._makeDraggable(value);
@@ -1804,12 +1788,13 @@
 
             }
 
-
         },
 
         modalDialogHide:function(){
 
-            !this.$modal ? this._dialogHide() : this.options.makeModelDialogHide.call( this, this._modalHideFn(), this._dialogHideFn() );
+            if(this.options.disabled === true){return;}
+
+            !this.$modal ? this._dialogHide() : this.options.makeModelDialogHide.call( this._publicMethods, this._modalHideFn(), this._dialogHideFn() );
 
         },
 
@@ -1821,13 +1806,23 @@
 
                 This = this;
 
-                this.$modal = $(op.makeModel.call( this, this.$target[0] ));
+                this.$modal = $(op.makeModel.call( this._publicMethods, this.$target[0] ));
 
-                this.modalState = 'close';
+                this._modalState = 'close';
 
-                !!op.quickClose && this._on( this.$modal, 'click', function(event){
+                !!op.quickClose && this._on( this.$modal, 'click.quickClose', function(event){
 
-                    This.modalState === 'open' && This._dialogState === 'open' && ( op.quickCloseCallBack.call( This, event, this ), This.clickCallBackName = 'quickCloseCallBack', This.modalDialogHide() );
+                    if( This._modalState === 'open' && This._dialogState === 'open' ){
+
+                        op.quickCloseCallBack.call( This._publicMethods, event, this );
+
+                        This.clickCallBackName = 'quickCloseCallBack';
+
+                        This.modalDialogHide();
+
+                        This._off( This.$modal, 'click.quickClose' );
+
+                    }
 
                 } );
 
@@ -1843,7 +1838,7 @@
 
                 this.$modal = false;
 
-                delete this.modalState;
+                delete this._modalState;
 
             }
 
@@ -1851,7 +1846,7 @@
 
         _dialogHideCallback:function(){
 
-            this.options.dialogHideCallBack.call( this, this.clickCallBackName );
+            this.options.dialogHideCallBack.call( this._publicMethods, this.clickCallBackName );
 
         },
 
@@ -1899,6 +1894,12 @@
 
         },
 
+        modalState:function(){
+
+            return this._modalState;
+
+        },
+
         _modalShowFn:function(){
 
             var This = this;
@@ -1911,13 +1912,77 @@
 
         },
 
+        clearDialogTimeout:function(id){
+
+            if(typeof id !== 'string'){return;}
+
+            if(id === 'all'){
+
+                this._clearDialogTimeout('modalShow');
+
+                this._clearDialogTimeout('modalHide');
+
+                this._clearDialogTimeout('dialogShow');
+
+                this._clearDialogTimeout('dialogHide');
+
+                return;
+
+            }
+
+            var This = this;
+
+            id.replace(/[^, ]+/g, function(name){
+
+                This._clearDialogTimeout(name);
+
+            });
+
+        },
+
+        _clearDialogTimeout:function(id){
+
+            if(id === 'modalShow' && this._modalShowTimeId){
+
+                clearTimeout(this._modalShowTimeId);
+
+                delete this._modalShowTimeId;
+
+            }else if(id === 'modalHide' && this._modalHideTimeId){
+
+                clearTimeout(this._modalHideTimeId);
+
+                delete this._modalHideTimeId;
+
+            }else if(id === 'dialogShow' && this._dialogShowTimeId){
+
+                clearTimeout(this._dialogShowTimeId);
+
+                delete this._dialogShowTimeId;
+
+            }else if(id === 'dialogHide' && this._dialogHideTimeId){
+
+                clearTimeout(this._dialogHideTimeId);
+
+                delete this._dialogHideTimeId;
+
+            }
+
+        },
+
         _modalShow:function(callback){
 
             if( !this.$modal ){ return; }
 
-            this._delay(function(){
+            this._modalShowTimeId = this._delay(function(){
 
-                if( this.modalState === 'open' && this.modalState === 'opening' ){
+                delete this._modalShowTimeId;
+
+                if( !this.$modal || this._modalState === 'opening' ){ return; }
+
+                if( this._modalState === 'open' ){
+
+                    !!callback && callback.call(this);
 
                     return;
 
@@ -1925,19 +1990,19 @@
 
                 var This = this;
 
-                this.modalState = 'opening';
+                this._modalState = 'opening';
 
                 this.options.modalShowAnimation.call(this.$modal,
 
                     function(){
 
-                        This.modalState = 'open';
+                        This._modalState = 'open';
 
                         !!callback && callback.call(This);
 
                     }
 
-                );
+                , this._publicEvent );
 
             },this.options.modalShowDelay);
 
@@ -1957,9 +2022,15 @@
 
         _dialogShow:function(callback){
 
-            this._delay(function(){
+            this._dialogShowTimeId = this._delay(function(){
 
-                 if( this._dialogState === 'open' || this._dialogState === 'opening' ){
+                delete this._dialogShowTimeId;
+
+                if( this._dialogState === 'closeing' ){return;}
+
+                if( this._dialogState === 'open' ){
+
+                    !!callback && callback.call(this);
 
                     return;
 
@@ -1968,6 +2039,8 @@
                 var This = this,$target = this.$target;
 
                 !!this.$minimizeBar && !!this.isMinimize && ( $target = this.$minimizeBar );
+
+                this._beforeDialogShowCallback(this);
 
                 this._dialogState = 'opening';
 
@@ -1985,9 +2058,21 @@
 
                     }
 
-                );
+                , this._publicEvent );
 
             },this.options.showDelay);
+
+        },
+
+        _beforeDialogShowCallback:function(){
+
+            this.hasDraggable && this.$target[this.dependsFnName.draggable]( 'option','disabled', false );
+
+            this.hasResizable && this.$target[this.dependsFnName.resizable]( 'option','disabled', false );
+
+            this._restore();
+
+            this._setFirstGialogSize();
 
         },
 
@@ -2003,7 +2088,7 @@
 
             if( !this.$modal && this._dialogState === 'close' ){
 
-                this.options.modalDialogHideCallBack.call( this, this.clickCallBackName );
+                this.options.modalDialogHideCallBack.call( this._publicMethods, this.clickCallBackName );
 
             }
 
@@ -2021,13 +2106,31 @@
 
         },
 
+        destroyOverlay:function(){
+
+            this._destroyOverlay();
+
+            this._modalDialogHideCallback.call(this);
+
+        },
+
         _modalHide:function(callback){
 
             if( !this.$modal ){ return; }
 
-            this._delay(function(){
+            this._modalHideTimeId = this._delay(function(){
 
-                if( this.modalState === 'close' && this.modalState === 'closeing' ){
+                delete this._modalHideTimeId;
+
+                if( !this.$modal || this._modalState === 'closeing' ){ return; }
+
+                if( this._modalState === 'close' ){
+
+                    this._destroyOverlay();
+
+                    !!callback && callback.call(this);
+
+                    this._modalDialogHideCallback.call(this);
 
                     return;
 
@@ -2035,13 +2138,13 @@
 
                 var This = this;
 
-                this.modalState = 'closeing';
+                this._modalState = 'closeing';
 
                 this.options.modalHideAnimation.call( this.$modal,
 
                     function(){
 
-                        This.modalState = 'close';
+                        This._modalState = 'close';
 
                         This._destroyOverlay();
 
@@ -2051,7 +2154,7 @@
 
                     }
 
-                );
+                , this._publicEvent );
 
             }, this.options.modalHideDelay );
 
@@ -2059,27 +2162,35 @@
 
         modalHide:function(){
 
+            if(this.options.disabled === true){return;}
+
             this._modalHide();
 
         },
 
         _focusDialog:function(){
 
-            this.options.dialogFocus.call(this, this.$target[0]);
+            this.options.dialogFocus.call(this._publicMethods, this.$target[0]);
 
         },
 
         _blurDialog:function(){
 
-            this.options.dialogBlur(this, this.$target[0]);
+            this.options.dialogBlur(this._publicMethods, this.$target[0]);
 
         },
 
         _dialogHide:function(callback){
 
-            this._delay( function(){
+            this._dialogHideTimeId = this._delay( function(){
 
-                if( this._dialogState === 'close' || this._dialogState === 'closeing' ){
+                delete this._dialogHideTimeId;
+
+                if( this._dialogState === 'closeing' ){return;}
+
+                if( this._dialogState === 'close' ){
+
+                    !!callback && callback.call(this);
 
                     return;
 
@@ -2089,7 +2200,7 @@
 
                 !!this.$minimizeBar && !!this.isMinimize && ( $target = this.$minimizeBar );
 
-                this._beforeDialogHideCallback.call(this);
+                this._beforeDialogHideCallback(this);
 
                 this._dialogState = 'closeing';
 
@@ -2109,13 +2220,15 @@
 
                     }
 
-                );
+                , this._publicEvent );
 
             }, this.options.hideDelay );
 
         },
 
         dialogHide:function(){
+
+            if(this.options.disabled === true){return;}
 
             this._dialogHide();
 
@@ -2140,6 +2253,8 @@
             this.hasDraggable && this.$target[this.dependsFnName.draggable]('destroy');
 
             this.hasResizable && this.$target[this.dependsFnName.resizable]('destroy');
+
+            this.clearDialogTimeout('all');
 
             this._destoryIframe();
 

@@ -35,7 +35,7 @@ leoUiLoad.require('leoUi-tooltip,leoCss,ready', function($) {
 
             positionStr:'random',//topLeft,topCenter,topRight,leftTop,leftCenter,leftBottom,bottomLeft,bottomCenter,bottomRight,rightTop,rightCenter,rightBottom,random;
 
-            toCenterOffset:"-25%"
+            toCenterOffset:"0"
 
         }
 
@@ -60,7 +60,7 @@ leoUiLoad.require('leoUi-tooltip,leoCss,ready', function($) {
 
         }else if(a.tooltipState() === "open"){
 
-            a.option({'arrow':false})
+            // a.option({'arrow':false})
 
             // a.option({"isPositionStr":false});
 

@@ -74,13 +74,13 @@
 
             hideDelay:0,
 
-            showAnimation: function( callBack,prop ) {
+            showAnimation: function(callBack, prop) {
 
                 this.css(prop).show( { effect: "clip", duration: "slow", complete: callBack } );
 
             },
 
-            hideAnimation: function(callBack) {
+            hideAnimation: function(callBack, prop) {
 
                 this.hide( { effect: "clip", duration: "slow", complete: callBack } );
 
@@ -92,6 +92,8 @@
 
         _init: function(){
 
+            this._tooltipState = 'close';
+
             this.$target.hide();
 
         	this._setClose();
@@ -99,8 +101,6 @@
         	this._setPosition();
 
         	this._appendTo();
-
-        	this._tooltipState = 'close';
 
         },
 
@@ -116,7 +116,9 @@
 
         _destroy:function() {
 
-           this.$target.remove();
+            this.clearTooltipTimeout('show,hide');
+
+            this.$target.remove();
 
         },
 
@@ -142,21 +144,25 @@
 
         _setContent:function(){
 
-            if( this.options.disabled ){ return; }
+            var options = this.options,isVisible,$target;
 
-            var isVisible = this.$target.is( ":visible" );
+            if( options.disabled ){ return; }
 
-            isVisible && this.$target.hide();
+            $target = this.$target;
 
-            this.$target.css( { width: '', height: '' } );
+            isVisible = this._tooltipState === 'open';
 
-            this.$content = this.$target.find( '.' + this.options.contentClassName );
+            isVisible && $target.hide();
 
-        	this.$content.text( this.options.content );
+            $target.css( { width: '', height: '' } );
 
-        	this.prop = { width: this.$target.outerWidth(), height: this.$target.outerHeight() };
+            this.$content = $target.find( '.' + options.contentClassName );
 
-            isVisible && this.$target.show();
+        	this.$content.text( options.content );
+
+        	this.prop = { width: $target.outerWidth(), height: $target.outerHeight() };
+
+            isVisible && $target.show();
 
         },
 
@@ -164,7 +170,7 @@
 
             if( this.options.disabled ){ return; }
 
-        	var isVisible = this.$target.is( ":visible" );
+        	var isVisible = this._tooltipState === 'open';
 
             !isVisible && this.$target.show();
 
@@ -182,17 +188,23 @@
 
                 this._setClose();
 
+                return;
+
             }
 
             if( key === 'contentClassName' || key === "content" ){
 
                 this._setContent();
 
+                return;
+
             }
 
             if( key === 'appendTo' ){
 
                 this._appendTo();
+
+                return;
 
             }
 
@@ -201,6 +213,8 @@
                 !this.options.arrow && this._destroyArrow();
 
                 this._setPosition();
+
+                return;
 
             }
 
@@ -394,9 +408,9 @@
 
         _tooltipHideFn:function(){
 
-            !!this.delayHideTime && clearTimeout( this.delayHideTime );
+            this.delayHideTimeId = this._delay(function(){
 
-            this.delayHideTime = this._delay(function(){
+                delete this.delayHideTimeId;
 
                 if( this.options.disabled ){ return; }
 
@@ -416,9 +430,9 @@
 
         _tooltipShowFn:function(){
 
-            !!this.delayShowTime && clearTimeout( this.delayShowTime );
+            this.delayShowTimeId = this._delay(function(){
 
-            this.delayShowTime = this._delay(function(){
+                delete this.delayShowTimeId;
 
                 if( this.options.disabled ){ return; }
 
@@ -433,6 +447,38 @@
                 }, this.prop );
 
             },this.options.showDelay);
+
+        },
+
+        _clearTooltipTimeout:function(id){
+
+            if(id === 'show' && this.delayShowTimeId){
+
+                clearTimeout(this.delayShowTimeId);
+
+                delete this.delayShowTimeId;
+
+            }else if(id === 'hide' && this.delayHideTimeId){
+
+                clearTimeout(this.delayHideTimeId);
+
+                delete this.delayHideTimeId;
+
+            }
+
+        },
+
+        clearTooltipTimeout:function(id){
+
+            if(typeof id !== 'string'){return;}
+
+            var This = this;
+
+            id.replace(/[^, ]+/g, function(name){
+
+                This._clearTooltipTimeout(name);
+
+            });
 
         }
 

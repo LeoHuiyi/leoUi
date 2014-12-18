@@ -8,11 +8,8 @@
  *
  * http://api.jqueryui.com/position/
  *
- * leoUI：修改getDimensions()，加上borders；
+ * leoUI：flip.top中的bug,增加feedback.outerOffsetName;
  *
- *        flip.top中的bug;
- *
- *        加上elemWidth、elemHeight的选项；作为元素本身的宽高
  *
  */
 ;(function(factory) {
@@ -31,8 +28,6 @@
 
 }(function($) {
 
-    $.ui = $.ui || {};
-
     var cachedScrollbarWidth, supportsOffsetFractions,
         max = Math.max,
         abs = Math.abs,
@@ -42,7 +37,8 @@
         roffset = /[\+\-]\d+(\.[\d]+)?%?/,
         rposition = /^\w+/,
         rpercent = /%$/,
-        _position = $.fn.position;
+        _position = $.fn.position,
+        uiPosition;
 
     function getOffsets(offsets, width, height) {
         return [
@@ -108,13 +104,7 @@
         return {
             width: elem.outerWidth(),
             height: elem.outerHeight(),
-            offset: elem.offset(),
-            borders:{
-                borderLeft: parseCss(raw, "borderLeftWidth"),
-                borderTop: parseCss(raw, "borderTopWidth"),
-                borderRight: parseCss(raw, "borderRightWidth"),
-                borderBottom: parseCss(raw, "borderBottomWidth")
-            }
+            offset: elem.offset()
         };
     }
 
@@ -198,7 +188,6 @@
         targetWidth = dimensions.width;
         targetHeight = dimensions.height;
         targetOffset = dimensions.offset;
-        targetborders = dimensions.borders;
         // clone to reuse original targetOffset later
         basePosition = $.extend({}, targetOffset);
 
@@ -237,19 +226,15 @@
             collision[1] = collision[0];
         }
 
-        if (options.at[0] === "left") {
-            basePosition.left += targetborders.borderLeft;
-        }else if (options.at[0] === "right") {
-            basePosition.left += targetWidth - targetborders.borderRight;
-        } else if (options.at[0] === "center") {
+        if ( options.at[ 0 ] === "right" ) {
+            basePosition.left += targetWidth;
+        } else if ( options.at[ 0 ] === "center" ) {
             basePosition.left += targetWidth / 2;
         }
 
-        if (options.at[1] === "top") {
-            basePosition.top += targetborders.borderTop;
-        }else if (options.at[1] === "bottom") {
-            basePosition.top += targetHeight - targetborders.borderBottom;
-        } else if (options.at[1] === "center") {
+        if ( options.at[ 1 ] === "bottom" ) {
+            basePosition.top += targetHeight;
+        } else if ( options.at[ 1 ] === "center" ) {
             basePosition.top += targetHeight / 2;
         }
 
@@ -260,8 +245,8 @@
         return this.each(function() {
             var collisionPosition, using,
                 elem = $(this),
-                elemWidth = options.elemWidth||elem.outerWidth(),
-                elemHeight = options.elemHeight||elem.outerHeight(),
+                elemWidth = elem.outerWidth(),
+                elemHeight = elem.outerHeight(),
                 marginLeft = parseCss(this, "marginLeft"),
                 marginTop = parseCss(this, "marginTop"),
                 collisionWidth = elemWidth + marginLeft + parseCss(this, "marginRight") + scrollInfo.width,
@@ -296,8 +281,8 @@
             };
 
             $.each(["left", "top"], function(i, dir) {
-                if ($.ui.position[collision[i]]) {
-                    $.ui.position[collision[i]][dir](position, {
+                if (uiPosition[collision[i]]) {
+                    uiPosition[collision[i]][dir](position, {
                         targetWidth: targetWidth,
                         targetHeight: targetHeight,
                         elemWidth: elemWidth,
@@ -378,7 +363,7 @@
         });
     };
 
-    $.ui.position = {
+    uiPosition = {
         fit: {
             left: function(position, data) {
                 var within = data.within,
@@ -524,12 +509,12 @@
         },
         flipfit: {
             left: function() {
-                $.ui.position.flip.left.apply(this, arguments);
-                $.ui.position.fit.left.apply(this, arguments);
+                uiPosition.flip.left.apply(this, arguments);
+                uiPosition.fit.left.apply(this, arguments);
             },
             top: function() {
-                $.ui.position.flip.top.apply(this, arguments);
-                $.ui.position.fit.top.apply(this, arguments);
+                uiPosition.flip.top.apply(this, arguments);
+                uiPosition.fit.top.apply(this, arguments);
             }
         }
     };

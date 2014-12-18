@@ -28,8 +28,14 @@ var zNodes = [{
 			name: "leoDroppable拖放组件",
 			url: {href: '#!leo#iframe/leoDroppable.html'}
 		}, {
+			name: "leoSelectable选择组件",
+			url: {href: '#!leo#iframe/leoSelectable.html'}
+		}, {
 			name: "leoDialog对话框组件",
 			url: {href: '#!leo#iframe/leoDialog.html'}
+		}, {
+			name: "leoTooltip提示框组件",
+			url: {href: '#!leo#iframe/leoTooltip.html'}
 		}]
 	}],reHref = /.*#!leo#/;
 

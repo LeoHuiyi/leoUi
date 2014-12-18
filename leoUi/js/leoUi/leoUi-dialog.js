@@ -108,7 +108,7 @@
 
             captionButtons:['pin', 'refresh', 'toggle', 'minimize', 'maximize', 'close'],//是否使用按钮，有'pin', 'refresh', 'toggle', 'minimize', 'maximize', 'close'可选，按照顺序显示，不用按钮可用false标示
 
-            position:{//参考jqueryUi的API（其中of属性设置成“window”或者“document”使用当前框架的window或者document）
+            position:{//参考jqueryUi的API（其中of和within属性设置成“window”或者“document”使用当前框架的window或者document）
 
                 my:"center",
 
@@ -116,7 +116,9 @@
 
                 of:'window',
 
-                collision:"fit"
+                collision:"fit",
+
+                within:'window'
 
             },
 
@@ -346,6 +348,16 @@
             }else if(position.of === 'document'){
 
                 position.of = this.document;
+
+            }
+
+            if(position.within === 'window'){
+
+                position.within = this.window;
+
+            }else if(position.within === 'document'){
+
+                position.within = this.document;
 
             }
 

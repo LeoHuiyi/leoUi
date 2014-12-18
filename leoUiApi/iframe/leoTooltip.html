@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="utf-8" />
-    <title>leoDialog</title>
+    <title>leoTooltip</title>
     <meta name="description" content="https://github.com/LeoHuiyi" />
     <meta name="keywords" content="leoUi,jquery组件,jqueryUi" />
     <meta name="author" content="leo" />
@@ -26,25 +26,25 @@
     </nav>
     <header id="hd">
         <section class="g-mod" id="title">
-            <h1 class="tit">leoDialog</h1>
+            <h1 class="tit">leoTooltip</h1>
             <div class="g-browser g-clear">
-                <p>leoDialog对话框组件</p>
-                <p>引用：leoUi-resizable.js</p>
-                <p>依赖：jQuery, leoUi-tools.js, leoUi-position.js, jquery-mousewheel.js, leoUi-mouse.js, leoUi-draggable.js, leoUi-resizable.js, leoUi-effects.js</p>
+                <p>leoTooltip提示框组件</p>
+                <p>引用：leoUi-tooltip.js</p>
+                <p>依赖：jQuery, leoUi-tools.js, leoUi-position.js, leoUi-effects.js</p>
             </div>
         </section>
     </header>
     <section id="bd">
         <section class="g-mod g-attr g-block">
-            <h2 class="tit">leoDialog对话框组件</h2>
+            <h2 class="tit">leoTooltip提示框组件</h2>
             <div class="cont">
-                <p><strong>$.leoDialog( options )</strong></p>
+                <p><strong>$.leoTooltip( options )</strong></p>
                 <p><strong>使用说明</strong>：</p>
                 <section class="g-mod g-attr g-block">
                     <div class="cont">
                         <p><strong>examples</strong>：</p>
                         <pre class="brush: js;">
-                            var $leoDialog = $.leoDialog({
+                            var $leoTooltip = $.leoTooltip({
 
                                 dialogHtml: '<div class="leoDialog">'
 					            +               '<div class="leoDialog_titlebar leoUi_clearfix">'
@@ -97,7 +97,7 @@
 
                             });
 
-                            $leoDialog.dialogShow();
+                            $leoTooltip.show();
                         </pre>
                     </div>
                 </section>
@@ -319,37 +319,37 @@
 
         }],optionsData = [{
 
-            'name': 'dialogHtml',
+            'name': 'tooltipHtml',
 
-            'default': '<div class="leoDialog"><div class="leoDialog_titlebar leoUi_clearfix"><span class="leoDialog_title"></span></div><div class="leoDialog_content"></div></div>',
-
-            'type': 'string',
-
-            'explain': 'dialog的基础html标签，其中leoDialog_titlebar为标题栏className，leoDialog_title为标题className，leoDialog_content为内容contentHtml的className，这几个className是必须的。'
-
-        }, {
-
-            'name': 'contentHtml',
-
-            'default': '<div id="delete_image"><div class="send_content clearfix"><div class="text"><span class="icon"></span><span class="title">标题内容</span></div><div class="send_bottom clearfix"><input class="send_submit" type="submit" value="确定" name="submit" /><input class="send_off" type="submit" value="取消" name="submit" /></div></div></div>',
+            'default': '参考源码',
 
             'type': 'string',
 
-            'explain': 'leoDialog_content中的html标签'
+            'explain': 'tooltip的基础html标签'
 
         }, {
 
-            'name': 'modal',
+            'name': 'contentClassName',
 
-            'default': 'true',
+            'default': 'leoTooltip_content',
 
-            'type': 'boolean',
+            'type': 'string',
 
-            'explain': '是否使用遮罩层'
+            'explain': 'leoTooltip_content的className，如果没有不能设置内容'
 
         }, {
 
-            'name': 'title',
+            'name': 'leoTooltip_close',
+
+            'default': 'leoTooltip_close',
+
+            'type': 'string',
+
+            'explain': 'leoTooltip_close的className。（false或者找不到元素，无关闭按钮事件）'
+
+        }, {
+
+            'name': 'appendTo',
 
             'default': '标 题',
 

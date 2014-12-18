@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+
+<head>
+    <meta charset="utf-8" />
+    <title>leoSelectable</title>
+    <meta name="description" content="https://github.com/LeoHuiyi" />
+    <meta name="keywords" content="leoUi,jquery组件,jqueryUi" />
+    <meta name="author" content="leo" />
+    <meta name="robots" content="all" />
+    <!--[if lte IE 8]>
+        <script src="../js/html5.js"></script>
+    <![endif]-->
+    <link rel="stylesheet" href="../css/reset.css" />
+    <link rel="stylesheet" href="../css/leoUi-grid.css" />
+    <link rel="stylesheet" href="../css/shCoreDjango.css" />
+    <link rel="stylesheet" href="../css/leoUiApiCssIframe.css" />
+</head>
+
+<body>
+    <nav id="guide" class="g-mod">
+        <div class="from">
+            <span>github:</span>
+            <a href="https://github.com/LeoHuiyi" target="_blank">https://github.com/LeoHuiyi</a>
+        </div>
+    </nav>
+    <header id="hd">
+        <section class="g-mod" id="title">
+            <h1 class="tit">leoSelectable</h1>
+            <div class="g-browser g-clear">
+                <p>leoSelectable选择组件</p>
+                <p>引用：leoUi-selectable.js</p>
+                <p>依赖：jQuery, leoUi-tools.js, leoUi-mouse.js(继承)</p>
+            </div>
+        </section>
+    </header>
+    <section id="bd">
+        <section class="g-mod g-attr g-block">
+            <h2 class="tit">leoSelectable选择组件</h2>
+            <div class="cont">
+                <p><strong>$('.leoUi').leoSelectable( options )</strong></p>
+                <p><strong>使用说明</strong>：</p>
+                <section class="g-mod g-attr g-block">
+                    <div class="cont">
+                        <p><strong>examples</strong>：</p>
+                        <pre class="brush: js;">
+                            $('.leoUi').leoSelectable({
+
+                                appendTo: "body",//选择帮手（套索） 应追加到哪个元素
+
+								autoRefresh: true,//这个选项确定每个选择操作开始时如何刷新(重新计算)每个选择项的位置和大小. 如果你有很多很多选择项, 你应当设置此项为false并且手动调用refresh() 方法
+
+								distance: 0,//定义需要移动多少个像素选择才会开始. 如果指定了该项, 选择不会马上开始,而是会在鼠标移动了指定像素的距离之后才会开始
+
+								filter: "*",//匹配子元素中那些符合条件的元素才可以被选择
+
+								tolerance: "touch",//指定那种模式，用来测试套索是否应该选择一个项目。允许使用的值:"fit": 套索完全重叠的项目。"touch": 套索重叠的项目任何部分
+
+								disabled:false,//如果设置为 true 将禁止selectable
+
+								helperClassName:"leoUi_selectable_helper",//助手的ClassName
+
+								selectedClassName:"leoUi_selected",//选中的select的ClassName
+
+								selectingClassName:"leoUi_selecting",//正在选择的select的ClassName
+
+								unselectingClassName:"leoUi_unselecting",//移除的select的ClassName
+
+								selecteeClassName:"leoUi_selectee",//能被选着的select的ClassName
+
+					            ...
+
+                            });
+
+                        </pre>
+                    </div>
+                </section>
+                <p><strong>options </strong></p>
+                <div class="cont">
+                    <div id="option-grid" class="g-grid"></div>
+                </div>
+                <p><strong>事件</strong>：</p>
+                <section class="g-mod g-attr g-block">
+                    <div class="cont">
+                        <p><strong>destroy()</strong>：销毁组件</p>
+                        <p><strong>arguments</strong>：无</p>
+                        <p><strong>returns</strong>：无</p>
+                        <p><strong>examples</strong>：</p>
+                        <pre class="brush: js;">
+                            $('.leoUi').leoSelectable( "destroy" );
+                        </pre>
+                    </div>
+                </section>
+                <section class="g-mod g-attr g-block">
+                    <div class="cont">
+                        <p><strong>option(arguments)</strong>：设置或者获取组件选项的值</p>
+                        <p><strong>arguments</strong>：参考leoPlugIn中的option方法</p>
+                        <p><strong>returns</strong>：参考leoPlugIn中的option方法</p>
+                        <p><strong>examples</strong>：</p>
+                        <pre class="brush: js;">
+                            $('.leoUi').leoSelectable( "option" "a.b.c", 500 );
+                        </pre>
+                    </div>
+                </section>
+            </div>
+        </section>
+    </section>
+    <footer id="ft">
+        <aside class="g-mod">
+            <div class="g-browser g-clear">
+                <p>author: leo</p>
+                <p>如有问题请联系：253383559@qq.com</p>
+            </div>
+        </aside>
+    </footer>
+    <script type="text/javascript" src="../js/jquery-1.11.1-min.js"></script>
+    <script type="text/javascript" src="../js/leoUi-tools.js"></script>
+    <script type="text/javascript" src="../js/leoUi-grid.js"></script>
+    <script type="text/javascript" src="../js/shCore.js"></script>
+    <script type="text/javascript" src="../js/shBrushJScript.js"></script>
+    <script type="text/javascript">
+    var tableModel = [{
+
+            id: 'name',
+
+            width: 200,
+
+            minWidth: 150,
+
+            fixed: true,
+
+            theadName: 'Name',
+
+            renderCell:function(val){
+
+                return '<div style="color:#008000">' + val + '</div>';
+
+            }
+
+        }, {
+
+            id: 'type',
+
+            width: 300,
+
+            fixed: true,
+
+            minWidth: 200,
+
+            className:'feedLine',
+
+            theadName: 'Type'
+
+        }, {
+
+            id: 'default',
+
+            width: 300,
+
+            className:'feedLine',
+
+            theadName: 'Default'
+
+        },{
+
+            id: 'explain',
+
+            width: 750,
+
+            fixed: true,
+
+            align: 'left',
+
+            theadName: 'Explain',
+
+            className:'feedLine'
+
+        }],optionsData = [{
+
+            'name': 'appendTo',
+
+            'default': 'body',
+
+            'type': 'selector',
+
+            'explain': '选择帮手（套索） 应追加到哪个元素 '
+
+        }, {
+
+            'name': 'autoRefresh',
+
+            'default': 'true',
+
+            'type': 'boolean',
+
+            'explain': '这个选项确定每个选择操作开始时如何刷新(重新计算)每个选择项的位置和大小. 如果你有很多很多选择项, 你应当设置此项为false并且手动调用refresh() 方法'
+
+        }, {
+
+            'name': 'distance',
+
+            'default': '0',
+
+            'type': 'number',
+
+            'explain': '定义需要移动多少个像素选择才会开始. 如果指定了该项, 选择不会马上开始,而是会在鼠标移动了指定像素的距离之后才会开始'
+
+        }, {
+
+            'name': 'filter',
+
+            'default': '*',
+
+            'type': 'selector',
+
+            'explain': '匹配子元素中那些符合条件的元素才可以被选择'
+
+        }, {
+
+            'name': 'tolerance',
+
+            'default': 'touch',
+
+            'type': 'string',
+
+            'explain': '指定那种模式，用来测试套索是否应该选择一个项目。允许使用的值:"fit": 套索完全重叠的项目。"touch": 套索重叠的项目任何部分'
+
+        }, {
+
+            'name': 'disabled',
+
+            'default': 'false',
+
+            'type': 'boolean',
+
+            'explain': '如果设置为 true 将禁止selectable'
+
+        }, {
+
+            'name': 'helperClassName',
+
+            'default': 'leoUi_selectable_helper',
+
+            'type': 'string',
+
+            'explain': '助手的ClassName'
+
+        }, {
+
+            'name': 'selectedClassName',
+
+            'default': 'leoUi_selected',
+
+            'type': 'string',
+
+            'explain': '选中的select的ClassName'
+
+        }, {
+
+            'name': 'selectingClassName',
+
+            'default': 'leoUi_selecting',
+
+            'type': 'string',
+
+            'explain': '正在选择的select的ClassName'
+
+        }, {
+
+            'name': 'unselectingClassName',
+
+            'default': 'leoUi_unselecting',
+
+            'type': 'string',
+
+            'explain': '移除的select的ClassName'
+
+        }, {
+
+            'name': 'selecteeClassName',
+
+            'default': 'leoUi_selectee',
+
+            'type': 'string',
+
+            'explain': '能被选着的select的ClassName'
+
+        }, {
+
+            'name': 'selected',
+
+            'default': '$.noop',
+
+            'type': 'function',
+
+            'explain': '此事件会在选择操作结束时，在添加到选择的每个元素上触发（ this: target, arguments: event, selected ）'
+
+        }, {
+
+            'name': 'selecting',
+
+            'default': '$.noop',
+
+            'type': 'function',
+
+            'explain': '此事件会在选择操作过程中，在添加到选择的每个元素上触发（ this: target, arguments: event, selecting ）'
+
+        }, {
+
+            'name': 'start',
+
+            'default': '$.noop',
+
+            'type': 'function',
+
+            'explain': '这个事件将在选择操作开始时触发（ this: target, arguments: event ）'
+
+        }, {
+
+            'name': 'stop',
+
+            'default': '$.noop',
+
+            'type': 'function',
+
+            'explain': '这个事件将在选择操作结束后触发（ this: target, arguments: event, $selected ）'
+
+        }, {
+
+            'name': 'unselected',
+
+            'default': '$.noop',
+
+            'type': 'function',
+
+            'explain': '此事件会在选择操作结束时，在从选择元素集合中每个元素上触发（ this: target, arguments: event, unselected ）'
+
+        }, {
+
+            'name': 'unselecting',
+
+            'default': '$.noop',
+
+            'type': 'function',
+
+            'explain': '此事件会在选择操作过程中，在从选择元素集合中移除的每个元素上触发（ this: target, arguments: event, unselecting ）'
+
+        }],gridOptions = {
+
+            dataType: 'data',
+
+            tableModel: tableModel,
+
+            height: false,
+
+            width: false,
+
+            isHover: false,
+
+            boxCheckType: false,
+
+            resizeWidth: false,
+
+            resizeHeight: false,
+
+            isPage: false,
+
+            evenClass: false
+
+        };
+    $('#option-grid').leoGrid($.extend(gridOptions, {gridData: optionsData}));
+    SyntaxHighlighter.all({'toolbar': false});
+    </script>
+</body>
+
+</html>

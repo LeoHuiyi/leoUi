@@ -39,7 +39,9 @@ leoUiLoad.require('leoUi-tooltip,leoCss,ready', function($) {
 
             of:$("#botton_1")
 
-        }
+        },
+
+        arrow:true
 
     }),str,arr;
 
@@ -62,7 +64,7 @@ leoUiLoad.require('leoUi-tooltip,leoCss,ready', function($) {
 
             // a.hide();
 
-             a.option({'arrow':false})
+             a.option({'arrow':false, 'distance':100,"arrowHeight":"100"})
 
         }
 
@@ -78,7 +80,9 @@ leoUiLoad.require('leoUi-tooltip,leoCss,ready', function($) {
 
             of:$("#botton_2")
 
-        }
+        },
+
+        'content':"strsssssssssssssss666666666666666666666666666666666666666666666666666666666666666666sssssssssssssssssssssss"
 
     }),str,arr;
 
@@ -93,7 +97,7 @@ leoUiLoad.require('leoUi-tooltip,leoCss,ready', function($) {
 
             // str = ran(arr,$.leoTools.random);
 
-            // b.option({'content':str,"position.toCenterOffset":"0"});
+            // b.option({'content':"str","position.toCenterOffset":"0"});
 
             b.show();
 
@@ -105,7 +109,7 @@ leoUiLoad.require('leoUi-tooltip,leoCss,ready', function($) {
 
             // b.option({'arrowHeight':100})
 
-            b.option({'closeClassName':false})
+            // b.option({'closeClassName':false})
 
             b.hide();
 

@@ -113,8 +113,8 @@
                         <p><strong>returns</strong>：无</p>
                         <p><strong>examples</strong>：</p>
                         <pre class="brush: js;">
-                            $.leoDialog( "destroy" );
-                            $.leoDialog.destroy();
+                            $.leoTooltip( "destroy" );
+                            $.leoTooltip.destroy();
                         </pre>
                     </div>
                 </section>
@@ -125,122 +125,62 @@
                         <p><strong>returns</strong>：参考leoPlugIn中的option方法</p>
                         <p><strong>examples</strong>：</p>
                         <pre class="brush: js;">
-                            $.leoDialog( "option" "a.b.c", 500 );
-                            $.leoDialog.option( "a.b.c", 500 );
+                            $.leoTooltip( "option" "a.b.c", 500 );
+                            $.leoTooltip.option( "a.b.c", 500 );
                         </pre>
                     </div>
                 </section>
                 <section class="g-mod g-attr g-block">
                     <div class="cont">
-                        <p><strong>setDialogTitle(text)</strong>：设置都dialog标题</p>
+                        <p><strong>tooltipPosition(notRandom)</strong>：设置都tooltip位置</p>
                         <p><strong>arguments</strong>：</p>
                         <div class="cont">
-                            <p>text(string): 标题文本</p>
+                            <p>notRandom(boolean): 不要调用_randomPosition</p>
                         </div>
                         <p><strong>returns</strong>：无</p>
                         <p><strong>examples</strong>：</p>
                         <pre class="brush: js;">
-                            $.leoDialog( "setDialogTitle" "标题" );
-                            $.leoDialog.setDialogTitle( "标题" );
+                            $.leoTooltip( "tooltipPosition" "true" );
+                            $.leoTooltip.tooltipPosition( "false" );
                         </pre>
                     </div>
                 </section>
                 <section class="g-mod g-attr g-block">
                     <div class="cont">
-                        <p><strong>clearDialogTimeout(id)</strong>：清除dialog和遮罩层的延时定时器</p>
+                        <p><strong>clearDialogTimeout(id)</strong>：清除tooltip的延时定时器</p>
                         <p><strong>arguments</strong>：</p>
                         <div class="cont">
-                            <p>id(string): 可以有"all", "modalShow", "modalHide", "dialogShow", "dialogHide",后面四个可以写一起写，以空格或者逗号隔开（比如：modalShow,dialogShow）</p>
+                            <p>id(string): 可以有"show", "hide",可以写一起写，以空格或者逗号隔开（比如：show,hide）</p>
                         </div>
                         <p><strong>returns</strong>：无</p>
                         <p><strong>examples</strong>：</p>
                         <pre class="brush: js;">
-                            $.leoDialog( "clearDialogTimeout" "modalShow,dialogShow" );
-                            $.leoDialog.clearDialogTimeout( "all" );
+                            $.leoTooltip( "clearDialogTimeout" "show,hide" );
+                            $.leoTooltip.clearDialogTimeout( "show" );
                         </pre>
                     </div>
                 </section>
                 <section class="g-mod g-attr g-block">
                     <div class="cont">
-                        <p><strong>dialogShow()</strong>：显示dialog和遮罩层</p>
+                        <p><strong>show()</strong>：显示tooltip</p>
                         <p><strong>arguments</strong>：无</p>
                         <p><strong>returns</strong>：无</p>
                         <p><strong>examples</strong>：</p>
                         <pre class="brush: js;">
-                            $.leoDialog( "dialogShow" );
-                            $.leoDialog.dialogShow();
+                            $.leoDialog( "show" );
+                            $.leoDialog.show();
                         </pre>
                     </div>
                 </section>
                 <section class="g-mod g-attr g-block">
                     <div class="cont">
-                        <p><strong>modalDialogHide()</strong>：关闭dialog和遮罩层</p>
+                        <p><strong>hide()</strong>：关闭tooltip</p>
                         <p><strong>arguments</strong>：无</p>
                         <p><strong>returns</strong>：无</p>
                         <p><strong>examples</strong>：</p>
                         <pre class="brush: js;">
-                            $.leoDialog( "modalDialogHide" );
-                            $.leoDialog.modalDialogHide();
-                        </pre>
-                    </div>
-                </section>
-                <section class="g-mod g-attr g-block">
-                    <div class="cont">
-                        <p><strong>moveToTop()</strong>：移动当前的的dialog到最上面（isMoveToTop = true 才有效）</p>
-                        <p><strong>arguments</strong>：无</p>
-                        <p><strong>returns</strong>：无</p>
-                        <p><strong>examples</strong>：</p>
-                        <pre class="brush: js;">
-                            $.leoDialog( "moveToTop" );
-                            $.leoDialog.moveToTop();
-                        </pre>
-                    </div>
-                </section>
-                <section class="g-mod g-attr g-block">
-                    <div class="cont">
-                        <p><strong>modalState()</strong>：遮罩层的状态</p>
-                        <p><strong>arguments</strong>：无</p>
-                        <p><strong>returns</strong>：返回'open','close','opening','closeing'4中状态</p>
-                        <p><strong>examples</strong>：</p>
-                        <pre class="brush: js;">
-                            $.leoDialog( "modalState" );
-                            $.leoDialog.modalState();
-                        </pre>
-                    </div>
-                </section>
-                <section class="g-mod g-attr g-block">
-                    <div class="cont">
-                        <p><strong>dialogState()</strong>：dialog的状态</p>
-                        <p><strong>arguments</strong>：无</p>
-                        <p><strong>returns</strong>：返回'open','close','opening','closeing'4中状态</p>
-                        <p><strong>examples</strong>：</p>
-                        <pre class="brush: js;">
-                            $.leoDialog( "dialogState" );
-                            $.leoDialog.dialogState();
-                        </pre>
-                    </div>
-                </section>
-                <section class="g-mod g-attr g-block">
-                    <div class="cont">
-                        <p><strong>modalHide()</strong>：关闭遮罩层</p>
-                        <p><strong>arguments</strong>：无</p>
-                        <p><strong>returns</strong>：无</p>
-                        <p><strong>examples</strong>：</p>
-                        <pre class="brush: js;">
-                            $.leoDialog( "modalHide" );
-                            $.leoDialog.modalHide();
-                        </pre>
-                    </div>
-                </section>
-                <section class="g-mod g-attr g-block">
-                    <div class="cont">
-                        <p><strong>dialogHide()</strong>：关闭dialog</p>
-                        <p><strong>arguments</strong>：无</p>
-                        <p><strong>returns</strong>：无</p>
-                        <p><strong>examples</strong>：</p>
-                        <pre class="brush: js;">
-                            $.leoDialog( "dialogHide" );
-                            $.leoDialog.dialogHide();
+                            $.leoTooltip( "hide" );
+                            $.leoTooltip.hide();
                         </pre>
                     </div>
                 </section>
@@ -351,21 +291,41 @@
 
             'name': 'appendTo',
 
-            'default': '标 题',
+            'default': 'body',
 
             'type': 'string',
 
-            'explain': 'dialog标题的内容'
+            'explain': 'leoTooltip应该被appendTo到哪个元素'
 
         }, {
 
-            'name': 'quickClose',
+            'name': 'arrow',
 
-            'default': 'false',
+            'default': 'true',
 
             'type': 'boolean',
 
-            'explain': '是否支持快捷关闭（点击遮罩层自动关闭）'
+            'explain': '是否要箭头'
+
+        }, {
+
+            'name': 'arrowHeight',
+
+            'default': '10',
+
+            'type': 'number',
+
+            'explain': '箭头高度'
+
+        }, {
+
+            'name': 'content',
+
+            'default': '参考源码',
+
+            'type': 'string or function',
+
+            'explain': 'tooltip(工具提示框)的内容（ this: null, arguments: content, target ）'
 
         }, {
 
@@ -375,167 +335,7 @@
 
             'type': 'boolean',
 
-            'explain': '是否禁止dialog'
-
-        }, {
-
-            'name': 'titlebarDblclickMax',
-
-            'default': 'false',
-
-            'type': 'boolean',
-
-            'explain': '是否支持双击标题栏最大化'
-
-        }, {
-
-            'name': 'appendTo',
-
-            'default': 'body',
-
-            'type': 'selector',
-
-            'explain': 'dialog应该被appendTo到哪个元素'
-
-        }, {
-
-            'name': 'modalShowDelay',
-
-            'default': '0',
-
-            'type': 'number',
-
-            'explain': '打开遮罩层延迟的时间'
-
-        }, {
-
-            'name': 'modalHideDelay',
-
-            'default': '0',
-
-            'type': 'number',
-
-            'explain': '关闭遮罩层延迟的时间'
-
-        }, {
-
-            'name': 'showDelay',
-
-            'default': '0',
-
-            'type': 'number',
-
-            'explain': '打开dialog延迟的时间'
-
-        }, {
-
-            'name': 'hideDelay',
-
-            'default': '0',
-
-            'type': 'number',
-
-            'explain': '关闭dialog延迟的时间'
-
-        }, {
-
-            'name': 'width',
-
-            'default': 'false',
-
-            'type': 'number or string',
-
-            'explain': '设置dialog的宽度（数值或者auto）'
-
-        }, {
-
-            'name': 'height',
-
-            'default': 'false',
-
-            'type': 'number or string',
-
-            'explain': '设置dialog的高度（数值或者auto）'
-
-        }, {
-
-            'name': 'zIndex',
-
-            'default': '1000',
-
-            'type': 'string',
-
-            'explain': '设置dialog的z-index'
-
-        }, {
-
-            'name': 'isMoveToTop',
-
-            'default': 'false',
-
-            'type': 'boolean',
-
-            'explain': '保持当前的的dialog在最上面，一个页面2个以上dialog建议开启'
-
-        }, {
-
-            'name': 'scope',
-
-            'default': 'all',
-
-            'type': 'string',
-
-            'explain': '用来设置MoveToTop的leoDialog对象的集合'
-
-        }, {
-
-            'name': 'getScope',
-
-            'default': 'all',
-
-            'type': 'string',
-
-            'explain': '用来取得MoveToTop的leoDialog对象的集合'
-
-        }, {
-
-            'name': 'okButtonClassName',
-
-            'default': '.send_submit',
-
-            'type': 'selector',
-
-            'explain': 'okButton的className的selector'
-
-        }, {
-
-            'name': 'cancelButtonClassName',
-
-            'default': '.send_off',
-
-            'type': 'selector',
-
-            'explain': 'cancelButton的className的selector'
-
-        }, {
-
-            'name': 'restore',
-
-            'default': 'false',
-
-            'type': 'boolean',
-
-            'explain': '是否每次打开dialog还原状态（使用options中的width，height，position设置打开）'
-
-        }, {
-
-            'name': 'captionButtons',
-
-            'default': '["pin", "refresh", "toggle", "minimize", "maximize", "close"]',
-
-            'type': 'object',
-
-            'explain': '是否使用按钮，有"pin", "refresh", "toggle", "minimize", "maximize", "close"可选，按照顺序显示，不用按钮可用false标示'
+            'explain': '如果设置为 true，则禁用该 tooltip（工具提示框）'
 
         }, {
 
@@ -545,57 +345,107 @@
 
             'type': 'object',
 
-            'explain': '参考jqueryUi的API（其中of和within属性设置成“window”或者“document”使用当前框架的window或者document）'
+            'explain': '设置tooltip的位置（其中of和within属性设置成“window”或者“document”使用当前框架的window或者document）'
 
         }, {
 
-            'name': 'initDraggable',
+            'name': 'orientation',
 
-            'default': 'true',
+            'default': 'random',
 
-            'type': 'boolean',
+            'type': 'string',
 
-            'explain': '是否使用拖拽组件(leoDraggable)'
-
-        }, {
-
-            'name': 'draggableOption',
-
-            'default': '参考源码',
-
-            'type': 'object',
-
-            'explain': '拖拽组件的options（参考leoDraggable）'
+            'explain': 'tooltip相对于position.of的位置（topLeft,topCenter,topRight,leftTop,leftCenter,leftBottom,bottomLeft,bottomCenter,bottomRight,rightTop,rightCenter,rightBottom,random;）'
 
         }, {
 
-            'name': 'initResizable',
+            'name': 'toCenterOffset',
 
-            'default': 'true',
+            'default': '0',
 
-            'type': 'boolean',
+            'type': 'number or string',
 
-            'explain': '是否使用缩放组件(leoResizable)'
-
-        }, {
-
-            'name': 'draggableOption',
-
-            'default': '参考源码',
-
-            'type': 'object',
-
-            'explain': '缩放组件的options（参考leoResizable）'
+            'explain': 'tooltip向中间的偏移量（可用百分比和数字表示）'
 
         }, {
 
-            'name': 'initCallBack',
+            'name': 'collision',
 
-            'default': '$.noop',
+            'default': 'flipfit flipfit',
+
+            'type': 'string',
+
+            'explain': '参考jqueryUi的position.collision的API选项'
+
+        }, {
+
+            'name': 'of',
+
+            'default': 'window',
+
+            'type': 'selector or element or jQuery or event',
+
+            'explain': '参考jqueryUi的position.of的API选项'
+
+        }, {
+
+            'name': 'within',
+
+            'default': 'window',
+
+            'type': 'selector or element or jQuery',
+
+            'explain': '参考jqueryUi的position.within的API选项'
+
+        }, {
+
+            'name': 'distance',
+
+            'default': '5',
+
+            'type': 'number',
+
+            'explain': 'tooltip(工具提示框)与目标的间隔'
+
+        }, {
+
+            'name': 'showDelay',
+
+            'default': '0',
+
+            'type': 'number',
+
+            'explain': '打开tooltip延迟的时间'
+
+        }, {
+
+            'name': 'hideDelay',
+
+            'default': '0',
+
+            'type': 'number',
+
+            'explain': '关闭tooltip延迟的时间'
+
+        }, {
+
+            'name': 'showAnimation',
+
+            'default': '查看源码',
 
             'type': 'function',
 
-            'explain': 'dialog组件初始化回调（ this: publicMethods, arguments: target ）'
+            'explain': 'tooltip显示的回调，可自定义动画等，在显示完毕必须调用callBack（this: $target, arguments: callBack, publicEvent）'
+
+        }, {
+
+            'name': 'hideAnimation',
+
+            'default': '查看源码',
+
+            'type': 'function',
+
+            'explain': 'tooltip关闭的回调，可自定义动画等，在显示完毕必须调用callBack（this: $target, arguments: callBack, publicEvent）'
 
         }, {
 
@@ -606,196 +456,6 @@
             'type': 'function',
 
             'explain': 'dialog组件显示之前回调（ this: publicMethods, arguments: target ）'
-
-        }, {
-
-            'name': 'okCallBack',
-
-            'default': '$.noop',
-
-            'type': 'function',
-
-            'explain': '点击ok按钮回调（ this: publicMethods, arguments: event, bottunDisable, bottunEnable））'
-
-        }, {
-
-            'name': 'cancelCallBack',
-
-            'default': '$.noop',
-
-            'type': 'function',
-
-            'explain': '点击cancel按钮回调（ this: publicMethods, arguments: event, bottunDisable, bottunEnable））'
-
-        }, {
-
-            'name': 'closeCallBack',
-
-            'default': '$.noop',
-
-            'type': 'function',
-
-            'explain': '点击close按钮回调（this: publicMethods, arguments: event, close）'
-
-        }, {
-
-            'name': 'quickCloseCallBack',
-
-            'default': '$.noop',
-
-            'type': 'function',
-
-            'explain': '点击罩盖层按钮回调（this: publicMethods, arguments: event, modal）'
-
-        }, {
-
-            'name': 'iframeLoadCallBack',
-
-            'default': '$.noop',
-
-            'type': 'function',
-
-            'explain': 'iframe load结束回调（this: publicMethods, arguments: event, iframe）'
-
-        }, {
-
-            'name': 'resize',
-
-            'default': '$.noop',
-
-            'type': 'function',
-
-            'explain': 'dialog大小调整回调（this: publicMethods, arguments: target）'
-
-        }, {
-
-            'name': 'dialogFocus',
-
-            'default': '$.noop',
-
-            'type': 'function',
-
-            'explain': 'dialog聚焦（this: publicMethods, arguments: target）'
-
-        }, {
-
-            'name': 'dialogBlur',
-
-            'default': '$.noop',
-
-            'type': 'function',
-
-            'explain': 'dialog丢失焦点（this: publicMethods, arguments: target）'
-
-        }, {
-
-            'name': 'makeModel',
-
-            'default': '查看源码',
-
-            'type': 'function',
-
-            'explain': '创建罩盖层,必须返回elem或者jquery对象（this: publicMethods, arguments: target）'
-
-        }, {
-
-            'name': 'makeDisabledDiv',
-
-            'default': '查看源码',
-
-            'type': 'function',
-
-            'explain': '创建disabled===true的罩盖层, appendTo->dialog,必须返回elem或者jquery对象（this: publicMethods, arguments: target）'
-
-        }, {
-
-            'name': 'modalShowAnimation',
-
-            'default': '查看源码',
-
-            'type': 'function',
-
-            'explain': 'modal显示的回调，可自定义动画等，在显示完毕必须调用callBack（this: $modal, arguments: callBack, publicEvent）'
-
-        }, {
-
-            'name': 'modalHideAnimation',
-
-            'default': '查看源码',
-
-            'type': 'function',
-
-            'explain': 'modal关闭的回调，可自定义动画等，在显示完毕必须调用callBack（this: $modal, arguments: callBack, publicEvent）'
-
-        }, {
-
-            'name': 'showAnimation',
-
-            'default': '查看源码',
-
-            'type': 'function',
-
-            'explain': 'dialog显示的回调，可自定义动画等，在显示完毕必须调用callBack（this: $target, arguments: callBack, publicEvent）'
-
-        }, {
-
-            'name': 'hideAnimation',
-
-            'default': '查看源码',
-
-            'type': 'function',
-
-            'explain': 'dialog关闭的回调，可自定义动画等，在显示完毕必须调用callBack（this: $target, arguments: callBack, publicEvent）'
-
-        }, {
-
-            'name': 'makeModelDialogShow',
-
-            'default': '查看源码',
-
-            'type': 'function',
-
-            'explain': '调整modal，dialog显示调用顺序（this: publicMethods, arguments: modelShowFn, dialogShowFn）'
-
-        }, {
-
-            'name': 'makeModelDialogHide',
-
-            'default': '查看源码',
-
-            'type': 'function',
-
-            'explain': '调整modal，dialog关闭调用顺序（this: publicMethods, arguments: modelHideFn, dialogHideFn）'
-
-        }, {
-
-            'name': 'dialogShowCallBack',
-
-            'default': '查看源码',
-
-            'type': 'function',
-
-            'explain': 'dialog显示完毕回调（this: publicMethods, arguments: target）'
-
-        }, {
-
-            'name': 'dialogHideCallBack',
-
-            'default': '查看源码',
-
-            'type': 'function',
-
-            'explain': 'dialog关闭完成回调，clickCallBackName：okCallBack, cancelCallBack, closeCallBack, quickCloseCallBack。（this: publicMethods, arguments: clickCallBackName）'
-
-        }, {
-
-            'name': 'modalDialogHideCallBack',
-
-            'default': '$.noop',
-
-            'type': 'function',
-
-            'explain': 'dialog和Model关闭完成回调，clickCallBackName：okCallBack, cancelCallBack, closeCallBack, quickCloseCallBack。（this: publicMethods, arguments: clickCallBackName）'
 
         }],gridOptions = {
 

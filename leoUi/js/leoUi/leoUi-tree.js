@@ -70,9 +70,19 @@
 
                 name:'name',
 
-                url:'url'
+                url:'url',
+
+                target:'target',
+
+                title:true
 
             },//json的key
+
+            check:{
+
+                enable:true
+
+            },
 
             isSimpleData:{
 
@@ -80,8 +90,9 @@
 
                 idKey:'id',
 
-                pidKey:'pId'
+                pidKey:'pId',
 
+                rootPId:0
 
             },//是否启用简单的json数据
 
@@ -101,9 +112,15 @@
 
             var op = this.options;
 
-            if( op.treeJson.constructor !== Array ){ return; }
+            if( $.type(op.treeJson) !== "array" ){
+
+                return;
+
+            }
 
             this.expando = "leoTree_" + ( this.version + Math.random() ).replace( /\D/g, "" );
+
+            this._ohasOwn = Object.prototype.hasOwnProperty;
 
             this._markTree();
 
@@ -115,15 +132,19 @@
 
         _createLoading:function(){
 
-            this.$loading = $('<div class="leoTree_loading" style="display: none;">读取中...</div>').appendTo(this.$target).show();
+            !this.$loading && (this.$loading = $('<div class="leoTree_loading" style="display: none;">读取中...</div>').appendTo(this.$target).show());
 
         },
 
         _destroyLoading:function(){
 
-            this.$loading.remove();
+            if(this.$loading){
 
-            this.$loading = null;
+                this.$loading.remove();
+
+                this.$loading = null;
+
+            }
 
         },
 
@@ -175,19 +196,23 @@
 
         _setDraggable:function(){
 
-            var This = this,dragId,dropJson,treeDragIsOpen = false,ul,inner;
+            var This = this,dragId,dropJson,$body = this.document.find('body'),
 
-            this.$tree.leoDraggable({
+            treeDragIsOpen = false,ul,inner,
 
-                mouseDownSelector:'span.leoTree_inner',
+            $tree,zIndex = (this.$target.css('zIndex') >> 0) + 1;
 
-                cancel:'span.leoTree_icon_triangle',
+            $tree = this.$tree.leoDraggable({
+
+                mouseDownSelector:'.leoTree_inner',
+
+                cancel:'.leoTree_icon_triangle',
 
                 distance:4,
 
                 cursor:'pointer',
 
-                droppableScope:'tree',
+                droppableScope:'leoTree',
 
                 bClone: true,
 
@@ -209,7 +234,9 @@
 
                     dragId = This.dragId = This._getTreeId( source.id, 'inner' );
 
-                    return $(source).clone().addClass('leoTree_active').removeAttr('id').css( { width: $(source).outerWidth(), position: 'absolute' } ).insertAfter(source);
+                    var $source = $(source);
+
+                    return $source.clone().addClass('leoTree_active').removeAttr('id').css( { width: $source.outerWidth(), position: 'absolute', zIndex: zIndex } ).appendTo($body);
 
                 },
 
@@ -225,7 +252,7 @@
 
                         This._treeNodeClose( inner, ul, dropJson, function(){
 
-                            This.$tree.leoDraggable('setDropsProp');
+                            $tree.leoDraggable('setDropsProp');
 
                         } );
 
@@ -259,13 +286,19 @@
 
             })
 
-            this._setDroppable( this.$tree.find('div.leoTree_node') );
+            this._setDroppable( $tree.find('div.leoTree_node') );
 
         },
 
         _setDroppable:function( $dropDivs ){
 
-            var This = this,nameDiv = 'div',distance = 4,id,arrowTop,arrowLeft,dropId,inner,arrowBottom,isNotDropNode,ul,dropJson,delayTime;
+            var This = this,nameDiv = 'div',distance = 4,
+
+            id,arrowTop,arrowLeft,dropId,inner,arrowBottom,
+
+            isNotDropNode,ul,dropJson,delayTime,
+
+            $tree = this.$tree;
 
             !!this.$dropDivs && this.$dropDivs.leoDroppable('destroy');
 
@@ -273,7 +306,7 @@
 
                 tolerance:'pointer',
 
-                scope:'tree',
+                scope:'leoTree',
 
                 onDragEnter: function( e, drop, drag ) {
 
@@ -293,21 +326,23 @@
 
                     dropJson = This.treeJson[dropId];
 
+                    isNotDropNode = This._isNotDropNode( dropId, This.dragId );
+
                 },
 
                 onDragOver: function( event, drop, drag ) {
 
-                    if(  ( isNotDropNode = This._isNotDropNode( dropId, This.dragId ) ) === true ){ return };
+                    if( isNotDropNode === true ){ return };
 
                     !This.innerHoverDisabled && ( This.innerHoverDisabled = true );
 
-                    This.$arrow.is( ':hidden' ) && This.$arrow.show();
+                    !!This.$arrow && This.$arrow.show();
 
                     if( event.pageY <= arrowTop + distance && This.enterFlag !== 1 ){
 
                         !!delayTime && clearTimeout( delayTime );
 
-                        This.$arrow.css( { top: arrowTop, left: arrowLeft } );
+                        !!This.$arrow && This.$arrow.css( { top: arrowTop, left: arrowLeft } );
 
                         This.enterFlag = 1;
 
@@ -317,7 +352,7 @@
 
                         !!delayTime && clearTimeout( delayTime );
 
-                        This.$arrow.css( { top: arrowBottom, left: arrowLeft } );
+                        !!This.$arrow && This.$arrow.css( { top: arrowBottom, left: arrowLeft } );
 
                         This.enterFlag = 2;
 
@@ -325,7 +360,7 @@
 
                     }else if( event.pageY < arrowBottom - distance && event.pageY > arrowTop + distance  && This.enterFlag !== 3 ){
 
-                        This.$arrow.css( { top: ( arrowTop + arrowBottom )/2, left: arrowLeft } );
+                        !!This.$arrow && This.$arrow.css( { top: ( arrowTop + arrowBottom )/2, left: arrowLeft } );
 
                         This.enterFlag = 3;
 
@@ -337,11 +372,13 @@
 
                                 This._treeNodeOpen( inner, ul, dropJson, function(){
 
-                                    This.$tree.leoDraggable('setDropsProp');
+                                    $tree.leoDraggable('setDropsProp');
 
                                 } );
 
                             }
+
+                            delayTime = null;
 
                         }, 400 );
 
@@ -353,11 +390,13 @@
 
                 onDragLeave: function( e, drop, drag ) {
 
+                    This.enterFlag = 0;
+
                     !!delayTime && clearTimeout( delayTime );
 
                     This._removeHoverClass( This._getTreeNode( this.id, 'div', 'inner' ) );
 
-                    This.$arrow.hide();
+                    !!This.$arrow && This.$arrow.hide();
 
                 },
 
@@ -381,21 +420,23 @@
 
             if( dragId === dropId ){ return true; }
 
-            // var parentId = this.treeJson[dropId].parentId;
+            var treeJson = this.treeJson,
 
-            // while(parentId){
+            parentId = treeJson[dropId].parentId;
 
-            //     if( parentId === dragId ){
+            while(parentId){
 
-            //         return true;
+                if( parentId === dragId ){
 
-            //     }
+                    return true;
 
-            //     parentId = this.treeJson[parentId].parentId;
+                }
 
-            // }
+                parentId = treeJson[parentId].parentId;
 
-            // return false;
+            }
+
+            return false;
 
         },
 
@@ -505,37 +546,43 @@
 
             $dropLi.children('div').empty().append( this.html );
 
-            delete this.html;
+            this.html = null;
 
         },
 
         _treeJsonAppendTo:function( dragId, dropId ){
 
-            var parentId,parentJson,parentNode;
+            var parentId,parentJson,parentNode,treeJson;
 
-            if(  ( parentId = this._getTreeNodeId( dragId, 'parent') ) !== dropId ){
+            if( ( parentId = this._getTreeNodeId( dragId, 'parent') ) !== dropId ){
 
-                !this.treeJson[dropId].children && ( this.treeJson[dropId].children = [] );
+                treeJson = this.treeJson;
 
-                this.treeJson[dragId].level = this._getLevel( dropId ) + 1;
+                !treeJson[dropId].children && ( treeJson[dropId].children = [] );
 
-                this.treeJson[dragId].parentId = dropId;
+                this._deleteLevel(treeJson[dragId].level, dragId);
 
-                this.treeJson[dropId].children.push( this.treeJson[dragId] );
+                treeJson[dragId].level = this._getLevel( dropId ) + 1;
+
+                this._addLevel(treeJson[dragId].level, dragId);
+
+                treeJson[dragId].parentId = dropId;
+
+                treeJson[dropId].children.push( treeJson[dragId] );
 
                 this._removeChildId( parentId, dragId );
 
-                if( $.isEmptyObject( this.treeJson[parentId].children ) ){
+                if( $.isEmptyObject( treeJson[parentId].children ) ){
 
-                    parentJson = this.treeJson[parentId];
+                    parentJson = treeJson[parentId];
 
-                    delete parentJson.children;
+                    parentJson.children = null;
 
-                    delete parentJson.open;
+                    parentJson.open = null;
 
-                    delete parentJson.UlId;
+                    parentJson.UlId = null;
 
-                    delete parentJson.switchId;
+                    parentJson.switchId = null;
 
                     parentNode = this._getTreeNode( parentId, 'li' );
 
@@ -545,7 +592,7 @@
 
                     $(parentNode).attr( 'class', 'leoTree_item' ).children('div').empty().append( this.html ).end().children('ul').remove();
 
-                    delete this.html;
+                    this.html = null;
 
                 }
 
@@ -557,19 +604,53 @@
 
             var childrens = this.treeJson[parentId].children,
 
-            i = childrens.length - 1;
+            i = childrens.length;
 
-            while( i >= 0 ){
+            while( i-- ){
 
                 if( childrens[ i ].id === childId ){
 
                     childrens.splice( i, 1 );
 
+                    break;
+
                 }
 
-                i--;
+            }
+
+        },
+
+        _deleteLevel:function(level, id){
+
+            var levels = this.treeJson['level_' + level],i;
+
+            if(levels){
+
+                i = levels.length;
+
+                while( i-- ){
+
+                if( levels[ i ] === id ){
+
+                        levels.splice( i, 1 );
+
+                        break;
+
+                    }
+
+                }
 
             }
+
+        },
+
+        _addLevel:function(level, id){
+
+            var levels = this.treeJson['level_' + level];
+
+            !levels && (levels = this.treeJson['level_' + level] = []);
+
+            levels.push(id);
 
         },
 
@@ -581,9 +662,13 @@
 
         _destroyArrow:function(){
 
-            this.$arrow.remove();
+            if(this.$arrow){
 
-            delete this.$arrow
+                this.$arrow.remove();
+
+                this.$arrow = null;
+
+            }
 
         },
 
@@ -605,19 +690,9 @@
 
         },
 
-        _getNodeSimpleDataId:function( id, name ){
+        _getNodeTreeData:function( id, name ){
 
-            var simpleDataId = this._getNodeTreeJson( id, name ).simpleDataId;
-
-            if( typeof simpleDataId === 'undefined' ){
-
-                return false;
-
-            }else{
-
-                return simpleDataId;
-
-            }
+            return this._getNodeTreeJson( id, name ).data || {};
 
         },
 
@@ -643,7 +718,7 @@
 
             }else{
 
-                 return this.treeJson[id][ setName + 'Id' ];
+                return this.treeJson[id][ setName + 'Id' ];
 
             }
 
@@ -659,7 +734,7 @@
 
             }else{
 
-                 return doc.getElementById( this.treeJson[id][ setName + 'Id' ] );
+                return doc.getElementById( this.treeJson[id][ setName + 'Id' ] );
 
             }
 
@@ -681,9 +756,7 @@
 
             var i = 0,length,child,id,treeId,rootId,op = this.options,
 
-            key = op.key,children = key.children,name = key.name,url = key.url,
-
-            simpleDataIdKey = op.isSimpleData.idKey;
+            key = op.key,children = key.children,treeData,childData;
 
             if( !isChild ){
 
@@ -691,9 +764,9 @@
 
                 level = 0;
 
-                this.id = 0;
+                this.nodeTreeId = 0;
 
-                id = this.id++;
+                id = this.nodeTreeId++;
 
                 treeId = this._setTreeId( id );
 
@@ -705,13 +778,15 @@
 
                 parentId = treeId;
 
-                treeJson = treeJson || this.options.treeJson;
+                treeJson = treeJson || $.extend(true, [], op.treeJson);
 
             }
 
             level += 1;
 
-            !this.treeJson[ 'level_'+level ] && ( this.treeJson[ 'level_'+level ] = [] );
+            treeData = this.treeJson;
+
+            !treeData[ 'level_'+level ] && ( treeData[ 'level_'+level ] = [] );
 
             length = treeJson.length;
 
@@ -719,49 +794,19 @@
 
                 if( child = treeJson[i++] ){
 
+                    id = this.nodeTreeId++;
+
+                    treeId = this._setTreeId(id);
+
                     if( child[children] ){
 
-                        id = this.id++;
+                        childData = this._setTreeJson(id, treeId, parentId, level, child, true);
 
-                        treeId = this._setTreeId(id);
+                        this._createLiStr( true, childData.liId );
 
-                        !this.treeJson[treeId] && ( this.treeJson[treeId] = {} );
+                        this._createDivStr( true, childData );
 
-                        this.treeJson[treeId].id = treeId;
-
-                        this.treeJson[treeId].name = child[name];
-
-                        this.treeJson[treeId].url = child[url];
-
-                        this.treeJson[treeId].simpleDataId = child[simpleDataIdKey];
-
-                        this.treeJson[treeId].level = level;
-
-                        this.treeJson[treeId].liId = this._setTreeNodeId( id, 'li', level );
-
-                        this.treeJson[treeId].ulId = this._setTreeNodeId( id, 'ul', level );
-
-                        this.treeJson[treeId].innerId = this._setTreeNodeId( id, 'inner', level );
-
-                        this.treeJson[treeId].switchId = this._setTreeNodeId( id, 'switch', level );
-
-                        this.treeJson[treeId].divId = this._setTreeNodeId( id, 'div', level );
-
-                        this.treeJson[treeId].aId = this._setTreeNodeId( id, 'a', level );
-
-                        this.treeJson[treeId].parentId = parentId;
-
-                        !child.open && ( child.open = false );
-
-                        this.treeJson[treeId].open = child.open;
-
-                        this.treeJson[ 'level_' + level ].push(treeId);
-
-                        this._createLiStr( true, this.treeJson[treeId].liId );
-
-                        this._createDivStr( true, this.treeJson[treeId] );
-
-                        this._createUlStr( this.treeJson[treeId].ulId, this.treeJson[treeId].open );
+                        this._createUlStr( childData.ulId, childData.open );
 
                         this._markNodeTree( child[children], true, level, treeId );
 
@@ -769,45 +814,19 @@
 
                     }else{
 
-                        id = this.id++;
+                        childData = this._setTreeJson(id, treeId, parentId, level, child);
 
-                        treeId = this._setTreeId(id);
+                        this._createLiStr( false, childData.liId );
 
-                        !this.treeJson[treeId] && ( this.treeJson[treeId] = {} );
-
-                        this.treeJson[treeId].id = treeId;
-
-                        this.treeJson[treeId].name = child[name];
-
-                        this.treeJson[treeId].url = child[url];
-
-                        this.treeJson[treeId].simpleDataId = child[simpleDataIdKey];
-
-                        this.treeJson[treeId].level = level;
-
-                        this.treeJson[treeId].liId = this._setTreeNodeId( id, 'li', level );
-
-                        this.treeJson[treeId].innerId = this._setTreeNodeId( id, 'inner', level );
-
-                        this.treeJson[treeId].divId = this._setTreeNodeId( id, 'div', level );
-
-                        this.treeJson[treeId].aId = this._setTreeNodeId( id, 'a', level );
-
-                        this.treeJson[ 'level_'+level ].push(treeId);
-
-                        this.treeJson[treeId].parentId = parentId;
-
-                        this._createLiStr( false, this.treeJson[treeId].liId );
-
-                        this._createDivStr( false, this.treeJson[treeId] );
+                        this._createDivStr( false, childData );
 
                         this.html += '</li>';
 
                     }
 
-                    !this.treeJson[parentId].children && ( this.treeJson[parentId].children = [] );
+                    !treeData[parentId].children && ( treeData[parentId].children = [] );
 
-                    this.treeJson[parentId].children.push( this.treeJson[treeId] );
+                    treeData[parentId].children.push( childData );
 
                 }
 
@@ -815,21 +834,127 @@
 
         },
 
+        _setTreeJson:function(id, treeId, parentId, level, data, isChild){
+
+            var treeData = this.treeJson,childData,key = this.options.key,
+
+            prop,val,_ohasOwn = this._ohasOwn;
+
+            childData = treeData[treeId] = {data: this._dataMin({}, data)};
+
+            childData.id = treeId;
+
+            childData.level = level;
+
+            childData.liId = this._setTreeNodeId( id, 'li', level );
+
+            !!isChild && (childData.ulId = this._setTreeNodeId( id, 'ul', level ));
+
+            childData.innerId = this._setTreeNodeId( id, 'inner', level );
+
+            !!isChild && (childData.switchId = this._setTreeNodeId( id, 'switch', level ));
+
+            childData.divId = this._setTreeNodeId( id, 'div', level );
+
+            childData.aId = this._setTreeNodeId( id, 'a', level );
+
+            childData.parentId = parentId;
+
+            childData.open = !!data.open;
+
+            treeData[ 'level_' + level ].push(treeId);
+
+            for(prop in key){
+
+                if(_ohasOwn.call(key, prop)){
+
+                    if(!!(val = data[key[prop]]) && prop !== 'children'){
+
+                        childData[prop] = val;
+
+                    }else if(prop === 'title' && key[prop] === true){
+
+                        childData[prop] = true;
+
+                    }
+
+                }
+
+            }
+
+            return childData;
+
+        },
+
+        _dataMin:function(receiver, supplier, deep){
+
+            var hasOwn = this._ohasOwn,key,copy,target,copyIsArray,
+
+            isPlainObject = $.isPlainObject,isArray = $.isArray,
+
+            children = this.options.key.children;
+
+            if(receiver === supplier){
+
+                return receiver;
+
+            }
+
+            for (key in supplier) {
+
+                if (hasOwn.call(supplier, key) && (key !== children)) {
+
+                    copy = supplier[key];
+
+                    target = receiver[key];
+
+                    if ( deep && copy && ( isPlainObject(copy) || (copyIsArray = isArray(copy)) ) ) {
+
+                        if ( copyIsArray ) {
+
+                            copyIsArray = false;
+
+                            clone = target && isArray(target) ? target : [];
+
+                        } else {
+
+                            clone = target && isPlainObject(target) ? target : {};
+
+                        }
+
+                        receiver[key] = this._dataMin(clone, copy, deep);
+
+                    }else if( copy !== undefined ){
+
+                        receiver[key] = copy;
+
+                    }
+
+                }
+
+            }
+
+            return receiver;
+
+        },
+
         _changeSimpleTreeJson:function(){
 
-            var op = this.options,
+            var op = this.options,i = 0,
 
-            simpleDatas = op.treeJson,treeJson = [],
+            simpleDatas = $.extend(true, [], op.treeJson),treeJson = [],
 
-            i = simpleDatas.length,simpleData,isSimpleData = op.isSimpleData,
+            length = simpleDatas.length,simpleData,isSimpleData = op.isSimpleData,
 
-            id = isSimpleData.idKey,pid = isSimpleData.pidKey;
+            id = isSimpleData.idKey,pid = isSimpleData.pidKey,children = op.key.children,
 
-            while( i-- ){
+            rootPId = isSimpleData.rootPId;
 
-                simpleData = simpleDatas[i];
+            while( i < length ){
 
-                if( + simpleData[pid] === 0 ){
+                simpleData = simpleDatas[i++];
+
+                if( + simpleData[pid] === + rootPId ){
 
                     treeJson.push( simpleData );
 
@@ -841,11 +966,11 @@
 
                 var i = 0,jsonLen = json.length,dataLen = data.length,
 
-                jsonData,jsonId,dataData;
+                jsonData,jsonId,dataData,j;
 
                 while( i < jsonLen ){
 
-                    var j = 0;
+                    j = 0;
 
                     jsonData = json[i++];
 
@@ -857,17 +982,17 @@
 
                         if( + dataData[pid] === jsonId ){
 
-                            !jsonData.children && ( jsonData.children = [] );
+                            !jsonData[children] && ( jsonData[children] = [] );
 
-                            jsonData.children.push( dataData );
+                            jsonData[children].push( dataData );
 
                         }
 
                     }
 
-                    if( jsonData.children ){
+                    if( jsonData[children] ){
 
-                        treeChild( jsonData.children, data );
+                        treeChild( jsonData[children], data );
 
                     }
 
@@ -885,11 +1010,9 @@
 
             this.html += '</ul>';
 
-            this.$tree = $( this.html );
+            this.$tree = $( this.html ).appendTo( this.$target );
 
-            this.$tree.appendTo( this.$target );
-
-            delete this.html;
+            this.html = null;
 
         },
 
@@ -907,69 +1030,119 @@
 
         _createDivStr:function( isChild, child, notWrap ){
 
-            var isIcon = this.options.isIcon,href,
+            var op = this.options,isIcon = op.isIcon,href,
 
-            name = child.name, divId = child.divId, innerId = child.innerId,
+            name = child.name, divId = child.divId,aId = child.aId,
 
-            switchId = child.switchId, isOpen = child.open,aId = child.aId,
+            url = child.url,target,title = child.title;
 
-            url = child.url,target;
+            this.html += this._wrapDivHtml(child, notWrap);
 
-            !notWrap ? this.html +='<div id="' + divId + '" class="leoTree_node">' :
-
-            this.html = '';
-
-            if( isChild ){
-
-                if( isOpen ){
-
-                    this.html += '<span id="' + innerId + '" class="leoTree_state_default leoTree_inner leoUi_clearfix leoTree_inner_open"><span id="' + switchId + '" class="leoTree_icon leoTree_icon_triangle"></span>';
-
-                    !!isIcon && ( this.html += '<span class="leoTree_icon leoTree_icon_folder"></span>' );
-
-
-                }else{
-
-                    this.html += '<span id="' + innerId + '" class="leoTree_state_default leoTree_inner leoUi_clearfix leoTree_inner_close"><span id="' + switchId + '" class="leoTree_icon leoTree_icon_triangle"></span>';
-
-                    !!isIcon && ( this.html += '<span class="leoTree_icon leoTree_icon_folder"></span>' );
-
-                }
-
-            }else{
-
-                !isIcon ? this.html += '<span id="' + innerId + '" class="leoTree_state_default leoTree_inner leoUi_clearfix">' : this.html += '<span id="' + innerId + '" class="leoTree_state_default leoTree_inner leoUi_clearfix"><span class="leoTree_icon leoTree_icon_document"></span>';
-
-            }
+            this.html += this._innerDivHtml(child, isChild, isIcon);
 
             if( url ){
 
-                if(href = url.href){
+                if(target = child.target){
 
-                    this.html += '<a id="' + aId + '" href="' + href + '"';
-
+                    this.html += '<a id="' + aId + '" href="' + url + '" target = "' + target + '" class="leoTree_dblclick_a"';
                 }else{
 
-                    this.html += '<a id="' + aId + '"';
-
-                }
-
-                if(target = url.target){
-
-                    this.html += 'target = "' + url.target + '" class="leoTree_dblclick_a"><span>' + name + '</span></a></span>';
-                }else{
-
-                    this.html += 'class="leoTree_dblclick_a"><span>' + name + '</span></a></span>';
+                    this.html += '<a id="' + aId + '" href="' + url + '" class="leoTree_dblclick_a"';
 
                 }
 
             }else{
 
-                this.html += '<a id="' + aId + '" class="leoTree_dblclick_a"><span>' + name + '</span></a></span>';
+                this.html += '<a id="' + aId + '" class="leoTree_dblclick_a"';
 
             }
 
-            !notWrap && ( this.html += '</div>' );
+            if(title === true){
+
+                this.html += 'title="' + name + '" >';
+
+            }else if(title){
+
+                this.html += 'title="' + title + '" >';
+
+            }else{
+
+                this.html += '>';
+
+            }
+
+            this.html += '<span>' + name + '</span></a></span>';
+
+            this.html += this._wrapDivHtml(child, notWrap, true);
+
+        },
+
+        _wrapDivHtml:function(child, notWrap, isEnd){
+
+            var str = '';
+
+            if(!notWrap){
+
+                !isEnd ? str +='<div id="' + child.divId + '" class="leoTree_node">' : str +='</div>';
+
+            }
+
+            return str;
+
+        },
+
+        _innerDivHtml:function(child, isChild, isIcon){
+
+            var str = '';
+
+            if( isChild ){
+
+                if( child.isOpen ){
+
+                    str += '<span id="' + child.innerId + '" class="leoTree_state_default leoTree_inner leoUi_clearfix leoTree_inner_open"><span id="' + child.switchId + '" class="leoTree_icon leoTree_icon_triangle"></span>';
+
+                    !!isIcon && ( str += this._iconHtml(isChild) );
+
+
+                }else{
+
+                    str += '<span id="' + child.innerId + '" class="leoTree_state_default leoTree_inner leoUi_clearfix leoTree_inner_close"><span id="' + child.switchId + '" class="leoTree_icon leoTree_icon_triangle"></span>';
+
+                    !!isIcon && ( str += this._iconHtml(isChild) );
+
+                }
+
+            }else{
+
+                str += '<span id="' + child.innerId + '" class="leoTree_state_default leoTree_inner leoUi_clearfix">';
+
+                !!isIcon && ( str += this._iconHtml(isChild) );
+
+            }
+
+            return str;
+
+        },
+
+        _iconHtml:function(isChild){
+
+            if(isChild){
+
+                return '<span class="leoTree_icon leoTree_icon_folder"></span>';
+
+            }else{
+
+                return '<span class="leoTree_icon leoTree_icon_document"></span>';
+
+            }
+
+        },
+
+        _divCheckHtml:function(){
+
+
+
+
 
         },
 
@@ -1045,7 +1218,7 @@
 
                     clickTime = setTimeout(function(){
 
-                        clickNodeCallBack !== false && clickNodeCallBack.call( self, event, This._getNodeSimpleDataId( self.id, 'a' ) );
+                        clickNodeCallBack !== false && clickNodeCallBack.call( self, event, This._getNodeTreeData( self.id, 'a' ) );
 
                     }, 300);
 
@@ -1055,7 +1228,7 @@
 
                 this._on( $tree, 'click.switch', 'a.leoTree_dblclick_a', function(event){
 
-                    clickNodeCallBack !== false && clickNodeCallBack.call( this, event, This._getNodeSimpleDataId( this.id, 'a' ) );
+                    clickNodeCallBack !== false && clickNodeCallBack.call( this, event, This._getNodeTreeData( this.id, 'a' ) );
 
                 });
 
@@ -1069,15 +1242,15 @@
 
             var childrens = this.treeJson[treeJson.parentId].children,
 
-            i = childrens.length - 1,childJson,document = this.document[0];
+            i = childrens.length,childJson,doc = this.document[0];
 
-            while( i >= 0 ){
+            while( i-- ){
 
-                childJson = childrens[i--];
+                childJson = childrens[i];
 
                 if( childJson.open === true ){
 
-                    this._treeNodeClose( document.getElementById( childJson.innerId ), document.getElementById( childJson.ulId ), childJson );
+                    this._treeNodeClose( doc.getElementById( childJson.innerId ), doc.getElementById( childJson.ulId ), childJson );
 
                 }
 
@@ -1097,7 +1270,7 @@
 
             }
 
-            var This = this,document = this.document[0];
+            var This = this,doc = this.document[0];
 
             this._on( this.$tree, 'mouseenter.treeHoverEvent', 'span.leoTree_inner', function(event){
 
@@ -1105,7 +1278,7 @@
 
                 treeJson = This.treeJson[ This._getTreeId( id, 'inner' ) ];
 
-                treeJson.open === false && This._treeNodeOpen( this, document.getElementById( This._getTreeNodeId( id, 'inner', 'ul' ) ), treeJson );
+                treeJson.open === false && This._treeNodeOpen( this, doc.getElementById( This._getTreeNodeId( id, 'inner', 'ul' ) ), treeJson );
 
             });
 
@@ -1115,7 +1288,7 @@
 
                 treeJson = This.treeJson[ This._getTreeId( id, 'li' ) ];
 
-                treeJson.open === true && This._treeNodeClose( document.getElementById( This._getTreeNodeId( id, 'li', 'inner' ) ), document.getElementById( This._getTreeNodeId( id, 'li', 'ul' ) ), treeJson );
+                treeJson.open === true && This._treeNodeClose( doc.getElementById( This._getTreeNodeId( id, 'li', 'inner' ) ), doc.getElementById( This._getTreeNodeId( id, 'li', 'ul' ) ), treeJson );
 
             });
 
@@ -1123,17 +1296,17 @@
 
         _treeNodeOpenOrClose:function( node, name ){
 
-            var id = node.id,document,ul,inner,
+            var id = node.id,doc,ul,inner,
 
             treeJson = this.treeJson[ this._getTreeId( id, name ) ];
 
             if( !treeJson.children ){ return; }
 
-            document = this.document[0];
+            doc = this.document[0];
 
-            ul = document.getElementById( this._getTreeNodeId( id, name, 'ul' ) );
+            ul = doc.getElementById( this._getTreeNodeId( id, name, 'ul' ) );
 
-            inner = document.getElementById( this._getTreeNodeId( id, name, 'inner' ) );
+            inner = doc.getElementById( this._getTreeNodeId( id, name, 'inner' ) );
 
             if( treeJson.open === true ){
 

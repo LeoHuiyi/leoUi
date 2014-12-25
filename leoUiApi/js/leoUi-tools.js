@@ -133,19 +133,21 @@
     //返回一个随机乱序的 obj 副本
     $.leoTools.shuffle = function(obj) {
 
-        var rand,shuffled = [];
+        // var rand,shuffled = [];
 
-        $.each(obj, function(key,value) {
+        // $.each(obj, function(key,value) {
 
-            rand = $.leoTools.random(key++);
+        //     rand = $.leoTools.random(key++);
 
-            shuffled[key - 1] = shuffled[rand];
+        //     shuffled[key - 1] = shuffled[rand];
 
-            shuffled[rand] = value;
+        //     shuffled[rand] = value;
 
-        });
+        // });
 
-        return shuffled;
+        // return shuffled;
+
+        return aslice.call(obj, 0).sort(function(){ return Math.random() - 0.5});
 
     };
 
@@ -173,7 +175,7 @@
     //返回所有滚动的父集合
     $.leoTools.scrollParents = function( $box, all ){
 
-        var scrollParent,i=0,position = $box.css( "position" ),
+        var scrollParent,i = 0,position = $box.css( "position" ),
 
         excludeStaticParent = position === "absolute",doc =  $box[ 0 ].ownerDocument || document;
 
@@ -393,6 +395,8 @@
 
                     function inFn( options ){
 
+                        if(!instance){return;}
+
                         var isMethodCall = typeof options === "string",args = aslice.call( arguments, 1 ),
 
                         returnValue = instance.$target;
@@ -419,6 +423,16 @@
 
                             methodValue = instance[ options ].apply( instance, args );
 
+                            if(options === 'destroy'){
+
+                                deleteObj(instance);
+
+                                instance = null;
+
+                                return false;
+
+                            }
+
                             if ( methodValue !== instance && methodValue !== undefined ) {
 
                                 returnValue = methodValue && methodValue.jquery ? returnValue.pushStack( methodValue.get() ) : methodValue;
@@ -431,27 +445,73 @@
 
                     }
 
-                    for (var key in instance ) {
+                    function deleteObj(obj){
 
-                        if ( $.isFunction( instance[key] ) && key.charAt( 0 ) !== "_" && key !== 'constructor' ) {
+                        if(obj){
 
-                            inFn[key] = function(key){
+                            for(var prop in obj){
+
+                                obj[prop] = null;
+
+                            }
+
+                        }
+
+                    };
+
+                    function updateInFnMethods(instance, methodArr){
+
+                        deleteObj(inFn);
+
+                        var key,i = methodArr.length,method;
+
+                        for ( key in instance ) {
+
+                            if ( $.isFunction( instance[key] ) && key.charAt( 0 ) !== "_" && key !== 'constructor' ) {
+
+                                inFn[key] = function(key){
+
+                                    return function(){
+
+                                        var arg = aslice.call(arguments);
+
+                                        arg.unshift(key);
+
+                                        return inFn.apply( inFn, arg );
+
+                                    }
+
+                                }( key );
+
+                            }
+
+                        }
+
+                        while(i--){
+
+                            method = methodArr[i];
+
+                            inFn[method] = function(method){
 
                                 return function(){
 
                                     var arg = aslice.call(arguments);
 
-                                    arg.unshift(key);
+                                    arg.unshift(method);
 
                                     return inFn.apply( inFn, arg );
 
                                 }
 
-                            }( key );
+                            }( method );
 
                         }
 
                     }
+
+                    updateInFnMethods(instance, ['instance']);
+
+                    instance.__updateInFnMethods = updateInFnMethods;
 
                     return inFn;
 
@@ -612,7 +672,7 @@
 
             }
 
-            li.defaults = $.extend( true, {}, leoPlugIn[li.inherit]['prototype']['defaults'], li.defaults );
+            li.defaults = leoToolsFn.extend( {}, leoPlugIn[li.inherit]['prototype']['defaults'], li.defaults );
 
             $.extend( plugInPrototype, li );
 
@@ -670,7 +730,7 @@
 
             function PlugIn( hash, target, dataId ){
 
-                this.options = $.extend( true, {}, this.defaults, hash );
+                this.options = leoToolsFn.extend( {}, this.defaults, hash );
 
                 this.$target = $( target || this.options[this.defaultsTarget] || '<div>' );
 
@@ -700,8 +760,6 @@
 
                     this.window = $( this.document[0].defaultView || this.document[0].parentWindow );
 
-                    this._init();
-
                     this.dataId !== false && $.data( target, this.dataId, this );
 
                     this._publicEvent = function(plugIn){
@@ -715,6 +773,70 @@
                         }
 
                     }(this);
+
+                    !!this._updatePublicMethods && this._updatePublicMethods();
+
+                    this._init();
+
+                },
+
+                _deletePublicEventObj:function(){
+
+                    var _publicMethods = this._publicMethods,prop;
+
+                    if(_publicMethods){
+
+                        for(prop in _publicMethods){
+
+                            if(Object.prototype.hasOwnProperty.call(_publicMethods, prop)){
+
+                                _publicMethods[prop] = null;
+
+                            }
+
+                        }
+
+                        this._publicMethods = null;
+
+                    }
+
+                    return this;
+
+                },
+
+                _updatePublicMethods:function(){
+
+                    this._deletePublicEventObj();
+
+                    this._publicMethods = function(plugIn){
+
+                        var _publicMethods = {},key;
+
+                        for ( key in plugIn ) {
+
+                            if ( $.isFunction( plugIn[key] ) && key.charAt( 0 ) !== "_" && key !== 'constructor' ) {
+
+                                _publicMethods[key] = function( plugIn, key ){
+
+                                    return function(){
+
+                                        return plugIn[key].apply( plugIn, arguments );
+
+                                    }
+
+                                }( plugIn, key );
+
+                            }
+
+                        }
+
+                        return _publicMethods;
+
+                    }(this);
+
+                    !!this.__updateInFnMethods && this.__updateInFnMethods(this, ['instance']);
+
+                    return this;
 
                 },
 
@@ -754,7 +876,7 @@
 
                                 arg[last] = function(event){
 
-                                    if( op.disabledEvent !== true && !$( event.target ).closest( "." + This.disableClassName )[0] ){
+                                    if( op.disabledEvent === false && !$( event.target ).closest( "." + This.disableClassName )[0] ){
 
                                         oldFn.apply(this, arguments);
 

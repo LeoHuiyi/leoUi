@@ -8,34 +8,37 @@
 var zNodes = [{
 	name: "leoUi文档",
 	open: true,
-	url: {href: '#!leo#iframe/leoUi-index.html'},
+	url: '#!leo#iframe/leoUi-index.html',
 	children: [{
 			name: "leoUiLoad模块加载器",
-			url: {href: '#!leo#iframe/leoUiLoad.html'}
+			url: '#!leo#iframe/leoUiLoad.html'
 		}, {
 			name: "leoPlugIn创建jQuery组件",
-			url: {href: '#!leo#iframe/leoPlugIn.html'}
+			url: '#!leo#iframe/leoPlugIn.html'
 		}, {
 			name: "leoMouse鼠标拖拽基础组件",
-			url: {href: '#!leo#iframe/leoMouse.html'}
+			url: '#!leo#iframe/leoMouse.html'
 		}, {
 			name: "leoDraggable拖拽组件",
-			url: {href: '#!leo#iframe/leoDraggable.html'}
+			url: '#!leo#iframe/leoDraggable.html'
 		}, {
 			name: "leoResizable缩放组件",
-			url: {href: '#!leo#iframe/leoResizable.html'}
+			url: '#!leo#iframe/leoResizable.html'
 		}, {
 			name: "leoDroppable拖放组件",
-			url: {href: '#!leo#iframe/leoDroppable.html'}
+			url: '#!leo#iframe/leoDroppable.html'
 		}, {
 			name: "leoSelectable选择组件",
-			url: {href: '#!leo#iframe/leoSelectable.html'}
+			url: '#!leo#iframe/leoSelectable.html'
 		}, {
 			name: "leoDialog对话框组件",
-			url: {href: '#!leo#iframe/leoDialog.html'}
+			url: '#!leo#iframe/leoDialog.html'
 		}, {
 			name: "leoTooltip提示框组件",
-			url: {href: '#!leo#iframe/leoTooltip.html'}
+			url: '#!leo#iframe/leoTooltip.html'
+		}, {
+			name: "leoTree树形组件",
+			url: '#!leo#iframe/leoTree.html'
 		}]
 	}],reHref = /.*#!leo#/;
 

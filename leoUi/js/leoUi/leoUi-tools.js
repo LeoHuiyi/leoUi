@@ -133,19 +133,21 @@
     //返回一个随机乱序的 obj 副本
     $.leoTools.shuffle = function(obj) {
 
-        var rand,shuffled = [];
+        // var rand,shuffled = [];
 
-        $.each(obj, function(key,value) {
+        // $.each(obj, function(key,value) {
 
-            rand = $.leoTools.random(key++);
+        //     rand = $.leoTools.random(key++);
 
-            shuffled[key - 1] = shuffled[rand];
+        //     shuffled[key - 1] = shuffled[rand];
 
-            shuffled[rand] = value;
+        //     shuffled[rand] = value;
 
-        });
+        // });
 
-        return shuffled;
+        // return shuffled;
+
+        return aslice.call(obj, 0).sort(function(){ return Math.random() - 0.5});
 
     };
 

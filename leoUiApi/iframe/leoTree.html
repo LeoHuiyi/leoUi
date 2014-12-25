@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+
+<head>
+    <meta charset="utf-8" />
+    <title>leoDraggable</title>
+    <meta name="description" content="https://github.com/LeoHuiyi" />
+    <meta name="keywords" content="leoUi,jquery组件,jqueryUi" />
+    <meta name="author" content="leo" />
+    <meta name="robots" content="all" />
+    <!--[if lte IE 8]>
+        <script src="../js/html5.js"></script>
+    <![endif]-->
+    <link rel="stylesheet" href="../css/reset.css" />
+    <link rel="stylesheet" href="../css/leoUi-grid.css" />
+    <link rel="stylesheet" href="../css/shCoreDjango.css" />
+    <link rel="stylesheet" href="../css/leoUiApiCssIframe.css" />
+</head>
+
+<body>
+    <nav id="guide" class="g-mod">
+        <div class="from">
+            <span>github:</span>
+            <a href="https://github.com/LeoHuiyi" target="_blank">https://github.com/LeoHuiyi</a>
+        </div>
+    </nav>
+    <header id="hd">
+        <section class="g-mod" id="title">
+            <h1 class="tit">leoTree</h1>
+            <div class="g-browser g-clear">
+                <p>leoTree树形组件</p>
+                <p>引用：leoUi-tree.js</p>
+                <p>依赖：jQuery, leoUi-tools.js, leoUi-position.js, jquery-mousewheel.js, leoUi-mouse.js(继承)</p>
+            </div>
+        </section>
+    </header>
+    <section id="bd">
+        <section class="g-mod g-attr g-block">
+            <h2 class="tit">leoTree拖拽组件</h2>
+            <div class="cont">
+                <p><strong>$('.leoUi').leoDraggable( options )</strong></p>
+                <p><strong>使用说明</strong>：</p>
+                <section class="g-mod g-attr g-block">
+                    <div class="cont">
+                        <p><strong>examples</strong>：</p>
+                        <pre class="brush: js;">
+                            $('.leoUi').leoDraggable({
+
+                                handle:false, //只有在特定的元素上触发鼠标按下事件时，才可以拖动
+
+					            cursor:'move',//拖拽动作时，鼠标的CSS样式
+
+					            bClone:true, //是否使用克隆拖拽
+
+					            bCloneAnimate:true, //克隆拖拽是否有动画
+
+					            dragBoxReturnToTarget:false,//拖拽结束时候，是否回到Target的位置
+
+					            refreshPositions:false,//配合droppable使用，move时候时刻调用leoDroppable进行碰撞检测（耗性能）
+
+					            duration:400,//动画时间
+
+					            stopMouseWheel:false, //拖拽时候是否关闭滚轮事件
+
+					            revert:false, //如果设置为true, 当拖动停止时元素将返回它的初始位置
+
+					            revertAnimate:true, //还原是否动画
+
+					            axis:false,//可用值为x只能在x方向拖动，设置为y只能在Y方向拖动
+
+					            cursorAt:false,//设置拖动帮手相对于鼠标光标的偏移量。坐标可被指定为一个散列 使用的组合中的一个或两个键：{ top, left, right, bottom }
+
+					            containment:false,  //可以限制draggable只能在指定的元素或区域的边界以内进行拖动
+
+					                                // Selector: 可拖动元素将被置于由选择器指定的第一个元素的起界限作用的盒模型中。如果没有找到任何元素，则不会设置界限
+
+					                                 // Element: 可拖动的元素将包含该元素的边界框。
+
+					                                // String:可选值: "parent", "document", "window"
+
+					                                // Array: 以 [ x1, y1, x2, y2 ] 数组形式定义一个限制区域
+
+					            scroll: true,//如果设置为true, 当拖动时，div盒模型将自动翻滚
+
+					            scrollSensitivity: 20,//离开可视区域边缘多少距离开始滚动。距离是相对指针进行计算的，而不是被拖到元素本身。如果scroll 选项设置为false，则不滚动。
+
+					            scrollSpeed: 20,//当鼠标指针的值小于scrollSensitivity的值时，窗口滚动的速度。如果scroll选项设置为false，则该参数无效
+
+                                closestScrollParent:false,//从最近的可滚动的祖先开始，在DOM 树上逐级向上的可滚动的祖先匹配，如果匹配到了break，没匹配到则默认到document，如果scroll选项设置为false，则该参数无效（document不算在内,false为不匹配）
+
+					            useLeoDroppable:false,//是否使用leoDroppable组件
+
+					            droppableScope:'all',//用来设置拖动（leoDraggable）元素和放置（leoDroppable）对象的集合,配合leoDroppable使用
+
+					            disabled:false,//当设置为true时禁止拖动
+
+					            grid:false,//拖拽元素时，只能以指定大小的方格进行拖动。数组形式为[ x, y ]
+
+					            iframeFix:false,//在拖动期间阻止iframe捕捉鼠标移过事件。与cursorAt选项搭配使用时或者当鼠标指针可能不在拖动助手元素之上时，该参数非常有用
+
+					                            // 支持多种类型:
+
+					                            // Boolean: 当设置为true, 透明层将被放置于页面上的所有iframe之上
+
+					                            // Selector: 任何由选择器匹配的iframe将被透明层覆盖
+
+                                                // function: 返回所有透明层jquery对象（arguments: darg, this.document[0]）
+
+					            proxy:function(source) { //source
+
+					                return $(source).clone().removeAttr('id').css({'opacity': '0.5'}).insertAfter(source);
+
+					            },//克隆拖拽返回的克隆对象（必须为jquery对象）
+
+					            ...
+
+                            })
+                        </pre>
+                    </div>
+                </section>
+                <p><strong>options </strong>：加上leoMouse（继承）的options</p>
+                <div class="cont">
+                    <div id="option-grid" class="g-grid"></div>
+                </div>
+                <p><strong>事件</strong>：</p>
+                <section class="g-mod g-attr g-block">
+                    <div class="cont">
+                        <p><strong>setScrollParents()</strong>：重新获取box的可滚动的祖先</p>
+                        <p><strong>arguments</strong>：无</p>
+                        <p><strong>returns</strong>：无</p>
+                        <p><strong>examples</strong>：</p>
+                        <pre class="brush: js;">
+                            $( ".leoUi" ).leoDraggable( "setScrollParents" );
+                        </pre>
+                    </div>
+                </section>
+                <section class="g-mod g-attr g-block">
+                    <div class="cont">
+                        <p><strong>setDropsProp()</strong>：重新条用leoDroppable的setDropsProp</p>
+                        <p><strong>arguments</strong>：无</p>
+                        <p><strong>returns</strong>：无</p>
+                        <p><strong>examples</strong>：</p>
+                        <pre class="brush: js;">
+                            $( ".leoUi" ).leoDraggable( "setDropsProp" );
+                        </pre>
+                    </div>
+                </section>
+                <section class="g-mod g-attr g-block">
+                    <div class="cont">
+                        <p><strong>destroy()</strong>：销毁组件</p>
+                        <p><strong>arguments</strong>：无</p>
+                        <p><strong>returns</strong>：无</p>
+                        <p><strong>examples</strong>：</p>
+                        <pre class="brush: js;">
+                            $( ".leoUi" ).leoDraggable( "destroy" );
+                        </pre>
+                    </div>
+                </section>
+                <section class="g-mod g-attr g-block">
+                    <div class="cont">
+                        <p><strong>option(arguments)</strong>：设置或者获取组件选项的值</p>
+                        <p><strong>arguments</strong>：参考leoPlugIn中的option方法</p>
+                        <p><strong>returns</strong>：参考leoPlugIn中的option方法</p>
+                        <p><strong>examples</strong>：</p>
+                        <pre class="brush: js;">
+                            $( ".leoUi" ).leoDraggable( "option" "a.b.c", 500 );
+                        </pre>
+                    </div>
+                </section>
+            </div>
+        </section>
+    </section>
+    <footer id="ft">
+        <aside class="g-mod">
+            <div class="g-browser g-clear">
+                <p>author: leo</p>
+                <p>如有问题请联系：253383559@qq.com</p>
+            </div>
+        </aside>
+    </footer>
+    <script type="text/javascript" src="../js/jquery-1.11.1-min.js"></script>
+    <script type="text/javascript" src="../js/leoUi-tools.js"></script>
+    <script type="text/javascript" src="../js/leoUi-grid.js"></script>
+    <script type="text/javascript" src="../js/shCore.js"></script>
+    <script type="text/javascript" src="../js/shBrushJScript.js"></script>
+    <script type="text/javascript">
+    var tableModel = [{
+
+            id: 'name',
+
+            width: 200,
+
+            minWidth: 150,
+
+            fixed: true,
+
+            theadName: 'Name',
+
+            renderCell:function(val){
+
+                return '<div style="color:#008000">' + val + '</div>';
+
+            }
+
+        }, {
+
+            id: 'type',
+
+            width: 300,
+
+            fixed: true,
+
+            minWidth: 200,
+
+            className:'feedLine',
+
+            theadName: 'Type'
+
+        }, {
+
+            id: 'default',
+
+            width: 300,
+
+            className:'feedLine',
+
+            theadName: 'Default'
+
+        },{
+
+            id: 'explain',
+
+            width: 750,
+
+            fixed: true,
+
+            align: 'left',
+
+            theadName: 'Explain',
+
+            className:'feedLine'
+
+        }],optionsData = [{
+
+            'name': 'handle',
+
+            'default': 'false',
+
+            'type': 'selector',
+
+            'explain': '只有在特定的元素上触发鼠标按下事件时，才可以拖动'
+
+        }, {
+
+            'name': 'cursor',
+
+            'default': 'move',
+
+            'type': 'string',
+
+            'explain': '拖拽动作时，鼠标的CSS样式'
+
+        }, {
+
+            'name': 'bClone',
+
+            'default': 'true',
+
+            'type': 'boolean',
+
+            'explain': '是否使用克隆拖拽'
+
+        }, {
+
+            'name': 'bCloneAnimate',
+
+            'default': 'true',
+
+            'type': 'boolean',
+
+            'explain': '克隆拖拽是否有动画'
+
+        }, {
+
+            'name': 'dragBoxReturnToTarget',
+
+            'default': 'false',
+
+            'type': 'boolean',
+
+            'explain': '拖拽结束时候，是否回到Target的位置'
+
+        }, {
+
+            'name': 'refreshPositions',
+
+            'default': 'false',
+
+            'type': 'boolean',
+
+            'explain': '配合droppable使用，move时候时刻调用leoDroppable进行碰撞检测（耗性能）'
+
+        }, {
+
+            'name': 'duration',
+
+            'default': '400',
+
+            'type': 'number',
+
+            'explain': '动画时间'
+
+        }, {
+
+            'name': 'stopMouseWheel',
+
+            'default': 'false',
+
+            'type': 'boolean',
+
+            'explain': '拖拽时候是否关闭滚轮事件'
+
+        }, {
+
+            'name': 'revert',
+
+            'default': 'false',
+
+            'type': 'boolean',
+
+            'explain': '如果设置为true, 当拖动停止时元素将返回它的初始位置'
+
+        }, {
+
+            'name': 'revertAnimate',
+
+            'default': 'true',
+
+            'type': 'boolean',
+
+            'explain': '还原是否动画'
+
+        }, {
+
+            'name': 'axis',
+
+            'default': 'false',
+
+            'type': 'string',
+
+            'explain': '可用值为x只能在x方向拖动，设置为y只能在Y方向拖动'
+
+        }, {
+
+            'name': 'cursorAt',
+
+            'default': 'false',
+
+            'type': 'object',
+
+            'explain': '设置拖动帮手相对于鼠标光标的偏移量。坐标可被指定为一个散列 使用的组合中的一个或两个键：{ top, left, right, bottom }'
+
+        }, {
+
+            'name': 'containment',
+
+            'default': 'false',
+
+            'type': 'selector or element or string or array',
+
+            'explain': '可以限制draggable只能在指定的元素或区域的边界以内进行拖动。Selector: 可拖动元素将被置于由选择器指定的第一个元素的起界限作用的盒模型中。如果没有找到任何元素，则不会设置界限。Element: 可拖动的元素将包含该元素的边界框。String:可选值: "parent", "document", "window"。Array: 以 [ x1, y1, x2, y2 ] 数组形式定义一个限制区域'
+
+        }, {
+
+            'name': 'scroll',
+
+            'default': 'false',
+
+            'type': 'boolean',
+
+            'explain': '如果设置为true, 当拖动时，div盒模型将自动翻滚'
+
+        }, {
+
+            'name': 'scrollSensitivity',
+
+            'default': '20',
+
+            'type': 'number',
+
+            'explain': '离开可视区域边缘多少距离开始滚动。距离是相对指针进行计算的，而不是被拖到元素本身。如果scroll 选项设置为false，则不滚动。'
+
+        }, {
+
+            'name': 'scrollSpeed',
+
+            'default': '20',
+
+            'type': 'number',
+
+            'explain': '当鼠标指针的值小于scrollSensitivity的值时，窗口滚动的速度。如果scroll选项设置为false，则该参数无效'
+
+        }, {
+
+            'name': 'closestScrollParent',
+
+            'default': 'false',
+
+            'type': 'selector or jQuery object or element',
+
+            'explain': '从最近的可滚动的祖先开始，在DOM 树上逐级向上的可滚动的祖先匹配，如果匹配到了break，没匹配到则默认到document，如果scroll选项设置为false，则该参数无效（document不算在内,false为不匹配）'
+
+        }, {
+
+            'name': 'useLeoDroppable',
+
+            'default': 'false',
+
+            'type': 'boolean',
+
+            'explain': '是否使用leoDroppable组件'
+
+        }, {
+
+            'name': 'droppableScope',
+
+            'default': 'all',
+
+            'type': 'string',
+
+            'explain': '用来设置拖动（leoDraggable）元素和放置（leoDroppable）对象的集合,配合leoDroppable使用'
+
+        }, {
+
+            'name': 'disabled',
+
+            'default': 'false',
+
+            'type': 'boolean',
+
+            'explain': '当设置为true时禁止拖动'
+
+        }, {
+
+            'name': 'grid',
+
+            'default': 'false',
+
+            'type': 'array',
+
+            'explain': '拖拽元素时，只能以指定大小的方格进行拖动。数组形式为[ x, y ]'
+
+        }, {
+
+            'name': 'iframeFix',
+
+            'default': 'false',
+
+            'type': 'boolean or selector',
+
+            'explain': '在拖动期间阻止iframe捕捉鼠标移过事件。与cursorAt选项搭配使用时或者当鼠标指针可能不在拖动助手元素之上时，该参数非常有用。支持多种类型:Boolean: 当设置为true, 透明层将被放置于页面上的所有iframe之上。Selector: 任何由选择器匹配的iframe将被透明层覆盖。function: 返回所有透明层jquery对象（arguments: darg, this.document[0]）'
+
+        }, {
+
+            'name': 'proxy',
+
+            'default': 'function(source){return $(source).clone().removeAttr("id").css({"opacity": "0.5"}).insertAfter(source);}',
+
+            'type': 'function',
+
+            'explain': '克隆拖拽返回的克隆对象（必须为jquery对象）（ arguments: target）'
+
+        }, {
+
+            'name': 'onBeforeDrag',
+
+            'default': '$.noop',
+
+            'type': 'function',
+
+            'explain': '开始拖拽之前回调，返回false，取消拖拽。（this: target, arguments: event）'
+
+        }, {
+
+            'name': 'onStartDrag',
+
+            'default': '$.noop',
+
+            'type': 'function',
+
+            'explain': '开始拖拽回调（this: target, arguments: event, dragBox）'
+
+        }, {
+
+            'name': 'onDrag',
+
+            'default': '$.noop',
+
+            'type': 'function',
+
+            'explain': '拖拽中回调（this: target, arguments: event, dragBox）'
+
+        }, {
+
+            'name': 'onBeforeStopDrag',
+
+            'default': '$.noop',
+
+            'type': 'function',
+
+            'explain': '拖拽结束前回调（this: target, arguments: event, dragBox）'
+
+        }, {
+
+            'name': 'onStopDrag',
+
+            'default': '$.noop',
+
+            'type': 'function',
+
+            'explain': '拖拽结束回调（this: target, arguments: event）'
+
+        }],gridOptions = {
+
+            dataType: 'data',
+
+            tableModel: tableModel,
+
+            height: false,
+
+            width: false,
+
+            isHover: false,
+
+            boxCheckType: false,
+
+            resizeWidth: false,
+
+            resizeHeight: false,
+
+            isPage: false,
+
+            evenClass: false
+
+        };
+    $('#option-grid').leoGrid($.extend(gridOptions, {gridData: optionsData}));
+    SyntaxHighlighter.all({'toolbar': false});
+    </script>
+</body>
+
+</html>

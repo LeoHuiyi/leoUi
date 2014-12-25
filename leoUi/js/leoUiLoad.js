@@ -30,7 +30,33 @@
 
 	rdeuce = /\/\w+\/\.\./, modules = { ready: {} },
 
-	readyFn, ready = W3C ? "DOMContentLoaded" : "readystatechange",basepath;
+	readyFn, ready = W3C ? "DOMContentLoaded" : "readystatechange",basepath,
+
+	class2type = {}, core_toString = class2type.toString,
+
+	isArray = Array.isArray || function( obj ) {
+
+		return type(obj) === "array";
+
+	},
+
+	isObj = function( obj ) {
+
+		return type(obj) === "object";
+
+	};
+
+	function type( obj ) {
+
+		if ( obj == null ) {
+
+			return String( obj );
+
+		}
+
+		return typeof obj === "object" || typeof obj === "function" ? class2type[ core_toString.call(obj) ] || "object" : typeof obj;
+
+	}
 
 	function extend(receiver, supplier) {
 
@@ -61,35 +87,41 @@
 
 	function mix(receiver, supplier, deep){
 
-		var i = 1,key,obj,target;
+		var key,copy,target,copyIsArray;
+
+		if(receiver === supplier){
+
+			return receiver;
+
+		}
 
 		for (key in supplier) {
 
 			if (hasOwn.call(supplier, key)) {
 
-				if(!deep){
+				copy = supplier[key];
 
-					receiver[key] = supplier[key];
+				target = receiver[key];
 
-				}else{
+				if ( deep && copy && ( isObj(copy) || (copyIsArray = isArray(copy)) ) ) {
 
-					obj = supplier[key];
+					if ( copyIsArray ) {
 
-					target = receiver[key];
+						copyIsArray = false;
 
-					if(typeof obj === 'object'){
+						clone = target && isArray(target) ? target : [];
 
-						receiver[key] = mix(target || {}, obj, deep);
+					} else {
 
-					}else if(obj.constructor === Array){
-
-						receiver[key] = mix(target || [], obj, deep);
-
-					}else{
-
-						receiver[key] = supplier[key];
+						clone = target && isObj(target) ? target : {};
 
 					}
+
+					receiver[key] = mix(clone, copy, deep);
+
+				}else if( copy !== undefined ){
+
+					receiver[key] = copy;
 
 				}
 

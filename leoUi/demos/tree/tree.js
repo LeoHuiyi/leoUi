@@ -2,7 +2,7 @@
 
 leoUiLoad.config({
 
-    debug: true,
+    debug: false,
 
     baseUrl:'/leoUi/',
 
@@ -22,7 +22,7 @@ leoUiLoad.config({
 
             exports: "$"
 
-        }　
+        }
 
     }
 
@@ -60,13 +60,8 @@ leoUiLoad.require('leoUi-tree,ready', function($) {
                         ]},
                     { name:"父节点12 - 折叠",
 
-                        // url:{
+                        url: 'http://www.baidu.com.cn',target:'_blank',
 
-                        //     href:'http://www.baidu.com.cn',
-
-                        //     target:'_blank'
-
-                        // },
                         children: [
                             { name:"叶子节点121"},
                             { name:"叶子节点122"},
@@ -127,7 +122,7 @@ leoUiLoad.require('leoUi-tree,ready', function($) {
         ],
 
     zSimpleNodes =[
-            { id:1, pId:0, name:"父节点1 - 展开", open:true},
+            { id:1, pId:0, name:"父节点1 - 展开", open:true,urdl: 'http://www.baidu.com.cn',target:'_blank', title:"12312321"},
             { id:11, pId:1, name:"父节点11 - 折叠"},
             { id:111, pId:11, name:"叶子节点111"},
             { id:112, pId:11, name:"叶子节点112"},
@@ -166,6 +161,14 @@ leoUiLoad.require('leoUi-tree,ready', function($) {
 
         autoCollapse:false,
 
+        key:{
+
+            children:'children',
+
+            title:true
+
+        },
+
         isSimpleData:{
 
             enable:true,
@@ -178,18 +181,24 @@ leoUiLoad.require('leoUi-tree,ready', function($) {
 
         isIcon:true,
 
-        dragAndDrop:true
+        dragAndDrop:true,
+
+        clickNodeCallBack:function(event, data){
+
+            console.log(data)
+
+        },
 
     });
 
     $('#botton_1').click(function(event) {
-            $("#tree").leoTree('option',{
+        $("#tree").leoTree('option',{
 
-                hoverOpenClose:false,
+            hoverOpenClose:false,
 
-                autoCollapse:true
+            autoCollapse:true
 
-            });
+        });
     });
 
 });

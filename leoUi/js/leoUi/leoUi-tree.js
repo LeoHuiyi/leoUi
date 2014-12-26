@@ -6,6 +6,8 @@
 * @author     leo
 *
 * 使用treeJon配合Id 提高速度！
+*
+* checkState:0(无)，1(半选)，2(全选)
 +-------------------------------------------------------------------
 */
 ;(function(factory) {
@@ -74,13 +76,17 @@
 
                 target:'target',
 
+                checked:'checked',
+
                 title:true
 
             },//json的key
 
             check:{
 
-                enable:true
+                enable:true,
+
+                checkType:'checkbox'
 
             },
 
@@ -522,9 +528,7 @@
 
         _treeLiToChild:function( dropId, dropLi, dragLi ){
 
-            var liJson = this.treeJson[dropId],level = liJson.level,
-
-            $dropLi = $(dropLi);
+            var liJson = this.treeJson[dropId],level = liJson.level;
 
             liJson.switchId = this._setTreeNodeId( dropId, 'switch', level, true );
 
@@ -532,21 +536,7 @@
 
             liJson.open = true;
 
-            this.html = '';
-
-            this._createUlStr( liJson.ulId, liJson.open );
-
-            this.html += '</ul>';
-
-            $dropLi.attr( 'class', 'leoTree_parent' ).append( this.html ).children('ul').append(dragLi);
-
-            this.html = '';
-
-            this._createDivStr( true, liJson, true );
-
-            $dropLi.children('div').empty().append( this.html );
-
-            this.html = null;
+            $(dropLi).attr( 'class', 'leoTree_parent' ).append( this._createUlStr( liJson.ulId, liJson.open, true ) ).children('ul').append(dragLi).end().children('div').empty().append( this._createDivStr( liJson, true, true ) );
 
         },
 
@@ -586,13 +576,7 @@
 
                     parentNode = this._getTreeNode( parentId, 'li' );
 
-                    this.html = '';
-
-                    this._createDivStr( false, parentJson , true );
-
-                    $(parentNode).attr( 'class', 'leoTree_item' ).children('div').empty().append( this.html ).end().children('ul').remove();
-
-                    this.html = null;
+                    $(parentNode).attr( 'class', 'leoTree_item' ).children('div').empty().append(  this._createDivStr( parentJson, false, true ) ).end().children('ul').remove();
 
                 }
 
@@ -686,7 +670,7 @@
 
         _getNodeTreeJson:function( id, name ){
 
-             return this.treeJson[id.slice( 0, id.indexOf( '_' + name ) )] || {};
+            return this.treeJson[id.slice( 0, id.indexOf( '_' + name ) )] || {};
 
         },
 
@@ -754,9 +738,9 @@
 
         _markNodeTree:function( treeJson, isChild, level, parentId ){
 
-            var i = 0,length,child,id,treeId,rootId,op = this.options,
+            var i = 0,length,child,id,treeId,rootId,op = this.options,childHtml,
 
-            key = op.key,children = key.children,treeData,childData;
+            key = op.key,children = key.children,treeData,childData,html = '';
 
             if( !isChild ){
 
@@ -774,7 +758,7 @@
 
                 this.treeJson[treeId] = { level: level, rootId: rootId }
 
-                this.html = '<ul id="' + rootId + '" class="leoTree_list leoUi_helper_reset">';
+                html += '<ul id="' + rootId + '" class="leoTree_list leoUi_helper_reset">';
 
                 parentId = treeId;
 
@@ -802,25 +786,19 @@
 
                         childData = this._setTreeJson(id, treeId, parentId, level, child, true);
 
-                        this._createLiStr( true, childData.liId );
+                        childHtml = this._markNodeTree( child[children], true, level, treeId );
 
-                        this._createDivStr( true, childData );
+                        this._setTreeCheckboxProp(child, childData, id, parentId, level, true);
 
-                        this._createUlStr( childData.ulId, childData.open );
-
-                        this._markNodeTree( child[children], true, level, treeId );
-
-                        this.html += '</ul></li>';
+                        html += this._createTreeNodeHtml(childData, childHtml);
 
                     }else{
 
                         childData = this._setTreeJson(id, treeId, parentId, level, child);
 
-                        this._createLiStr( false, childData.liId );
+                        this._setTreeCheckboxProp(child, childData, id, parentId, level, false);
 
-                        this._createDivStr( false, childData );
-
-                        this.html += '</li>';
+                        html += this._createTreeNodeHtml(childData);
 
                     }
 
@@ -832,13 +810,15 @@
 
             }
 
+            !isChild && (html += '</ul>');
+
+            return html;
+
         },
 
         _setTreeJson:function(id, treeId, parentId, level, data, isChild){
 
-            var treeData = this.treeJson,childData,key = this.options.key,
-
-            prop,val,_ohasOwn = this._ohasOwn;
+            var treeData = this.treeJson,childData;
 
             childData = treeData[treeId] = {data: this._dataMin({}, data)};
 
@@ -864,11 +844,89 @@
 
             treeData[ 'level_' + level ].push(treeId);
 
+            this._setTreeJsonProp(data, childData);
+
+            return childData;
+
+        },
+
+        _setTreeCheckboxProp:function(data, childData, id, parentId, level, isChild){
+
+            var op = this.options, check = op.check, childLen,
+
+            isCheck = !!check.enable,
+
+            checkType = check.checkType,checkbox;
+
+            if(isCheck && checkType === 'checkbox'){
+
+                checkKey = op.key.checked;
+
+                childData.checkId = this._setTreeNodeId( id, 'check', level );
+
+                !(checkbox = childData.checkbox) && (checkbox = childData.checkbox = {});
+
+                if(!isChild){
+
+                    if(data[checkKey]){
+
+                        checkbox.state = 2;
+
+                        this._setparentCheckboxChildLen(parentId, 1);
+
+                    }else{
+
+                        checkbox.state = 0;
+
+                    }
+
+                }else{
+
+                    childLen = childData.children.length;
+
+                    if(checkbox.childCheckedLen === childLen){
+
+                        checkbox.state = 2;
+
+                        this._setparentCheckboxChildLen(parentId, 1);
+
+                    }else if(checkbox.childCheckedLen > 0){
+
+                        checkbox.state = 1;
+
+                        this._setparentCheckboxChildLen(parentId, 0.5);
+
+                    }else{
+
+                        checkbox.state = 0;
+
+                    }
+
+                }
+
+            }
+
+        },
+
+        _setparentCheckboxChildLen:function(parentId, num){
+
+            var parentCheckbox;
+
+            !(parentCheckbox = this.treeJson[parentId].checkbox) && (parentCheckbox = this.treeJson[parentId].checkbox = {});
+
+            parentCheckbox.childCheckedLen === undefined ? parentCheckbox.childCheckedLen = num : parentCheckbox.childCheckedLen += num;
+
+        },
+
+        _setTreeJsonProp:function(data, childData){
+
+            var key = this.options.key,prop,val,_ohasOwn = this._ohasOwn;
+
             for(prop in key){
 
-                if(_ohasOwn.call(key, prop)){
+                if(_ohasOwn.call(key, prop) && prop !== 'children'){
 
-                    if(!!(val = data[key[prop]]) && prop !== 'children'){
+                    if(!!(val = data[key[prop]])){
 
                         childData[prop] = val;
 
@@ -881,8 +939,6 @@
                 }
 
             }
-
-            return childData;
 
         },
 
@@ -1006,74 +1062,88 @@
 
         _markTree:function(){
 
-            this._markNodeTree( this.options.isSimpleData.enable === true && this._changeSimpleTreeJson() );
+            this.$tree = $( this._markNodeTree( this.options.isSimpleData.enable === true && this._changeSimpleTreeJson() ) ).appendTo( this.$target );
 
-            this.html += '</ul>';
-
-            this.$tree = $( this.html ).appendTo( this.$target );
-
-            this.html = null;
 
         },
 
-        _createUlStr:function( id, isOpen ){
+        _createUlStr:function( id, isOpen, end ){
 
-            !isOpen ? this.html += '<ul id="' + id + '" class="leoTree_list leoUi_helper_reset leoTree_child" style="display: none;">' : this.html += '<ul id="' + id + '" class="leoTree_list leoUi_helper_reset leoTree_child" style="display: block;">';
+            var str = '';
 
-        },
+            if(isOpen){
 
-        _createLiStr:function( isChild, id ){
+                str += '<ul id="' + id + '" class="leoTree_list leoUi_helper_reset leoTree_child" style="display: block;">';
 
-            !isChild ? this.html += '<li id="' + id + '" class="leoTree_item">' : this.html += '<li id="' + id + '" class="leoTree_parent">';
-
-        },
-
-        _createDivStr:function( isChild, child, notWrap ){
-
-            var op = this.options,isIcon = op.isIcon,href,
-
-            name = child.name, divId = child.divId,aId = child.aId,
-
-            url = child.url,target,title = child.title;
-
-            this.html += this._wrapDivHtml(child, notWrap);
-
-            this.html += this._innerDivHtml(child, isChild, isIcon);
-
-            if( url ){
-
-                if(target = child.target){
-
-                    this.html += '<a id="' + aId + '" href="' + url + '" target = "' + target + '" class="leoTree_dblclick_a"';
-                }else{
-
-                    this.html += '<a id="' + aId + '" href="' + url + '" class="leoTree_dblclick_a"';
-
-                }
+                !!end && (str += '</ul>');
 
             }else{
 
-                this.html += '<a id="' + aId + '" class="leoTree_dblclick_a"';
+                str += '<ul id="' + id + '" class="leoTree_list leoUi_helper_reset leoTree_child" style="display: none;">';
+
+                !!end && (str += '</ul>');
 
             }
 
-            if(title === true){
+            return str;
 
-                this.html += 'title="' + name + '" >';
+        },
 
-            }else if(title){
+        _createLiStr:function( id, isChild ){
 
-                this.html += 'title="' + title + '" >';
+            if(isChild){
+
+                return '<li id="' + id + '" class="leoTree_parent">';
 
             }else{
 
-                this.html += '>';
+                return '<li id="' + id + '" class="leoTree_item">';
 
             }
 
-            this.html += '<span>' + name + '</span></a></span>';
+        },
 
-            this.html += this._wrapDivHtml(child, notWrap, true);
+        _createTreeNodeHtml:function(childData, childHtml){
+
+            var str = '';
+
+            if(childHtml){
+
+                str += this._createLiStr( childData.liId, true );
+
+                str += this._createDivStr( childData, true );
+
+                str += this._createUlStr( childData.ulId, childData.open );
+
+                str += childHtml;
+
+                str += '</ul></li>';
+
+            }else{
+
+                str += this._createLiStr( childData.liId ,false );
+
+                str += this._createDivStr( childData, false );
+
+                str += '</li>';
+
+            }
+
+            return str;
+
+        },
+
+        _createDivStr:function( child, isChild, notWrap ){
+
+            var str = '';
+
+            str += this._wrapDivHtml(child, notWrap);
+
+            str += this._innerDivHtml(child, isChild);
+
+            str += this._wrapDivHtml(child, notWrap, true);
+
+            return str;
 
         },
 
@@ -1091,9 +1161,9 @@
 
         },
 
-        _innerDivHtml:function(child, isChild, isIcon){
+        _innerDivHtml:function(child, isChild){
 
-            var str = '';
+            var str = '',isIcon = this.options.isIcon;
 
             if( isChild ){
 
@@ -1101,12 +1171,16 @@
 
                     str += '<span id="' + child.innerId + '" class="leoTree_state_default leoTree_inner leoUi_clearfix leoTree_inner_open"><span id="' + child.switchId + '" class="leoTree_icon leoTree_icon_triangle"></span>';
 
+                    str += this._checkHtml(child);
+
                     !!isIcon && ( str += this._iconHtml(isChild) );
 
 
                 }else{
 
                     str += '<span id="' + child.innerId + '" class="leoTree_state_default leoTree_inner leoUi_clearfix leoTree_inner_close"><span id="' + child.switchId + '" class="leoTree_icon leoTree_icon_triangle"></span>';
+
+                    str += this._checkHtml(child);
 
                     !!isIcon && ( str += this._iconHtml(isChild) );
 
@@ -1116,9 +1190,53 @@
 
                 str += '<span id="' + child.innerId + '" class="leoTree_state_default leoTree_inner leoUi_clearfix">';
 
+                str += this._checkHtml(child);
+
                 !!isIcon && ( str += this._iconHtml(isChild) );
 
             }
+
+            str += this._aHtml(child);
+
+            str += '</span>';
+
+            return str;
+
+        },
+
+        _checkHtml:function(child){
+
+            if(!child.checkId){
+
+                return '';
+
+            }
+
+            var state = child.checkbox.state,
+
+            str = '<div id="'+ child.checkId +'" class="leoTree_checkbox">';
+
+            if(state === 2){
+
+                str += '<div class="leoTree_checkbox_box leoTree_checkbox_active">';
+
+                str += '<span class="leoTree_checkbox_icon leoTree_checkbox_check"></span>';
+
+            }else if(state === 1){
+
+                str += '<div class="leoTree_checkbox_box leoTree_checkbox_active">';
+
+                str += '<span class="leoTree_checkbox_icon leoTree_checkbox_halfCheck"></span>';
+
+            }else if(state === 0){
+
+                str += '<div class="leoTree_checkbox_box">';
+
+                str += '<span></span>';
+
+            }
+
+            str += '</div></div>';
 
             return str;
 
@@ -1138,11 +1256,46 @@
 
         },
 
-        _divCheckHtml:function(){
+        _aHtml:function(child){
 
+            var str = '',name = child.name,aId = child.aId,
 
+            url = child.url,target,title = child.title;;
 
+            if( url ){
 
+                if(target = child.target){
+
+                    str += '<a id="' + aId + '" href="' + url + '" target = "' + target + '" class="leoTree_dblclick_a"';
+                }else{
+
+                    str += '<a id="' + aId + '" href="' + url + '" class="leoTree_dblclick_a"';
+
+                }
+
+            }else{
+
+                str += '<a id="' + aId + '" class="leoTree_dblclick_a"';
+
+            }
+
+            if(title === true){
+
+                str += 'title="' + name + '" >';
+
+            }else if(title){
+
+                str += 'title="' + title + '" >';
+
+            }else{
+
+                str += '>';
+
+            }
+
+            str += '<span>' + name + '</span></a>';
+
+            return str;
 
         },
 
@@ -1150,7 +1303,7 @@
 
             var This = this,$tree = this.$tree;
 
-            this._on( $tree, 'mouseenter.hover', 'span.leoTree_inner', function(event){
+            this._on( $tree, 'mouseenter.hover', '.leoTree_inner', function(event){
 
                 event.stopPropagation();
 
@@ -1160,7 +1313,7 @@
 
             });
 
-            this._on( $tree, 'mouseleave.hover', 'span.leoTree_inner', function(event){
+            this._on( $tree, 'mouseleave.hover', '.leoTree_inner', function(event){
 
                 event.stopPropagation();
 
@@ -1170,7 +1323,7 @@
 
             });
 
-            this._on( $tree, 'click.switch', 'span.leoTree_icon_triangle', function(event){
+            this._on( $tree, 'click.switch', '.leoTree_icon_triangle', function(event){
 
                 event.stopPropagation();
 
@@ -1178,7 +1331,7 @@
 
             });
 
-            this._on( $tree, 'click.active', 'span.leoTree_inner', function(event){
+            this._on( $tree, 'click.active', '.leoTree_inner', function(event){
 
                 event.stopPropagation();
 
@@ -1190,6 +1343,96 @@
 
             this._treeHoverEvent();
 
+            this._addCheckboxEvent();
+
+        },
+
+        _addCheckboxEvent:function(){
+
+            var $tree = this.$tree,This = this;
+
+            this._on( $tree, 'mouseenter.CheckboxHover', '.leoTree_checkbox_box', function(event){
+
+                event.stopPropagation();
+
+                $(this).addClass('leoTree_checkbox_hover');
+
+            });
+
+            this._on( $tree, 'mouseleave.CheckboxHover', '.leoTree_checkbox_box', function(event){
+
+                event.stopPropagation();
+
+                $(this).removeClass('leoTree_checkbox_hover');
+
+            });
+
+            this._on( $tree, 'click.CheckboxHover', '.leoTree_checkbox', function(event){
+
+                event.stopPropagation();
+
+                This._checkboxChick(this);
+
+            });
+
+        },
+
+        _checkboxChick:function(elem){
+
+            var nodeTreeJson = this._getNodeTreeJson(elem.id, 'check'),
+
+            checkbox = nodeTreeJson.checkbox;
+
+            this._checkboxChildsChecked(nodeTreeJson);
+
+        },
+
+        _checkboxChildsChecked:function(nodeTreeJson){
+
+            var childsJson;
+
+            if(childsJson = nodeTreeJson.children){
+
+                this._checkboxSetState(nodeTreeJson, 2);
+
+                this._checkboxFindChildsChecked(childsJson);
+
+            }
+
+        },
+
+        _checkboxFindChildsChecked:function(childsJson){
+
+            var i = childsJson.length,childJson;
+
+            while(i--){
+
+                childJson = childsJson[i];
+
+                this._checkboxSetState(childJson, 2);
+
+                !!childJson.children && this._checkboxFindChildsChecked(childJson.children);
+
+            }
+
+        },
+
+        _checkboxSetState:function(nodeTreeJson, state){
+
+            if(state === 2){
+
+                $(this._getTreeNode(nodeTreeJson.id, "check")).children().addClass('leoTree_checkbox_active').children().removeClass().addClass('leoTree_checkbox_icon leoTree_checkbox_check');
+
+            }else if(state === 1){
+
+                $(this._getTreeNode(nodeTreeJson.id, "check")).children().addClass('leoTree_checkbox_active').children().removeClass().addClass('leoTree_checkbox_icon leoTree_checkbox_halfCheck');
+
+            }else if(state === 0){
+
+                $(this._getTreeNode(nodeTreeJson.id, "check")).children().removeClass().addClass('leoTree_checkbox_box').children().removeClass();
+
+            }
+
         },
 
         _treeSwitchClickEvent:function(){
@@ -1200,7 +1443,7 @@
 
             if(op.isDblclick){
 
-                this._on( $tree, 'dblclick.switch', 'a.leoTree_dblclick_a', function(event){
+                this._on( $tree, 'dblclick.switch', '.leoTree_dblclick_a', function(event){
 
                     event.stopPropagation();
 
@@ -1210,7 +1453,7 @@
 
                 });
 
-                this._on( $tree, 'click.switch', 'a.leoTree_dblclick_a', function(event){
+                this._on( $tree, 'click.switch', '.leoTree_dblclick_a', function(event){
 
                     var self = this;
 
@@ -1226,7 +1469,7 @@
 
             }else{
 
-                this._on( $tree, 'click.switch', 'a.leoTree_dblclick_a', function(event){
+                this._on( $tree, 'click.switch', '.leoTree_dblclick_a', function(event){
 
                     clickNodeCallBack !== false && clickNodeCallBack.call( this, event, This._getNodeTreeData( this.id, 'a' ) );
 

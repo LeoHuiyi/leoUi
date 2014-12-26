@@ -6,7 +6,9 @@ leoUiLoad.config({
 
     alias: {
 
-        leoCss: '../../css/leo.css',
+        base: '../../css/base.css',
+
+        leoUi: '../../css/leoUi.css',
 
         jqueryMousewheel: '../jquery/jquery-mousewheel'
 
@@ -26,7 +28,7 @@ leoUiLoad.config({
 
 })
 
-leoUiLoad.require('leoUi-droppable,leoCss,ready', function($) {
+leoUiLoad.require('leoUi-droppable,base,leoUi,ready', function($) {
 
     $('.portlet').leoDraggable({
         bClone: true,

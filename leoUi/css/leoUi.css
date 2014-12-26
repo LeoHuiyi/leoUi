@@ -8,12 +8,12 @@
 /*leoDialog*/
 .leoDialog{padding:0;border-radius: 3px;overflow: hidden;position:absolute;border: 1px solid #A8A8A8;box-shadow: 0 5px 10px rgba(0, 0, 0, 0.8);background-color: #ffffff;color: #4F4F4F;font-family: Arial,sans-serif;font-size: 100%;outline: none;}
 .leoDialog_inherit .leoDialog_titlebar{cursor: inherit !important}
-.leoDialog_titlebar{border-left: medium none;border-radius: 0;border-right: medium none;border-top: medium none;background: url("../images/leoUi/leoUi-bg_highlight-soft_100_c0c0c0_1x100.png") repeat-x scroll center top #C0C0C0;position:relative;overflow: hidden;cursor: move;padding: 0.5em 1em 0.3em;text-align: right;text-shadow: 0 1px 0 rgba(255, 255, 255, 0.7);border-bottom: 1px solid #A8A8A8;z-index:0;}
+.leoDialog_titlebar{border-left: medium none;border-radius: 0;border-right: medium none;border-top: medium none;background: url("../img/leoUi-bg_highlight-soft_100_c0c0c0_1x100.png") repeat-x scroll center top #C0C0C0;position:relative;overflow: hidden;cursor: move;padding: 0.5em 1em 0.3em;text-align: right;text-shadow: 0 1px 0 rgba(255, 255, 255, 0.7);border-bottom: 1px solid #A8A8A8;z-index:0;}
 .leoDialog_title{color: #333333;font-weight: bold;float: left;width: auto; margin: 0.1em 16px 0.2em 0;font-size: 18px}
 .leoDialog_titlebar_button{display: inline-block;height: 18px;outline: medium none;padding: 1px;text-align: left;width: 19px;border-radius: 3px;text-decoration: none;color: #4F4F4F;}
-.leoDialog_titlebar_button:hover{background: url("../images/leoUi/leoUi-bg_highlight-soft_100_83b0ca_1x100.png") repeat-x scroll center top #83B0CA;box-shadow: 0 0 3px #85B2CB;border: 1px solid #8AB0C6;padding:0;}
-.leoDialog_titlebar_button:hover span{background-image: url("../images/leoUi/leoUi-icons_38667f_256x240.png");}
-.leoDialog_titlebar_button_span{margin: 1px;background-image: url("../images/leoUi/leoUi-icons_898989_256x240.png");text-indent: -9999px;height: 16px;width: 16px;background-repeat: no-repeat;border-radius: 10px;display: block;overflow: hidden;margin: 1px;}
+.leoDialog_titlebar_button:hover{background: url("../img/leoUi-bg_highlight-soft_100_83b0ca_1x100.png") repeat-x scroll center top #83B0CA;box-shadow: 0 0 3px #85B2CB;border: 1px solid #8AB0C6;padding:0;}
+.leoDialog_titlebar_button:hover span{background-image: url("../img/leoUi-icons_38667f_256x240.png");}
+.leoDialog_titlebar_button_span{margin: 1px;background-image: url("../img/leoUi-icons_898989_256x240.png");text-indent: -9999px;height: 16px;width: 16px;background-repeat: no-repeat;border-radius: 10px;display: block;overflow: hidden;margin: 1px;}
 .leoDialog_close_span{background-position: -80px -128px; }
 .leoDialog_maximize_span{background-position: -32px -80px; }
 .leoDialog_minimize_span{background-position: -48px -128px; }
@@ -27,9 +27,9 @@
 .leoDialog_content_iframe{overflow: hidden;padding:0;}
 
 /*leoDialog content*/
-.leoDialog_content .icon{vertical-align: middle;background: url("../images/leoUi/ico_warn.png") no-repeat scroll -50px -204px;display: inline-block;height: 25px;width: 25px;}
-.leoDialog_content .iconOk{vertical-align: middle;background: url("../images/leoUi/ico_warn.png") no-repeat scroll -50px -3px;display: inline-block;height: 25px;width: 25px;}
-.leoDialog_content .iconNo{vertical-align: middle;background: url("../images/leoUi/ico_warn.png") no-repeat scroll -50px -53px;display: inline-block;height: 25px;width: 25px;}
+.leoDialog_content .icon{vertical-align: middle;background: url("../img/ico_warn.png") no-repeat scroll -50px -204px;display: inline-block;height: 25px;width: 25px;}
+.leoDialog_content .iconOk{vertical-align: middle;background: url("../img/ico_warn.png") no-repeat scroll -50px -3px;display: inline-block;height: 25px;width: 25px;}
+.leoDialog_content .iconNo{vertical-align: middle;background: url("../img/ico_warn.png") no-repeat scroll -50px -53px;display: inline-block;height: 25px;width: 25px;}
 #delete_image{background-color: #ffffff;border-radius: 3px;height: 100%;overflow: auto;}
 #delete_image .send_content{background-color: #ffffff;position: relative;padding: 28px 50px 30px;width: auto;height: auto}
 #delete_image .send_content .text{text-align: left;cursor: default;color: #222222;}
@@ -56,17 +56,17 @@
 .leoTooltip_arrow_bottom{left:50%;top:-10px;border-left: 8px solid transparent;border-right: 8px solid transparent;border-bottom: 10px solid #000;margin-left: -8px;}
 
 /*leoTree*/
-.leoTree{width:360px;}
+.leoTree{width:360px;overflow: auto; border:2px solid red;}
 .leoTree_child{margin-left: 32px}
 .leoTree_state_default, .leoTree_state_default a{ color: inherit; text-shadow: 0 1px 0 rgba(255, 255, 255, 0.8); }
 .leoTree_icon{width:16px;height: 16px;text-indent:-9999px;}
-.leoTree_icon_triangle{background-image: url("../images/leoUi/leoUi-icons_38667f_256x240.png");cursor: pointer;}
+.leoTree_icon_triangle{background-image: url("../img/leoUi-icons_38667f_256x240.png");cursor: pointer;}
 .leoTree_inner_open .leoTree_icon_triangle{background-position: -48px -16px;}
 .leoTree_inner_close .leoTree_icon_triangle{background-position: -32px -16px;}
-.leoTree_icon_folder{background-image: url("../images/leoUi/leoUi-icons_38667f_256x240.png");}
+.leoTree_icon_folder{background-image: url("../img/leoUi-icons_38667f_256x240.png");}
 .leoTree_inner_open .leoTree_icon_folder{background-position: -16px -96px;}
 .leoTree_inner_close .leoTree_icon_folder{background-position: 0 -96px;}
-.leoTree_icon_document{background-image: url("../images/leoUi/leoUi-icons_38667f_256x240.png");background-position: -32px -96px;}
+.leoTree_icon_document{background-image: url("../img/leoUi-icons_38667f_256x240.png");background-position: -32px -96px;}
 .leoTree_list{float: left;padding: 0.5em;width: 100%;}
 .leoTree_list .leoTree_node{background: none repeat scroll 0 0 rgba(0, 0, 0, 0);border: 0 none;clear: both;display: block;float: left;font-weight: normal;margin: 0 20px 0 0;line-height: 16px}
 .leoTree_list .leoTree_item{clear: left;display: inline;float: left;margin: 0 0 0 16px;padding: 0;width: 100%;}
@@ -75,16 +75,23 @@
 .leoTree_inner{border: 1px solid transparent;display: block;padding: 3px;vertical-align: middle; border-radius: 3px;margin:2px 0;}
 .leoTree_inner a{color: inherit;display: block;float: left;margin: 0 0.5em;outline: medium none;text-decoration: none;cursor: pointer;}
 .leoTree_active{background-color:rgb(131, 176, 202);background: linear-gradient(to bottom, rgba(131, 176, 202, 1) 0%, rgba(185, 224, 245, 1) 100%) repeat scroll 0 0;border: 1px solid #7096ab;color: #1c4257;box-shadow: 0 1px 0 rgba(255, 255, 255, 0.25) inset;}
-.leoTree_inner_hover{background: url("../images/leoUi/leoUi-bg_highlight-soft_100_83b0ca_1x100.png") repeat-x scroll center top #83b0ca;border: 1px solid #8ab0c6;box-shadow: 0 0 3px #85b2cb;color: #313131;font-weight: bold; font-weight: 400;}
+.leoTree_inner_hover{background: url("../img/leoUi-bg_highlight-soft_100_83b0ca_1x100.png") repeat-x scroll center top #83b0ca;border: 1px solid #8ab0c6;box-shadow: 0 0 3px #85b2cb;color: #313131;font-weight: bold; font-weight: 400;}
 .leoTree_arrow{border-width: 0px;background: none repeat scroll 0 0 transparent;box-shadow: none;padding: 0;margin:0;text-shadow: none;position:absolute;}
 .leoTree_arrow img{position: absolute; display: block; height: 30px; margin-top: -12px;right: 4px}
-.leoTree_loading{background: url("../images/indicator.gif") no-repeat scroll 8px center #fff;border: 2px solid #aaa;display: none;font-size: 14px;font-weight: bold;left: 45%;padding: 6px 20px 6px 30px;position: absolute;text-align: center;top: 45%;width: auto;z-index: 101;}
+.leoTree_loading{background: url("../img/indicator.gif") no-repeat scroll 8px center #fff;border: 2px solid #aaa;display: none;font-size: 14px;font-weight: bold;left: 45%;padding: 6px 20px 6px 30px;position: absolute;text-align: center;top: 45%;width: auto;z-index: 101;}
+.leoTree_checkbox{float:left;margin:0;}
+.leoTree_checkbox .leoTree_checkbox_box{position: relative;border-radius: 2px;bottom: 0;height: 16px;left: 0;margin-right: 3px;width: 16px;box-shadow: 0 1px 1px rgba(0, 0, 0, 0.25); background: linear-gradient(to bottom, rgba(243, 243, 243, 1) 0%, rgba(204, 204, 204, 1) 100%) repeat scroll 0 0 rgba(0, 0, 0, 0);border: 1px solid #a8a8a8;}
+.leoTree_checkbox .leoTree_checkbox_active{ background: linear-gradient(to bottom, rgba(131, 176, 202, 1) 0%, rgba(185, 224, 245, 1) 100%) repeat scroll 0 0 rgba(0, 0, 0, 0);border: 1px solid #7096ab;text-shadow: 0 1px 0 rgba(255, 255, 255, 0.7);}
+.leoTree_checkbox .leoTree_checkbox_hover{background: url("../img/leoUi-bg_highlight-soft_100_83b0ca_1x100.png") repeat-x scroll center top #83b0ca;}
+.leoTree_checkbox .leoTree_checkbox_icon{float: left;border-radius: 3px;background-image: url("../img/leoUi-icons_38667f_256x240.png");text-indent: -9999px;height: 16px;width: 16px;background-repeat: no-repeat;display: block;overflow: hidden;}
+.leoTree_checkbox .leoTree_checkbox_check{ background-position: -64px -144px;}
+.leoTree_checkbox .leoTree_checkbox_halfCheck{ background-position: -96px -160px;}
 
 /*leoSelect*/
 .leoSelect{display: inline-block;vertical-align: middle;outline:none}
 .leoSelect .leoSelect_tit{background: none repeat scroll 0 0 #fff;border: 1px solid #dbdbdb;display: block;height: 20px;line-height: 20px;padding: 5px 38px 5px 10px;position: relative;text-decoration: none;white-space: nowrap;word-break: break-all;cursor: pointer;-moz-user-select: none; -webkit-user-select: none;-ms-user-select: none;-khtml-user-select: none;user-select: none;}
 .leoSelect .leoSelect_tit_val{color: #333;display: inline-block;vertical-align: middle;}
-.leoSelect .leoSelect_tit_icon{background: url("../images/skin_icons.png") no-repeat scroll -49px -160px #fafafa;border-left: 1px solid #dbdbdb;display: block;height: 100%;position: absolute;right: 0;top: 0;width: 28px;}
+.leoSelect .leoSelect_tit_icon{background: url("../img/skin_icons.png") no-repeat scroll -49px -160px #fafafa;border-left: 1px solid #dbdbdb;display: block;height: 100%;position: absolute;right: 0;top: 0;width: 28px;}
 .leoSelect .leoSelect_items, .leoSelect_items_clone{background: none repeat scroll 0 0 #fff;border: 1px solid #dbdbdb;position: absolute;top: 0;left:0;overflow: auto;}
 .leoSelect_items .leoSelect_items_ul{padding: 5px;position: relative;}
 .leoSelect_items .leoSelect_items_ul li{color: #666;cursor: pointer;display: block;line-height: 18px;padding: 6px 10px;white-space: nowrap;float:none;margin: 0;height: 20px;}
@@ -97,11 +104,10 @@
 .leoListMenu .leoListMenu_item{color: #666;cursor: pointer;display: block;line-height: 18px;padding: 6px 10px;white-space: nowrap;float:none;margin: 0;height: 20px;}
 .leoListMenu .leoListMenu_focus{background-color: #7bbfd0;color: #fff;}
 .leoListMenu .leoListMenu_focus span{animation:myfirst 1s;-moz-animation:a 1s;-webkit-animation:myfirst 1s;-o-animation:myfirst 1s;}
-@keyframes a
-{
-0%   {margin-left: 0px;}
-50%  {margin-left: 30px;}
-100% {margin-left: 0;}
+@keyframes a{
+	0%   {margin-left: 0px;}
+	50%  {margin-left: 30px;}
+	100% {margin-left: 0;}
 }
 .leoListMenu .leoListMenu_select{background-color: #7bbff2;color: #fff;}
 
@@ -109,7 +115,7 @@
 .leoComboBox_wrop .leoComboBox{background: none repeat scroll 0 0 #fff;border: 1px solid #d4d4d4;color: #999;font-size: 14px;line-height: 20px;min-height: 20px;vertical-align: middle;width: 200px;height: 30px;}
 .leoComboBox_wrop .leoComboBox_input{border: 0 none;color: #999;float: left;height: 18px;line-height: 20px;outline: 0 none;padding: 5px 4px;font-size: 14px;min-height: 20px;vertical-align: middle;background: none repeat scroll 0 0 #fff;}
 .leoComboBox_wrop .leoComboBox_input:focus{background: none repeat scroll 0 0 #fffbde;color: #333;border-color: #7bbff2;}
-.leoComboBox_wrop .leoComboBox_button{background: url("../images/leoUi/leoComboBox_button.png") no-repeat center;height: 100%;width: 16px;float: right;cursor: pointer;}
+.leoComboBox_wrop .leoComboBox_button{background: url("../img/leoComboBox_button.png") no-repeat center;height: 100%;width: 16px;float: right;cursor: pointer;}
 .leoComboBox_wrop .leoComboBox_hover{border:1px solid #7bbff2;}
 .leoComboBox_wrop .leoComboBox_focus{border:1px solid #7bbff2;}
 
@@ -125,18 +131,18 @@
 .leoUiScrollbar{font-size: 1em;overflow: hidden;outline: none;background-image: none;border-radius: 3px;border: 1px solid #a8a8a8;background: #ffffff;color: #4f4f4f;font-family: Arial,sans-serif;}
 .leoUiScrollbar .leoUiScrollbar-container{overflow: hidden;position: relative;zoom: 1;}
 .leoUiScrollbar .leoUiScrollbar-state-default{position: absolute;text-shadow: 0px 1px 0px rgba(255,255,255,0.7);color: #4f4f4f;font-weight: bold;}
-.leoUiScrollbar .leoUiScrollbar-state-default .leoUiScrollbar-icon{background-image: url(../images/leoUi/ui-icons_38667f_256x240.png); width: 16px;height: 16px;display: block;text-indent: -99999px;overflow: hidden;background-repeat: no-repeat;-moz-border-radius: 10px;-webkit-border-radius: 10px;border-radius: 10px;}
-.leoUiScrollbar .leoUiScrollbar-hbar-buttontop{top: 0;background: url(../images/leoUi/scroller-up-arrow.png) no-repeat top;height: 25px;border: none;-moz-box-shadow: none;-webkit-box-shadow: none;box-shadow: none;width: 18px;}
+.leoUiScrollbar .leoUiScrollbar-state-default .leoUiScrollbar-icon{background-image: url(../img/ui-icons_38667f_256x240.png); width: 16px;height: 16px;display: block;text-indent: -99999px;overflow: hidden;background-repeat: no-repeat;-moz-border-radius: 10px;-webkit-border-radius: 10px;border-radius: 10px;}
+.leoUiScrollbar .leoUiScrollbar-hbar-buttontop{top: 0;background: url(../img/scroller-up-arrow.png) no-repeat top;height: 25px;border: none;-moz-box-shadow: none;-webkit-box-shadow: none;box-shadow: none;width: 18px;}
 .leoUiScrollbar .leoUiScrollbar-icon-triangle-1-n {background-position: 0 -16px;}
-.leoUiScrollbar .leoUiScrollbar-hbar-buttonbottom{bottom: 0;background: url(../images/leoUi/scroller-down-arrow.png) no-repeat bottom;height: 25px;border: none;-moz-box-shadow: none;-webkit-box-shadow: none;box-shadow: none;width: 18px;}
+.leoUiScrollbar .leoUiScrollbar-hbar-buttonbottom{bottom: 0;background: url(../img/scroller-down-arrow.png) no-repeat bottom;height: 25px;border: none;-moz-box-shadow: none;-webkit-box-shadow: none;box-shadow: none;width: 18px;}
 .leoUiScrollbar .leoUiScrollbar-hbar-buttonbottom .leoUiScrollbar-icon{margin-top: 10px;}
 .leoUiScrollbar .leoUiScrollbar-icon-triangle-1-s{background-position: -64px -16px;}
-.leoUiScrollbar .leoUiScrollbar-hbar-buttonleft{left: 0;background: url(../images/leoUi/scroller-left-arrow.png) no-repeat left;width: 25px;border: none;-moz-box-shadow: none;-webkit-box-shadow: none;box-shadow: none;height: 18px;}
+.leoUiScrollbar .leoUiScrollbar-hbar-buttonleft{left: 0;background: url(../img/scroller-left-arrow.png) no-repeat left;width: 25px;border: none;-moz-box-shadow: none;-webkit-box-shadow: none;box-shadow: none;height: 18px;}
 .leoUiScrollbar .leoUiScrollbar-icon-triangle-1-w{background-position: -96px -16px;}
-.leoUiScrollbar .leoUiScrollbar-hbar-buttonright{bottom: 0;background: url(../images/leoUi/scroller-right-arrow.png) no-repeat right;width: 25px;border: none;-moz-box-shadow: none;-webkit-box-shadow: none;box-shadow: none;height: 18px;}
+.leoUiScrollbar .leoUiScrollbar-hbar-buttonright{bottom: 0;background: url(../img/scroller-right-arrow.png) no-repeat right;width: 25px;border: none;-moz-box-shadow: none;-webkit-box-shadow: none;box-shadow: none;height: 18px;}
 .leoUiScrollbar .leoUiScrollbar-hbar-buttonright .leoUiScrollbar-icon{margin-left: 10px;}
 .leoUiScrollbar .leoUiScrollbar-icon-triangle-1-e{background-position: -32px -16px;}
-.leoUiScrollbar .leoUiScrollbar-handle{background: url(images/scrollbar-vertical.png) repeat-y left;-moz-border-radius: 12px;-webkit-border-radius: 12px;border-radius: 12px;-moz-box-shadow: inset 1px 0 0 rgba(255,255,255,0.25);z-index: 9;border-color: #a5a9ae;margin: -5px 0;position: absolute; font-size:0px; overflow:hidden;}
+.leoUiScrollbar .leoUiScrollbar-handle{background: url(../img/scrollbar-vertical.png) repeat-y left;-moz-border-radius: 12px;-webkit-border-radius: 12px;border-radius: 12px;-moz-box-shadow: inset 1px 0 0 rgba(255,255,255,0.25);z-index: 9;border-color: #a5a9ae;margin: -5px 0;position: absolute; font-size:0px; overflow:hidden;}
 .leoUiScrollbar .leoUiScrollbar-handle .leoUiScrollbar-icon{display: none}
 .leoUiScrollbar .leoUiScrollbar-icon-grip-solid-horizontal{background-position: -48px -224px;}
 .leoUiScrollbar .leoUiScrollbar-hbarcontainer{ position: absolute; height: 18px; padding-left: 18px; padding-right: 18px; border: none;font-size: 0px; background: #f8f8f8;-moz-box-shadow: inset 3px 0 10px rgba(0,0,0,0.25);-webkit-box-shadow: inset 3px 0 10px rgba(0,0,0,0.25);box-shadow: inset 3px 0 10px rgba(0,0,0,0.25); }

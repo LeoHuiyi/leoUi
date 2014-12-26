@@ -8,7 +8,9 @@ leoUiLoad.config({
 
     alias : {
 
-        leoCss : '../../css/leo.css',
+        base: '../../css/base.css',
+
+        leoUi: '../../css/leoUi.css',
 
         jqueryMousewheel:'../jquery/jquery-mousewheel'
 
@@ -28,7 +30,7 @@ leoUiLoad.config({
 
 })
 
-leoUiLoad.require('leoUi-selectable,leoCss,ready', function($) {
+leoUiLoad.require('leoUi-selectable,base,leoUi,ready', function($) {
 
     $( "#selectable" ).leoSelectable({
         stop: function(event, $selected) {

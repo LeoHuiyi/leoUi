@@ -6,7 +6,9 @@ leoUiLoad.config({
 
     alias: {
 
-        leoCss: '../../css/leo.css',
+        base: '../../css/base.css',
+
+        leoUi: '../../css/leoUi.css',
 
         jqueryMousewheel: '../jquery/jquery-mousewheel'
 
@@ -26,7 +28,7 @@ leoUiLoad.config({
 
 })
 
-leoUiLoad.require('leoUi-dialog,leoCss,ready', function($) {
+leoUiLoad.require('leoUi-dialog,base,leoUi,ready', function($) {
 
     var flag = false;
 

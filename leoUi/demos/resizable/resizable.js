@@ -7,7 +7,9 @@ leoUiLoad.config({
 
         alias : {
 
-            leoCss : '../../css/leo.css',
+            base: '../../css/base.css',
+
+            leoUi: '../../css/leoUi.css',
 
             jqueryMousewheel:'../jquery/jquery-mousewheel'
 
@@ -27,7 +29,7 @@ leoUiLoad.config({
 
 })
 
-leoUiLoad.require('leoUi-resizable,leoCss,ready', function($) {
+leoUiLoad.require('leoUi-resizable,base,leoUi,ready', function($) {
 
     $('body').leoResizable({
 

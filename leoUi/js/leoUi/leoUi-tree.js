@@ -1393,15 +1393,29 @@
 
             if(childsJson = nodeTreeJson.children){
 
-                this._checkboxSetState(nodeTreeJson, 2);
+                if(nodeTreeJson.checkbox.state === 0){
 
-                this._checkboxFindChildsChecked(childsJson);
+                    this._checkboxSetState(nodeTreeJson, 2);
+
+                    this._checkboxSetChildsJson(nodeTreeJson, 2);
+
+                    this._checkboxFindChildsChecked(childsJson, 2);
+
+                }else{
+
+                    this._checkboxSetState(nodeTreeJson, 0);
+
+                    this._checkboxSetChildsJson(nodeTreeJson, 0);
+
+                    this._checkboxFindChildsChecked(childsJson, 0);
+
+                }
 
             }
 
         },
 
-        _checkboxFindChildsChecked:function(childsJson){
+        _checkboxFindChildsChecked:function(childsJson, state){
 
             var i = childsJson.length,childJson;
 
@@ -1409,9 +1423,31 @@
 
                 childJson = childsJson[i];
 
-                this._checkboxSetState(childJson, 2);
+                this._checkboxSetState(childJson, state);
 
-                !!childJson.children && this._checkboxFindChildsChecked(childJson.children);
+                this._checkboxSetChildsJson(childJson, state);
+
+                !!childJson.children && this._checkboxFindChildsChecked(childJson.children, state);
+
+            }
+
+        },
+
+        _checkboxSetChildsJson:function(nodeTreeJson, state){
+
+            var checkbox = nodeTreeJson.checkbox;
+
+            if(state === 2){
+
+                checkbox.state = 2;
+
+                !!nodeTreeJson.children && (checkbox.childCheckedLen = nodeTreeJson.children.length);
+
+            }else if(state === 0){
+
+                checkbox.state = 0;
+
+                !!nodeTreeJson.children && (checkbox.childCheckedLen = 0);
 
             }
 

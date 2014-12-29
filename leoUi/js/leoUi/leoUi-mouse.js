@@ -128,8 +128,6 @@
 
             this._on( this.$target, 'mousedown.mouse', selector, function(event) {
 
-                event.stopPropagation();
-
                 if( !This._lockDrag ){
 
                     event.delegateTarget !== this && ( This.$target = $(this) );

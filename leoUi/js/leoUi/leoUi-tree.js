@@ -84,7 +84,7 @@
 
             check:{
 
-                enable:true,
+                enable:false,
 
                 checkType:'checkbox'
 
@@ -542,7 +542,7 @@
 
         _treeJsonAppendTo:function( dragId, dropId ){
 
-            var parentId,parentJson,parentNode,treeJson;
+            var parentId,parentJson,treeJson,oldParentId;
 
             if( ( parentId = this._getTreeNodeId( dragId, 'parent') ) !== dropId ){
 
@@ -555,6 +555,8 @@
                 treeJson[dragId].level = this._getLevel( dropId ) + 1;
 
                 this._addLevel(treeJson[dragId].level, dragId);
+
+                oldParentId = treeJson[dragId].parentId;
 
                 treeJson[dragId].parentId = dropId;
 
@@ -574,11 +576,13 @@
 
                     parentJson.switchId = null;
 
-                    parentNode = this._getTreeNode( parentId, 'li' );
-
-                    $(parentNode).attr( 'class', 'leoTree_item' ).children('div').empty().append(  this._createDivStr( parentJson, false, true ) ).end().children('ul').remove();
+                    $(this._getTreeNode( parentId, 'li' )).attr( 'class', 'leoTree_item' ).children('div').empty().append(  this._createDivStr( parentJson, false, true ) ).end().children('ul').remove();
 
                 }
+
+                this._checkboxRefreshParentsChecked(dropId);
+
+                this._checkboxRefreshParentsChecked(oldParentId);
 
             }
 
@@ -700,7 +704,7 @@
 
                 return id.replace( setName, getName );
 
-            }else{
+            }else if(this.treeJson[id]){
 
                 return this.treeJson[id][ setName + 'Id' ];
 
@@ -710,17 +714,7 @@
 
         _getTreeNode:function( id, setName, getName ){
 
-            var doc = this.document[0];
-
-            if( getName ){
-
-                return doc.getElementById( this._getTreeNodeId( id, setName, getName ) );
-
-            }else{
-
-                return doc.getElementById( this.treeJson[id][ setName + 'Id' ] );
-
-            }
+            return this.document[0].getElementById( this._getTreeNodeId( id, setName, getName ) );
 
         },
 
@@ -788,7 +782,7 @@
 
                         childHtml = this._markNodeTree( child[children], true, level, treeId );
 
-                        this._setTreeCheckboxProp(child, childData, id, parentId, level, true);
+                        this._checkboxSetTreeProp(child, childData, id, parentId, level, true);
 
                         html += this._createTreeNodeHtml(childData, childHtml);
 
@@ -796,7 +790,7 @@
 
                         childData = this._setTreeJson(id, treeId, parentId, level, child);
 
-                        this._setTreeCheckboxProp(child, childData, id, parentId, level, false);
+                        this._checkboxSetTreeProp(child, childData, id, parentId, level, false);
 
                         html += this._createTreeNodeHtml(childData);
 
@@ -850,7 +844,7 @@
 
         },
 
-        _setTreeCheckboxProp:function(data, childData, id, parentId, level, isChild){
+        _checkboxSetTreeProp:function(data, childData, id, parentId, level, isChild){
 
             var op = this.options, check = op.check, childLen,
 
@@ -864,7 +858,11 @@
 
                 childData.checkId = this._setTreeNodeId( id, 'check', level );
 
-                !(checkbox = childData.checkbox) && (checkbox = childData.checkbox = {});
+                !(checkbox = childData.checkbox) && (checkbox = childData.checkbox = {
+
+                    childCheckedLen: 0
+
+                });
 
                 if(!isChild){
 
@@ -872,11 +870,13 @@
 
                         checkbox.state = 2;
 
-                        this._setparentCheckboxChildLen(parentId, 1);
+                        this._checkboxSetParentChildLen(parentId, 1);
 
                     }else{
 
                         checkbox.state = 0;
+
+                        this._checkboxSetParentChildLen(parentId, 0);
 
                     }
 
@@ -888,17 +888,19 @@
 
                         checkbox.state = 2;
 
-                        this._setparentCheckboxChildLen(parentId, 1);
+                        this._checkboxSetParentChildLen(parentId, 1);
 
                     }else if(checkbox.childCheckedLen > 0){
 
                         checkbox.state = 1;
 
-                        this._setparentCheckboxChildLen(parentId, 0.5);
+                        this._checkboxSetParentChildLen(parentId, 0.5);
 
                     }else{
 
                         checkbox.state = 0;
+
+                        this._checkboxSetParentChildLen(parentId, 0);
 
                     }
 
@@ -908,9 +910,9 @@
 
         },
 
-        _setparentCheckboxChildLen:function(parentId, num){
+        _checkboxSetParentChildLen:function(parentId, num){
 
-            var parentCheckbox;
+            var parentCheckbox, num = +num;
 
             !(parentCheckbox = this.treeJson[parentId].checkbox) && (parentCheckbox = this.treeJson[parentId].checkbox = {});
 
@@ -1064,7 +1066,6 @@
 
             this.$tree = $( this._markNodeTree( this.options.isSimpleData.enable === true && this._changeSimpleTreeJson() ) ).appendTo( this.$target );
 
-
         },
 
         _createUlStr:function( id, isOpen, end ){
@@ -1171,7 +1172,7 @@
 
                     str += '<span id="' + child.innerId + '" class="leoTree_state_default leoTree_inner leoUi_clearfix leoTree_inner_open"><span id="' + child.switchId + '" class="leoTree_icon leoTree_icon_triangle"></span>';
 
-                    str += this._checkHtml(child);
+                    str += this._checkboxHtml(child);
 
                     !!isIcon && ( str += this._iconHtml(isChild) );
 
@@ -1180,7 +1181,7 @@
 
                     str += '<span id="' + child.innerId + '" class="leoTree_state_default leoTree_inner leoUi_clearfix leoTree_inner_close"><span id="' + child.switchId + '" class="leoTree_icon leoTree_icon_triangle"></span>';
 
-                    str += this._checkHtml(child);
+                    str += this._checkboxHtml(child);
 
                     !!isIcon && ( str += this._iconHtml(isChild) );
 
@@ -1190,7 +1191,7 @@
 
                 str += '<span id="' + child.innerId + '" class="leoTree_state_default leoTree_inner leoUi_clearfix">';
 
-                str += this._checkHtml(child);
+                str += this._checkboxHtml(child);
 
                 !!isIcon && ( str += this._iconHtml(isChild) );
 
@@ -1204,7 +1205,7 @@
 
         },
 
-        _checkHtml:function(child){
+        _checkboxHtml:function(child){
 
             if(!child.checkId){
 
@@ -1349,65 +1350,57 @@
 
         _addCheckboxEvent:function(){
 
-            var $tree = this.$tree,This = this;
+            if(this.options.check.enable === true && this.options.check.checkType === 'checkbox'){
 
-            this._on( $tree, 'mouseenter.CheckboxHover', '.leoTree_checkbox_box', function(event){
+                var $tree = this.$tree,This = this;
 
-                event.stopPropagation();
+                this._on( $tree, 'mouseenter.CheckboxHover', '.leoTree_checkbox_box', function(event){
 
-                $(this).addClass('leoTree_checkbox_hover');
+                    $(this).addClass('leoTree_checkbox_hover');
 
-            });
+                });
 
-            this._on( $tree, 'mouseleave.CheckboxHover', '.leoTree_checkbox_box', function(event){
+                this._on( $tree, 'mouseleave.CheckboxHover', '.leoTree_checkbox_box', function(event){
 
-                event.stopPropagation();
+                    $(this).removeClass('leoTree_checkbox_hover');
 
-                $(this).removeClass('leoTree_checkbox_hover');
+                });
 
-            });
+                this._on( $tree, 'click.CheckboxHover', '.leoTree_checkbox', function(event){
 
-            this._on( $tree, 'click.CheckboxHover', '.leoTree_checkbox', function(event){
+                    event.stopPropagation();
 
-                event.stopPropagation();
+                    This._checkboxChick(this);
 
-                This._checkboxChick(this);
+                });
 
-            });
+            }
 
         },
 
         _checkboxChick:function(elem){
 
-            var nodeTreeJson = this._getNodeTreeJson(elem.id, 'check'),
+            if(this.options.check.enable === true && this.options.check.checkType === 'checkbox'){
 
-            checkbox = nodeTreeJson.checkbox;
+                var nodeTreeJson = this._getNodeTreeJson(elem.id, 'check'),
 
-            this._checkboxChildsChecked(nodeTreeJson);
-
-        },
-
-        _checkboxChildsChecked:function(nodeTreeJson){
-
-            var childsJson;
-
-            if(childsJson = nodeTreeJson.children){
+                checkbox = nodeTreeJson.checkbox;
 
                 if(nodeTreeJson.checkbox.state === 0){
 
-                    this._checkboxSetState(nodeTreeJson, 2);
+                    this._checkboxFindChildsChecked(nodeTreeJson.children, 2);
 
-                    this._checkboxSetChildsJson(nodeTreeJson, 2);
+                    this._checkboxFindParentsChecked(nodeTreeJson, 2);
 
-                    this._checkboxFindChildsChecked(childsJson, 2);
+                    this._checkboxSelfChecked(nodeTreeJson, 2);
 
                 }else{
 
-                    this._checkboxSetState(nodeTreeJson, 0);
+                    this._checkboxFindChildsChecked(nodeTreeJson.children, 0);
 
-                    this._checkboxSetChildsJson(nodeTreeJson, 0);
+                    this._checkboxFindParentsChecked(nodeTreeJson, 0);
 
-                    this._checkboxFindChildsChecked(childsJson, 0);
+                    this._checkboxSelfChecked(nodeTreeJson, 0);
 
                 }
 
@@ -1415,7 +1408,99 @@
 
         },
 
+        _checkboxSelfChecked:function(childsJson, state){
+
+            this._checkboxSetState(childsJson, state);
+
+            this._checkboxSetChildsJson(childsJson, state);
+
+        },
+
+        _checkboxRefreshParentsChecked:function(id){
+
+            if(this.options.check.enable === true && this.options.check.checkType === 'checkbox'){
+
+                var nodeTreeJson, childsJson, checkbox;
+
+                if(nodeTreeJson = this.treeJson[id]){
+
+                    childsJson =  nodeTreeJson.children;
+
+                    checkbox = nodeTreeJson.checkbox;
+
+                    if(childsJson){
+
+                        i = childsJson.length;
+
+                        checkbox.childCheckedLen = 0;
+
+                        while(i--){
+
+                            checkbox.childCheckedLen += childsJson[i].checkbox.state/2;
+
+                        }
+
+                        this._checkboxSetParentState(nodeTreeJson);
+
+                    }
+
+                }
+
+            }
+
+        },
+
+        _checkboxFindParentsChecked:function(nodeTreeJson, state){
+
+            if(!nodeTreeJson.parentId){return;}
+
+            var oldeState = nodeTreeJson.checkbox.state,
+
+            parentJson = this.treeJson[nodeTreeJson.parentId],
+
+            parentCheckbox = parentJson.checkbox;
+
+            parentCheckbox.childCheckedLen += (state - oldeState)/2;
+
+            this._checkboxSetParentState(parentJson);
+
+        },
+
+        _checkboxSetParentState:function(parentJson){
+
+            var checkbox = parentJson.checkbox;
+
+            if(checkbox.childCheckedLen === parentJson.children.length){
+
+                this._checkboxSetState(parentJson, 2);
+
+                this._checkboxFindParentsChecked(parentJson, 2);
+
+                checkbox.state = 2;
+
+            }else if(checkbox.childCheckedLen > 0){
+
+                this._checkboxSetState(parentJson, 1);
+
+                this._checkboxFindParentsChecked(parentJson, 1);
+
+                checkbox.state = 1;
+
+            }else{
+
+                this._checkboxSetState(parentJson, 0);
+
+                this._checkboxFindParentsChecked(parentJson, 0);
+
+                checkbox.state = 0;
+
+            }
+
+        },
+
         _checkboxFindChildsChecked:function(childsJson, state){
+
+            if(!childsJson){return;}
 
             var i = childsJson.length,childJson;
 
@@ -1427,7 +1512,7 @@
 
                 this._checkboxSetChildsJson(childJson, state);
 
-                !!childJson.children && this._checkboxFindChildsChecked(childJson.children, state);
+                this._checkboxFindChildsChecked(childJson.children, state);
 
             }
 
@@ -1455,15 +1540,15 @@
 
         _checkboxSetState:function(nodeTreeJson, state){
 
-            if(state === 2){
+            if(state === 2 && nodeTreeJson.checkbox.state !== 2){
 
                 $(this._getTreeNode(nodeTreeJson.id, "check")).children().addClass('leoTree_checkbox_active').children().removeClass().addClass('leoTree_checkbox_icon leoTree_checkbox_check');
 
-            }else if(state === 1){
+            }else if(state === 1 && nodeTreeJson.checkbox.state !== 1){
 
                 $(this._getTreeNode(nodeTreeJson.id, "check")).children().addClass('leoTree_checkbox_active').children().removeClass().addClass('leoTree_checkbox_icon leoTree_checkbox_halfCheck');
 
-            }else if(state === 0){
+            }else if(state === 0 && nodeTreeJson.checkbox.state !== 0){
 
                 $(this._getTreeNode(nodeTreeJson.id, "check")).children().removeClass().addClass('leoTree_checkbox_box').children().removeClass();
 
@@ -1491,6 +1576,8 @@
 
                 this._on( $tree, 'click.switch', '.leoTree_dblclick_a', function(event){
 
+                    event.stopPropagation();
+
                     var self = this;
 
                     !!clickTime && clearTimeout(clickTime);
@@ -1506,6 +1593,8 @@
             }else{
 
                 this._on( $tree, 'click.switch', '.leoTree_dblclick_a', function(event){
+
+                    event.stopPropagation();
 
                     clickNodeCallBack !== false && clickNodeCallBack.call( this, event, This._getNodeTreeData( this.id, 'a' ) );
 
@@ -1653,6 +1742,6 @@
 
     })
 
-	return $;
+    return $;
 
 }));

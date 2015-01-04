@@ -22,7 +22,7 @@
 
 }(function($) {
 
-	$.leoTools.plugIn({
+    $.leoTools.plugIn({
 
         name:'leoSelect',
 
@@ -34,11 +34,11 @@
 
         defaults:{
 
-        	selectHtml:'<div class="leoSelect"></div>',
+            selectHtml:'<div class="leoSelect"></div>',
 
-        	selectTitHtml: '<div class="leoSelect_tit">'
+            selectTitHtml: '<div class="leoSelect_tit">'
             +                '<span class="leoSelect_tit_val">选项</span>'
-            +				 '<i class="leoSelect_tit_icon"></i>'
+            +                '<i class="leoSelect_tit_icon"></i>'
             +            '</div>',
 
             selectItemsHtml: '<div class="leoSelect_items"></div>',
@@ -57,7 +57,7 @@
 
             disabledClass:'disabled',
 
-			position: {
+            position: {
 
                 my: "left top",
 
@@ -87,35 +87,35 @@
 
         _init: function(){
 
-        	if( this.$target.is('select') !== true ){
+            if( this.$target.is('select') !== true ){
 
-        		console.log('目标元素必须是select标签');
+                console.log('目标元素必须是select标签');
 
-        	}
+            }
 
-        	this._createSelectHtml();
+            this._createSelectHtml();
 
-        	this._initSelectItemsState();
+            this._initSelectItemsState();
 
-        	this._addEvent();
+            this._addEvent();
 
         },
 
         _createSelectHtml:function(){
 
-        	var $target = this.$target,op = this.options,
+            var $target = this.$target,op = this.options,
 
-        	selectTitStr = op.selectTitHtml,$el,
+            selectTitStr = op.selectTitHtml,$el,
 
-        	selectItemsStr = op.selectItemsHtml,selectedClass = op.selectedClass,
+            selectItemsStr = op.selectItemsHtml,selectedClass = op.selectedClass,
 
             disabledClass = op.disabledClass,
 
-        	ulStr = '<ul class="leoSelect_items_ul">';
+            ulStr = '<ul class="leoSelect_items_ul">';
 
-        	$target.children('option').each(function(index, el) {
+            $target.children('option').each(function(index, el) {
 
-        		$el = $(el);
+                $el = $(el);
 
                 if( $el.prop('selected') === true ){
 
@@ -129,27 +129,27 @@
 
                 }
 
-        		ulStr += ' op-val="' + $el.attr('value') + '"';
+                ulStr += ' op-val="' + $el.attr('value') + '"';
 
-        		ulStr += '>' + $el.text() +'</li>';
+                ulStr += '>' + $el.text() +'</li>';
 
-        	});
+            });
 
-        	ulStr += '</ul>';
+            ulStr += '</ul>';
 
-        	this.$select = $(op.selectHtml).prop('tabindex',$target.prop('tabindex'));
+            this.$select = $(op.selectHtml).prop('tabindex',$target.prop('tabindex'));
 
-        	this.$selectTit = $(selectTitStr).find('span.leoSelect_tit_val').text( ( this.selectedLi = $target.children().eq($target[0].selectedIndex) ).text()).end().appendTo(this.$select);
+            this.$selectTit = $(selectTitStr).find('span.leoSelect_tit_val').text( ( this.selectedLi = $target.children().eq($target[0].selectedIndex) ).text()).end().appendTo(this.$select);
 
-        	this.$selectItems = $(selectItemsStr).css( { 'zIndex': op.selectItemsZIndex, 'max-height': op.selectItemsMaxHeight,  'min-height': op.selectItemsMinHeight, 'height': op.selectItemsHeight } ).hide().append(ulStr).appendTo(this.$select);
+            this.$selectItems = $(selectItemsStr).css( { 'zIndex': op.selectItemsZIndex, 'max-height': op.selectItemsMaxHeight,  'min-height': op.selectItemsMinHeight, 'height': op.selectItemsHeight } ).hide().append(ulStr).appendTo(this.$select);
 
             this.$selectItemsUl = this.$selectItems.find('ul.leoSelect_items_ul');
 
-        	this.$select.insertBefore($target);
+            this.$select.insertBefore($target);
 
             this._setSelectWidth();
 
-        	this.$target.hide();
+            this.$target.hide();
 
         },
 
@@ -181,55 +181,55 @@
 
         _initSelectItemsState:function(){
 
-        	this.$selectItems.is(':hidden') ? this._selectItemsState = 'close' : this._selectItemsState = 'open';
+            this.$selectItems.is(':hidden') ? this._selectItemsState = 'close' : this._selectItemsState = 'open';
 
         },
 
         _setItemsPosition:function(position){
 
-        	var position = position || this.options.position,
+            var $selectItems = this.$selectItems,
 
-        	$selectItems = this.$selectItems,
+            isVisible = $selectItems.is( ":visible" );
 
-        	isVisible = $selectItems.is( ":visible" );
+            position = position || this.options.position
 
-        	!isVisible && $selectItems.show();
+            !isVisible && $selectItems.show();
 
-        	position.of = this.$select;
+            position.of = this.$select;
 
-        	$selectItems.position(position);
+            $selectItems.position(position);
 
-        	!isVisible && $selectItems.hide();
+            !isVisible && $selectItems.hide();
 
         },
 
         _addEvent:function(){
 
-        	var This = this,$ul = this.$selectItemsUl,op = this.options,
+            var This = this,$ul = this.$selectItemsUl,op = this.options,
 
             $val = this.$selectTit.find('span.leoSelect_tit_val'),
 
             disabledClass = op.disabledClass,selectedClass = op.selectedClass;
 
-        	this._on( this.$select, 'click', 'div.leoSelect_tit', function(event){
+            this._on( this.$select, 'click', 'div.leoSelect_tit', function(event){
 
-        		event.stopPropagation();
+                event.stopPropagation();
 
-        		if( This._selectItemsState === 'close' ){
+                if( This._selectItemsState === 'close' ){
 
                     This.selectedLi = $ul.children('li.'+selectedClass).removeClass(selectedClass).end().children('li').eq(This.$target[0].selectedIndex).addClass(selectedClass);
 
-        			This.show();
+                    This.show();
 
-        		}else if( This._selectItemsState === 'open' ){
+                }else if( This._selectItemsState === 'open' ){
 
-        			This.hide();
+                    This.hide();
 
-        		}
+                }
 
-        	} );
+            } );
 
-        	this._on( this.$selectItems, 'click', 'li', function(event){
+            this._on( this.$selectItems, 'click', 'li', function(event){
 
                 event.stopPropagation();
 
@@ -239,15 +239,15 @@
 
                 This.hide();
 
-        		$ul.children('li.'+selectedClass).removeClass(selectedClass);
+                $ul.children('li.'+selectedClass).removeClass(selectedClass);
 
-        		$li.addClass(selectedClass);
+                $li.addClass(selectedClass);
 
                 $val.text($li.text());
 
-        		This.$target.find('option').eq($li.index()).prop('selected',true);
+                This.$target.find('option').eq($li.index()).prop('selected',true);
 
-        	} );
+            } );
 
             this._on( this.$selectItems, 'mouseenter', 'li', function(event){
 
@@ -265,25 +265,25 @@
 
             } );
 
-        	this._on( 'body', 'click', function(event){
+            this._on( 'body', 'click', function(event){
 
-        		This._selectItemsState === 'open' && !$(event.target).closest(This.$select)[0] === true && This.hide();
+                This._selectItemsState === 'open' && !$(event.target).closest(This.$select)[0] && This.hide();
 
-        	} );
+            } );
 
         },
 
         _destroy:function() {
 
-			this.$select.remove();
+            this.$select.remove();
 
-			this.$target.show();
+            this.$target.show();
 
         },
 
         getSelectItemsState:function(){
 
-        	return this._selectItemsState;
+            return this._selectItemsState;
 
         },
 
@@ -333,7 +333,7 @@
 
         _selectItemsShowFn:function(){
 
-        	var This = this;
+            var This = this;
 
             this._selectItemsState = 'opening';
 
@@ -403,6 +403,6 @@
 
     });
 
-	return $;
+    return $;
 
 }));

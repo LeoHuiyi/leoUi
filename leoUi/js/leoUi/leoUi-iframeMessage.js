@@ -64,7 +64,7 @@
 
 		var _fdata = function(data) {
 
-			data = data == null ? '' : data;
+			data = data === null ? '' : data;
 
 			data = $.trim(data);
 

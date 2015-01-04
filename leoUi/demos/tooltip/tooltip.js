@@ -1,9 +1,9 @@
-//tooltip
+
 leoUiLoad.config({
 
     debug: true,
 
-    baseUrl:'/leoUi/',
+    baseUrl:'leoUi/',
 
     alias : {
 

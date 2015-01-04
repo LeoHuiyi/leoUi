@@ -1,10 +1,8 @@
-//tree
-
 leoUiLoad.config({
 
-    debug: false,
+    debug: true,
 
-    baseUrl:'/leoUi/',
+    baseUrl:'leoUi/',
 
     alias : {
 
@@ -24,7 +22,7 @@ leoUiLoad.config({
 
             exports: "$"
 
-        }
+        }　
 
     }
 

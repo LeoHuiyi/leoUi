@@ -22,7 +22,7 @@
 
 }(function($) {
 
-	$.leoTools.plugIn({
+    $.leoTools.plugIn({
 
         name:'leoComboBox',
 
@@ -108,9 +108,7 @@
 
         _createCombo:function(){
 
-            var op = this.options;
-
-            $input = this.$input;
+            var op = this.options,$input = this.$input;
 
             this.oldInputWidth = $input.width();
 
@@ -130,13 +128,13 @@
 
         _setComboboxWidth:function(){
 
-        	var op = this.options;
+            var op = this.options;
 
-        	this.$combobox.setOuterWidth(op.width);
+            this.$combobox.setOuterWidth(op.width);
 
-        	this.$input.setOuterWidth(this.$combobox.width() - this.$button.outerWidth());
+            this.$input.setOuterWidth(this.$combobox.width() - this.$button.outerWidth());
 
-        	this.$target.setOuterWidth(this.$combobox.outerWidth());
+            this.$target.setOuterWidth(this.$combobox.outerWidth());
 
         },
 
@@ -144,13 +142,13 @@
 
             if( key === 'width' ){
 
-            	this._setComboboxWidth();
+                this._setComboboxWidth();
 
                 return;
 
             }else if( key === 'appendTo' ){
 
-            	return;
+                return;
 
             }
 
@@ -160,11 +158,11 @@
 
         _addComBoxEvent:function(){
 
-        	var This = this,
+            var This = this,
 
-        	comboboxHoverClass = this.options.comboboxHoverClass;
+            comboboxHoverClass = this.options.comboboxHoverClass;
 
-        	this._on( this.$button, 'mousedown', function(){
+            this._on( this.$button, 'mousedown', function(){
 
                 This.cancelBlur = true;
 
@@ -198,15 +196,15 @@
 
         getSeleteLabel:function(){
 
-        	var selectElem = this.selectElem,val = '';
+            var selectElem = this.selectElem,val = '';
 
-        	if(selectElem){
+            if(selectElem){
 
-        		val = this.listMenuData[selectElem.id].data.label;
+                val = this.listMenuData[selectElem.id].data.label;
 
-        	}
+            }
 
-        	return val;
+            return val;
 
         },
 
@@ -230,43 +228,43 @@
 
         _inputFocus:function(){
 
-        	this.$combobox.addClass(this.options.comboboxFocusClass);
+            this.$combobox.addClass(this.options.comboboxFocusClass);
 
         },
 
         _afterBlur:function(){
 
-        	this.$combobox.removeClass(this.options.comboboxFocusClass).removeClass(this.options.comboboxHoverClass);
+            this.$combobox.removeClass(this.options.comboboxFocusClass).removeClass(this.options.comboboxHoverClass);
 
         },
 
         _beforeShow:function(){
 
-        	this.setIndex(this.options.minzIndex + $.leoTools.getUuid());
+            this.setIndex(this.options.minzIndex + $.leoTools.getUuid());
 
         },
 
         toggle:function(){
 
-        	if(this._listMenuState === 'close'){
+            if(this._listMenuState === 'close'){
 
-        		this.open();
+                this.open();
 
-        	}else if(this._listMenuState === 'open'){
+            }else if(this._listMenuState === 'open'){
 
-        		this.$input.blur();
+                this.$input.blur();
 
-        	}
+            }
 
         },
 
         _destroy:function(){
 
-        	var op = this.options;
+            var op = this.options;
 
-        	this.$input.width(this.oldInputWidth).removeClass('leoComboBox_input').insertBefore(this.$comboboxWrop);
+            this.$input.width(this.oldInputWidth).removeClass('leoComboBox_input').insertBefore(this.$comboboxWrop);
 
-        	this.$comboboxWrop.remove()
+            this.$comboboxWrop.remove()
 
             this._super();
 
@@ -274,6 +272,6 @@
 
     });
 
-	return $;
+    return $;
 
 }));

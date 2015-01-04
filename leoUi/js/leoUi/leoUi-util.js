@@ -22,12 +22,14 @@
 
 }(function($){
 
-	$.leoTools = $.leoTools || {};
+    $.leoTools = $.leoTools || {};
 
-	 //返回最里层子类
+     //返回最里层子类
     $.leoTools.findInnerMostChildren = function($box,selector,childrenArray){
 
-        var childrenArray = childrenArray || [],selector = selector || '*';
+        childrenArray = childrenArray || [];
+        
+        selector = selector || '*';
 
         $box.each(function(i,el){
 
@@ -50,7 +52,7 @@
     // 返回box范围默认屏幕可见范围
     $.leoTools.boxArea = function(position){
 
-        var $win = $(window),$doc = $(document);
+        var $win = $(window),$doc = $(document),areaMaxX,areaMaxY;
 
         if (position === 'absolute') {
 
@@ -66,7 +68,9 @@
 
 
         } else {
+            
             return;
+            
         }
 
         return {
@@ -75,9 +79,9 @@
 
             areaMaxY: areaMaxY
 
-        }
+        };
 
-    }
+    };
 
     // 返回拖拽范围默认屏幕可见范围
     $.leoTools.dragArea = function($box, position, areaMinX, areaMinY, areaMaxX, areaMaxY) {
@@ -110,7 +114,9 @@
 
 
         } else {
-            return false
+            
+            return false;
+            
         }
 
         boxOuterH > winH && (areaMaxY = areaMinY);
@@ -127,7 +133,7 @@
 
             areaMaxY: areaMaxY
 
-        }
+        };
 
     };
 
@@ -184,14 +190,14 @@
 
             right: right
 
-        }
+        };
 
     };
 
     //box在屏幕中出现的位置data：[{'PER':0.25},{'PER':0.5}]||[{'PX':100},{'PX':100}],BOX出现位置第一个为TOP第二个为LEFT,PER为百分比,PX为像素
     $.leoTools.boxPosition = function($box, position, data) {
 
-        var Distance = {}, $win = $(window),
+        var $win = $(window),
 
             iBoxWidth = $box.outerWidth(),
 
@@ -238,13 +244,13 @@
 
                 iBoxTop = iWindowScrollTop;
 
-            };
+            }
 
             if (iBoxLeft < iWinwdowScrollLeft) {
 
                 iBoxLeft = iWinwdowScrollLeft;
 
-            };
+            }
 
         } else if (position === 'fixed') {
 
@@ -278,7 +284,7 @@
 
         iBoxLeft = $.leoTools.range(iBoxLeft, 0, iBoxMaxLeft);
 
-        return Distance = {
+        return {
 
             top: iBoxTop,
 
@@ -335,9 +341,9 @@
             props.left = ( offsets.left - curOffset.left ) + curLeft;
         }
 
-        return props
+        return props;
 
-    }
+    };
 
     //box Resize时在屏幕中出现的位置data：[{'PER':0.25},{'PER':0.5}]||[{'PX':100},{'PX':100}],BOX出现位置第一个为TOP第二个为LEFT,PER为百分比,PX为像素，$.leoTools.boxResizePosition( $('#b'))卸载事件
     $.leoTools.boxResizePosition = function( $box, positionType, positionData ) {
@@ -483,7 +489,7 @@
 
     };
 
-	$.leoTools.plugIn({
+    $.leoTools.plugIn({
 
         name:'delayScrollOrResize',
 
@@ -507,7 +513,7 @@
 
         init:function(){
 
-            var time;
+            var time,options = this.options;
 
             if( typeof options.delay === 'number' && options.delay >= 0 ){
 
@@ -517,7 +523,7 @@
 
                     time = setTimeout( function(){
 
-                        options.handler.apply( $box, arguments );
+                        options.handler.apply( this, arguments );
 
                     }, options.delay );
 
@@ -528,7 +534,7 @@
 
                 this._on( options.selector, options.events, function(){
 
-                    options.handler.apply( $box, arguments );
+                    options.handler.apply( this, arguments );
 
                 })
 

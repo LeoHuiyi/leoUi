@@ -20,7 +20,7 @@
 
 	factorys = [],//储存需要绑定ID与factory对应关系的模块（标准浏览器下，先parse的script节点会先onload）
 
-	moduleClass = "leoUi" + (new Date - 0),
+	moduleClass = "leoUi" + (new Date() - 0),
 
 	hasOwn = Object.prototype.hasOwnProperty,
 
@@ -48,7 +48,7 @@
 
 	function type( obj ) {
 
-		if ( obj == null ) {
+		if ( obj === null ) {
 
 			return String( obj );
 
@@ -83,11 +83,11 @@
 		}
 
 		return receiver;
-	};
+	}
 
 	function mix(receiver, supplier, deep){
 
-		var key,copy,target,copyIsArray;
+		var key,copy,target,copyIsArray,clone;
 
 		if(receiver === supplier){
 
@@ -131,7 +131,7 @@
 
 		return receiver;
 
-	};
+	}
 
 	function leoUiLoad(){}
 
@@ -275,7 +275,7 @@
 
 				} else if ( global.opera ) {
 
-					opera.postError(str);
+					global.opera.postError(str);
 
 				} else if ( global.console && console.info && console.log ) {
 
@@ -315,7 +315,7 @@
 
 				i = 0,
 
-				protocol, isHttp, urlDir, idDir, dirPath, len, dir;
+				protocol, urlDir, idDir, dirPath, len, dir;
 
 			protocol = url.match(rProtocol)[1];
 
@@ -446,7 +446,7 @@
 
 			shim:{}
 
-		}
+		};
 
         if (initMod) {
 
@@ -458,7 +458,7 @@
 
 					leoUiLoad.require(initMod);
 
-				} )
+				} );
 
 			}else{
 
@@ -470,7 +470,7 @@
 
 		scripts = script = null;
 
-	};
+	}
 
 	//============================加载系统===========================
 
@@ -518,11 +518,11 @@
 
 		var nodes = (base ? DOC : head).getElementsByTagName("script"); //只在head标签中寻找
 
-		for (var i = nodes.length, node; node = nodes[--i];) {
+		for (var i = nodes.length, node; (node = nodes[--i]);) {
 
 			if ((base || node.className === moduleClass) && node.readyState === "interactive") {
 
-				return node.className = node.hasAttribute ? node.src : node.getAttribute('src', 4);
+				return (node.className = node.hasAttribute ? node.src : node.getAttribute('src', 4));
 
 			}
 
@@ -548,7 +548,7 @@
 	function checkDeps() {
 
 		//检测此JS模块的依赖是否都已安装完毕,是则安装自身
-		loop: for ( var i = loadings.length, id; id = loadings[--i]; ) {
+		loop: for ( var i = loadings.length, id; (id = loadings[--i]); ) {
 
 			var obj = modules[id],deps = obj.deps;
 
@@ -602,7 +602,7 @@
 
 	function loadJSCSS( url, parent, shim ) {
 
-		var configOp = leoUiLoad.config.options
+		var configOp = leoUiLoad.config.options,ret;
 
 		//1. 特别处理ready标识符
 		if (/^ready$/.test(url)) {
@@ -641,7 +641,7 @@
 
 			} else if (url.slice(0, 2) === "..") { //相对于父路径
 
-				ret = parent + "/" + url
+				ret = parent + "/" + url;
 
 				while (rdeuce.test(ret)) {
 
@@ -679,7 +679,7 @@
 
 		if (configOp.nocache) {
 
-            src += ( src.indexOf("?") === -1 ? "?" : "&" ) + ( new Date - 0 );
+            src += ( src.indexOf("?") === -1 ? "?" : "&" ) + ( new Date() - 0 );
 
         }
 
@@ -935,13 +935,13 @@
 	 */
 	global.define = leoUiLoad.define = function(id, deps, factory) { //模块名,依赖列表,模块本身
 
-		var args = leoUiLoad.slice(arguments),
+		var args = leoUiLoad.slice(arguments),_id,
 
 		isLeoUiCombo = leoUiLoad.config.options.isLeoUiCombo === true;
 
 		if (typeof id === "string") {
 
-			var _id = args.shift();
+			_id = args.shift();
 
 		}
 
@@ -1045,7 +1045,7 @@
 	 */
 	function fireFactory( id, deps, factory ) {
 
-		for (var i = 0, array = [], d; d = deps[i++];) {
+		for (var i = 0, array = [], d; (d = deps[i++]);) {
 
 			d !== "ready" && modules[d] && array.push( modules[d].exports );
 
@@ -1115,7 +1115,7 @@
 
 		}
 
-	};
+	}
 
 	//在firefox3.6之前，不存在readyState属性
 	//http://www.cnblogs.com/rubylouvre/archive/2012/12/18/2822912.html

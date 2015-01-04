@@ -164,8 +164,6 @@
 
                         this.refresh(newMenuData);
 
-                        op.source = newMenuData;
-
                         this._initSource();
 
                     }
@@ -180,9 +178,7 @@
 
                         this.refresh(newMenuData);
 
-                        op.source = newMenuData;
-
-                        this._initSource();
+                        this._initSource(newMenuData);
 
                     }
 
@@ -196,9 +192,7 @@
 
                         this.refresh(newMenuData);
 
-                        op.source = newMenuData;
-
-                        this._initSource();
+                        this._initSource(newMenuData);
 
                     }
 
@@ -214,13 +208,13 @@
 
                 this.term = val;
 
-                this.selectedItemVal = this.setSelectItem(val, 'value');
+                this.selectedItemVal = val;
 
             }else if((val = this.$input.val())){
 
                 this.term = val;
 
-                this.selectedItemVal = this.setSelectItem(val, 'value');
+                this.selectedItemVal = val;
 
             }
 
@@ -480,13 +474,13 @@
 
         },
 
-        _initSource: function() {
+        _initSource: function(normalizeSource) {
 
-            var array, url, This = this, source = this.options.source;
+            var array, url, This = this, source = normalizeSource || this.options.source;
 
             if ( $.isArray( source ) ) {
 
-                array = this.normalize(source, true);
+                this.normalizeSource = array = this.normalize(source, !normalizeSource);
 
                 this.source = function( request, response ) {
 
@@ -659,6 +653,16 @@
                 this.cancelSearch = true;
 
                 this._close();
+
+            }
+
+        },
+
+        inputFocus:function(){
+
+            if(this.$input[0]){
+
+                this.$input.focus().leoUiTextSelection('last');
 
             }
 

@@ -196,15 +196,33 @@
 
         getSeleteLabel:function(){
 
-            var selectElem = this.selectElem,val = '';
+            var selectedItemVal = this.selectedItemVal,
 
-            if(selectElem){
+            normalizeSource = this.normalizeSource,i,label = '';
 
-                val = this.listMenuData[selectElem.id].data.label;
+            if(normalizeSource && selectedItemVal){
+
+                i = normalizeSource.length;
+
+                while(i--){
+
+                    if(normalizeSource[i].value === selectedItemVal){
+
+                        label = normalizeSource[i].label;
+
+                        break;
+
+                    }
+
+                }
+
+                return label;
+
+            }else{
+
+                return label;
 
             }
-
-            return val;
 
         },
 
@@ -264,7 +282,7 @@
 
             this.$input.width(this.oldInputWidth).removeClass('leoComboBox_input').insertBefore(this.$comboboxWrop);
 
-            this.$comboboxWrop.remove()
+            this.$comboboxWrop.remove();
 
             this._super();
 

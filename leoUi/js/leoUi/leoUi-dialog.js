@@ -210,7 +210,7 @@
                     "opacity": 0
                 }).animate({
                     "opacity": 0.8
-                }, 500, callBack);
+                }, 200, callBack);
 
                 // this.css("opacity", 0.8).show();
 
@@ -222,7 +222,7 @@
 
                 this.animate({
                     "opacity": 0
-                }, 500, callBack);
+                }, 200, callBack);
 
                 // this.hide();
 

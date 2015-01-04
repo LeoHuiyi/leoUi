@@ -770,7 +770,7 @@
 
             while( i < length ){
 
-                if( child = treeJson[i++] ){
+                if((child = treeJson[i++])){
 
                     id = this.nodeTreeId++;
 
@@ -848,7 +848,7 @@
 
             var op = this.options, check = op.check, childLen,
 
-            isCheck = !!check.enable,
+            isCheck = !!check.enable,checkKey,
 
             checkType = check.checkType,checkbox;
 
@@ -912,11 +912,11 @@
 
         _checkboxSetParentChildLen:function(parentId, num){
 
-            var parentCheckbox, num = +num;
+            var parentCheckbox;
 
             !(parentCheckbox = this.treeJson[parentId].checkbox) && (parentCheckbox = this.treeJson[parentId].checkbox = {});
 
-            parentCheckbox.childCheckedLen === undefined ? parentCheckbox.childCheckedLen = num : parentCheckbox.childCheckedLen += num;
+            parentCheckbox.childCheckedLen === undefined ? parentCheckbox.childCheckedLen = +num : parentCheckbox.childCheckedLen += +num;
 
         },
 
@@ -948,7 +948,7 @@
 
             var hasOwn = this._ohasOwn,key,copy,target,copyIsArray,
 
-            isPlainObject = $.isPlainObject,isArray = $.isArray,
+            isPlainObject = $.isPlainObject,isArray = $.isArray,clone,
 
             children = this.options.key.children;
 
@@ -1261,13 +1261,14 @@
 
             var str = '',name = child.name,aId = child.aId,
 
-            url = child.url,target,title = child.title;;
+            url = child.url,target,title = child.title;
 
             if( url ){
 
-                if(target = child.target){
+                if((target = child.target)){
 
                     str += '<a id="' + aId + '" href="' + url + '" target = "' + target + '" class="leoTree_dblclick_a"';
+                    
                 }else{
 
                     str += '<a id="' + aId + '" href="' + url + '" class="leoTree_dblclick_a"';
@@ -1566,8 +1567,6 @@
 
                 this._on( $tree, 'dblclick.switch', '.leoTree_dblclick_a', function(event){
 
-                    event.stopPropagation();
-
                     !!clickTime && clearTimeout(clickTime);
 
                     This._treeNodeOpenOrClose( this, 'a' );
@@ -1575,8 +1574,6 @@
                 });
 
                 this._on( $tree, 'click.switch', '.leoTree_dblclick_a', function(event){
-
-                    event.stopPropagation();
 
                     var self = this;
 
@@ -1593,8 +1590,6 @@
             }else{
 
                 this._on( $tree, 'click.switch', '.leoTree_dblclick_a', function(event){
-
-                    event.stopPropagation();
 
                     clickNodeCallBack !== false && clickNodeCallBack.call( this, event, This._getNodeTreeData( this.id, 'a' ) );
 

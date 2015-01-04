@@ -78,23 +78,25 @@ leoUiLoad.require('leoUi-droppable,base,leoUi,ready', function($) {
 
         onDragEnter: function( e, drop, dargBox ) {
 
-            var source = dargBox.box;
-
-            // console.log(drop)
-
-            // console.log(dargBox)
-
-            // console.log(source !== this)
+            var source = dargBox.box,$drag,$drop;
 
             if (source !== this) {
 
-                if ($(this).parent()[0] !== $(source).parent()[0] || $(this).index() < $(source).index()) {
+                $drag = $(source);
 
-                    $(source).insertBefore(this).leoDraggable('setDropsProp');
+                $drop = $(this);
 
-                } else {
+                if($drag.parent()[0] !== $drop.parent()[0]){
 
-                    $(source).insertAfter(this).leoDraggable('setDropsProp');
+                    $drag.insertBefore(this).leoDraggable('setDropsProp');
+
+                }else if($drop.index() < $drag.index()){
+
+                    $drag.insertBefore(this).leoDraggable('setDropsProp');
+
+                }else if(!$drop.is('.portlet-last')){
+
+                    $drag.insertAfter(this).leoDraggable('setDropsProp');
 
                 }
 
@@ -110,25 +112,25 @@ leoUiLoad.require('leoUi-droppable,base,leoUi,ready', function($) {
         }
 
     })
-    $('.column').leoDroppable({
+    // $('.column').leoDroppable({
 
-        // accept:'#leo',
+    //     // accept:'#leo',
 
-        checkFirst:false,
+    //     checkFirst:false,
 
-        onDragEnter: function( e, drop, dargBox ) {
+    //     onDragEnter: function( e, drop, dargBox ) {
 
-            var source = dargBox.box;
+    //         var source = dargBox.box;
 
-            if (!$.contains(this, source)) {
+    //         if (!$.contains(this, source)) {
 
-                $(source).appendTo(this);
+    //             $(source).appendTo(this);
 
-            }
+    //         }
 
-        }
+    //     }
 
-    });
+    // });
 
     $('#scroll').leoDraggable({
         bClone: true,

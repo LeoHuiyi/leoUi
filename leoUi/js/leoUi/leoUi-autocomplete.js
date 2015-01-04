@@ -22,7 +22,7 @@
 
 }(function($) {
 
-	$.leoTools.plugIn({
+    $.leoTools.plugIn({
 
         name:'leoAutocomplete',
 
@@ -158,7 +158,7 @@
 
                 case 'first':
 
-                    if(newMenuData = this._addMenuData(data, menuData[0]._id, true)){
+                    if((newMenuData = this._addMenuData(data, menuData[0]._id, true))){
 
                         newMenuData = this.normalize(newMenuData, true);
 
@@ -174,7 +174,7 @@
 
                 case 'last':
 
-                    if(newMenuData = this._addMenuData(data, menuData[menuData.length - 1]._id, false)){
+                    if((newMenuData = this._addMenuData(data, menuData[menuData.length - 1]._id, false))){
 
                         newMenuData = this.normalize(newMenuData, true);
 
@@ -190,7 +190,7 @@
 
                 default:
 
-                    if(newMenuData = this._addMenuData(data, item.id || item, isBefore)){
+                    if((newMenuData = this._addMenuData(data, item.id || item, isBefore))){
 
                         newMenuData = this.normalize(newMenuData, true);
 
@@ -216,7 +216,7 @@
 
                 this.selectedItemVal = this.setSelectItem(val, 'value');
 
-            }else if(val = this.$input.val()){
+            }else if((val = this.$input.val())){
 
                 this.term = val;
 
@@ -837,6 +837,6 @@
 
     });
 
-	return $;
+    return $;
 
 }));

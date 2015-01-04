@@ -40,7 +40,7 @@ var rExistId = /define\(\s*['"][^\[\('"\{]+['"]\s*,?/,
 
 	type = function( obj ) {
 
-		if ( obj == null ) {
+		if ( obj === null ) {
 
 			return String( obj );
 
@@ -92,7 +92,7 @@ var rExistId = /define\(\s*['"][^\[\('"\{]+['"]\s*,?/,
 
 	mix = function minIn(receiver, supplier, deep) {
 
-		var key,copy,target,copyIsArray;
+		var key,copy,target,copyIsArray,clone;
 
 		if(receiver === supplier){
 
@@ -166,7 +166,7 @@ var rExistId = /define\(\s*['"][^\[\('"\{]+['"]\s*,?/,
 
             walk = function(path, fileList, folderList, jsFileList){
 
-                files = fs.readdirSync(path);
+                var files = fs.readdirSync(path);
 
                 files.forEach(function(item) {
 
@@ -213,7 +213,7 @@ var rExistId = /define\(\s*['"][^\[\('"\{]+['"]\s*,?/,
 
 		var cache = depsCache[key],
 
-			deps = [],
+			deps = [];
 
 			config = config || {};
 
@@ -390,7 +390,7 @@ var rExistId = /define\(\s*['"][^\[\('"\{]+['"]\s*,?/,
 
 		if (arr[0] == "..") { //处理 ../ddd/d
 
-			arr.splice(0, 2, arr[0] + "/" + arr[1])
+			arr.splice(0, 2, arr[0] + "/" + arr[1]);
 
 		}
 
@@ -398,7 +398,7 @@ var rExistId = /define\(\s*['"][^\[\('"\{]+['"]\s*,?/,
 
 			if (!fs.existsSync(cur)) { //不存在就创建一个
 
-				fs.mkdirSync(cur, mode)
+				fs.mkdirSync(cur, mode);
 
 			}
 
@@ -534,11 +534,11 @@ var rExistId = /define\(\s*['"][^\[\('"\{]+['"]\s*,?/,
 		}
 
 		// 合并好文本内容后的回调
-		if (typeof complete === 'function') {
+		// if (typeof complete === 'function') {
 
-			contents = complete(contents);
+		// 	contents = complete(contents);
 
-		}
+		// }
 
 		// 写入文件
 		try {
@@ -619,7 +619,7 @@ var rExistId = /define\(\s*['"][^\[\('"\{]+['"]\s*,?/,
 
 		}
 
-		if(folder = options.folder){
+		if((folder = options.folder)){
 
 			files = scanFolder(path.resolve(baseUrl, folder.inputSrc), folder.deep).jsFiles;
 

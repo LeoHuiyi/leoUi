@@ -192,7 +192,7 @@
 
             this.opMaxHeight = op.maxHeight;
 
-            this.opMinWidth = $.leoTools.range( op.minWidth, 0, this.opMaxWidth )
+            this.opMinWidth = $.leoTools.range( op.minWidth, 0, this.opMaxWidth );
 
             this.opMinHeight = $.leoTools.range( op.minHeight, 0, this.opMaxHeight );
 
@@ -222,7 +222,7 @@
 
                     this.flag_NS = '';
 
-                };
+                }
 
                 if( event.pageX >= left + outerW - op.edge ){
 
@@ -584,7 +584,7 @@
 
             NSMinScaleWH =  this.NWMinWidth / this.SEMinHeight,
 
-            NWMinScaleWH =  this.NWMinWidth / this.NWMinHeight;
+            NWMinScaleWH =  this.NWMinWidth / this.NWMinHeight,
 
             SEMaxScaleWH =  this.SEMaxWidth / this.SEMaxHeight,
 
@@ -960,7 +960,7 @@
 
             var dragBoxOffset = this.$dragBox.offset(),
 
-            op = this.options,This = this,$target = this.$target,
+            op = this.options,$target = this.$target,
 
             width = this.width,height = this.height;
 
@@ -994,7 +994,7 @@
 
                     }
 
-                }})
+                }});
 
             }else{
 
@@ -1068,13 +1068,13 @@
 
                 return _cursorChange;
 
-            }
+            };
 
             fn.setCursorChange = this._setCursorChange = function(flag){
 
                 _cursorChange = !!flag;
 
-            }
+            };
 
         }
 

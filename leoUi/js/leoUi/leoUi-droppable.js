@@ -70,9 +70,9 @@
 
             var $box = draggable.dragBox,top = draggable.dragBoxTop,
 
-            left = draggable.dragBoxLeft;
+            left = draggable.dragBoxLeft,
 
-            outerW = $box.outerWidth();
+            outerW = $box.outerWidth(),
 
             outerH = $box.outerHeight();
 
@@ -381,6 +381,6 @@
 
     });
 
-	return $;
+    return $;
 
 }));

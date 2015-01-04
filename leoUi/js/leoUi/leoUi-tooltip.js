@@ -22,7 +22,7 @@
 
 }(function($) {
 
-	$.leoTools.plugIn({
+    $.leoTools.plugIn({
 
         name:'leoTooltip',
 
@@ -36,9 +36,9 @@
 
         defaults:{
 
-        	tooltipHtml: '<div class="leoTooltip">'
+            tooltipHtml: '<div class="leoTooltip">'
             +                '<div class="leoTooltip_titlebar leoUi_clearfix">标 题</div>'
-            +				 '<div class="leoTooltip_close">X</div>'
+            +                '<div class="leoTooltip_close">X</div>'
             +                '<div class="leoTooltip_content"></div>'
             +            '</div>',//tooltip的基础html标签
 
@@ -58,25 +58,25 @@
 
             },//tooltip(工具提示框)的内容（ this: null, arguments: content, target ）
 
-			disabled:false,//如果设置为 true，则禁用该 tooltip（工具提示框）
+            disabled:false,//如果设置为 true，则禁用该 tooltip（工具提示框）
 
-			position:{//设置tooltip的位置（其中of和within属性设置成“window”或者“document”使用当前框架的window或者document）
+            position:{//设置tooltip的位置（其中of和within属性设置成“window”或者“document”使用当前框架的window或者document）
 
-				orientation:'random',//tooltip相对于position.of的位置（topLeft,topCenter,topRight,leftTop,leftCenter,leftBottom,bottomLeft,bottomCenter,bottomRight,rightTop,rightCenter,rightBottom,random;）
+                orientation:'random',//tooltip相对于position.of的位置（topLeft,topCenter,topRight,leftTop,leftCenter,leftBottom,bottomLeft,bottomCenter,bottomRight,rightTop,rightCenter,rightBottom,random;）
 
-				toCenterOffset:'-25%',//tooltip向中间的偏移量（可用百分比和数字表示）
+                toCenterOffset:'-25%',//tooltip向中间的偏移量（可用百分比和数字表示）
 
-				collision:"flipfit flipfit",
+                collision:"flipfit flipfit",
 
                 of:'window',
 
                 within:'window'
 
-			},
+            },
 
-			distance:5,//tooltip(工具提示框)与目标的间隔
+            distance:5,//tooltip(工具提示框)与目标的间隔
 
-			showDelay:0,//打开tooltip延迟的时间
+            showDelay:0,//打开tooltip延迟的时间
 
             hideDelay:0,//关闭tooltip延迟的时间
 
@@ -110,11 +110,11 @@
 
             this._tooltipState = 'close';
 
-        	this._setClose();
+            this._setClose();
 
-        	this._setPosition();
+            this._setPosition();
 
-        	this._appendTo();
+            this._appendTo();
 
         },
 
@@ -158,7 +158,7 @@
 
             if( this.options.disabled ){ return; }
 
-        	this.$target.appendTo( this.options.appendTo );
+            this.$target.appendTo( this.options.appendTo );
 
             this._setContent();
 
@@ -190,7 +190,7 @@
 
             if( this._close ){
 
-                var This = this;
+                This = this;
 
                 this._on( this.$target.find( this._close ), 'click.close', function(){
 
@@ -226,7 +226,7 @@
 
             if( this.options.disabled ){ return; }
 
-        	var isVisible = this._tooltipState === 'open',$target = this.$target;
+            var isVisible = this._tooltipState === 'open',$target = this.$target;
 
             !!this.options.arrow && $target.css( 'margin', '' );
 
@@ -302,7 +302,7 @@
 
         _setStrPosition:function(){
 
-        	var options = this.options,distance = options.distance >> 0,toCenterOffset = $.trim( options.position.toCenterOffset ),percent,percentNum,num;
+            var options = this.options,distance = options.distance >> 0,toCenterOffset = $.trim( options.position.toCenterOffset ),percent,percentNum,num,reverseOffset;
 
             if( ( percentNum = toCenterOffset.indexOf('%') ) !== -1 ){
 
@@ -324,43 +324,43 @@
 
             }
 
-        	this.strPosition = {
+            this.strPosition = {
 
-        		topLeft: { my: "center bottom-" + distance, at: "left" + reverseOffset + " top" },
+                topLeft: { my: "center bottom-" + distance, at: "left" + reverseOffset + " top" },
 
-        		topCenter: { my: "center bottom-" + distance, at: "center top" },
+                topCenter: { my: "center bottom-" + distance, at: "center top" },
 
-	            topRight: { my: "center bottom-" + distance, at: "right" + toCenterOffset + " top" },
+                topRight: { my: "center bottom-" + distance, at: "right" + toCenterOffset + " top" },
 
-	            leftTop: { my: "right-" + distance + " center", at: "left top" + reverseOffset },
+                leftTop: { my: "right-" + distance + " center", at: "left top" + reverseOffset },
 
-	            leftCenter: { my: "right-" + distance + " center", at: "left center" },
+                leftCenter: { my: "right-" + distance + " center", at: "left center" },
 
-	            leftBottom: { my: "right-" + distance + " center", at: "left bottom" + toCenterOffset },
+                leftBottom: { my: "right-" + distance + " center", at: "left bottom" + toCenterOffset },
 
-	            bottomLeft: { my: "center top+" + distance, at: "left" + reverseOffset + " bottom" },
+                bottomLeft: { my: "center top+" + distance, at: "left" + reverseOffset + " bottom" },
 
-	            bottomCenter: { my: "center top+" + distance, at: "center bottom" },
+                bottomCenter: { my: "center top+" + distance, at: "center bottom" },
 
-	            bottomRight: { my: "center top+" + distance, at: "right" + toCenterOffset + " bottom" },
+                bottomRight: { my: "center top+" + distance, at: "right" + toCenterOffset + " bottom" },
 
-	            rightTop: { my: "left+" + distance + " center", at: "right top" + reverseOffset },
+                rightTop: { my: "left+" + distance + " center", at: "right top" + reverseOffset },
 
-	            rightCenter: { my: "left+" + distance + " center", at: "right center" },
+                rightCenter: { my: "left+" + distance + " center", at: "right center" },
 
-	            rightBottom: { my: "left+" + distance + " center", at: "right bottom" + toCenterOffset }
+                rightBottom: { my: "left+" + distance + " center", at: "right bottom" + toCenterOffset }
 
-        	}
+            }
 
         },
 
         _setPosition:function(){
 
-        	var options = this.options,This = this;
+            var options = this.options,This = this;
 
             this.position = this._changePosition(options.position);
 
-        	this._setStrPosition();
+            this._setStrPosition();
 
             this._getPosition();
 
@@ -380,7 +380,7 @@
 
             }
 
-         	$.extend( this.position, this.strPosition[orientation] );
+            $.extend( this.position, this.strPosition[orientation] );
 
         },
 
@@ -414,35 +414,35 @@
 
             }
 
-        	!$arrow && ( $arrow = this.$arrow = $('<div class="leoTooltip_arrow"></div>').appendTo( $target ) );
+            !$arrow && ( $arrow = this.$arrow = $('<div class="leoTooltip_arrow"></div>').appendTo( $target ) );
 
-        	$arrow.removeClass('leoTooltip_arrow_top leoTooltip_arrow_left leoTooltip_arrow_bottom leoTooltip_arrow_right').css( {'borderColor': '', top: '', left: '' } );
+            $arrow.removeClass('leoTooltip_arrow_top leoTooltip_arrow_left leoTooltip_arrow_bottom leoTooltip_arrow_right').css( {'borderColor': '', top: '', left: '' } );
 
-        	if( arrow === 'top' ){
+            if( arrow === 'top' ){
 
-        		$arrow.addClass('leoTooltip_arrow_top').css( {'borderTopColor': $target.css( 'backgroundColor' ),'left': this._getArrowPosition('horizontal', feedback.target, element, element.width/2) } );
+                $arrow.addClass('leoTooltip_arrow_top').css( {'borderTopColor': $target.css( 'backgroundColor' ),'left': this._getArrowPosition('horizontal', feedback.target, element, element.width/2) } );
 
                 $target.css( { 'marginBottom': arrowHeight, top: top - arrowHeight, left: left } );
 
-        	}else if( arrow === 'left' ){
+            }else if( arrow === 'left' ){
 
-        		$arrow.addClass('leoTooltip_arrow_left').css( { 'borderLeftColor': $target.css( 'backgroundColor' ), 'top': this._getArrowPosition('vertical', feedback.target, element, element.height/2) } );
+                $arrow.addClass('leoTooltip_arrow_left').css( { 'borderLeftColor': $target.css( 'backgroundColor' ), 'top': this._getArrowPosition('vertical', feedback.target, element, element.height/2) } );
 
                 $target.css( { 'marginRight': arrowHeight, top: top, left: left - arrowHeight } );
 
-        	}else if( arrow === 'bottom' ){
+            }else if( arrow === 'bottom' ){
 
                 $arrow.addClass('leoTooltip_arrow_bottom').css( { 'borderBottomColor': $target.css( 'backgroundColor' ), 'left': this._getArrowPosition('horizontal', feedback.target, element, element.width/2) } );
 
                 $target.css( { 'marginTop': arrowHeight, top: top, left: left } );
 
-        	}else if( arrow === 'right' ){
+            }else if( arrow === 'right' ){
 
                 $arrow.addClass('leoTooltip_arrow_right').css( { 'borderRightColor': $target.css( 'backgroundColor' ), 'top': this._getArrowPosition('horizontal', feedback.target, element, element.width/2) } );
 
                 $target.css( { 'marginLeft': arrowHeight, top: top, left: left } );
 
-        	}else{
+            }else{
 
                 $target.css( { top: top, left: left } );
 
@@ -512,7 +512,7 @@
 
         tooltipState:function(){
 
-        	return this._tooltipState;
+            return this._tooltipState;
 
         },
 
@@ -532,7 +532,7 @@
 
             if( this.options.disabled ){ return; }
 
-        	this._tooltipHideFn();
+            this._tooltipHideFn();
 
         },
 
@@ -614,6 +614,6 @@
 
     });
 
-	return $;
+    return $;
 
 }));

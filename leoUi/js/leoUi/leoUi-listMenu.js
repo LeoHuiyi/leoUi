@@ -22,7 +22,7 @@
 
 }(function($) {
 
-	$.leoTools.plugIn({
+    $.leoTools.plugIn({
 
         name:'leoListMenu',
 
@@ -42,13 +42,13 @@
 
             appendTo:'body',
 
-        	data:[],
+            data:[],
 
             isHide:false,
 
-        	listMenuHtml:'<div class="leoListMenu"><div class="leoListMenu_menuContentIn"></div></div>',
+            listMenuHtml:'<div class="leoListMenu"><div class="leoListMenu_menuContentIn"></div></div>',
 
-        	menuContentHtml:'<div class="leoListMenu_menuContent"></div>',
+            menuContentHtml:'<div class="leoListMenu_menuContent"></div>',
 
             menuItemHtmlFn:function(data, i){//data._disableItem = true不设置为menuItem
 
@@ -66,7 +66,7 @@
 
             width: 100,
 
-			position: {
+            position: {
 
                 my: "left top",
 
@@ -116,7 +116,7 @@
 
             this._setOpDisabled();
 
-        	this._createlistMenuHtml();
+            this._createlistMenuHtml();
 
         },
 
@@ -154,21 +154,21 @@
 
         _createMenuItems:function(datas, value){
 
-        	var op = this.options,datas = datas || $.extend([], op.data),
+            var op = this.options,listDatas = datas || $.extend([], op.data),
 
             i = 0,data,prefix = this.prefix,itemData,menuData = [],
 
             listMenuData = {},menuItemHtmlFn = op.menuItemHtmlFn,id,
 
-        	$menuContent = this.$menuContent,prevId,firstId,lastId,
+            $menuContent = this.$menuContent,prevId,firstId,lastId,
 
-        	datasLen = datas.length,last = datasLen - 1,$elem,
+            listDatasLen = listDatas.length,last = listDatasLen - 1,$elem,
 
             menuItemsClass = op.menuItemsClass,selectElem,focusElem;
 
-        	for(; i < datasLen ; i++){
+            for(; i < listDatasLen ; i++){
 
-        		data = datas[i];
+                data = listDatas[i];
 
                 id = prefix + this.uid++;
 
@@ -222,7 +222,7 @@
 
                 menuData.push(data);
 
-        	}
+            }
 
             if(lastId && firstId){
 
@@ -246,7 +246,7 @@
 
         _createlistMenuHtml:function(){
 
-        	var op = this.options;
+            var op = this.options;
 
             this.$menuContent = $(op.menuContentHtml);
 
@@ -296,19 +296,19 @@
 
         _addEvent:function(){
 
-        	var This = this,op = this.options,
+            var This = this,op = this.options,
 
             $menuContent = this.$menuContent,
 
             menuItemsClass = '.' + op.menuItemsClass;
 
-        	this._on($menuContent, 'mouseenter', menuItemsClass, function(event){
+            this._on($menuContent, 'mouseenter', menuItemsClass, function(event){
 
-        		event.stopPropagation();
+                event.stopPropagation();
 
                 This._focus(this);
 
-        	});
+            });
 
             this._on($menuContent, 'mouseleave', menuItemsClass, function(event){
 
@@ -552,7 +552,7 @@
 
                 case 'first':
 
-                    if(newMenuData = this._addMenuData(data, menuData[0]._id, true)){
+                    if((newMenuData = this._addMenuData(data, menuData[0]._id, true))){
 
                         this.refresh(newMenuData);
 
@@ -562,7 +562,7 @@
 
                 case 'last':
 
-                    if(newMenuData = this._addMenuData(data, menuData[menuData.length - 1]._id, false)){
+                    if((newMenuData = this._addMenuData(data, menuData[menuData.length - 1]._id, false))){
 
                         this.refresh(newMenuData);
 
@@ -572,7 +572,7 @@
 
                 default:
 
-                    if(newMenuData = this._addMenuData(data, item.id || item, isBefore)){
+                    if((newMenuData = this._addMenuData(data, item.id || item, isBefore))){
 
                         this.refresh(newMenuData);
 
@@ -602,7 +602,7 @@
 
                     next = doc.getElementById(id = listMenuData[ direction + "Id" ]);
 
-                }else if(selectElemData = listMenuData[focusElem.id]){
+                }else if((selectElemData = listMenuData[focusElem.id])){
 
                     next = doc.getElementById(id = selectElemData[ direction + "Id" ]);
 
@@ -634,13 +634,13 @@
 
         _destroy:function() {
 
-			this.$target.remove();
+            this.$target.remove();
 
         },
 
         getListMenuState:function(){
 
-        	return this._listMenuState;
+            return this._listMenuState;
 
         },
 
@@ -722,7 +722,7 @@
 
         _showFn:function(callBack){
 
-        	var This = this,op = this.options;
+            var This = this,op = this.options;
 
             this._listMenuState = 'opening';
 
@@ -792,6 +792,6 @@
 
     });
 
-	return $;
+    return $;
 
 }));

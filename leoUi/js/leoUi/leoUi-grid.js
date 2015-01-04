@@ -2079,7 +2079,7 @@
 
             this.sortRows = $bodyTable.find('tr.jqgrow').get();
 
-            status = this.colsStatus[thId] = ( this.colsStatus[thId] === null ) ? 1 : this.colsStatus[thId] * -1;
+            status = this.colsStatus[thId] = ( this.colsStatus[thId] === undefined ) ? 1 : this.colsStatus[thId] * -1;
 
             if( $.isFunction(localSort) ){
 

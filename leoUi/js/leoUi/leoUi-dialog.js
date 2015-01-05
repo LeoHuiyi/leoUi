@@ -70,6 +70,12 @@
 
             modal:true,//是否使用遮罩层
 
+            contentSelector:'.leoDialog_content',
+
+            titlebarSelector:'.leoDialog_titlebar',
+
+            titleSelector:'.leoDialog_title',
+
             title:'标 题',//dialog标题的内容
 
             quickClose: false,// 是否支持快捷关闭（点击遮罩层自动关闭）
@@ -529,7 +535,7 @@
 
         setDialogTitle:function(text){
 
-            !!this.$uiDialogTitlebar && this.$uiDialogTitlebar.find('.leoDialog_title').text(text || this.options.title || '');
+            this.options.titleSelector !== false && this.$target.find(this.options.titleSelector).text(text || this.options.title || '');
 
         },
 
@@ -1248,11 +1254,11 @@
 
         _createDialog:function(){
 
-            var $uiDialogTitlebar = this.$target.find('.leoDialog_titlebar');
+            var op = this.options, $uiDialogTitlebar;
 
-            this.$content = this.$target.hide().css( 'z-index', this.options.zIndex ).find( '.leoDialog_content' );
+            this.$content = this.$target.hide().css( 'z-index', this.options.zIndex ).find(op.contentSelector);
 
-            !$uiDialogTitlebar[0] ? this.$uiDialogTitlebar = false : this.$uiDialogTitlebar = $uiDialogTitlebar;
+            op.titlebarSelector === false ? this.$uiDialogTitlebar = false : !($uiDialogTitlebar = this.$target.find(op.titlebarSelector))[0] ? this.$uiDialogTitlebar = false : this.$uiDialogTitlebar = $uiDialogTitlebar;
 
         },
 

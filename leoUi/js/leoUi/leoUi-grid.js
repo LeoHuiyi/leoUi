@@ -277,8 +277,6 @@
 
             oldCurrentPage = currentPage = this.currentPage || + op.currentPage;
 
-            page = page >> 0;
-
             switch(page){
 
                 case 'now':
@@ -311,7 +309,11 @@
 
                 default:
 
-                    currentPage = + page;
+                    if($.isNumeric(+page)){
+
+                        currentPage = +page;
+
+                    }
 
             }
 

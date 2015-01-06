@@ -263,7 +263,7 @@
 
             var op = this.options,index,currentPage,last,totalpages,oldCurrentPage;
 
-            totalItems = + totalItems || + this.totalItems || this.teams.length;
+            totalItems = + totalItems || + this.totalItems || (this.teams && this.teams.length) || 0;
 
             perPages = + perPages || + this.perPages || + op.rowNum;
 

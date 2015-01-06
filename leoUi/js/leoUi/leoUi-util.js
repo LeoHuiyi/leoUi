@@ -28,7 +28,7 @@
     $.leoTools.findInnerMostChildren = function($box,selector,childrenArray){
 
         childrenArray = childrenArray || [];
-        
+
         selector = selector || '*';
 
         $box.each(function(i,el){
@@ -67,10 +67,6 @@
             areaMaxY = $win.height();
 
 
-        } else {
-            
-            return;
-            
         }
 
         return {
@@ -114,9 +110,9 @@
 
 
         } else {
-            
+
             return false;
-            
+
         }
 
         boxOuterH > winH && (areaMaxY = areaMinY);
@@ -543,6 +539,5 @@
         }
 
     });
-
 
 }));

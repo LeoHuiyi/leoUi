@@ -914,7 +914,7 @@
 
                     }catch(e){};
 
-                    (/msie/.test(navigator.userAgent.toLowerCase())) && CollectGarbage();
+                    ;(/msie/.test(navigator.userAgent.toLowerCase())) && window.CollectGarbage && window.CollectGarbage();
 
                     $iframe.remove();
 
@@ -944,9 +944,7 @@
 
                 this.$innerIframe.each(function(index, el) {
 
-                    var $el = $(el);
-
-                    $el.attr( "src", $el.attr("src") );
+                    el.contentWindow.location.reload();
 
                 });
 

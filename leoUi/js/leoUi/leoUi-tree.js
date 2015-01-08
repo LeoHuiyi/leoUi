@@ -64,6 +64,8 @@
 
             autoCollapse:false,//自动折叠的功能
 
+            ajaxMegCallback:$.noop,//ajax信息回调
+
             arrowSrc: '../../img/arrow.png',//箭头图标src
 
             key:{
@@ -172,13 +174,15 @@
 
                     This._destroyLoading();
 
+                    op.ajaxMegCallback(data, "done");
+
                     teamsKey === false ? op.treeJson = data : op.treeJson = data[teamsKey];
 
                     This._createTree();
 
                 }).fail(function(data){
 
-                    console.log(data.statusText);
+                    op.ajaxMegCallback(data, "fail");
 
                 });
 
@@ -252,7 +256,7 @@
 
                     inner = This._getTreeNode( dragId, 'inner' );
 
-                    ul = This._getTreeNode( dragId, 'ul' )
+                    ul = This._getTreeNode( dragId, 'ul' );
 
                     if( dropJson.open === true ){
 
@@ -290,7 +294,7 @@
 
                 }
 
-            })
+            });
 
             this._setDroppable( $tree.find('div.leoTree_node') );
 
@@ -338,7 +342,7 @@
 
                 onDragOver: function( event, drop, drag ) {
 
-                    if( isNotDropNode === true ){ return };
+                    if( isNotDropNode === true ){ return; }
 
                     !This.innerHoverDisabled && ( This.innerHoverDisabled = true );
 
@@ -750,7 +754,7 @@
 
                 rootId = this._setTreeNodeId( id, 'root', level );
 
-                this.treeJson[treeId] = { level: level, rootId: rootId }
+                this.treeJson[treeId] = { level: level, rootId: rootId };
 
                 html += '<ul id="' + rootId + '" class="leoTree_list leoUi_helper_reset">';
 
@@ -1319,7 +1323,7 @@
 
                 event.stopPropagation();
 
-                if( This.innerHoverDisabled === true ){ return };
+                if( This.innerHoverDisabled === true ){ return; }
 
                 This._removeHoverClass(this);
 
@@ -1383,9 +1387,7 @@
 
             if(this.options.check.enable === true && this.options.check.checkType === 'checkbox'){
 
-                var nodeTreeJson = this._getNodeTreeJson(elem.id, 'check'),
-
-                checkbox = nodeTreeJson.checkbox;
+                var nodeTreeJson = this._getNodeTreeJson(elem.id, 'check');
 
                 if(nodeTreeJson.checkbox.state === 0){
 
@@ -1421,9 +1423,9 @@
 
             if(this.options.check.enable === true && this.options.check.checkType === 'checkbox'){
 
-                var nodeTreeJson, childsJson, checkbox;
+                var nodeTreeJson, childsJson, checkbox,i;
 
-                if(nodeTreeJson = this.treeJson[id]){
+                if((nodeTreeJson = this.treeJson[id])){
 
                     childsJson =  nodeTreeJson.children;
 
@@ -1735,7 +1737,7 @@
 
         }
 
-    })
+    });
 
     return $;
 

@@ -180,6 +180,18 @@
 
             cancelCallBack:$.noop,//点击cancel按钮回调（ this: publicMethods, arguments: event, bottunDisable, bottunEnable））
 
+            pinCallBack:$.noop,//点击pin按钮回调（this: publicMethods, arguments: event, close）
+
+            refreshCallBack:$.noop,//点击refresh按钮回调（this: publicMethods, arguments: event, close）
+
+            toggleCallBack:$.noop,//点击toggle按钮回调（this: publicMethods, arguments: event, close）
+
+            minimizeCallBack:$.noop,//点击minimize按钮回调（this: publicMethods, arguments: event, close）
+
+            maximizeCallBack:$.noop,//点击maximize按钮回调（this: publicMethods, arguments: event, close）
+
+            restoreCallBack:$.noop,//点击restore按钮回调（this: publicMethods, arguments: event, close）
+
             closeCallBack:$.noop,//点击close按钮回调（this: publicMethods, arguments: event, close）
 
             quickCloseCallBack:$.noop,//点击罩盖层按钮回调（this: publicMethods, arguments: event, modal）
@@ -661,7 +673,7 @@
 
             if(!info){return;}
 
-            var buttonObject,deps = info.deps,This = this,
+            var buttonObject,This = this,
 
             buttonCss = 'leoDialog_' + name,
 
@@ -681,7 +693,9 @@
 
                     if( This._dialogState === 'open' ){
 
-                        name === 'close' && ( This.options.closeCallBack.call( This._publicMethods, event, this ), This.clickCallBackName = 'closeCallBack' );
+                        var callbackName = name + 'CallBack';
+
+                        This.options[callbackName].call( This._publicMethods, event, this ), This.clickCallBackName = callbackName;
 
                         This[info.click]();
 
@@ -912,7 +926,7 @@
 
                         el.contentWindow.document.close();
 
-                    }catch(e){};
+                    }catch(e){}
 
                     ;(/msie/.test(navigator.userAgent.toLowerCase())) && window.CollectGarbage && window.CollectGarbage();
 
@@ -1234,7 +1248,7 @@
 
                 This._addElemDisableClassName(el);
 
-            }
+            };
 
         },
 
@@ -1246,7 +1260,7 @@
 
                 This._removeElemDisableClassName(el);
 
-            }
+            };
 
         },
 
@@ -1492,7 +1506,7 @@
 
                         }
 
-                    }
+                    };
 
                     this._setDraggableIframeFix();
 
@@ -1540,7 +1554,7 @@
 
                     });
 
-                }
+                };
 
             }
 
@@ -1592,7 +1606,7 @@
 
                                 height:height - This.reHeight
 
-                            })
+                            });
 
                             op.resize.call(This._publicMethods, $target[0]);
 
@@ -1624,7 +1638,7 @@
 
                         }
 
-                    }
+                    };
 
                     $target[dependsFnName.resizable]( $.extend({}, op.resizableOption, this.resizableDefault ) );
 
@@ -1924,7 +1938,7 @@
 
                 This._modalShow(callback);
 
-            }
+            };
 
         },
 
@@ -2030,9 +2044,9 @@
 
             return function(callback){
 
-                This._dialogShow(callback)
+                This._dialogShow(callback);
 
-            }
+            };
 
         },
 
@@ -2118,7 +2132,7 @@
 
                 This._modalHide(callback);
 
-            }
+            };
 
         },
 
@@ -2258,7 +2272,7 @@
 
                 This._dialogHide(callback);
 
-            }
+            };
 
         },
 
@@ -2320,7 +2334,7 @@
 
                 return arr;
 
-            }
+            };
 
             this._setDialogs = function(scope){
 
@@ -2328,7 +2342,7 @@
 
                 _dialogs[scope].push( this );
 
-            }
+            };
 
             this._deletDialogs = function(scope){
 

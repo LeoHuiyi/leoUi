@@ -106,9 +106,9 @@
 
             getScope:'all',//用来取得MoveToTop的leoDialog对象的集合
 
-            okButtonClassName:'.send_submit',//okButton的className的selector
+            okButtonSelector:'.send_submit',//okButton的className的selector
 
-            cancelButtonClassName:'.send_off',//cancelButton的className的selector
+            cancelButtonSelector:'.send_off',//cancelButton的className的selector
 
             restore:false,//是否每次打开dialog还原状态（使用options中的width，height，position设置打开）
 
@@ -431,11 +431,11 @@
 
         _createOkButton:function(){
 
-            var okButtonClassName = this.options.okButtonClassName,
+            var okButtonSelector = this.options.okButtonSelector,
 
             This = this,$ok,element;
 
-            if( okButtonClassName === false || !(element = this.$target.find( okButtonClassName )[0])){return;}
+            if( okButtonSelector === false || !(element = this.$target.find( okButtonSelector )[0])){return;}
 
             if( !this.$ok ){
 
@@ -483,11 +483,11 @@
 
         _createCancelButton:function(){
 
-            var cancelButtonClassName = this.options.cancelButtonClassName,
+            var cancelButtonSelector = this.options.cancelButtonSelector,
 
             This = this,$cancel,element;
 
-            if( cancelButtonClassName === false || !(element = this.$target.find( cancelButtonClassName )[0])){return;}
+            if( cancelButtonSelector === false || !(element = this.$target.find( cancelButtonSelector )[0])){return;}
 
             if( !this.$cancel ){
 
@@ -1714,7 +1714,7 @@
 
             }
 
-            if( key === 'okButtonClassName' ){
+            if( key === 'okButtonSelector' ){
 
                 this._destroyOkButton();
 
@@ -1724,7 +1724,7 @@
 
             }
 
-            if( key === 'cancelButtonClassName' ){
+            if( key === 'cancelButtonSelector' ){
 
                 this._destroyCancelButton();
 

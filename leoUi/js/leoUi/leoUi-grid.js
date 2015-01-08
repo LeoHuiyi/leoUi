@@ -147,6 +147,8 @@
 
             resizeWidth:false,//是否在改变尺寸时调节宽度
 
+            ajaxMegCallback:$.noop,//ajax信息回调
+
             beforeSaveCell:false,//保存之前回调
 
             afterSaveCell:$.noop,//保存后回调
@@ -205,6 +207,8 @@
 
                     This._loading();
 
+                    op.ajaxMegCallback(data, "done");
+
                     This.totalItems = data[ajax.teamsCountKey];
 
                     teamsKey === false ? This.teams = data : This.teams = data[teamsKey];
@@ -231,7 +235,7 @@
 
                 }).fail(function(data){
 
-                    console.log(data.statusText);
+                    op.ajaxMegCallback(data, "fail");
 
                 });
 
@@ -413,6 +417,8 @@
 
                     This._loading();
 
+                    op.ajaxMegCallback(data, 'done');
+
                     console.log(data);
 
                     This.totalItems = data[ajax.teamsCountKey];
@@ -439,7 +445,7 @@
 
                 }).fail(function(data){
 
-                    console.log(data.statusText);
+                    op.ajaxMegCallback(data, "fail");
 
                 });
 
@@ -952,9 +958,9 @@
 
             child,prop,arr = [],tableData = this.tableData[tr.id],
 
-            fnArr = [],This = this,i = 0,dfd,
+            fnArr = [],This = this,i = 0,dfd,op = this.options,
 
-            edit,trIdKey = this.options.trIdKey,data = {};
+            edit,trIdKey = op.trIdKey,data = {};
 
             data[trIdKey] = tableData[trIdKey];
 
@@ -1028,9 +1034,11 @@
 
                 this._loading(true);
 
-                $.when.apply(null,fnArr).done(function(datas){
+                $.when.apply(null,fnArr).done(function(doneData){
 
                     This._loading();
+
+                    op.ajaxMegCallback(doneData, 'done');
 
                     data.teams = arr;
 
@@ -1040,6 +1048,8 @@
 
                     This._loading();
 
+                    op.ajaxMegCallback(data, 'fail');
+
                     typeOptionFailCallBack && typeOptionFailCallBack(failData);
 
                 });
@@ -1048,9 +1058,9 @@
 
         },
 
-        _getEditTypeOption:function(edit, doneCallBack){
+        _getEditTypeOption:function(edit, doneCallBack, failCallBack){
 
-            var dfd,prop;
+            var dfd,prop,This;
 
             if( typeof edit.typeOption === 'function' ){
 
@@ -1058,11 +1068,21 @@
 
                     prop = {};
 
+                    This = this;
+
                     edit.typeOption( dfd = $.Deferred(), prop, 'typeOption' );
 
                     dfd.done(function(data){
 
+                        This.options.ajaxMegCallback(data, 'fail');
+
                         doneCallBack && doneCallBack(prop.typeOption);
+
+                    }).fail(function(data){
+
+                        This.options.ajaxMegCallback(data, 'fail');
+
+                        failCallBack && failCallBack(prop.typeOption);
 
                     });
 
@@ -1140,17 +1160,21 @@
 
                 this._loading(true);
 
-                dfd.done(function(){
+                dfd.done(function(doneData){
 
                     This._loading();
 
-                    typeOptionDoneCallBack && typeOptionDoneCallBack(data);
+                    This.options.ajaxMegCallback(doneData, 'done');
+
+                    typeOptionDoneCallBack && typeOptionDoneCallBack(data, 'done');
 
                 }).fail(function(failData){
 
                     This._loading();
 
-                    typeOptionFailCallBack && typeOptionFailCallBack(failData);
+                    This.options.ajaxMegCallback(data, 'fail');
+
+                    typeOptionFailCallBack && typeOptionFailCallBack(failData, 'fail');
 
                 });
 

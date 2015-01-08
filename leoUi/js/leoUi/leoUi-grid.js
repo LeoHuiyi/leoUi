@@ -81,6 +81,8 @@
 
                 minWidth:10,//最小宽度
 
+                dragMinWidth:10,//拖动最小宽度
+
                 renderCell:null,//为每一个单元格渲染内容
 
                 edit:false,//是否可以编辑
@@ -2275,13 +2277,13 @@
 
             dargLine.thId = thId;
 
-            dargLine.minWidth = this._getTableModel(thId).minWidth;
+            dargLine.dragMinWidth = this._getTableModel(thId).dragMinWidth;
 
             this.$rsLine.css({top:0,left:firstLeft = ( event.pageX - (this.dargLine.startLeft=this.$gridBox.offset().left))}).height(lineHeight).show();
 
             baseLeft = dargLine.baseLeft = firstLeft - dargLine.width;
 
-            dargLine.minLeft = baseLeft + dargLine.minWidth;
+            dargLine.minLeft = baseLeft + dargLine.dragMinWidth;
 
             this._textselect(true);
 

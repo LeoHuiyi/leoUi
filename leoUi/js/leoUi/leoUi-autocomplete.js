@@ -58,7 +58,7 @@
 
                 my: "left bottom",
 
-                at: "left-1 top+1",
+                at: "left top+1",
 
                 collision: "flip",
 

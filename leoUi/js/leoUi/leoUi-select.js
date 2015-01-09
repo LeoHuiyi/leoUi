@@ -71,13 +71,13 @@
 
             showAnimation: function(callBack) {
 
-                this.show( { effect: "blind", duration: "slow", complete: callBack } );
+                this.show( { effect: "blind", duration: 200, complete: callBack } );
 
             },
 
             hideAnimation: function(callBack) {
 
-                this.hide( { effect: "blind", duration: "slow", complete: callBack } );
+                this.hide( { effect: "blind", duration: 200, complete: callBack } );
 
             },
 
@@ -171,9 +171,9 @@
 
             }else{
 
-                this.$select.width(opWidth);
+                this.$select.setOuterWidth(opWidth);
 
-                this.$selectItems.width(opWidth);
+                this.$selectItems.setOuterWidth(opWidth);
 
             }
 
@@ -191,7 +191,7 @@
 
             isVisible = $selectItems.is( ":visible" );
 
-            position = position || this.options.position
+            position = position || this.options.position;
 
             !isVisible && $selectItems.show();
 
@@ -213,7 +213,7 @@
 
             this._on( this.$select, 'click', 'div.leoSelect_tit', function(event){
 
-                event.stopPropagation();
+                event.preventDefault();
 
                 if( This._selectItemsState === 'close' ){
 
@@ -230,6 +230,8 @@
             } );
 
             this._on( this.$selectItems, 'click', 'li', function(event){
+
+                event.preventDefault();
 
                 event.stopPropagation();
 
@@ -250,6 +252,8 @@
             } );
 
             this._on( this.$selectItems, 'mouseenter', 'li', function(event){
+
+                event.preventDefault();
 
                 event.stopPropagation();
 

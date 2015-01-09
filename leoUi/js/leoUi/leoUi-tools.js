@@ -22,7 +22,7 @@
 
 }(function($) {
 
-    var ap = Array.prototype,aslice = ap.slice,expandoId,oproto = Object.prototype,ohasOwn = oproto.hasOwnProperty,jQuery = $,parseCss;
+    var ap = Array.prototype,aslice = ap.slice,expandoId,oproto = Object.prototype,ohasOwn = oproto.hasOwnProperty,parseCss;
 
     $.leoTools = $.leoTools || {};
 
@@ -34,7 +34,7 @@
 
         return function(){
 
-            return uuid++
+            return uuid++;
 
         };
 
@@ -170,7 +170,7 @@
 
         return parseFloat( $.css( element, property ), 10 ) || 0;
 
-    }
+    };
 
     //返回所有滚动的父集合
     $.leoTools.scrollParents = function( $box, all ){
@@ -215,7 +215,7 @@
 
         return i === 0 ? scrollParent.add( doc ) : scrollParent;
 
-    }
+    };
 
     //返回所有滚动的父集合的Top
     $.leoTools.getScrollParentsTop = function(scrollParents){
@@ -242,7 +242,7 @@
 
         }
 
-    }
+    };
 
     //返回所有滚动的父集合的Left
     $.leoTools.getScrollParentsLeft = function(scrollParents){
@@ -269,19 +269,19 @@
 
         }
 
-    }
+    };
 
     $.leoTools.htmlEncode = function(str){
 
         return $('<div/>').text(str).html();
 
-    }
+    };
 
     $.leoTools.htmlDecode = function(str){
 
         return $('<div/>').html(str).text();
 
-    }
+    };
 
     $.leoTools.keyCode = {
 
@@ -351,7 +351,7 @@
 
         return newProto;
 
-    }
+    };
 
     $.leoTools.extend = function( target ) {
 
@@ -399,7 +399,7 @@
 
                         var isMethodCall = typeof options === "string",args = aslice.call( arguments, 1 ),
 
-                        returnValue = instance.$target;
+                        returnValue = instance.$target,methodValue;
 
                         if(isMethodCall){
 
@@ -457,7 +457,7 @@
 
                         }
 
-                    };
+                    }
 
                     function updateInFnMethods(instance, methodArr){
 
@@ -479,7 +479,7 @@
 
                                         return inFn.apply( inFn, arg );
 
-                                    }
+                                    };
 
                                 }( key );
 
@@ -501,7 +501,7 @@
 
                                     return inFn.apply( inFn, arg );
 
-                                }
+                                };
 
                             }( method );
 
@@ -523,7 +523,7 @@
 
                 return returnFn( new $.leoTools.plugIn[name]( options, false, false ) );
 
-            }
+            };
 
 
         }else{
@@ -718,7 +718,7 @@
 
                         return returnValue;
 
-                    };
+                    }
 
                     return returnFn;
 
@@ -770,7 +770,7 @@
 
                             return !!plugIn[eventName] && plugIn[eventName].apply(plugIn, aslice.call( arguments, 1 ) );
 
-                        }
+                        };
 
                     }(this);
 
@@ -822,7 +822,7 @@
 
                                         return plugIn[key].apply( plugIn, arguments );
 
-                                    }
+                                    };
 
                                 }( plugIn, key );
 
@@ -882,7 +882,7 @@
 
                                     }
 
-                                }
+                                };
 
                             }
 
@@ -894,7 +894,7 @@
 
                                 oldFn.apply(this, arguments);
 
-                            }
+                            };
 
                         }
 
@@ -932,7 +932,7 @@
 
                             emptyFn = $.noop;
 
-                            emptyFn.guid = leoUiGuid
+                            emptyFn.guid = leoUiGuid;
 
                             arg[last] = emptyFn;
 
@@ -1226,7 +1226,7 @@
 
                     }
 
-                };
+                }
 
             }
 
@@ -1444,59 +1444,59 @@
 
         },
 
-        leftBorderWidth: function(){
+        leftBorderWidth: function(isMargin){
 
             var element = this[0];
 
-            return parseCss(element, 'borderLeftWidth') + parseCss(element, 'paddingLeft') + parseCss(element, 'marginLeft');
+            return parseCss(element, 'borderLeftWidth') + parseCss(element, 'paddingLeft') + (!!isMargin ? parseCss(element, 'marginLeft') : 0);
 
         },
 
-        rightBorderWidth: function(){
+        rightBorderWidth: function(isMargin){
 
             var element = this[0];
 
-            return parseCss(element, 'borderRightWidth') + parseCss(element, 'paddingRight') + parseCss(element, 'marginRight');
+            return parseCss(element, 'borderRightWidth') + parseCss(element, 'paddingRight') + (!!isMargin ? parseCss(element, 'marginRight') : 0);
 
         },
 
-        topBorderWidth: function(){
+        topBorderWidth: function(isMargin){
 
             var element = this[0];
 
-            return parseCss(element, 'borderTopWidth') + parseCss(element, 'paddingTop') + parseCss(element, 'marginTop');
+            return parseCss(element, 'borderTopWidth') + parseCss(element, 'paddingTop') + (!!isMargin ? parseCss(element, 'marginTop') : 0);
 
         },
 
-        bottomBorderWidth: function(){
+        bottomBorderWidth: function(isMargin){
 
             var element = this[0];
 
-            return parseCss(element, 'borderBottomWidth') + parseCss(element, 'paddingBottom') + parseCss(element, 'marginBottom');
+            return parseCss(element, 'borderBottomWidth') + parseCss(element, 'paddingBottom') + (!!isMargin ? parseCss(element, 'marginBottom') : 0);
 
         },
 
-        borderSize: function(){
+        borderSize: function(isMargin){
 
             return {
 
-                width: this.leftBorderWidth() + this.rightBorderWidth(),
+                width: this.leftBorderWidth(isMargin) + this.rightBorderWidth(isMargin),
 
-                height: this.topBorderWidth() + this.bottomBorderWidth()
+                height: this.topBorderWidth(isMargin) + this.bottomBorderWidth(isMargin)
 
             };
 
         },
 
-        setOuterWidth: function(width){
+        setOuterWidth: function(width, isMargin){
 
-            return this.width(width - this.leftBorderWidth() - this.rightBorderWidth());
+            return this.width(width - this.leftBorderWidth(isMargin) - this.rightBorderWidth(isMargin));
 
         },
 
-        setOuterHeight: function(height){
+        setOuterHeight: function(height, isMargin){
 
-            return this.height(height - this.topBorderWidth() - this.bottomBorderWidth());
+            return this.height(height - this.topBorderWidth(isMargin) - this.bottomBorderWidth(isMargin));
 
         },
 
@@ -1505,23 +1505,23 @@
             return function( delay, fn ){
 
                 return typeof delay === "number" ? this.each(function(){
-                        var elem = this;
+                    var elem = this;
 
-                        setTimeout(function(){
+                    setTimeout(function(){
 
-                            $( elem ).focus();
+                        $( elem ).focus();
 
-                            if ( fn ) {
+                        if ( fn ) {
 
-                                fn.call( elem );
+                            fn.call( elem );
 
-                            }
+                        }
 
-                        }, delay );
+                    }, delay );
 
-                    }) :
+                }) :
 
-                    orig.apply( this, arguments );
+                orig.apply( this, arguments );
 
             };
 

@@ -302,7 +302,7 @@
 
         _setStrPosition:function(){
 
-            var options = this.options,distance = options.distance >> 0,toCenterOffset = $.trim( options.position.toCenterOffset ),percent,percentNum,num,reverseOffset;
+            var options = this.options,distance = +options.distance,toCenterOffset = $.trim( options.position.toCenterOffset ),percent,percentNum,num,reverseOffset;
 
             if( ( percentNum = toCenterOffset.indexOf('%') ) !== -1 ){
 
@@ -316,7 +316,7 @@
 
             }else{
 
-                toCenterOffset = parseInt(toCenterOffset, 10) || 0
+                toCenterOffset = parseInt(toCenterOffset, 10) || 0;
 
                 reverseOffset = -1 * toCenterOffset;
 
@@ -350,13 +350,13 @@
 
                 rightBottom: { my: "left+" + distance + " center", at: "right bottom" + toCenterOffset }
 
-            }
+            };
 
         },
 
         _setPosition:function(){
 
-            var options = this.options,This = this;
+            var options = this.options;
 
             this.position = this._changePosition(options.position);
 
@@ -400,7 +400,7 @@
 
             var arrow = feedback.outerOffsetName,
 
-            arrowHeight = this.options.arrowHeight >> 0,element = feedback.element,
+            arrowHeight = +this.options.arrowHeight,element = feedback.element,
 
             top = element.top,left = element.left,
 

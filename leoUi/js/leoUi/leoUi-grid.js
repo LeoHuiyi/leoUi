@@ -147,6 +147,8 @@
 
             resizeWidth:false,//是否在改变尺寸时调节宽度
 
+            beforeAjaxMegCallback:$.noop,//ajax之前信息回调(init, changePager, getEditRowInfo, getEditTypeOption, getEditCellInfo)
+
             ajaxMegCallback:$.noop,//ajax信息回调
 
             beforeSaveCell:false,//保存之前回调
@@ -185,7 +187,9 @@
 
         _getData:function(pagerInfo){
 
-            var op = this.options,dataType = op.dataType,ajax,This = this,teamsKey;
+            var op = this.options,dataType = op.dataType,ajax,This = this,teamsKey,
+
+            pagerCurrentPage;
 
             if(dataType === 'ajax'){
 
@@ -195,7 +199,23 @@
 
                 if(op.isPage === true){
 
-                    pagerInfo === 'init' ? ajax = this._getSendAjaxPagerInfo( op.currentPage, op.rowNum, true ) : ajax = this._getSendAjaxPagerInfo( pagerInfo.fristItems, pagerInfo.perPages );
+                    if(pagerInfo === 'init'){
+
+                        ajax = this._getSendAjaxPagerInfo( op.currentPage, op.rowNum, true );
+
+                        pagerCurrentPage = op.currentPage;
+
+                        op.beforeAjaxMegCallback('init');
+
+                    }else{
+
+                        ajax = this._getSendAjaxPagerInfo( pagerInfo.fristItems, pagerInfo.perPages );
+
+                        pagerCurrentPage = pagerInfo.currentPage;
+
+                        op.beforeAjaxMegCallback('changePager');
+
+                    }
 
                 }else{
 
@@ -217,7 +237,7 @@
 
                     if(op.isPage === true){
 
-                        This._changePager( This._getPagerInfo( pagerInfo.currentPage ) );
+                        This._changePager( This._getPagerInfo( pagerCurrentPage ) );
 
                     }else{
 
@@ -405,6 +425,8 @@
 
                 this._loading(true);
 
+                op.beforeAjaxMegCallback('init');
+
                 teamsKey = op.ajax.teamsKey;
 
                 this.options.isPage === true ? ajax = this._getSendAjaxPagerInfo( op.currentPage, op.rowNum, true ) : ajax = op.ajax;
@@ -565,7 +587,7 @@
 
             LPageStyle = pagerInfo.isLastPage === true ? 'cursor: default;' : 'cursor: pointer;',
 
-            str = '<div id="'+ leoGrid +'page" class="leoUi-state-default leoUi-jqgrid-pager leoUi-corner-bottom"><div class="leoUi-pager-control" id="'+ leoGrid +'pg_page"><table cellspacing="0" cellpadding="0" border="0" role="row" style="width:100%;table-layout:fixed;height:100%;" class="leoUi-pg-table"><tbody><tr><td align="left" id="'+ leoGrid +'page_left"></td><td align="center" style="white-space: pre; width: 276px;" id="'+ leoGrid +'page_center"><table cellspacing="0" cellpadding="0" border="0" class="leoUi-pg-table" style="table-layout:auto;" id="'+ leoGrid +'page_center_table"><tbody><tr><td class="leoUi-pg-button leoUi-corner-all leoUi-state-disabled" id="'+ leoGrid +'first_page" style="'+fPageStyle+'"><span class="leoUi-icon leoUi-icon-seek-first"></span></td><td class="leoUi-pg-button leoUi-corner-all leoUi-state-disabled" id="'+ leoGrid +'prev_page" style="'+fPageStyle+'"><span class="leoUi-icon leoUi-icon-seek-prev"></span></td><td style="width: 4px; cursor: default;" class="leoUi-pg-button leoUi-state-disabled"><span class="leoUi-separator"></span></td><td><input id="'+ leoGrid +'set_page_input" type="text" role="textbox" value="'+pagerInfo.currentPage+'" maxlength="7" size="2" class="leoUi-pg-input"><span style="margin:0 4px 0 8px">共</span><span id="'+ leoGrid +'sp_1_page">'+pagerInfo.totalpages+'</span><span style="margin:0 4px">页</span></td><td style="width:4px;" class="leoUi-pg-button leoUi-state-disabled"><span class="leoUi-separator"></span></td><td class="leoUi-pg-button leoUi-corner-all leoUi-state-disabled" id="'+ leoGrid +'next_page" style="'+LPageStyle+'"><span class="leoUi-icon leoUi-icon-seek-next"></span></td><td class="leoUi-pg-button leoUi-corner-all leoUi-state-disabled" id="'+ leoGrid +'last_page" style="'+LPageStyle+'"><span class="leoUi-icon leoUi-icon-seek-end"></span></td><td><select  id="'+ leoGrid +'get_perPages_select" class="leoUi-pg-selbox">';
+            str = '<div id="'+ leoGrid +'page" class="leoUi-state-default leoUi-jqgrid-pager leoUi-corner-bottom"><div class="leoUi-pager-control" id="'+ leoGrid +'pg_page"><table cellspacing="0" cellpadding="0" border="0" role="row" style="width:100%;table-layout:fixed;height:100%;" class="leoUi-pg-table"><tbody><tr><td align="left" id="'+ leoGrid +'page_left"></td><td align="center" style="white-space: pre; width: 276px;" id="'+ leoGrid +'page_center"><table cellspacing="0" cellpadding="0" border="0" class="leoUi-pg-table" style="table-layout:auto;" id="'+ leoGrid +'page_center_table"><tbody><tr><td class="leoUi-pg-button leoUi-corner-all leoUi-state-disabled" id="'+ leoGrid +'first_page" style="'+fPageStyle+'"><span class="leoUi-icon leoUi-icon-seek-first"></span></td><td class="leoUi-pg-button leoUi-corner-all leoUi-state-disabled" id="'+ leoGrid +'prev_page" style="'+fPageStyle+'"><span class="leoUi-icon leoUi-icon-seek-prev"></span></td><td style="width: 4px; cursor: default;" class="leoUi-pg-button leoUi-state-disabled"><span class="leoUi-separator"></span></td><td><input id="'+ leoGrid +'set_page_input" type="text" role="textbox" value="'+pagerInfo.currentPage+'" maxlength="7" size="2" class="leoUi-pg-input"><span style="margin:0 4px 0 8px">共</span><span id="'+ leoGrid +'sp_1_page">'+pagerInfo.totalpages+'</span><span style="margin:0 4px">页</span></td><td style="width: 4px; cursor: default;" class="leoUi-pg-button leoUi-state-disabled"><span class="leoUi-separator"></span></td><td class="leoUi-pg-button leoUi-corner-all leoUi-state-disabled" id="'+ leoGrid +'next_page" style="'+LPageStyle+'"><span class="leoUi-icon leoUi-icon-seek-next"></span></td><td class="leoUi-pg-button leoUi-corner-all leoUi-state-disabled" id="'+ leoGrid +'last_page" style="'+LPageStyle+'"><span class="leoUi-icon leoUi-icon-seek-end"></span></td><td><select  id="'+ leoGrid +'get_perPages_select" class="leoUi-pg-selbox">';
 
             pagerInfo = pagerInfo !== 'init' ? (pagerInfo || this._getPagerInfo()) : {};
 
@@ -1034,6 +1056,8 @@
 
                 this._loading(true);
 
+                op.beforeAjaxMegCallback('getEditRowInfo');
+
                 $.when.apply(null,fnArr).done(function(doneData){
 
                     This._loading();
@@ -1045,8 +1069,6 @@
                     typeOptionDoneCallBack && typeOptionDoneCallBack(data);
 
                 }).fail(function(failData){
-
-                    This._loading();
 
                     op.ajaxMegCallback(data, 'fail');
 
@@ -1060,27 +1082,35 @@
 
         _getEditTypeOption:function(edit, doneCallBack, failCallBack){
 
-            var dfd,prop,This;
+            var dfd,prop,op,This;
 
             if( typeof edit.typeOption === 'function' ){
 
                 if( edit.typeOptionFnAsyn === true ){
 
-                    prop = {};
+                    op = this.options;
 
                     This = this;
+
+                    this._loading(true);
+
+                    op.beforeAjaxMegCallback('getEditTypeOption');
+
+                    prop = {};
 
                     edit.typeOption( dfd = $.Deferred(), prop, 'typeOption' );
 
                     dfd.done(function(data){
 
-                        This.options.ajaxMegCallback(data, 'fail');
+                        This._loading();
+
+                        op.ajaxMegCallback(data, 'fail');
 
                         doneCallBack && doneCallBack(prop.typeOption);
 
                     }).fail(function(data){
 
-                        This.options.ajaxMegCallback(data, 'fail');
+                        op.ajaxMegCallback(data, 'fail');
 
                         failCallBack && failCallBack(prop.typeOption);
 
@@ -1160,6 +1190,8 @@
 
                 this._loading(true);
 
+                op.beforeAjaxMegCallback('getEditCellInfo');
+
                 dfd.done(function(doneData){
 
                     This._loading();
@@ -1169,8 +1201,6 @@
                     typeOptionDoneCallBack && typeOptionDoneCallBack(data, 'done');
 
                 }).fail(function(failData){
-
-                    This._loading();
 
                     This.options.ajaxMegCallback(data, 'fail');
 

@@ -172,6 +172,14 @@
 
             },
 
+            maximizeContainment:'window', // Selector: 可拖动元素将被置于由选择器指定的第一个元素的起界限作用的盒模型中。如果没有找到任何元素，则不会设置界限
+
+                                 // Element: 可拖动的元素将包含该元素的边界框。
+
+                                // String:可选值: "document", "window"
+
+                                // Array: 以 [ x1, y1, x2, y2 ] 数组形式定义一个限制区域
+
             initCallBack:$.noop,//dialog组件初始化回调（ this: publicMethods, arguments: target ）
 
             beforeShow:$.noop,//dialog组件显示之前回调（ this: publicMethods, arguments: target ）
@@ -719,9 +727,9 @@
 
             if(!this.resizeMaximize && (!!this.buttons.maximize || !!this.options.titlebarDblclickMax)){
 
-                var $window = this.window,This = this,time;
+                var This = this,time;
 
-                this._on( $window, 'resize.maximize', function(){
+                this._on( this.window, 'resize.maximize', function(){
 
                     !!time && clearTimeout(time);
 
@@ -731,11 +739,11 @@
 
                             This._getBorderWidths();
 
-                            var height,
+                            var height,maximizeContainment = This._getMaximizeContainment(),
 
-                            width = $window.width() - This.borderWidths.left - This.borderWidths.right;
+                            width = maximizeContainment.width - This.borderWidths.left - This.borderWidths.right;
 
-                            !!This.contentHide ? height = 'auto' : height = $window.height() - This.borderWidths.top - This.borderWidths.bottom;
+                            !!This.contentHide ? height = 'auto' : height = maximizeContainment.height - This.borderWidths.top - This.borderWidths.bottom;
 
                             This._setSizes( { width: width, height : height,  top: 0, left: 0 } );
 
@@ -1048,17 +1056,54 @@
 
             this._setSize('cssPosition', 'fixed');
 
-            var $window = this.window,height,
+            var maximizeContainment = this._getMaximizeContainment(),height,
 
-            width = $window.width() - this.borderWidths.left - this.borderWidths.right;
+            width = maximizeContainment.width - this.borderWidths.left - this.borderWidths.right;
 
-            !!this.contentHide ? height = 'auto' : height = $window.height() - this.borderWidths.top - this.borderWidths.bottom;
+            !!this.contentHide ? height = 'auto' : height = maximizeContainment.height - this.borderWidths.top - this.borderWidths.bottom;
 
             this._setSizes( { width: width, height : height, top: 0, left: 0 } );
 
             !!this.buttons.maximize && this._leoDialogRestoreAdd( $( this.buttons.maximize.element ) );
 
             this.options.resize.call(this._publicMethods, this.$target[0]);
+
+        },
+
+        _getMaximizeContainment:function(){
+
+            var maximizeContainment = this.options.maximizeContainment,
+
+            containment = {};
+
+            if($.type(maximizeContainment) === 'array'){
+
+                containment.width = maximizeContainment[2] - maximizeContainment[0];
+
+                containment.height = maximizeContainment[3] - maximizeContainment[1];
+
+
+            }else if( maximizeContainment === 'document' ){
+
+                containment.width = this.document.width();
+
+                containment.height = this.document.height();
+
+            }else if( maximizeContainment === 'window' ){
+
+                containment.width = this.window.width();
+
+                containment.height = this.window.height();
+
+            }else{
+
+                containment.width = $(maximizeContainment).outerWidth();
+
+                containment.height = $(maximizeContainment).outerHeight();
+
+            }
+
+            return containment;
 
         },
 

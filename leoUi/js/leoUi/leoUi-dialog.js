@@ -1501,11 +1501,17 @@
 
         },
 
-        _restore:function(){
+        restore:function(){
+
+            this._restore(true);
+
+        },
+
+        _restore:function(isRestore){
 
             var op = this.options;
 
-            if(this.firstTime === false && op.restore === true){
+            if(this.firstTime === false && op.restore === true || isRestore){
 
                 if(this.isMaximize || this.isMinimize){
 

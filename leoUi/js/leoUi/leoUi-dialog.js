@@ -178,8 +178,6 @@
 
                                 // String:可选值: "document", "window"
 
-                                // Array: 以 [ x1, y1, x2, y2 ] 数组形式定义一个限制区域
-
             initCallBack:$.noop,//dialog组件初始化回调（ this: publicMethods, arguments: target ）
 
             beforeShow:$.noop,//dialog组件显示之前回调（ this: publicMethods, arguments: target ）
@@ -333,6 +331,8 @@
 
             this._changePosition();
 
+            this._saveOriginalPositionOfWidthAndHeight();
+
             this._createDialog();
 
             this._setContent();
@@ -386,6 +386,33 @@
                 position.within = this.document;
 
             }
+
+        },
+
+        _saveOriginalPositionOfWidthAndHeight:function(){
+
+            var $of = $(this.options.position.of);
+
+            this._originalPositionOfWidth = $of.outerWidth();
+
+            this._originalPositionOfHeight = $of.outerHeight();
+
+        },
+
+        resizeDialog:function(){
+
+            var $target = this.$target,
+
+            parseCss = $.leoTools.parseCss;
+
+            $target.css({
+
+                'left': ($target.outerWidth()*parseCss($target[0], 'left'))/this._originalPositionOfWidth,
+
+
+                'top': ($target.outerWidth()*parseCss($target[0], 'top'))/this._originalPositionOfWidth
+
+            });
 
         },
 
@@ -725,7 +752,7 @@
 
         _createWinResizeMax:function(){
 
-            if(!this.resizeMaximize && (!!this.buttons.maximize || !!this.options.titlebarDblclickMax)){
+            if(!this._hasResizeMaximize && (!!this.buttons.maximize || !!this.options.titlebarDblclickMax)){
 
                 var This = this,time;
 
@@ -735,25 +762,41 @@
 
                     time = setTimeout( function(){
 
-                        if( This.isMaximize ){
-
-                            This._getBorderWidths();
-
-                            var height,maximizeContainment = This._getMaximizeContainment(),
-
-                            width = maximizeContainment.width - This.borderWidths.left - This.borderWidths.right;
-
-                            !!This.contentHide ? height = 'auto' : height = maximizeContainment.height - This.borderWidths.top - This.borderWidths.bottom;
-
-                            This._setSizes( { width: width, height : height,  top: 0, left: 0 } );
-
-                        }
+                        This._resizeMaximize();
 
                     }, 100 );
 
                 });
 
-                this.resizeMaximize = true;
+                this._hasResizeMaximize = true;
+
+            }
+
+        },
+
+        resizeMaximize:function(){
+
+            this._resizeMaximize();
+
+        },
+
+        _resizeMaximize:function(setPosition){
+
+            if( this.isMaximize ){
+
+                var height,width,
+
+                maximizeContainment = this._getMaximizeContainment();
+
+                this._getBorderWidths();
+
+                !!setPosition && this._setSize('cssPosition', maximizeContainment.position);
+
+                width = maximizeContainment.width - this.borderWidths.left - this.borderWidths.right;
+
+                !!this.contentHide ? height = 'auto' : height = maximizeContainment.height - this.borderWidths.top - this.borderWidths.bottom;
+
+                this._setSizes( { width: width, height : height,  top: maximizeContainment.top, left: maximizeContainment.left } );
 
             }
 
@@ -761,11 +804,11 @@
 
         _destroyWinResizeMax:function(){
 
-            if(this.resizeMaximize && !this.buttons.maximize && !this.options.titlebarDblclickMax){
+            if(this._hasResizeMaximize && !this.buttons.maximize && !this.options.titlebarDblclickMax){
 
                 this._off( this.window, 'resize.maximize' );
 
-                delete this.resizeMaximize;
+                delete this._hasResizeMaximize;
 
             }
 
@@ -1052,17 +1095,7 @@
 
             this.isMaximize = true;
 
-            this._getBorderWidths();
-
-            this._setSize('cssPosition', 'fixed');
-
-            var maximizeContainment = this._getMaximizeContainment(),height,
-
-            width = maximizeContainment.width - this.borderWidths.left - this.borderWidths.right;
-
-            !!this.contentHide ? height = 'auto' : height = maximizeContainment.height - this.borderWidths.top - this.borderWidths.bottom;
-
-            this._setSizes( { width: width, height : height, top: 0, left: 0 } );
+            this._resizeMaximize(true);
 
             !!this.buttons.maximize && this._leoDialogRestoreAdd( $( this.buttons.maximize.element ) );
 
@@ -1074,20 +1107,19 @@
 
             var maximizeContainment = this.options.maximizeContainment,
 
-            containment = {};
+            containment = {},$maximizeContainment,offset;
 
-            if($.type(maximizeContainment) === 'array'){
-
-                containment.width = maximizeContainment[2] - maximizeContainment[0];
-
-                containment.height = maximizeContainment[3] - maximizeContainment[1];
-
-
-            }else if( maximizeContainment === 'document' ){
+            if( maximizeContainment === 'document' ){
 
                 containment.width = this.document.width();
 
                 containment.height = this.document.height();
+
+                containment.position = 'absolute';
+
+                containment.top = 0;
+
+                containment.left = 0;
 
             }else if( maximizeContainment === 'window' ){
 
@@ -1095,11 +1127,27 @@
 
                 containment.height = this.window.height();
 
+                containment.position = 'fixed';
+
+                containment.top = 0;
+
+                containment.left = 0;
+
             }else{
 
-                containment.width = $(maximizeContainment).outerWidth();
+                $maximizeContainment = $(maximizeContainment);
 
-                containment.height = $(maximizeContainment).outerHeight();
+                offset = $maximizeContainment.offset();
+
+                containment.width = $maximizeContainment.outerWidth();
+
+                containment.height = $maximizeContainment.outerHeight();
+
+                $maximizeContainment.css('position') === 'fixed' ? containment.position = 'fixed' : containment.position = 'absolute';
+
+                containment.top = offset.top;
+
+                containment.left = offset.left;
 
             }
 
@@ -1229,7 +1277,7 @@
 
                 offset:{ top: offset.top, left: offset.left }
 
-            }
+            };
 
         },
 
@@ -2417,7 +2465,7 @@
 
                 }
 
-            }
+            };
 
         }
 

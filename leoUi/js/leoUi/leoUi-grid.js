@@ -411,8 +411,6 @@
 
                 this._setTableWidth();
 
-                This._setFixHeight();
-
                 this._setTableHeight();
 
                 this._tableWidthAuto();
@@ -457,8 +455,6 @@
 
                     This._setTableWidth();
 
-                    This._setFixHeight();
-
                     This._setTableHeight();
 
                     This._tableWidthAuto();
@@ -478,8 +474,6 @@
         changeData:function(url){
 
             !!url && (this.options.ajax.url = url);
-
-            this._setFixHeight();
 
             this._setTableWidth(true);
 
@@ -707,8 +701,6 @@
 
                 this._addEvent();
 
-                this._setFixHeight();
-
                 this._setTableWidth();
 
                 this._tableWidthAuto();
@@ -866,7 +858,7 @@
 
                 tableHeight = this.$gridBox.height();
 
-                this.$uiJqgridBdiv.height( tableHeight - this.difGridBoxHeight );
+                this.$uiJqgridBdiv.height( tableHeight - this._getHdivAndPagerHeight() );
 
             }else if(typeof tableHeight === 'string'){
 
@@ -874,15 +866,15 @@
 
                 tableHeight = this.$gridBox.height();
 
-                this.$uiJqgridBdiv.height( tableHeight - this.difGridBoxHeight );
+                this.$uiJqgridBdiv.height( tableHeight - this._getHdivAndPagerHeight() );
 
             }
 
         },
 
-        _setFixHeight:function(){
+        _getHdivAndPagerHeight:function(){
 
-            this.difGridBoxHeight = this.$gridBox.height() - this.$uiJqgridBdiv.outerHeight();
+            return this.$uiJqgridHdiv.outerHeight() + (this.$pager && this.$pager.outerHeight() || 0);
 
         },
 

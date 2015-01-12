@@ -399,7 +399,7 @@
 
                 this.teams = $.extend( [], op.gridData );
 
-                This.options.isPage === true && (pagerInfo = this._getPagerInfo( op.currentPage, op.rowNum ));
+                op.isPage === true && (pagerInfo = this._getPagerInfo( op.currentPage, op.rowNum ));
 
                 this._createBodyTable(pagerInfo);
 
@@ -419,7 +419,7 @@
 
                 this.$gridBox.css( 'visibility', '' );
 
-                this.options.tableLoadCallback.call( null, this.$bodyTable[0] );
+                op.tableLoadCallback.call( null, this.$bodyTable[0] );
 
             }else if( op.dataType === 'ajax' ){
 
@@ -447,7 +447,7 @@
 
                     teamsKey === false ? This.teams = data : This.teams = data[teamsKey];
 
-                    This.options.isPage === true && ( pagerInfo = This._getPagerInfo( op.currentPage, op.rowNum ) );
+                    op.isPage === true && ( pagerInfo = This._getPagerInfo( op.currentPage, op.rowNum ) );
 
                     This._createBodyTable(pagerInfo);
 
@@ -463,7 +463,7 @@
 
                     This._tableWidthAuto();
 
-                    This.options.tableLoadCallback.call( null, this.$bodyTable );
+                    op.tableLoadCallback.call( null, This.$bodyTable[0] );
 
                 }).fail(function(data){
 
@@ -478,6 +478,10 @@
         changeData:function(url){
 
             !!url && (this.options.ajax.url = url);
+
+            this._setFixHeight();
+
+            this._setTableWidth(true);
 
             this._getData('init');
 
@@ -531,6 +535,8 @@
 
             this.$lastPage.css( 'cursor', LPageStyle );
 
+            this.$allPage.text(pagerInfo.totalpages);
+
             if( typeof rowLength === 'number' ){
 
                 lastItems = pagerInfo.fristItems + rowLength;
@@ -548,8 +554,6 @@
                 }
 
             }else{
-
-                this.$allPage.text(pagerInfo.totalpages);
 
                 this.$prevPage.css( 'cursor', fPageStyle );
 
@@ -1134,7 +1138,9 @@
 
             if(!td){return;}
 
-            var This = this,thid = $(td).attr('thid'),trIdKey = this.options.trIdKey,
+            var This = this,thid = $(td).attr('thid'),op = this.options,
+
+            trIdKey = op.trIdKey,
 
             tableData = this.tableData[td.parentNode.id],data = { thid: thid },
 
@@ -1196,13 +1202,13 @@
 
                     This._loading();
 
-                    This.options.ajaxMegCallback(doneData, 'done');
+                    op.ajaxMegCallback(doneData, 'done');
 
                     typeOptionDoneCallBack && typeOptionDoneCallBack(data, 'done');
 
                 }).fail(function(failData){
 
-                    This.options.ajaxMegCallback(data, 'fail');
+                    op.ajaxMegCallback(data, 'fail');
 
                     typeOptionFailCallBack && typeOptionFailCallBack(failData, 'fail');
 

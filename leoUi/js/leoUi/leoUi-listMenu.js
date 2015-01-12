@@ -82,7 +82,7 @@
 
             showAnimation: function(callBack) {
 
-                this.show( { effect: "blind", duration: "slow", complete: callBack} );
+                this.show( { effect: "blind", duration: 200, complete: callBack} );
 
                 // this.show();
 
@@ -92,7 +92,7 @@
 
             hideAnimation: function(callBack) {
 
-                this.hide( { effect: "blind", duration: "slow", complete: callBack} );
+                this.hide( { effect: "blind", duration: 200, complete: callBack} );
 
                 // this.hide();
 

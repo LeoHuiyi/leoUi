@@ -125,6 +125,8 @@
 
             rowDataKeys:false,
 
+            isFooter:true,
+
             cellEdit:false,//是否可编辑单元格
 
             minRow:0,//至少一条数据
@@ -162,6 +164,8 @@
             setTableWidthCallback:$.noop,//设置表格的宽度默认与父级宽高
 
             tableLoadCallback:$.noop,//table完成后回调
+
+            clickTrCallback:$.noop,//点击bodyTableTR回调
 
             clickTdCallback:$.noop//点击bodyTableTD回调
 
@@ -227,21 +231,27 @@
 
                     This._loading();
 
+                    console.log(data);
+
                     op.ajaxMegCallback(data, "done");
 
-                    This.totalItems = data[ajax.teamsCountKey];
-
-                    teamsKey === false ? This.teams = data : This.teams = data[teamsKey];
+                    teamsKey === false ? This.teamsData = data : This.teamsData = data[teamsKey];
 
                     This._clearTableData();
 
                     if(op.isPage === true){
 
-                        This._changePager( This._getPagerInfo( pagerCurrentPage ) );
+                        This.totalItems = data[ajax.teamsCountKey];
+
+                        This._changePager( This._getPagerInfo( pagerCurrentPage) );
 
                     }else{
 
+                        This.totalItems = data[ajax.teamsCountKey] || This.teamsData.length;
+
                         This._bodyTableAppendContent();
+
+                        This._changeRightInfo();
 
                         This._setTableHeight(true);
 
@@ -253,6 +263,8 @@
 
                     This._restoreSortClass();
 
+                    op.tableLoadCallback( This.$bodyTable[0] );
+
                 }).fail(function(data){
 
                     op.ajaxMegCallback(data, "fail");
@@ -260,6 +272,16 @@
                 });
 
             }else if(dataType === 'data'){
+
+                if(pagerInfo === 'init'){
+
+                    this.totalItems = op.gridData.length;
+
+                    this.teamsData = op.gridData;
+
+                    op.isPage === true && (pagerInfo = this._getPagerInfo( op.currentPage, op.rowNum ));
+
+                }
 
                 this._clearTableData();
 
@@ -271,6 +293,8 @@
 
                     this._bodyTableAppendContent();
 
+                    this._changeRightInfo();
+
                     this._setTableHeight(true);
 
                     this._resizeTableWidth();
@@ -281,21 +305,23 @@
 
                 this._restoreSortClass();
 
+                op.tableLoadCallback( This.$bodyTable[0] );
+
             }
 
         },
 
         _getPagerInfo:function( page, perPages, totalItems ){
 
-            var op = this.options,index,currentPage,last,totalpages,oldCurrentPage;
+            var op = this.options,index,currentPage,
 
-            totalItems = + totalItems || + this.totalItems || (this.teams && this.teams.length) || 0;
+            last,totalpages,oldCurrentPage,
 
-            perPages = + perPages || + this.perPages || + op.rowNum;
+            isAjax = this.options.dataType === 'ajax';
 
-            perPages < 1 && ( perPages = 1 );
+            totalItems = $.isNumeric(+totalItems) ? +totalItems : +this.totalItems;
 
-            this.perPages = perPages;
+            this.perPages = perPages = perPages >> 0 || this.perPages >> 0 || op.rowNum >> 0;
 
             totalpages = Math.ceil( totalItems/perPages );
 
@@ -353,7 +379,7 @@
 
             }
 
-            this.currentPage =  currentPage;
+            page !== 'now' && (this.currentPage =  currentPage);
 
             index = perPages * ( currentPage - 1 );
 
@@ -365,7 +391,7 @@
 
             return{
 
-                isChange: oldCurrentPage !== currentPage,
+                isChange: isAjax ? true : oldCurrentPage !== currentPage,
 
                 totalItems: totalItems,
 
@@ -373,13 +399,13 @@
 
                 length: last + 1 - index,
 
-                currentPage: currentPage,
+                currentPage: this.currentPage,
 
                 totalpages: totalpages,
 
-                isFristPage: currentPage === 1,
+                isFristPage: isAjax ? false : currentPage === 1,
 
-                isLastPage: currentPage === totalpages,
+                isLastPage: isAjax ? false : currentPage === totalpages,
 
                 fristItems: index,
 
@@ -389,97 +415,19 @@
 
         },
 
-        _initData:function(){
-
-            var op = this.options,pagerInfo,This = this,teamsKey,ajax;
-
-            if( op.dataType === 'data' ){
-
-                this.totalItems = op.gridData.length;
-
-                this.teams = $.extend( [], op.gridData );
-
-                op.isPage === true && (pagerInfo = this._getPagerInfo( op.currentPage, op.rowNum ));
-
-                this._createBodyTable(pagerInfo);
-
-                this._initPager(pagerInfo);
-
-                this._addEvent();
-
-                this.$target.empty().append( this.$gridBox );
-
-                this._setTableWidth();
-
-                this._setTableHeight();
-
-                this._tableWidthAuto();
-
-                this.$gridBox.css( 'visibility', '' );
-
-                op.tableLoadCallback.call( null, this.$bodyTable[0] );
-
-            }else if( op.dataType === 'ajax' ){
-
-                this._loading(true);
-
-                op.beforeAjaxMegCallback('init');
-
-                teamsKey = op.ajax.teamsKey;
-
-                this.options.isPage === true ? ajax = this._getSendAjaxPagerInfo( op.currentPage, op.rowNum, true ) : ajax = op.ajax;
-
-                this.$target.empty().append( this.$gridBox );
-
-                this.$gridBox.css( 'visibility', '' );
-
-                $.ajax(ajax).done(function(data){
-
-                    This._loading();
-
-                    op.ajaxMegCallback(data, 'done');
-
-                    console.log(data);
-
-                    This.totalItems = data[ajax.teamsCountKey];
-
-                    teamsKey === false ? This.teams = data : This.teams = data[teamsKey];
-
-                    op.isPage === true && ( pagerInfo = This._getPagerInfo( op.currentPage, op.rowNum ) );
-
-                    This._createBodyTable(pagerInfo);
-
-                    This._initPager(pagerInfo);
-
-                    This._addEvent();
-
-                    This._setTableWidth();
-
-                    This._setTableHeight();
-
-                    This._tableWidthAuto();
-
-                    op.tableLoadCallback.call( null, This.$bodyTable[0] );
-
-                }).fail(function(data){
-
-                    op.ajaxMegCallback(data, "fail");
-
-                });
-
-            }
-
-        },
-
         changeData:function(url){
 
             !!url && (this.options.ajax.url = url);
 
+            this.$gridBox.show();
+
             this._setTableWidth(true);
 
-            this._getData('init');
+            this._setTableHeight(true);
 
-            this.$gridBox.show();
+            this._tableWidthAuto();
+
+            this._getData('init');
 
         },
 
@@ -507,13 +455,13 @@
 
         },
 
-        _changePager:function( pagerInfo, notAddBodyTable, rowLength ){
+        _changePager:function( pagerInfo, notAddBodyTable ){
 
             if(this.options.isPage === false){return;}
 
-            var fPageStyle,LPageStyle,lastItems,oldCurrentPage;
+            var fPageStyle,LPageStyle;
 
-            rowLength === 0 && ( oldCurrentPage = this.currentPage );
+            this.$pager.show();
 
             !pagerInfo && ( pagerInfo = this._getPagerInfo( 'now' ) );
 
@@ -531,41 +479,11 @@
 
             this.$allPage.text(pagerInfo.totalpages);
 
-            if( typeof rowLength === 'number' ){
+            this.$prevPage.css( 'cursor', fPageStyle );
 
-                lastItems = pagerInfo.fristItems + rowLength;
+            this.$setPageInput.val(pagerInfo.currentPage);
 
-                if( rowLength === 0 ){
-
-                    this.$pageRightInfo.text('无数据显示');
-
-                    this.currentPage = oldCurrentPage;
-
-                }else{
-
-                    this.$pageRightInfo.html((pagerInfo.fristItems+1)+' - '+lastItems+'&nbsp;&nbsp;共'+pagerInfo.totalItems+'条');
-
-                }
-
-            }else{
-
-                this.$prevPage.css( 'cursor', fPageStyle );
-
-                this.$setPageInput.val(pagerInfo.currentPage);
-
-                if(pagerInfo.length === 0){
-
-                    this.$pageRightInfo.text('无数据显示');
-
-                }else{
-
-                    lastItems = pagerInfo.lastItems + 1;
-
-                    this.$pageRightInfo.html((pagerInfo.fristItems+1)+' - '+lastItems+'&nbsp;&nbsp;共'+pagerInfo.totalItems+'条');
-
-                }
-
-            }
+            this._changeRightInfo(pagerInfo.fristItems+1);
 
             this._setTableHeight(true);
 
@@ -573,51 +491,117 @@
 
         },
 
-        _initPager:function( pagerInfo, isHide ){
+        _initPager:function(){
 
             if(this.options.isPage === false){return;}
 
-            var rowList = this.options.rowList,i = 0,length = rowList.length,child,
+            var rowList = this.options.rowList,i = 0,
 
-            perPages = pagerInfo.perPages,leoGrid = this.leoGrid,
+            length = rowList.length,child,centerStr,
 
-            fPageStyle = pagerInfo.isFristPage === true ? 'cursor: default;' : 'cursor: pointer;',
+            $pageCenter = this.$pageCenter,fPageStyle,LPageStyle,
 
-            LPageStyle = pagerInfo.isLastPage === true ? 'cursor: default;' : 'cursor: pointer;',
+            perPages = this.options.rowNum,leoGrid = this.leoGrid;
 
-            str = '<div id="'+ leoGrid +'page" class="leoUi-state-default leoUi-jqgrid-pager leoUi-corner-bottom"><div class="leoUi-pager-control" id="'+ leoGrid +'pg_page"><table cellspacing="0" cellpadding="0" border="0" role="row" style="width:100%;table-layout:fixed;height:100%;" class="leoUi-pg-table"><tbody><tr><td align="left" id="'+ leoGrid +'page_left"></td><td align="center" style="white-space: pre; width: 276px;" id="'+ leoGrid +'page_center"><table cellspacing="0" cellpadding="0" border="0" class="leoUi-pg-table" style="table-layout:auto;" id="'+ leoGrid +'page_center_table"><tbody><tr><td class="leoUi-pg-button leoUi-corner-all leoUi-state-disabled" id="'+ leoGrid +'first_page" style="'+fPageStyle+'"><span class="leoUi-icon leoUi-icon-seek-first"></span></td><td class="leoUi-pg-button leoUi-corner-all leoUi-state-disabled" id="'+ leoGrid +'prev_page" style="'+fPageStyle+'"><span class="leoUi-icon leoUi-icon-seek-prev"></span></td><td style="width: 4px; cursor: default;" class="leoUi-pg-button leoUi-state-disabled"><span class="leoUi-separator"></span></td><td><input id="'+ leoGrid +'set_page_input" type="text" role="textbox" value="'+pagerInfo.currentPage+'" maxlength="7" size="2" class="leoUi-pg-input"><span style="margin:0 4px 0 8px">共</span><span id="'+ leoGrid +'sp_1_page">'+pagerInfo.totalpages+'</span><span style="margin:0 4px">页</span></td><td style="width: 4px; cursor: default;" class="leoUi-pg-button leoUi-state-disabled"><span class="leoUi-separator"></span></td><td class="leoUi-pg-button leoUi-corner-all leoUi-state-disabled" id="'+ leoGrid +'next_page" style="'+LPageStyle+'"><span class="leoUi-icon leoUi-icon-seek-next"></span></td><td class="leoUi-pg-button leoUi-corner-all leoUi-state-disabled" id="'+ leoGrid +'last_page" style="'+LPageStyle+'"><span class="leoUi-icon leoUi-icon-seek-end"></span></td><td><select  id="'+ leoGrid +'get_perPages_select" class="leoUi-pg-selbox">';
+            LPageStyle = fPageStyle = 'cursor: default;';
 
-            pagerInfo = pagerInfo !== 'init' ? (pagerInfo || this._getPagerInfo()) : {};
+            centerStr = '<table cellspacing="0" cellpadding="0" border="0" class="leoUi-pg-table" style="table-layout:auto;" id="'+ leoGrid +'page_center_table"><tbody><tr><td class="leoUi-pg-button leoUi-corner-all leoUi-state-disabled" id="'+ leoGrid +'first_page" style="'+fPageStyle+'"><span class="leoUi-icon leoUi-icon-seek-first"></span></td><td class="leoUi-pg-button leoUi-corner-all leoUi-state-disabled" id="'+ leoGrid +'prev_page" style="'+fPageStyle+'"><span class="leoUi-icon leoUi-icon-seek-prev"></span></td><td style="width: 4px; cursor: default;" class="leoUi-pg-button leoUi-state-disabled"><span class="leoUi-separator"></span></td><td><input id="'+ leoGrid +'set_page_input" type="text" role="textbox" value="1" maxlength="7" size="2" class="leoUi-pg-input"><span style="margin:0 4px 0 8px">共</span><span id="'+ leoGrid +'sp_1_page">0</span><span style="margin:0 4px">页</span></td><td style="width: 4px; cursor: default;" class="leoUi-pg-button leoUi-state-disabled"><span class="leoUi-separator"></span></td><td class="leoUi-pg-button leoUi-corner-all leoUi-state-disabled" id="'+ leoGrid +'next_page" style="'+LPageStyle+'"><span class="leoUi-icon leoUi-icon-seek-next"></span></td><td class="leoUi-pg-button leoUi-corner-all leoUi-state-disabled" id="'+ leoGrid +'last_page" style="'+LPageStyle+'"><span class="leoUi-icon leoUi-icon-seek-end"></span></td><td><select  id="'+ leoGrid +'get_perPages_select" class="leoUi-pg-selbox">';
 
             for( ; i < length; i++ ){
 
                 child = rowList[i];
 
-                child === perPages ? str += '<option selected="selected" value="'+child+'">'+child+'</option>' : str += '<option value="'+child+'">'+child+'</option>';
+                child === perPages ? centerStr += '<option selected="selected" value="'+child+'">'+child+'</option>' : centerStr += '<option value="'+child+'">'+child+'</option>';
 
             }
 
-            pagerInfo.length === 0 ? str += '</select></td></tr></tbody></table></td><td align="right" id="'+ leoGrid +'page_right"><div id="'+ leoGrid +'page_right_info" class="leoUi-paging-info" style="text-align:right">无数据显示</div></td></tr></tbody></table></div></div>' : str += '</select></td></tr></tbody></table></td><td align="right" id="'+ leoGrid +'page_right"><div id="'+ leoGrid +'page_right_info" class="leoUi-paging-info" style="text-align:right">'+(pagerInfo.fristItems+1)+' - '+(pagerInfo.lastItems+1)+'&nbsp;&nbsp;共'+pagerInfo.totalItems+'条</div></td></tr></tbody></table></div></div>';
+            centerStr += '</select></td></tr></tbody></table>';
 
-            this.$pager = $(str);
+            this.$pager = $(centerStr).hide().appendTo($pageCenter);
 
-            this.$firstPage = this.$pager.find('#' + leoGrid + 'first_page');
+            this.$firstPage = $pageCenter.find('#' + leoGrid + 'first_page');
 
-            this.$prevPage = this.$pager.find('#' + leoGrid + 'prev_page');
+            this.$prevPage = $pageCenter.find('#' + leoGrid + 'prev_page');
 
-            this.$nextPage = this.$pager.find('#' + leoGrid + 'next_page');
+            this.$nextPage = $pageCenter.find('#' + leoGrid + 'next_page');
 
-            this.$lastPage = this.$pager.find('#' + leoGrid + 'last_page');
+            this.$lastPage = $pageCenter.find('#' + leoGrid + 'last_page');
 
-            this.$allPage = this.$pager.find('#' + leoGrid + 'sp_1_page');
+            this.$allPage = $pageCenter.find('#' + leoGrid + 'sp_1_page');
 
-            this.$pageRightInfo = this.$pager.find('#' + leoGrid + 'page_right_info');
-
-            this.$setPageInput = this.$pager.find('#' + leoGrid + 'set_page_input');
+            this.$setPageInput = $pageCenter.find('#' + leoGrid + 'set_page_input');
 
             this._initPagerEvent();
 
-            this.$pager.appendTo(this.$gviewGrid);
+        },
+
+        _initRightInfo:function(){
+
+            if(this.options.isFooter === false){
+
+                return;
+
+            }
+
+            this.$pageRightInfo = $('<div id="'+ this.leoGrid +'page_right_info" class="leoUi-paging-info" style="text-align:right">无数据显示</div>').appendTo(this.$pageRight);
+
+        },
+
+        _changeRightInfo:function(fristItems){
+
+            if(this.options.isFooter === false){
+
+                return;
+
+            }
+
+            var totalItems = (+this.totalItems) + (+this.nullItemsLen),
+
+            lastItems,pagerLen = this.$bodyTable[0].rows.length - 1;
+
+            fristItems = $.isNumeric(+fristItems) ? +fristItems : 1;
+
+            if(totalItems === 0){
+
+                this.$pageRightInfo.text('无数据显示');
+
+            }else{
+
+                lastItems = fristItems + pagerLen - 1;
+
+                pagerLen === 0 && (fristItems = 0);
+
+                this.$pageRightInfo.html(fristItems + ' - ' + lastItems + '&nbsp;&nbsp;共' + totalItems + '条');
+
+            }
+
+        },
+
+        _createFooter:function(){
+
+            if(this.options.isFooter === false){
+
+                this.options.isPage = false;
+
+                return;
+
+            }
+
+            var leoGrid = this.leoGrid;
+
+            this.$footer = $('<div id="'+ leoGrid +'page" class="leoUi-state-default leoUi-jqgrid-pager leoUi-corner-bottom"><div class="leoUi-pager-control" id="'+ leoGrid +'pg_page"><table cellspacing="0" cellpadding="0" border="0" role="row" style="width:100%;table-layout:fixed;height:100%;" class="leoUi-pg-table"><tbody><tr><td align="left" id="'+ leoGrid +'page_left"></td><td align="center" style="white-space: pre; width: 276px;" id="'+ leoGrid +'page_center"></td><td align="right" id="'+ leoGrid +'page_right"></td></td></tr></tbody></table></div></div>');
+
+            this.$pageLeft = this.$footer.find('#' + leoGrid + 'page_left');
+
+            this.$pageCenter= this.$footer.find('#' + leoGrid + 'page_center');
+
+            this.$pageRight = this.$footer.find('#' + leoGrid + 'page_right');
+
+            this._initPager();
+
+            this._initRightInfo();
+
+            this.$footer.appendTo(this.$gviewGrid);
 
         },
 
@@ -625,7 +609,7 @@
 
             var This = this,leoGrid = this.leoGrid;
 
-            this._on( this.$pager.find('#' + leoGrid + 'page_center_table'), 'click', 'td', function(event){
+            this._on( this.$footer.find('#' + leoGrid + 'page_center_table'), 'click', 'td', function(event){
 
                 event.preventDefault();
 
@@ -649,7 +633,7 @@
 
             } );
 
-            this._on( this.$pager.find('#' + leoGrid + 'get_perPages_select'), 'change', function(event){
+            this._on( this.$footer.find('#' + leoGrid + 'get_perPages_select'), 'change', function(event){
 
                 event.preventDefault();
 
@@ -677,6 +661,8 @@
 
             this.leoGridTrId = 0;
 
+            this.totalItems = 0;
+
             this.$gviewGrid = this.$gridBox.find('#' + leoGrid + 'gview_grid');
 
             this.$uiJqgridHdiv = this.$gviewGrid.find('div.leoUi-jqgrid-hdiv');
@@ -691,25 +677,29 @@
 
             this._createSortTb();
 
+            this._createBodyTable('init');
+
+            this._createFooter();
+
+            this.$target.empty().append( this.$gridBox );
+
+            this._addEvent();
+
+            this._setTableWidth();
+
+            this._setTableHeight();
+
+            this._tableWidthAuto();
+
             if(this.options.onlyInit){
-
-                this._createBodyTable('init');
-
-                this._initPager('init');
-
-                this.$target.empty().append( this.$gridBox );
-
-                this._addEvent();
-
-                this._setTableWidth();
-
-                this._tableWidthAuto();
 
                 this.$gridBox.hide().css( 'visibility', '' );
 
             }else{
 
-                this._initData();
+                this.$gridBox.css( 'visibility', '' );
+
+                this._getData('init');
 
             }
 
@@ -739,7 +729,7 @@
 
         _setTableWidth:function(isRiseze){
 
-            if( this.options.resizeWidth === false && isRiseze === true ){ return; }
+            if( this.options.resizeWidth === false && isRiseze === true || this.$target.is(':hidden') ){ return; }
 
             var tableWidth = this.options.width;
 
@@ -757,7 +747,7 @@
 
                 this.$uiJqgridBdiv.width(tableWidth);
 
-                !!this.$pager && this.$pager.width(tableWidth);
+                !!this.$footer && this.$footer.width(tableWidth);
 
                 this.tableOption.boxWidth = tableWidth;
 
@@ -773,7 +763,7 @@
 
                 this.$uiJqgridBdiv.width(tableWidth);
 
-                !!this.$pager && this.$pager.width(tableWidth);
+                !!this.$footer && this.$footer.width(tableWidth);
 
             }
 
@@ -793,7 +783,7 @@
 
                 this.$uiJqgridBdiv.width(tableWidth);
 
-                !!this.$pager && this.$pager.width(tableWidth);
+                !!this.$footer && this.$footer.width(tableWidth);
 
                 this.tableOption.boxWidth = tableWidth;
 
@@ -811,7 +801,7 @@
 
                 this.$uiJqgridBdiv.width(tableWidth);
 
-                !!this.$pager && this.$pager.width(tableWidth);
+                !!this.$footer && this.$footer.width(tableWidth);
 
                 flag = true;
             }
@@ -822,7 +812,7 @@
 
                 tableHeight = this.$gridBox.height();
 
-                this.$uiJqgridBdiv.height( tableHeight - this.difGridBoxHeight );
+                this.$uiJqgridBdiv.height( tableHeight - this._getHdivAndPagerHeight() );
 
                 flag = true;
 
@@ -832,7 +822,7 @@
 
                 tableHeight = this.$gridBox.height();
 
-                this.$uiJqgridBdiv.height( tableHeight - this.difGridBoxHeight );
+                this.$uiJqgridBdiv.height( tableHeight - this._getHdivAndPagerHeight() );
 
                 flag = true;
 
@@ -844,7 +834,7 @@
 
         _setTableHeight:function(isRiseze){
 
-            if( this.options.resizeHeight === false && isRiseze === true ){ return; }
+            if( this.options.resizeHeight === false && isRiseze === true || this.$target.is(':hidden')){ return; }
 
             var tableHeight = this.options.height;
 
@@ -874,7 +864,7 @@
 
         _getHdivAndPagerHeight:function(){
 
-            return this.$uiJqgridHdiv.outerHeight() + (this.$pager && this.$pager.outerHeight() || 0);
+            return this.$uiJqgridHdiv.outerHeight() + (this.$footer && this.$footer.outerHeight() || 0);
 
         },
 
@@ -916,11 +906,25 @@
 
                 this._removeSelectAllRowArr();
 
-                this._changePager( false, true, this.$bodyTable[0].rows.length - 1 );
+                this._refreshPager();
 
                 this._boxIsAllCheck();
 
                 this._refreshEvenClass();
+
+            }
+
+        },
+
+        _refreshPager:function(){
+
+            if(this.options.isPage === false){
+
+                this._changeRightInfo(1);
+
+            }else{
+
+                this._changePager( false, true );
 
             }
 
@@ -1218,23 +1222,31 @@
 
         removeRow:function(tr){
 
-            $(tr).remove();
+            var tableData;
 
-            this.totalItems--;
+            if(tr.id && (tableData = this.tableData[tr.id])){
 
-            this._changePager( false, true, this.$bodyTable[0].rows.length - 1 );
+                $(tr).remove();
 
-            this._removeSelectRowArr(tr);
+                !tableData._nullItem ? this.totalItems-- : this.nullItemsLen--;
 
-            this._removeSelectRowtableData(tr);
+                this._refreshPager();
 
-            this._refreshEvenClass();
+                this._removeSelectRowArr(tr);
 
-            this._boxIsAllCheck();
+                this._removeSelectRowtableData(tr);
+
+                this._refreshEvenClass();
+
+                this._boxIsAllCheck();
+
+            }
 
         },
 
         _resizeTableWidth:function( first, firstTableWidth ){
+
+            if(this.$target.is(':hidden')){return;}
 
             var tableOption = this.tableOption,resizeGetWidth,
 
@@ -1426,7 +1438,7 @@
 
             this._on( this.$bodyTable, 'click', 'tr', function(event){
 
-                !!This._boxCheck && This._boxCheck(this);
+                This.options.clickTrCallback.call( this, event, this, This._publicEvent, This.$bodyTable[0] ) !== false && !!This._boxCheck && This._boxCheck(this);
 
             } );
 
@@ -1949,7 +1961,7 @@
 
             this.totalItems = totalItems + length;
 
-            this._changePager( false, true, rowLength );
+            this._refreshPager();
 
             this._boxIsAllCheck();
 
@@ -2435,11 +2447,11 @@
 
         _bodyTableTbodyStr:function( pagerInfo ){
 
-            if( !this.teams ){ return ''; }
+            if( !this.teamsData ){ return ''; }
 
-            var opModel = this.tableOption.tableModel,index,op = this.options,
+            var opModel = this.tableOption.tableModel,op = this.options,
 
-            i,length,teams = this.teams,
+            i = 0,length,teams,index,
 
             str = '<tbody>' + this._tableTbodyFirstTrStr( opModel, opModel.length );
 
@@ -2447,35 +2459,33 @@
 
                 pagerInfo = pagerInfo || this._getPagerInfo();
 
-                index = i = pagerInfo.fristItems;
-
-                length = pagerInfo.lastItems + 1;
+                index = pagerInfo.fristItems;
 
                 if( op.dataType === 'ajax' ){
 
                     i = 0;
 
-                    length = pagerInfo.length;
+                    teams = this.teamsData.slice();
+
+                }else{
+
+                    teams = this.teamsData.slice(pagerInfo.fristItems, pagerInfo.lastItems + 1);
 
                 }
 
-                teams = this.createEmptyArray(length, teams);
+                teams = this.teams = this.createEmptyArray(teams);
 
                 length = teams.length;
 
                 for ( ; i < length; i++ ) {
 
-                    str += this._tableTbodyTrStr( teams[i], opModel, index );
-
-                    index++;
+                    str += this._tableTbodyTrStr( teams[i], opModel, index++ );
 
                 }
 
             }else{
 
-                length = teams.length || this.totalItems;
-
-                teams = this.createEmptyArray(length, teams);
+                teams = this.teams = this.createEmptyArray(this.teamsData.slice());
 
                 length = teams.length;
 
@@ -2491,17 +2501,21 @@
 
         },
 
-        createEmptyArray:function(length, teams){
+        createEmptyArray:function(teams){
 
             var minLength,op = this.options,minRow = op.minRow,
 
-            tableModel = op.tableModel,i,obj;
+            tableModel = op.tableModel,i,obj,
+
+            length = teams.length;
+
+            this.nullItemsLen = 0;
 
             if((minLength = minRow - length) > 0 && tableModel){
 
                 i = tableModel.length;
 
-                obj = {};
+                obj = {_nullItem:true};
 
                 obj[op.trIdKey] = op.defaulTrId;
 
@@ -2514,6 +2528,8 @@
                 while(minLength--){
 
                     teams.push($.extend({}, obj));
+
+                    this.nullItemsLen++;
 
                 }
 
@@ -2631,17 +2647,25 @@
 
             var str = '',i = 0,length = gridJsonTh.length,th,op = this.options,
 
-            trId = gridJsonTr && gridJsonTr[op.trIdKey],tableDatas = this.tableData,
+            trId = gridJsonTr && gridJsonTr[op.trIdKey],
 
-            evenClass = op.evenClass,leoGrid = this.leoGrid,tableData,rowDatas,
+            tableDatas = this.tableData,
 
-            id = leoGrid + this.leoGridTrId++,rowDataKeys = op.rowDataKeys,value;
+            evenClass = op.evenClass,
+
+            leoGrid = this.leoGrid,tableData,rowDatas,
+
+            id = leoGrid + this.leoGridTrId++,
+
+            rowDataKeys = op.rowDataKeys,value;
 
             typeof evenClass !== 'string' ? str = '<tr id="' + id + '" class="leoUi-widget-content jqgrow leoUi-row-ltr" tabindex="-1" ' : trIndex % 2 === 1 ? str = '<tr id="' + id + '" class="leoUi-widget-content jqgrow leoUi-row-ltr ' + evenClass + '" tabindex="-1" ' : str = '<tr id="' + id + '" class="leoUi-widget-content jqgrow leoUi-row-ltr" tabindex="-1"';
 
             str += '>';
 
             tableData = tableDatas[id] = {};
+
+            tableData._nullItem = gridJsonTr._nullItem;
 
             rowDatas = tableData.rowDatas = {};
 

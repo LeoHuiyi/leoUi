@@ -750,8 +750,6 @@
 
             $.extend(PlugIn.prototype, {
 
-                constructor: PlugIn,
-
                 _create:function(){
 
                     var target = this.$target[0];

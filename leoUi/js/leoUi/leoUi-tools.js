@@ -391,140 +391,107 @@
 
             $[name] = function(options){
 
-                function returnFn( instance ){
+                var args = aslice.call( arguments, 1 ),
 
-                    function inFn( options ){
-
-                        if(!instance){return;}
-
-                        var isMethodCall = typeof options === "string",args = aslice.call( arguments, 1 ),
-
-                        returnValue = instance.$target,methodValue;
-
-                        if(isMethodCall){
-
-                            if ( options === "instance" ) {
-
-                                return instance;
-
-                            }
-
-                            if ( !instance ) {
-
-                                return false;
-
-                            }
-
-                            if ( !$.isFunction( instance[options] ) || options.charAt( 0 ) === "_" ) {
-
-                                return false;
-
-                            }
-
-                            methodValue = instance[ options ].apply( instance, args );
-
-                            if(options === 'destroy'){
-
-                                deleteObj(instance);
-
-                                instance = null;
-
-                                return false;
-
-                            }
-
-                            if ( methodValue !== instance && methodValue !== undefined ) {
-
-                                returnValue = methodValue && methodValue.jquery ? returnValue.pushStack( methodValue.get() ) : methodValue;
-
-                            }
-
-                        }
-
-                        return returnValue;
-
-                    }
-
-                    function deleteObj(obj){
-
-                        if(obj){
-
-                            for(var prop in obj){
-
-                                obj[prop] = null;
-
-                            }
-
-                        }
-
-                    }
-
-                    function updateInFnMethods(instance, methodArr){
-
-                        deleteObj(inFn);
-
-                        var key,i = methodArr.length,method;
-
-                        for ( key in instance ) {
-
-                            if ( $.isFunction( instance[key] ) && key.charAt( 0 ) !== "_" && key !== 'constructor' ) {
-
-                                inFn[key] = function(key){
-
-                                    return function(){
-
-                                        var arg = aslice.call(arguments);
-
-                                        arg.unshift(key);
-
-                                        return inFn.apply( inFn, arg );
-
-                                    };
-
-                                }( key );
-
-                            }
-
-                        }
-
-                        while(i--){
-
-                            method = methodArr[i];
-
-                            inFn[method] = function(method){
-
-                                return function(){
-
-                                    var arg = aslice.call(arguments);
-
-                                    arg.unshift(method);
-
-                                    return inFn.apply( inFn, arg );
-
-                                };
-
-                            }( method );
-
-                        }
-
-                    }
-
-                    updateInFnMethods(instance, ['instance']);
-
-                    instance.__updateInFnMethods = updateInFnMethods;
-
-                    return inFn;
-
-                }
-
-                var args = aslice.call( arguments, 1 );
+                instance, returnObj = {},prop;
 
                 options = args.length ? $.leoTools.extend.apply( null, [ options ].concat(args) ) : options;
 
-                return returnFn( new $.leoTools.plugIn[name]( options, false, false ) );
+                instance = new $.leoTools.plugIn[name]( options, false, false );
+
+                function deleteObj(obj){
+
+                    if(obj){
+
+                        for(var prop in obj){
+
+                            delete obj[prop];
+
+                        }
+
+                    }
+
+                }
+
+                function setReturnObjMethods(prop, instance, returnObj){
+
+                    returnObj[prop] = (function(key, instance, returnObj){
+
+                            var retunFn;
+
+                            if(key === 'destroy'){
+
+                                returnFn = function(){
+
+                                    instance[key].apply( instance, arguments );
+
+                                    deleteObj(instance);
+
+                                    deleteObj(returnObj);
+
+                                    returnObj = null;
+
+                                    instance = null;
+
+                                };
+
+                            }else if(key === 'instance'){
+
+                                returnFn = function(){
+
+                                    return instance;
+
+                                };
+
+                            }else{
+
+                                returnFn = function(){
+
+                                    if(!instance){
+
+                                        return;
+
+                                    }
+
+                                    var returnValue = instance[key].apply( instance, arguments );
+
+                                    if(returnValue !== undefined){
+
+                                        return returnValue;
+
+                                    }else{
+
+                                        return returnObj;
+
+                                    }
+
+                                };
+
+                            }
+
+                            return returnFn;
+
+                        }(prop, instance, returnObj));
+
+                }
+
+                for(prop in instance){
+
+                    if ( $.isFunction( instance[prop] ) && prop.charAt( 0 ) !== "_" && prop !== 'constructor' ) {
+
+                        setReturnObjMethods(prop, instance, returnObj);
+
+                    }
+
+                }
+
+                setReturnObjMethods("instance", instance, returnObj);
+
+                instance = null;
+
+                return returnObj;
 
             };
-
 
         }else{
 
@@ -760,81 +727,7 @@
 
                     this.dataId !== false && $.data( target, this.dataId, this );
 
-                    this._publicEvent = function(plugIn){
-
-                        return function(eventName){
-
-                            if(typeof eventName !== 'string' || eventName.charAt( 0 ) === "_"){ return; }
-
-                            return !!plugIn[eventName] && plugIn[eventName].apply(plugIn, aslice.call( arguments, 1 ) );
-
-                        };
-
-                    }(this);
-
-                    !!this._updatePublicMethods && this._updatePublicMethods();
-
                     this._init();
-
-                },
-
-                _deletePublicEventObj:function(){
-
-                    var _publicMethods = this._publicMethods,prop;
-
-                    if(_publicMethods){
-
-                        for(prop in _publicMethods){
-
-                            if(Object.prototype.hasOwnProperty.call(_publicMethods, prop)){
-
-                                _publicMethods[prop] = null;
-
-                            }
-
-                        }
-
-                        this._publicMethods = null;
-
-                    }
-
-                    return this;
-
-                },
-
-                _updatePublicMethods:function(){
-
-                    this._deletePublicEventObj();
-
-                    this._publicMethods = function(plugIn){
-
-                        var _publicMethods = {},key;
-
-                        for ( key in plugIn ) {
-
-                            if ( $.isFunction( plugIn[key] ) && key.charAt( 0 ) !== "_" && key !== 'constructor' ) {
-
-                                _publicMethods[key] = function( plugIn, key ){
-
-                                    return function(){
-
-                                        return plugIn[key].apply( plugIn, arguments );
-
-                                    };
-
-                                }( plugIn, key );
-
-                            }
-
-                        }
-
-                        return _publicMethods;
-
-                    }(this);
-
-                    !!this.__updateInFnMethods && this.__updateInFnMethods(this, ['instance']);
-
-                    return this;
 
                 },
 

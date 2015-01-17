@@ -417,7 +417,7 @@
 
                     returnObj[prop] = (function(key, instance, returnObj){
 
-                            var retunFn;
+                            var returnFn;
 
                             if(key === 'destroy'){
 
@@ -1141,19 +1141,7 @@
 
                         if( key.charAt( 0 ) !== "_" ){
 
-                            fn[key] = function( PlugInPrototype, method ){
-
-                                return function(){
-
-                                    var args = aslice.call(arguments);
-
-                                    args.push(fn);
-
-                                    return method.apply( PlugInPrototype, args );
-
-                                }
-
-                            }( plugInPrototype, method );
+                            setKeyFn(key, fn, plugInPrototype, method);
 
                         }else{
 
@@ -1164,6 +1152,24 @@
                     }
 
                 }
+
+            }
+
+            function setKeyFn(key, fn, plugInPrototype, method){
+
+                fn[key] = function( PlugInPrototype, method ){
+
+                    return function(){
+
+                        var args = aslice.call(arguments);
+
+                        args.push(fn);
+
+                        return method.apply( PlugInPrototype, args );
+
+                    }
+
+                }( plugInPrototype, method );
 
             }
 
@@ -1187,7 +1193,7 @@
 
         }
 
-    }
+    };
 
     $.fn.extend({
 

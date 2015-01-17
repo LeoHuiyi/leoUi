@@ -1438,13 +1438,13 @@
 
             this._on( this.$bodyTable, 'click', 'tr', function(event){
 
-                This.options.clickTrCallback.call( this, event, this, This._publicEvent, This.$bodyTable[0] ) !== false && !!This._boxCheck && This._boxCheck(this);
+                This.options.clickTrCallback.call( this, event, this, This.$bodyTable[0] ) !== false && !!This._boxCheck && This._boxCheck(this);
 
             } );
 
             this._on( this.$bodyTable, 'click', 'td', function(event){
 
-                This.options.clickTdCallback.call( this, event, this, This._publicEvent, This.$bodyTable[0] );
+                This.options.clickTdCallback.call( this, event, this, This.$bodyTable[0] );
 
                 This.cellEdit(this);
 

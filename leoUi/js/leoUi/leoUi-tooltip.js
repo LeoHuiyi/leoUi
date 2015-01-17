@@ -100,7 +100,7 @@
 
             },//tooltip关闭的回调，可自定义动画等，在显示完毕必须调用callBack（this: $target, arguments: callBack, publicEvent）
 
-            beforeShow:$.noop//dialog组件显示之前回调（ this: publicMethods, arguments: target ）
+            beforeShow:$.noop//dialog组件显示之前回调（arguments: target ）
 
         },
 
@@ -520,7 +520,7 @@
 
             if( this.options.disabled ){ return; }
 
-            this.options.beforeShow.call( this._publicMethods, this.$target[0] );
+            this.options.beforeShow( this.$target[0] );
 
             this.tooltipPosition();
 

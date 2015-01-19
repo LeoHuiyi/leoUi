@@ -693,6 +693,8 @@
 
             });
 
+            plugInPrototype.superClass = inheritPrototype;
+
         }else{
 
             function PlugIn( hash, target, dataId ){

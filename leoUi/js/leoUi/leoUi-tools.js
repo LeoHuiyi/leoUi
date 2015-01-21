@@ -6,8 +6,7 @@
 * @author     leo
 +-------------------------------------------------------------------
 */
-;
-(function(factory) {
+;(function(factory) {
 
     if (typeof define === "function" && define.amd) {
 
@@ -154,7 +153,7 @@
         // return shuffled;
 
         return aslice.call(obj, 0).sort(function() {
-            return Math.random() - 0.5
+            return Math.random() - 0.5;
         });
 
     };

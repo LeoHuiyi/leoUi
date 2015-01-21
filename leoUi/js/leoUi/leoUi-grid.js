@@ -683,6 +683,8 @@
 
             this.totalItems = 0;
 
+            this.nullItemsLen = 0;
+
             this.$gviewGrid = this.$gridBox.find('#' + leoGrid + 'gview_grid');
 
             this.$uiJqgridHdiv = this.$gviewGrid.find('div.leoUi-jqgrid-hdiv');
@@ -1434,9 +1436,9 @@
 
                 time = setTimeout( function(){
 
-                    This._setTableWidth(true);
-
                     This._setTableHeight(true);
+
+                    This._setTableWidth(true);
 
                     This._resizeTableWidth();
 
@@ -2534,8 +2536,6 @@
             tableModel = op.tableModel,i,obj,
 
             length = teams.length;
-
-            this.nullItemsLen = 0;
 
             if((minLength = minRow - length) > 0 && tableModel){
 

@@ -821,15 +821,9 @@
 
     },{
 
-        escapeRegex: function( value ) {
-
-            return value.replace( /[\-\[\]{}()*+?.,\\\^$|#\s]/g, "\\$&" );
-
-        },
-
         filter: function( array, term ) {
 
-            var matcher = new RegExp( $.fn.leoAutocomplete.escapeRegex( term ), "i" );
+            var matcher = new RegExp( $.leoTools.escapeRegex( term ), "i" );
 
             return $.grep( array, function( value ) {
 

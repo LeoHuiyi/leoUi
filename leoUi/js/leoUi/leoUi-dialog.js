@@ -784,13 +784,13 @@
 
             if( this.isMaximize ){
 
-                var height,width,
-
-                maximizeContainment = this._getMaximizeContainment();
+                var height,width,maximizeContainment;
 
                 this._getBorderWidths();
 
-                !!setPosition && this._setSize('cssPosition', maximizeContainment.position);
+                !!setPosition && this._setSize('cssPosition', this._getMaximizeContainment(true));
+
+                maximizeContainment = this._getMaximizeContainment();
 
                 width = maximizeContainment.width - this.borderWidths.left - this.borderWidths.right;
 
@@ -1103,13 +1103,19 @@
 
         },
 
-        _getMaximizeContainment:function(){
+        _getMaximizeContainment:function(onlyPosition){
 
             var maximizeContainment = this.options.maximizeContainment,
 
             containment = {},$maximizeContainment,offset;
 
             if( maximizeContainment === 'document' ){
+
+                if(onlyPosition){
+
+                    return 'absolute';
+
+                }
 
                 containment.width = this.document.width();
 
@@ -1123,6 +1129,12 @@
 
             }else if( maximizeContainment === 'window' ){
 
+                if(onlyPosition){
+
+                    return 'fixed';
+
+                }
+
                 containment.width = this.window.width();
 
                 containment.height = this.window.height();
@@ -1134,6 +1146,12 @@
                 containment.left = 0;
 
             }else{
+
+                if(onlyPosition){
+
+                    return $(maximizeContainment).css('position') === 'fixed' ? 'fixed' : 'absolute';
+
+                }
 
                 $maximizeContainment = $(maximizeContainment);
 
@@ -1375,11 +1393,9 @@
 
             var $content = this.$content.empty().append(this.options.contentHtml),
 
-            $iframe = $content.find('iframe'),This,iframeLoadCallBack;
+            $iframe = $content.find('iframe'),iframeLoadCallBack;
 
             if( $iframe[0] ){
-
-                This = this;
 
                 iframeLoadCallBack = this.options.iframeLoadCallBack;
 

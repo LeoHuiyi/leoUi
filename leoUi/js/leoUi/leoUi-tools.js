@@ -6,7 +6,8 @@
 * @author     leo
 +-------------------------------------------------------------------
 */
-;(function(factory) {
+;
+(function(factory) {
 
     if (typeof define === "function" && define.amd) {
 
@@ -22,17 +23,21 @@
 
 }(function($) {
 
-    var ap = Array.prototype,aslice = ap.slice,expandoId,oproto = Object.prototype,ohasOwn = oproto.hasOwnProperty,parseCss;
+    var ap = Array.prototype,
+        aslice = ap.slice,
+        expandoId, oproto = Object.prototype,
+        ohasOwn = oproto.hasOwnProperty,
+        parseCss;
 
     $.leoTools = $.leoTools || {};
 
     $.leoTools.version = '1.0.0';
 
-    $.leoTools.getUuid = (function(){
+    $.leoTools.getUuid = (function() {
 
         var uuid = 0;
 
-        return function(){
+        return function() {
 
             return uuid++;
 
@@ -42,7 +47,7 @@
 
     $.leoTools.getId = function(name) {
 
-        return "Leo"  + (name === undefined ? '_' : '_' + name+'_') + Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+        return "Leo" + (name === undefined ? '_' : '_' + name + '_') + Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
 
     };
 
@@ -59,32 +64,32 @@
     };
 
     // 返回min<=mun<=max
-    $.leoTools.range = function( mun, min, max ) {
+    $.leoTools.range = function(mun, min, max) {
 
-        if( max === 'max' && min === 'min' ){
+        if (max === 'max' && min === 'min') {
 
             return mun;
 
-        }else if( max === 'max' ){
+        } else if (max === 'max') {
 
             return mun > min ? mun : min;
 
-        }else if ( min === 'min' ){
+        } else if (min === 'min') {
 
             return mun < max ? mun : max;
 
-        }else{
+        } else {
 
-            return ( mun > min ? mun : min ) < max ? ( mun > min ? mun : min ) : max;
+            return (mun > min ? mun : min) < max ? (mun > min ? mun : min) : max;
 
         }
 
     };
 
     // 返回随机数
-    $.leoTools.random = function( min, max ) {
+    $.leoTools.random = function(min, max) {
 
-        if ( max === undefined ) {
+        if (max === undefined) {
 
             max = min;
 
@@ -92,7 +97,7 @@
 
         }
 
-        return min + Math.floor( Math.random() * ( max - min + 1 ) );
+        return min + Math.floor(Math.random() * (max - min + 1));
 
     };
 
@@ -105,7 +110,8 @@
 
         var keys = [];
 
-        for (var key in obj) if (ohasOwn(obj, key)) keys.push(key);
+        for (var key in obj)
+            if (ohasOwn(obj, key)) keys.push(key);
 
         return keys;
 
@@ -147,7 +153,9 @@
 
         // return shuffled;
 
-        return aslice.call(obj, 0).sort(function(){ return Math.random() - 0.5});
+        return aslice.call(obj, 0).sort(function() {
+            return Math.random() - 0.5
+        });
 
     };
 
@@ -156,7 +164,7 @@
 
         if (n == null || guard) {
 
-        if (obj.length !== +obj.length) obj = $.leoTools.values(obj);
+            if (obj.length !== +obj.length) obj = $.leoTools.values(obj);
 
             return obj[$.leoTools.random(obj.length - 1)];
 
@@ -166,20 +174,22 @@
 
     };
 
-    parseCss = $.leoTools.parseCss = function( element, property ) {
+    parseCss = $.leoTools.parseCss = function(element, property) {
 
-        return parseFloat( $.css( element, property ), 10 ) || 0;
+        return parseFloat($.css(element, property), 10) || 0;
 
     };
 
     //返回所有滚动的父集合
-    $.leoTools.scrollParents = function( $box, all ){
+    $.leoTools.scrollParents = function($box, all) {
 
-        var scrollParent,i = 0,position = $box.css( "position" ),
+        var scrollParent, i = 0,
+            position = $box.css("position"),
 
-        excludeStaticParent = position === "absolute",doc =  $box[ 0 ].ownerDocument || document;
+            excludeStaticParent = position === "absolute",
+            doc = $box[0].ownerDocument || document;
 
-        if( ( /fixed/ ).test( position ) && !all ){
+        if ((/fixed/).test(position) && !all) {
 
             return 'boxFixed';
 
@@ -187,25 +197,26 @@
 
             scrollParent = $box.parents().filter(function() {
 
-                var parent = $( this ),flag;
+                var parent = $(this),
+                    flag;
 
-                if ( excludeStaticParent && parent.css( "position" ) === "static" ) {
+                if (excludeStaticParent && parent.css("position") === "static") {
 
                     return false;
 
                 }
 
-                if( !all ){
+                if (!all) {
 
-                    ( i > 0 ) ? flag = false : flag = ( /(auto|scroll)/ ).test( parent.css( "overflow" ) + parent.css( "overflow-y" ) + parent.css( "overflow-x" ) );
+                    (i > 0) ? flag = false: flag = (/(auto|scroll)/).test(parent.css("overflow") + parent.css("overflow-y") + parent.css("overflow-x"));
 
-                    ( /fixed/ ).test( $.css( this, "position" ) ) && ( i++ );
+                    (/fixed/).test($.css(this, "position")) && (i++);
 
                     return flag;
 
-                }else{
+                } else {
 
-                    return ( /(auto|scroll)/ ).test( parent.css( "overflow" ) + parent.css( "overflow-y" ) + parent.css( "overflow-x" ) );
+                    return (/(auto|scroll)/).test(parent.css("overflow") + parent.css("overflow-y") + parent.css("overflow-x"));
 
                 }
 
@@ -213,28 +224,29 @@
 
         }
 
-        return i === 0 ? scrollParent.add( doc ) : scrollParent;
+        return i === 0 ? scrollParent.add(doc) : scrollParent;
 
     };
 
     //返回所有滚动的父集合的Top
-    $.leoTools.getScrollParentsTop = function(scrollParents){
+    $.leoTools.getScrollParentsTop = function(scrollParents) {
 
-        var top = 0,i = scrollParents.length;
+        var top = 0,
+            i = scrollParents.length;
 
-        if( scrollParents === 'boxFixed' || i===0 ){
+        if (scrollParents === 'boxFixed' || i === 0) {
 
             return top;
 
-        }else if( i === 1 ){
+        } else if (i === 1) {
 
-            return $( scrollParents[0] ).scrollTop();
+            return $(scrollParents[0]).scrollTop();
 
-        }else{
+        } else {
 
-            while(i--){
+            while (i--) {
 
-                top = top + $( scrollParents[i] ).scrollTop();
+                top = top + $(scrollParents[i]).scrollTop();
 
             }
 
@@ -245,23 +257,24 @@
     };
 
     //返回所有滚动的父集合的Left
-    $.leoTools.getScrollParentsLeft = function(scrollParents){
+    $.leoTools.getScrollParentsLeft = function(scrollParents) {
 
-        var left = 0,i = scrollParents.length;
+        var left = 0,
+            i = scrollParents.length;
 
-        if( scrollParents === 'boxFixed' || i === 0){
+        if (scrollParents === 'boxFixed' || i === 0) {
 
             return left;
 
-        }else if(i === 1){
+        } else if (i === 1) {
 
-            return $( scrollParents[0] ).scrollLeft();
+            return $(scrollParents[0]).scrollLeft();
 
-        }else{
+        } else {
 
-            while(i--){
+            while (i--) {
 
-                left = left + $( scrollParents[i] ).scrollLeft();
+                left = left + $(scrollParents[i]).scrollLeft();
 
             }
 
@@ -271,13 +284,13 @@
 
     };
 
-    $.leoTools.htmlEncode = function(str){
+    $.leoTools.htmlEncode = function(str) {
 
         return $('<div/>').text(str).html();
 
     };
 
-    $.leoTools.htmlDecode = function(str){
+    $.leoTools.htmlDecode = function(str) {
 
         return $('<div/>').html(str).text();
 
@@ -319,13 +332,13 @@
 
     };
 
-    $.leoTools.ie = !!/msie [\w.]+/.exec( navigator.userAgent.toLowerCase() );
+    $.leoTools.ie = !!/msie [\w.]+/.exec(navigator.userAgent.toLowerCase());
 
     $.leoTools.isSupport__proto__ = ({}).__proto__ == Object.prototype;
 
-    $.leoTools.clone = function(obj){
+    $.leoTools.clone = function(obj) {
 
-        var newObj,noop = function(){};
+        var newObj, noop = function() {};
 
         if (Object.create) {
 
@@ -353,25 +366,28 @@
 
     };
 
-    $.leoTools.extend = function( target ) {
+    $.leoTools.extend = function(target) {
 
-        var input = aslice.call( arguments, 1 ),inputIndex = 0,inputLength = input.length,key,value;
+        var input = aslice.call(arguments, 1),
+            inputIndex = 0,
+            inputLength = input.length,
+            key, value;
 
-        for ( ; inputIndex < inputLength; inputIndex++ ) {
+        for (; inputIndex < inputLength; inputIndex++) {
 
-            for ( key in input[ inputIndex ] ) {
+            for (key in input[inputIndex]) {
 
-                value = input[ inputIndex ][ key ];
+                value = input[inputIndex][key];
 
-                if ( input[ inputIndex ].hasOwnProperty( key ) && value !== undefined ) {
+                if (input[inputIndex].hasOwnProperty(key) && value !== undefined) {
 
-                    if ( $.isPlainObject( value ) ) {
+                    if ($.isPlainObject(value)) {
 
-                        target[ key ] = $.isPlainObject( target[ key ] ) ? $.leoTools.extend( {}, target[ key ], value ) : $.leoTools.extend( {}, value );
+                        target[key] = $.isPlainObject(target[key]) ? $.leoTools.extend({}, target[key], value) : $.leoTools.extend({}, value);
 
                     } else {
 
-                        target[ key ] = value;
+                        target[key] = value;
 
                     }
 
@@ -385,25 +401,26 @@
 
     };
 
-    $.leoTools.bridge = function( name, isFn ) {
+    $.leoTools.bridge = function(name, isFn) {
 
-        if(!isFn){
+        if (!isFn) {
 
-            $[name] = function(options){
+            $[name] = function(options) {
 
-                var args = aslice.call( arguments, 1 ),
+                var args = aslice.call(arguments, 1),
 
-                instance, returnObj = {},prop;
+                    instance, returnObj = {},
+                    prop;
 
-                options = args.length ? $.leoTools.extend.apply( null, [ options ].concat(args) ) : options;
+                options = args.length ? $.leoTools.extend.apply(null, [options].concat(args)) : options;
 
-                instance = new $.leoTools.plugIn[name]( options, false, false );
+                instance = new $.leoTools.plugIn[name](options, false, false);
 
-                function deleteObj(obj){
+                function deleteObj(obj) {
 
-                    if(obj){
+                    if (obj) {
 
-                        for(var prop in obj){
+                        for (var prop in obj) {
 
                             delete obj[prop];
 
@@ -413,71 +430,71 @@
 
                 }
 
-                function setReturnObjMethods(prop, instance, returnObj){
+                function setReturnObjMethods(prop, instance, returnObj) {
 
-                    returnObj[prop] = (function(key, instance, returnObj){
+                    returnObj[prop] = (function(key, instance, returnObj) {
 
-                            var returnFn;
+                        var returnFn;
 
-                            if(key === 'destroy'){
+                        if (key === 'destroy') {
 
-                                returnFn = function(){
+                            returnFn = function() {
 
-                                    instance[key].apply( instance, arguments );
+                                instance[key].apply(instance, arguments);
 
-                                    deleteObj(instance);
+                                deleteObj(instance);
 
-                                    deleteObj(returnObj);
+                                deleteObj(returnObj);
 
-                                    returnObj = null;
+                                returnObj = null;
 
-                                    instance = null;
+                                instance = null;
 
-                                };
+                            };
 
-                            }else if(key === 'instance'){
+                        } else if (key === 'instance') {
 
-                                returnFn = function(){
+                            returnFn = function() {
 
-                                    return instance;
+                                return instance;
 
-                                };
+                            };
 
-                            }else{
+                        } else {
 
-                                returnFn = function(){
+                            returnFn = function() {
 
-                                    if(!instance){
+                                if (!instance) {
 
-                                        return;
+                                    return;
 
-                                    }
+                                }
 
-                                    var returnValue = instance[key].apply( instance, arguments );
+                                var returnValue = instance[key].apply(instance, arguments);
 
-                                    if(returnValue !== undefined){
+                                if (returnValue !== undefined) {
 
-                                        return returnValue;
+                                    return returnValue;
 
-                                    }else{
+                                } else {
 
-                                        return returnObj;
+                                    return returnObj;
 
-                                    }
+                                }
 
-                                };
+                            };
 
-                            }
+                        }
 
-                            return returnFn;
+                        return returnFn;
 
-                        }(prop, instance, returnObj));
+                    }(prop, instance, returnObj));
 
                 }
 
-                for(prop in instance){
+                for (prop in instance) {
 
-                    if ( $.isFunction( instance[prop] ) && prop.charAt( 0 ) !== "_" && prop !== 'constructor' ) {
+                    if ($.isFunction(instance[prop]) && prop.charAt(0) !== "_" && prop !== 'constructor') {
 
                         setReturnObjMethods(prop, instance, returnObj);
 
@@ -493,23 +510,25 @@
 
             };
 
-        }else{
+        } else {
 
-            var fullName = $.leoTools.getExpando( name + '_dataId' );
+            var fullName = $.leoTools.getExpando(name + '_dataId');
 
-            $.fn[ name ] = function( options ) {
+            $.fn[name] = function(options) {
 
-                var isMethodCall = typeof options === "string",args = aslice.call( arguments, 1 ),returnValue = this;
+                var isMethodCall = typeof options === "string",
+                    args = aslice.call(arguments, 1),
+                    returnValue = this;
 
-                options = !isMethodCall && args.length ? $.leoTools.extend.apply( null, [ options ].concat(args) ) : options;
+                options = !isMethodCall && args.length ? $.leoTools.extend.apply(null, [options].concat(args)) : options;
 
-                if ( isMethodCall ) {
+                if (isMethodCall) {
 
                     this.each(function() {
 
-                        var methodValue,instance = $.data( this, fullName );
+                        var methodValue, instance = $.data(this, fullName);
 
-                        if ( options === "instance" ) {
+                        if (options === "instance") {
 
                             returnValue = instance;
 
@@ -517,23 +536,23 @@
 
                         }
 
-                        if ( !instance ) {
+                        if (!instance) {
 
                             return false;
 
                         }
 
-                        if ( !$.isFunction( instance[options] ) || options.charAt( 0 ) === "_" ) {
+                        if (!$.isFunction(instance[options]) || options.charAt(0) === "_") {
 
                             return false;
 
                         }
 
-                        methodValue = instance[ options ].apply( instance, args );
+                        methodValue = instance[options].apply(instance, args);
 
-                        if ( methodValue !== instance && methodValue !== undefined ) {
+                        if (methodValue !== instance && methodValue !== undefined) {
 
-                            returnValue = methodValue && methodValue.jquery ? returnValue.pushStack( methodValue.get() ) : methodValue;
+                            returnValue = methodValue && methodValue.jquery ? returnValue.pushStack(methodValue.get()) : methodValue;
 
                             return false;
 
@@ -545,13 +564,13 @@
 
                     this.each(function() {
 
-                        var instance = $.data( this, fullName );
+                        var instance = $.data(this, fullName);
 
-                        if ( instance ) {
+                        if (instance) {
 
-                            instance.option( options || {} );
+                            instance.option(options || {});
 
-                            if ( instance._init ) {
+                            if (instance._init) {
 
                                 instance._init();
 
@@ -559,7 +578,7 @@
 
                         } else {
 
-                            new $.leoTools.plugIn[name]( options, this, fullName );
+                            new $.leoTools.plugIn[name](options, this, fullName);
 
                         }
 
@@ -575,51 +594,56 @@
 
     };
 
-    $.leoTools.plugIn = function( options, methods ){
+    $.leoTools.plugIn = function(options, methods) {
 
         var plugInDefaults = {
 
-            name:'leoUi',
+                name: 'leoUi',
 
-            version:'1.0',
+                version: '1.0',
 
-            defaultsTarget:false,
+                defaultsTarget: false,
 
-            disableClassName:false,
+                disableClassName: false,
 
-            inherit:false,
+                inherit: false,
 
-            addJquery:false,
+                addJquery: false,
 
-            addJqueryFn:true,
+                addJqueryFn: true,
 
-            defaults: {
+                defaults: {
 
-                disabledEvent:false
+                    disabledEvent: false
+
+                },
+
+                _init: $.noop,
+
+                _destroy: $.noop,
+
+                _setOption: $.noop
 
             },
+            li = $.extend(true, {}, plugInDefaults, options),
+            inherit,
 
-            _init: $.noop,
+            inheritPrototype, plugInPrototype, PlugInBasePrototypeKeys,
 
-            _destroy: $.noop,
+            leoToolsFn = $.leoTools,
+            leoPlugIn;
 
-            _setOption :$.noop
-
-        },li = $.extend( true, {}, plugInDefaults, options ),inherit,
-
-        inheritPrototype,plugInPrototype,PlugInBasePrototypeKeys,
-
-        leoToolsFn = $.leoTools,leoPlugIn;
-
-        if( typeof li.name !== 'string' ){ return; }
+        if (typeof li.name !== 'string') {
+            return;
+        }
 
         leoPlugIn = leoToolsFn.plugIn;
 
-        if( !!leoPlugIn[li.inherit] && $.isFunction( inherit = leoPlugIn[li.inherit] ) ){
+        if (!!leoPlugIn[li.inherit] && $.isFunction(inherit = leoPlugIn[li.inherit])) {
 
-            function PlugIn( hash, target, dataId ){
+            function PlugIn(hash, target, dataId) {
 
-                inherit.apply( this, arguments );
+                inherit.apply(this, arguments);
 
             }
 
@@ -627,57 +651,59 @@
 
             inheritPrototype = inherit.prototype;
 
-            if( leoToolsFn.isSupport__proto__ ){
+            if (leoToolsFn.isSupport__proto__) {
 
                 plugInPrototype = PlugIn.prototype;
 
                 plugInPrototype.__proto__ = inheritPrototype;
 
-            }else{
+            } else {
 
-                plugInPrototype = PlugIn.prototype = leoToolsFn.createPrototype( inheritPrototype, PlugIn );
+                plugInPrototype = PlugIn.prototype = leoToolsFn.createPrototype(inheritPrototype, PlugIn);
 
             }
 
-            li.defaults = leoToolsFn.extend( {}, leoPlugIn[li.inherit]['prototype']['defaults'], li.defaults );
+            li.defaults = leoToolsFn.extend({}, leoPlugIn[li.inherit]['prototype']['defaults'], li.defaults);
 
-            $.extend( plugInPrototype, li );
+            $.extend(plugInPrototype, li);
 
-            $.each( plugInPrototype, function( prop, value ) {
+            $.each(plugInPrototype, function(prop, value) {
 
-                if ( !$.isFunction( value ) || !!PlugInBasePrototypeKeys[prop] || !inheritPrototype[prop] || !li[prop] ){
+                if (!$.isFunction(value) || !!PlugInBasePrototypeKeys[prop] || !inheritPrototype[prop] || !li[prop]) {
 
                     return;
 
                 }
 
-                plugInPrototype[prop] = (function(){
+                plugInPrototype[prop] = (function() {
 
-                    var _super = function(){
+                    var _super = function() {
 
-                        return inheritPrototype[prop].apply( this, arguments );
+                            return inheritPrototype[prop].apply(this, arguments);
 
-                    },
+                        },
 
-                    _superApply = function( args ){
+                        _superApply = function(args) {
 
-                        return inheritPrototype[prop].apply( this, args );
+                            return inheritPrototype[prop].apply(this, args);
 
-                    };
+                        };
 
                     returnFn['_super'] = _super;
 
                     returnFn['_superApply'] = _superApply;
 
-                    function returnFn(){
+                    function returnFn() {
 
-                        var __super = this._super, __superApply = this._superApply,returnValue;
+                        var __super = this._super,
+                            __superApply = this._superApply,
+                            returnValue;
 
                         this._super = _super;
 
                         this._superApply = _superApply;
 
-                        returnValue = value.apply( this, arguments );
+                        returnValue = value.apply(this, arguments);
 
                         this._super = __super;
 
@@ -695,17 +721,17 @@
 
             plugInPrototype.superClass = inheritPrototype;
 
-        }else{
+        } else {
 
-            function PlugIn( hash, target, dataId ){
+            function PlugIn(hash, target, dataId) {
 
-                this.options = leoToolsFn.extend( {}, this.defaults, hash );
+                this.options = leoToolsFn.extend({}, this.defaults, hash);
 
-                this.$target = $( target || this.options[this.defaultsTarget] || '<div>' );
+                this.$target = $(target || this.options[this.defaultsTarget] || '<div>');
 
                 this.dataId = dataId;
 
-                this.nameSpace = leoToolsFn.getId( this.name + this.version + '_nameSpace' );
+                this.nameSpace = leoToolsFn.getId(this.name + this.version + '_nameSpace');
 
                 this.disableClassName = this.disableClassName || 'LeoPlugIn_' + this.name + '_disable';
 
@@ -719,57 +745,63 @@
 
             $.extend(PlugIn.prototype, {
 
-                _create:function(){
+                _create: function() {
 
                     var target = this.$target[0];
 
-                    this.document = $( target.style ? target.ownerDocument : target.document || target );
+                    this.document = $(target.style ? target.ownerDocument : target.document || target);
 
-                    this.window = $( this.document[0].defaultView || this.document[0].parentWindow );
+                    this.window = $(this.document[0].defaultView || this.document[0].parentWindow);
 
-                    this.dataId !== false && $.data( target, this.dataId, this );
+                    this.dataId !== false && $.data(target, this.dataId, this);
 
                     this._init();
 
                 },
 
-                _delay: function( handler, delay ) {
+                _delay: function(handler, delay) {
 
                     var instance = this;
 
                     function handlerProxy() {
 
-                        return ( typeof handler === "string" ? instance[ handler ] : handler ).apply( instance, arguments );
+                        return (typeof handler === "string" ? instance[handler] : handler).apply(instance, arguments);
 
                     }
 
-                    return setTimeout( handlerProxy, delay || 0 );
+                    return setTimeout(handlerProxy, delay || 0);
 
                 },
 
-                _on:function(){
+                _on: function() {
 
-                    var arg = aslice.call( arguments, 2 ),op = this.options,
+                    var arg = aslice.call(arguments, 2),
+                        op = this.options,
 
-                    $self = $(arguments[0]),self = $self[0],leoUiGuid,
+                        $self = $(arguments[0]),
+                        self = $self[0],
+                        leoUiGuid,
 
-                    events = arguments[1], eventStr = '',This = this,oldFn,last;
+                        events = arguments[1],
+                        eventStr = '',
+                        This = this,
+                        oldFn, last;
 
-                    if( typeof events === 'string' && !!self ){
+                    if (typeof events === 'string' && !!self) {
 
-                        events.replace( leoToolsFn.rword, function(name) {
+                        events.replace(leoToolsFn.rword, function(name) {
 
                             eventStr += name + '.' + This.nameSpace + ' ';
 
                         });
 
-                        if( !!self.parentNode && arg[arg.length-1] === 'supportDisabled' && arg.pop() ){
+                        if (!!self.parentNode && arg[arg.length - 1] === 'supportDisabled' && arg.pop()) {
 
-                            if( $.isFunction( oldFn = arg[last = arg.length - 1]) ){
+                            if ($.isFunction(oldFn = arg[last = arg.length - 1])) {
 
-                                arg[last] = function(event){
+                                arg[last] = function(event) {
 
-                                    if( op.disabledEvent === false && !$( event.target ).closest( "." + This.disableClassName )[0] ){
+                                    if (op.disabledEvent === false && !$(event.target).closest("." + This.disableClassName)[0]) {
 
                                         oldFn.apply(this, arguments);
 
@@ -779,11 +811,13 @@
 
                             }
 
-                        }else if( $.isFunction( oldFn = arg[last = arg.length - 1] ) ){
+                        } else if ($.isFunction(oldFn = arg[last = arg.length - 1])) {
 
-                            arg[last] = function(event){
+                            arg[last] = function(event) {
 
-                                if( op.disabledEvent === true ){ return; }
+                                if (op.disabledEvent === true) {
+                                    return;
+                                }
 
                                 oldFn.apply(this, arguments);
 
@@ -795,9 +829,9 @@
 
                         $self.on.apply($self, arg);
 
-                        !!oldFn && typeof ( leoUiGuid = arg[arg.length - 1].guid ) === 'number' && ( oldFn.leoUiGuid = leoUiGuid );
+                        !!oldFn && typeof(leoUiGuid = arg[arg.length - 1].guid) === 'number' && (oldFn.leoUiGuid = leoUiGuid);
 
-                        $.inArray( self, this.offArr ) === -1 && this.offArr.push( self );
+                        $.inArray(self, this.offArr) === -1 && this.offArr.push(self);
 
                     }
 
@@ -805,23 +839,26 @@
 
                 },
 
-                _off:function(){
+                _off: function() {
 
-                    var arg = aslice.call( arguments, 2 ),
+                    var arg = aslice.call(arguments, 2),
 
-                    $self = $(arguments[0]),emptyFn,last,leoUiGuid,
+                        $self = $(arguments[0]),
+                        emptyFn, last, leoUiGuid,
 
-                    events = arguments[1],eventStr = '',This = this;
+                        events = arguments[1],
+                        eventStr = '',
+                        This = this;
 
-                    if( typeof events === 'string' && !!$self[0] ){
+                    if (typeof events === 'string' && !!$self[0]) {
 
-                        events.replace( leoToolsFn.rword, function(name) {
+                        events.replace(leoToolsFn.rword, function(name) {
 
                             eventStr += name + '.' + This.nameSpace + ' ';
 
                         });
 
-                        if( $.isFunction(arg[last = arg.length - 1]) && !!( leoUiGuid = arg[last].leoUiGuid ) ){
+                        if ($.isFunction(arg[last = arg.length - 1]) && !!(leoUiGuid = arg[last].leoUiGuid)) {
 
                             emptyFn = $.noop;
 
@@ -835,13 +872,13 @@
 
                         arg = [eventStr].concat(arg);
 
-                        $self.off.apply( $self, arg );
+                        $self.off.apply($self, arg);
 
-                    }else{
+                    } else {
 
-                        arg = aslice.call( arguments, 1 );
+                        arg = aslice.call(arguments, 1);
 
-                        $self.off.apply( $self, ['.' + This.nameSpace].concat(arg) );
+                        $self.off.apply($self, ['.' + This.nameSpace].concat(arg));
 
                     }
 
@@ -849,21 +886,21 @@
 
                 },
 
-                hasLeoPlugIn:function( el, name ){
+                hasLeoPlugIn: function(el, name) {
 
-                    return !!$(el).data( leoToolsFn.getExpando( name + '_dataId' ) );
+                    return !!$(el).data(leoToolsFn.getExpando(name + '_dataId'));
 
                 },
 
-                _trigger:function( el, event, data ){
+                _trigger: function(el, event, data) {
 
                     data = data || {};
 
-                    if( typeof event === 'string' ){
+                    if (typeof event === 'string') {
 
                         $(el).trigger(event + '.' + this.nameSpace, data);
 
-                    }else if( typeof event === 'object' ){
+                    } else if (typeof event === 'object') {
 
                         var type = event.type;
 
@@ -877,15 +914,15 @@
 
                 },
 
-                _targetTrigger:function( name, fn, context ){
+                _targetTrigger: function(name, fn, context) {
 
-                    if( !!name && !!fn && $.isFunction(fn) ){
+                    if (!!name && !!fn && $.isFunction(fn)) {
 
-                        !!context ? this._on( this.$target , name, $.proxy( fn, context ) ) : this._on( this.$target, name, fn );
+                        !!context ? this._on(this.$target, name, $.proxy(fn, context)) : this._on(this.$target, name, fn);
 
-                    }else if( !!name ) {
+                    } else if (!!name) {
 
-                        this.$target.trigger( name + '.' + this.nameSpace, fn );
+                        this.$target.trigger(name + '.' + this.nameSpace, fn);
 
                     }
 
@@ -893,33 +930,35 @@
 
                 },
 
-                _addElemDisableClassName:function( el ){
+                _addElemDisableClassName: function(el) {
 
-                    var disableClassName = this.disableClassName,$box = $(el);
+                    var disableClassName = this.disableClassName,
+                        $box = $(el);
 
-                    !$box.hasClass( disableClassName ) && ( $box.addClass( disableClassName ), this.disableIdArr.push( $box[0] ) );
+                    !$box.hasClass(disableClassName) && ($box.addClass(disableClassName), this.disableIdArr.push($box[0]));
 
                     return this;
 
                 },
 
-                _removeElemDisableClassName:function( el ){
+                _removeElemDisableClassName: function(el) {
 
-                    var disableClassName = this.disableClassName,$box = $(el),
+                    var disableClassName = this.disableClassName,
+                        $box = $(el),
 
-                    disableIdArr = this.disableIdArr;
+                        disableIdArr = this.disableIdArr;
 
-                    $box.hasClass( disableClassName ) && disableIdArr.length > 0 && ( disableIdArr = $.grep( disableIdArr, function( val, index ) {
+                    $box.hasClass(disableClassName) && disableIdArr.length > 0 && (disableIdArr = $.grep(disableIdArr, function(val, index) {
 
                         return val !== $box[0];
 
-                    } ), $box.removeClass( disableClassName ) );
+                    }), $box.removeClass(disableClassName));
 
                     return this;
 
                 },
 
-                trigger: function(){
+                trigger: function() {
 
                     this._trigger.apply(this, arguments);
 
@@ -935,29 +974,30 @@
 
                 },
 
-                widget: function(){
+                widget: function() {
 
                     return this.$target || null;
 
                 },
 
-                _deletData:function(){
+                _deletData: function() {
 
                     var disableClassName = this.disableClassName,
 
-                    nameSpace = '.' + this.nameSpace,
+                        nameSpace = '.' + this.nameSpace,
 
-                    disableIdArr = this.disableIdArr,offArr = this.offArr;
+                        disableIdArr = this.disableIdArr,
+                        offArr = this.offArr;
 
-                    !!disableIdArr && disableIdArr.length>0 && $.each(disableIdArr, function(index, val) {
+                    !!disableIdArr && disableIdArr.length > 0 && $.each(disableIdArr, function(index, val) {
 
-                        $(val).removeClass( disableClassName );
+                        $(val).removeClass(disableClassName);
 
                     });
 
-                    !!offArr && offArr.length>0 && $.each(offArr, function(index, val) {
+                    !!offArr && offArr.length > 0 && $.each(offArr, function(index, val) {
 
-                        $(val).off( nameSpace );
+                        $(val).off(nameSpace);
 
                     });
 
@@ -969,87 +1009,88 @@
 
                 },
 
-                option: function( key, value ) {
+                option: function(key, value) {
 
-                    var options = key,parts,curOption,i,oldKey;
+                    var options = key,
+                        parts, curOption, i, oldKey;
 
-                    if ( arguments.length === 0 ) {
+                    if (arguments.length === 0) {
 
-                        return leoToolsFn.extend( {}, this.options );
+                        return leoToolsFn.extend({}, this.options);
 
                     }
 
-                    if ( typeof key === "string" ) {
+                    if (typeof key === "string") {
 
                         options = {};
 
                         oldKey = key;
 
-                        parts = key.split( "." );
+                        parts = key.split(".");
 
                         key = parts.shift();
 
-                        if ( parts.length ) {
+                        if (parts.length) {
 
-                            curOption = options[ key ] = leoToolsFn.extend( {}, this.options[ key ] );
+                            curOption = options[key] = leoToolsFn.extend({}, this.options[key]);
 
-                            for ( i = 0; i < parts.length - 1; i++ ) {
+                            for (i = 0; i < parts.length - 1; i++) {
 
-                                curOption[ parts[ i ] ] = curOption[ parts[ i ] ] || {};
+                                curOption[parts[i]] = curOption[parts[i]] || {};
 
-                                curOption = curOption[ parts[ i ] ];
+                                curOption = curOption[parts[i]];
 
                             }
 
                             key = parts.pop();
 
-                            if ( arguments.length === 1 ) {
+                            if (arguments.length === 1) {
 
-                                return curOption[ key ] === undefined ? null : curOption[ key ];
+                                return curOption[key] === undefined ? null : curOption[key];
 
                             }
 
-                            curOption[ key ] = value;
+                            curOption[key] = value;
 
-                            this.__setOption(  oldKey, value, true );
+                            this.__setOption(oldKey, value, true);
 
                         } else {
 
-                            if ( arguments.length === 1 ) {
+                            if (arguments.length === 1) {
 
-                                return this.options[ key ] === undefined ? null : this.options[ key ];
+                                return this.options[key] === undefined ? null : this.options[key];
 
                             }
 
-                            options[ key ] = value;
+                            options[key] = value;
 
-                            this.__setOptions( options );
+                            this.__setOptions(options);
 
                         }
 
-                    }else{
+                    } else {
 
-                        this.__setOptions( options );
+                        this.__setOptions(options);
 
                     }
 
                 },
 
-                __setOptions: function( options ) {
+                __setOptions: function(options) {
 
                     var key;
 
-                    for ( key in options ) {
+                    for (key in options) {
 
-                        if( options.hasOwnProperty( key ) ){
+                        if (options.hasOwnProperty(key)) {
 
-                            if( key.indexOf('.') !== -1 ){
+                            if (key.indexOf('.') !== -1) {
 
-                                this.__setOption(  key, options[ key ], true );
+                                this.__setOption(key, options[key], true);
 
-                            }else{
+                            } else {
 
-                                this.__setOption( key, options[ key ] );
+                                this.__setOption(key, options[key]);
 
                             }
 
@@ -1059,17 +1100,17 @@
 
                 },
 
-                __setOption: function( key, value, bParts ) {
+                __setOption: function(key, value, bParts) {
 
-                    if(bParts){
+                    if (bParts) {
 
-                        var parts = key.split( "." );
+                        var parts = key.split(".");
 
-                        ( function f( options, parts, lastKey, value ){
+                        (function f(options, parts, lastKey, value) {
 
                             var key, rKey = parts.shift();
 
-                            if( rKey === lastKey ){
+                            if (rKey === lastKey) {
 
                                 options[lastKey] = value;
 
@@ -1077,13 +1118,13 @@
 
                             }
 
-                            for ( key in options ) {
+                            for (key in options) {
 
-                                if( options.hasOwnProperty( key ) ){
+                                if (options.hasOwnProperty(key)) {
 
-                                    if( key === rKey ){
+                                    if (key === rKey) {
 
-                                        return f( options[key], parts,lastKey,value );
+                                        return f(options[key], parts, lastKey, value);
 
                                     }
 
@@ -1091,13 +1132,13 @@
 
                             }
 
-                        })( this.options, parts, parts[parts.length-1], value ) && this._setOption( key, value );
+                        })(this.options, parts, parts[parts.length - 1], value) && this._setOption(key, value);
 
-                    }else{
+                    } else {
 
-                        this.options[ key ] = value;
+                        this.options[key] = value;
 
-                        this._setOption( key, value );
+                        this._setOption(key, value);
 
                     }
 
@@ -1105,17 +1146,17 @@
 
             });
 
-            if( !leoPlugIn.PlugInBasePrototypeKeys ){
+            if (!leoPlugIn.PlugInBasePrototypeKeys) {
 
-                var key,val = PlugIn.prototype;
+                var key, val = PlugIn.prototype;
 
                 leoPlugIn.PlugInBasePrototypeKeys = {};
 
-                for ( key in val ) {
+                for (key in val) {
 
-                    if( ohasOwn.call( val, key ) ){
+                    if (ohasOwn.call(val, key)) {
 
-                        !!key && ( key !== 'constructor' ) && ( leoPlugIn.PlugInBasePrototypeKeys[key] = true );
+                        !!key && (key !== 'constructor') && (leoPlugIn.PlugInBasePrototypeKeys[key] = true);
 
                     }
 
@@ -1123,31 +1164,34 @@
 
             }
 
-            $.extend( PlugIn.prototype, li );
+            $.extend(PlugIn.prototype, li);
 
         }
 
-        function setMethods( name, methods, fn ){
+        function setMethods(name, methods, fn) {
 
-            var key,plugInPrototype = PlugIn.prototype,method;
+            var key, plugInPrototype = PlugIn.prototype,
+                method;
 
-            if(!methods){return;}
+            if (!methods) {
+                return;
+            }
 
-            for ( key in methods ) {
+            for (key in methods) {
 
-                if( ohasOwn.call( methods, key ) ){
+                if (ohasOwn.call(methods, key)) {
 
                     method = methods[key];
 
-                    if( $.type(method) === 'function' ){
+                    if ($.type(method) === 'function') {
 
-                        if( key.charAt( 0 ) !== "_" ){
+                        if (key.charAt(0) !== "_") {
 
                             setKeyFn(key, fn, plugInPrototype, method);
 
-                        }else{
+                        } else {
 
-                            method.call( plugInPrototype, fn );
+                            method.call(plugInPrototype, fn);
 
                         }
 
@@ -1157,21 +1201,21 @@
 
             }
 
-            function setKeyFn(key, fn, plugInPrototype, method){
+            function setKeyFn(key, fn, plugInPrototype, method) {
 
-                fn[key] = function( PlugInPrototype, method ){
+                fn[key] = function(PlugInPrototype, method) {
 
-                    return function(){
+                    return function() {
 
                         var args = aslice.call(arguments);
 
                         args.push(fn);
 
-                        return method.apply( PlugInPrototype, args );
+                        return method.apply(PlugInPrototype, args);
 
                     }
 
-                }( plugInPrototype, method );
+                }(plugInPrototype, method);
 
             }
 
@@ -1179,19 +1223,19 @@
 
         leoToolsFn.plugIn[li.name] = PlugIn;
 
-        if( li.addJquery === true ){
+        if (li.addJquery === true) {
 
-            leoToolsFn.bridge( li.name );
+            leoToolsFn.bridge(li.name);
 
-            setMethods( li.name, methods, $[li.name] );
+            setMethods(li.name, methods, $[li.name]);
 
         }
 
-        if( li.addJqueryFn === true ){
+        if (li.addJqueryFn === true) {
 
-            leoToolsFn.bridge( li.name, true );
+            leoToolsFn.bridge(li.name, true);
 
-            setMethods( li.name, methods, $.fn[li.name] );
+            setMethods(li.name, methods, $.fn[li.name]);
 
         }
 
@@ -1199,27 +1243,28 @@
 
     $.fn.extend({
 
-        leoUiTextSelection: function(){
+        leoUiTextSelection: function() {
 
-            var start, end, t = this[0], val = this.val(),
+            var start, end, t = this[0],
+                val = this.val(),
 
-            selection, re, selRange, range, stored_range, s, e;
+                selection, re, selRange, range, stored_range, s, e;
 
-            if(arguments.length === 0){
+            if (arguments.length === 0) {
 
-                if(typeof t.selectionStart !== "undefined"){
+                if (typeof t.selectionStart !== "undefined") {
 
                     s = t.selectionStart;
 
                     e = t.selectionEnd;
 
-                }else{
+                } else {
 
-                    try{
+                    try {
 
                         selection = document.selection;
 
-                        if (t.tagName.toLowerCase() != "textarea"){
+                        if (t.tagName.toLowerCase() != "textarea") {
 
                             //this.focus();
 
@@ -1235,7 +1280,7 @@
 
                             e = range.text.length;
 
-                        }else{
+                        } else {
 
                             range = selection.createRange();
 
@@ -1251,13 +1296,16 @@
 
                         }
 
-                    }catch(e){}
+                    } catch (e) {}
 
                 }
 
                 return {
 
-                    start: s, end: e, text: val.substring(s, e), replace: function (st){
+                    start: s,
+                    end: e,
+                    text: val.substring(s, e),
+                    replace: function(st) {
 
                         return val.substring(0, s) + st + val.substring(e, val.length);
 
@@ -1265,31 +1313,31 @@
 
                 };
 
-            }else if(arguments.length === 1){
+            } else if (arguments.length === 1) {
 
-                if(typeof arguments[0] === "object" && typeof arguments[0].start === "number" && typeof arguments[0].end === "number"){
+                if (typeof arguments[0] === "object" && typeof arguments[0].start === "number" && typeof arguments[0].end === "number") {
 
                     start = arguments[0].start;
 
                     end = arguments[0].end;
 
-                }else if(typeof arguments[0] === "string"){
+                } else if (typeof arguments[0] === "string") {
 
                     if ((start = val.indexOf(arguments[0])) > -1) {
 
                         end = start + arguments[0].length;
 
-                    }else if(arguments[0] === 'last'){
+                    } else if (arguments[0] === 'last') {
 
                         end = start = val.length;
 
                     }
 
-                }else if($.type(arguments[0]) === "regexp") {
+                } else if ($.type(arguments[0]) === "regexp") {
 
                     re = arguments[0].exec(val);
 
-                    if(re != null){
+                    if (re != null) {
 
                         start = re.index;
 
@@ -1299,9 +1347,9 @@
 
                 }
 
-            }else if(arguments.length === 2){
+            } else if (arguments.length === 2) {
 
-                if(typeof arguments[0] === "number" && typeof arguments[1] === "number") {
+                if (typeof arguments[0] === "number" && typeof arguments[1] === "number") {
 
                     start = arguments[0];
 
@@ -1311,7 +1359,7 @@
 
             }
 
-            if(typeof start === "undefined"){
+            if (typeof start === "undefined") {
 
                 start = 0;
 
@@ -1319,7 +1367,7 @@
 
             }
 
-            if(typeof t.createTextRange !== "undefined"){
+            if (typeof t.createTextRange !== "undefined") {
 
                 selRange = t.createTextRange();
 
@@ -1331,7 +1379,7 @@
 
                 selRange.select();
 
-            }else{
+            } else {
 
                 t.selectionStart = start;
 
@@ -1343,7 +1391,7 @@
 
         },
 
-        leftBorderWidth: function(isMargin){
+        leftBorderWidth: function(isMargin) {
 
             var element = this[0];
 
@@ -1351,7 +1399,7 @@
 
         },
 
-        rightBorderWidth: function(isMargin){
+        rightBorderWidth: function(isMargin) {
 
             var element = this[0];
 
@@ -1359,7 +1407,7 @@
 
         },
 
-        topBorderWidth: function(isMargin){
+        topBorderWidth: function(isMargin) {
 
             var element = this[0];
 
@@ -1367,7 +1415,7 @@
 
         },
 
-        bottomBorderWidth: function(isMargin){
+        bottomBorderWidth: function(isMargin) {
 
             var element = this[0];
 
@@ -1375,7 +1423,7 @@
 
         },
 
-        borderSize: function(isMargin){
+        borderSize: function(isMargin) {
 
             return {
 
@@ -1387,72 +1435,73 @@
 
         },
 
-        setOuterWidth: function(width, isMargin){
+        setOuterWidth: function(width, isMargin) {
 
             return this.width(width - this.leftBorderWidth(isMargin) - this.rightBorderWidth(isMargin));
 
         },
 
-        setOuterHeight: function(height, isMargin){
+        setOuterHeight: function(height, isMargin) {
 
             return this.height(height - this.topBorderWidth(isMargin) - this.bottomBorderWidth(isMargin));
 
         },
 
-        focus: (function( orig ){
+        focus: (function(orig) {
 
-            return function( delay, fn ){
+            return function(delay, fn) {
 
-                return typeof delay === "number" ? this.each(function(){
-                    var elem = this;
+                return typeof delay === "number" ? this.each(function() {
+                        var elem = this;
 
-                    setTimeout(function(){
+                        setTimeout(function() {
 
-                        $( elem ).focus();
+                            $(elem).focus();
 
-                        if ( fn ) {
+                            if (fn) {
 
-                            fn.call( elem );
+                                fn.call(elem);
 
-                        }
+                            }
 
-                    }, delay );
+                        }, delay);
 
-                }) :
+                    }) :
 
-                orig.apply( this, arguments );
+                    orig.apply(this, arguments);
 
             };
 
-        })( $.fn.focus ),
+        })($.fn.focus),
 
-        zIndex: function( zIndex ){
+        zIndex: function(zIndex) {
 
-            if ( zIndex !== undefined ) {
+            if (zIndex !== undefined) {
 
-                return this.css( "zIndex", zIndex );
+                return this.css("zIndex", zIndex);
 
             }
 
-            if ( this.length ) {
+            if (this.length) {
 
-                var elem = $( this[ 0 ] ), position, value;
+                var elem = $(this[0]),
+                    position, value;
 
-                while ( elem.length && elem[ 0 ] !== document ) {
+                while (elem.length && elem[0] !== document) {
 
                     // Ignore z-index if position is set to a value where z-index is ignored by the browser
                     // This makes behavior of this function consistent across browsers
                     // WebKit always returns auto if the element is positioned
-                    position = elem.css( "position" );
+                    position = elem.css("position");
 
-                    if ( position === "absolute" || position === "relative" || position === "fixed" ) {
+                    if (position === "absolute" || position === "relative" || position === "fixed") {
                         // IE returns 0 when zIndex is not specified
                         // other browsers return a string
                         // we ignore the case of nested elements with an explicit value of 0
                         // <div style="z-index: -10;"><div style="z-index: 0;"></div></div>
-                        value = parseInt( elem.css( "zIndex" ), 10 );
+                        value = parseInt(elem.css("zIndex"), 10);
 
-                        if ( !isNaN( value ) && value !== 0 ) {
+                        if (!isNaN(value) && value !== 0) {
                             return value;
                         }
 
@@ -1468,6 +1517,12 @@
         }
 
     });
+
+    $.leoTools.escapeRegex = function(value) {
+
+        return value.replace(/[\-\[\]{}()*+?.,\\\^$|#\s]/g, "\\$&");
+
+    };
 
     return $;
 

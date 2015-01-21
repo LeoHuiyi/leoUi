@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <title>leo</title>
+    <meta name="description" content="">
+    <meta name="keywords" content="">
+    <script type="text/javascript" data-main="../demos/template/template" src="../../js/leoUiLoad.js"></script>
+  
+    <style type="text/css">
+    #wrap{
+        zoom:1;
+        position:relative;
+        padding:98px 0 0 0;
+        margin:5px 0 0 200px;
+        width:447px;
+        height:418px;
+        background:url("http://firekylin.my.baidu.com/doc/example/images/bg.gif") no-repeat;
+    }
+    #sort{
+        position:absolute;
+        top:80px;
+        left:160px;
+        width:12px;
+        height:12px;
+        overflow:hidden;
+        cursor:pointer;
+    }
+    #sort.up{
+        background:url("http://firekylin.my.baidu.com/doc/example/images/up.gif") no-repeat;
+    }
+    #sort.down{
+        background:url("http://firekylin.my.baidu.com/doc/example/images/down.gif") no-repeat;
+    }
+    #container{
+        margin:0px 0 0 16px;
+        width:411px;
+        height:233px;
+        overflow-x:hidden;
+        overflow-y:auto;
+        font-size:12px;
+    }
+    div.edit, div.normal{
+        overflow:hidden;
+        zoom:1;
+        margin:1px 5px 0 5px;
+        width:401px;
+        height:27px;
+        line-height:28px;
+        border-bottom:1px dashed #fff;
+    }
+    div.normal{
+        border-bottom:1px dashed #ccc;
+    }
+    div.normal:hover{
+        background:#eee;
+    }
+    div.normal img{
+        cursor:pointer;
+    }
+    div.edit{
+        background:#feffda;
+    }
+    div.cell1, div.cell2, div.cell3{
+        float:left;
+        text-align:center;
+    }
+    div.cell1{
+        padding-left:20px;
+        width:191px;
+        text-align:left;
+    }
+    div.cell2{
+        width:70px;
+    }
+    div.cell3{
+        width:120px;
+    }
+    #createDiv{
+        margin:20px 0 0 17px;
+    }
+
+    </style>
+
+</head>
+
+<body>
+    <h3>BaiduTemplate单元测试用例</h3>
+<!-- 测试模板1开始 -->
+<script id='t:_1234-abcd-1' type="text/template">
+<br>
+1、基本输出（自动HTML转义）：  <%=value1%> 
+<br>
+<br>
+2、容错写法：  <%=value2;%>
+<br>
+<br>
+3、不转义输出： <%:=value3%> 或 <%-value3%>
+<br>
+<br>
+4、容错写法： <%:=value4;%>
+<br>
+<br>
+5、URL转义输出： <%:u=value5%>
+<br>
+<br>
+6、容错写法： <%:u=value6;%>
+<br>
+<br>
+7、UI变量在页面标签事件中使用转义： <%:v=value7%>
+<br>
+<br>
+8、容错写法：<%:v=value8;%>
+<br>
+<br>
+9、HTML转义输出：<%:h=value9%>
+<br>
+<br>
+10、容错写法：<%:h=value10;%>
+<br>
+<br>
+11、变量未定义自动输出空：<%=value11%>
+<br>
+<br>
+12、模板直接输出特殊字符：5个斜杠 ///// 5个单引 ‘’‘’‘ 5个双引 “”“”“
+<br>
+<br>
+13、注释：
+    <!-- HTML注释支持 -->  
+    <%* 模板自带注释 *%> 
+    <% //js注释方式 
+    %>
+<br>
+<br>
+14、判断语句：
+    <%if(value14){%>
+        <input type="text" value="<%:v=value14%>"/>
+    <%}else{%>
+        无值
+    <%}%>
+<br>
+<br>
+15、循环语句：
+<br>
+<ul>
+<%for(var i=0;i<value17.length;i++){%>
+    <li><%=value17[i]%></li>
+<%}%>
+</ul>
+<br>
+<br>
+16、a标签 <br>
+单引问题：<a target='_blank' href='http://www.baidu.com ' onclick='alert("test");'>test</a><br>
+双引问题：<a target="_blank" href="http://www.baidu.com" onclick="alert('test');">test</a><br>
+17、定义变量：
+<%var varTest1 = value1%>
+varTest1:  <%=varTest1;%>
+<br>
+18、定义变量容错：
+<%var varTest2 = value2;%>
+varTest2:  <%=varTest2%>
+<br>
+</script>
+<!-- 测试模板1结束 -->
+
+<div id="results"></div>
+
+</html>

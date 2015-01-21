@@ -315,7 +315,7 @@
 
             var op = this.options,index,currentPage,
 
-            last,totalpages,oldCurrentPage,
+            last,totalpages,oldCurrentPage,isChange,
 
             isAjax = this.options.dataType === 'ajax';
 
@@ -369,6 +369,8 @@
 
             }
 
+            ;(isAjax || currentPage === oldCurrentPage) && (isChange = true);
+
             if( currentPage < 1 ){
 
                 currentPage = 1;
@@ -391,7 +393,7 @@
 
             return{
 
-                isChange: isAjax ? true : oldCurrentPage !== currentPage,
+                isChange: !isChange ? oldCurrentPage !== currentPage : isChange,
 
                 totalItems: totalItems,
 
@@ -403,9 +405,9 @@
 
                 totalpages: totalpages,
 
-                isFristPage: isAjax ? false : currentPage === 1,
+                isFristPage: isAjax ? false : this.currentPage <= 1,
 
-                isLastPage: isAjax ? false : currentPage === totalpages,
+                isLastPage: isAjax ? false : this.currentPage >= totalpages,
 
                 fristItems: index,
 
@@ -531,6 +533,8 @@
 
             this.$setPageInput = $pageCenter.find('#' + leoGrid + 'set_page_input');
 
+            this.currentPage = 1;
+
             this._initPagerEvent();
 
         },
@@ -567,9 +571,17 @@
 
             }else{
 
-                lastItems = fristItems + pagerLen - 1;
+                if(pagerLen === 0){
 
-                pagerLen === 0 && (fristItems = 0);
+                    fristItems = 0;
+
+                    lastItems = 0;
+
+                }else{
+
+                    lastItems = fristItems + pagerLen - 1;
+
+                }
 
                 this.$pageRightInfo.html(fristItems + ' - ' + lastItems + '&nbsp;&nbsp;共' + totalItems + '条');
 
@@ -609,9 +621,15 @@
 
             var This = this,leoGrid = this.leoGrid;
 
-            this._on( this.$footer.find('#' + leoGrid + 'page_center_table'), 'click', 'td', function(event){
+            this._on( this.$pageCenter, 'click', 'td', function(event){
 
                 event.preventDefault();
+
+                if($(this).css('cursor') === 'default'){
+
+                    return;
+
+                }
 
                 if( this.id === leoGrid + 'first_page' ){
 
@@ -656,6 +674,8 @@
             this.$gridBox = $('<div id="'+ leoGrid +'leoUi_grid" class="leoUi-jqgrid leoUi-widget leoUi-widget-content leoUi-corner-all" style="visibility:hidden"><div id="'+ leoGrid +'lui_grid" class="leoUi-widget-overlay jqgrid-overlay"></div><div id="'+ leoGrid +'load_grid" class="loading leoUi-state-default leoUi-state-active">读取中...</div><div class="leoUi-jqgrid-view" id="'+ leoGrid +'gview_grid"><div class="leoUi-state-default leoUi-jqgrid-hdiv"><div class="leoUi-jqgrid-hbox"></div></div><div class="leoUi-jqgrid-bdiv"><div class="leoUi-jqgrid-hbox-inner" style="position:relative;"></div></div></div><div id="'+ leoGrid +'rs_mgrid" class="leoUi-jqgrid-resize-mark" ></div></div>');
 
             this.tableData = {};
+
+            this.tableData.rowArr = [];
 
             this.tableData.selectRowElArr = [];
 
@@ -708,6 +728,8 @@
         _clearTableData:function(){
 
             this.tableData = {};
+
+            this.tableData.rowArr = [];
 
             this.tableData.selectRowElArr = [];
 
@@ -900,7 +922,7 @@
 
                     $(selectRowElArr[i]).remove();
 
-                    this._removeSelectRowtableData(selectRowElArr[i]);
+                    this._removeTableDataRow(selectRowElArr[i].id);
 
                 }
 
@@ -927,12 +949,6 @@
                 this._changePager( false, true );
 
             }
-
-        },
-
-        _removeSelectRowtableData:function(tr){
-
-            delete this.tableData[tr.id];
 
         },
 
@@ -970,7 +986,7 @@
 
         getTrId:function(tr){
 
-            return (tr && this.tableData[tr.id][this.options.trIdKey]) || '';
+            return (tr && this._getTableDataRow(tr.id)[this.options.trIdKey]) || '';
 
         },
 
@@ -978,7 +994,7 @@
 
             var tableModel = this.tableOption.tableModel,length = tableModel.length,
 
-            child,prop,arr = [],tableData = this.tableData[tr.id],
+            child,prop,arr = [],tableData = this._getTableDataRow(tr.id),
 
             fnArr = [],This = this,i = 0,dfd,op = this.options,
 
@@ -1138,7 +1154,7 @@
 
             trIdKey = op.trIdKey,
 
-            tableData = this.tableData[td.parentNode.id],data = { thid: thid },
+            tableData = this._getTableDataRow(td.parentNode.id),data = { thid: thid },
 
             dfd, tdModel = $.extend({}, this._getTableModel(thid)),
 
@@ -1222,9 +1238,9 @@
 
         removeRow:function(tr){
 
-            var tableData;
+            var tableData,trId = tr.id;
 
-            if(tr.id && (tableData = this.tableData[tr.id])){
+            if(trId && (tableData = this._getTableDataRow(trId))){
 
                 $(tr).remove();
 
@@ -1234,7 +1250,7 @@
 
                 this._removeSelectRowArr(tr);
 
-                this._removeSelectRowtableData(tr);
+                this._removeTableDataRow(trId);
 
                 this._refreshEvenClass();
 
@@ -1501,7 +1517,7 @@
 
             tableModel = this._getTableModel(thid);
 
-            tdData = this.tableData[trid][thid];
+            tdData = this._getTableDataRow(trid)[thid];
 
             tableModelId = tdData.tableModelId;
 
@@ -1555,7 +1571,7 @@
 
             if(edit){
 
-                trData = this.tableData[tdId = td.parentNode.id];
+                trData = this._getTableDataRow(tdId = td.parentNode.id);
 
                 tdData = trData[thid];
 
@@ -1659,61 +1675,53 @@
 
         getEditTableData: function(cellCallBack, rowCallBack, tableCallBack){
 
-            var tableData = $.extend({}, this.tableData),callBackData,
+            var tableData = this._copyTableDataRow(),callBackData,
 
             prop,arr = [],row,rowObj,cell,isEmpty,val,tableModelId,
 
-            trIdKey = this.options.trIdKey,value;
+            trIdKey = this.options.trIdKey,value,i = 0,length = tableData.length;
 
-            for(prop in tableData){
+            for(; i < length; i++){
 
-                if(tableData.hasOwnProperty(prop)){
+                row = tableData[i];
 
-                    row = tableData[prop];
+                rowObj = {};
 
-                    if(prop !== 'selectRowElArr'){
+                isEmpty = true;
 
-                        rowObj = {};
+                for(prop in row){
 
-                        isEmpty = true;
+                    if(row.hasOwnProperty(prop)){
 
-                        for(prop in row){
+                        cell = row[prop];
 
-                            if(row.hasOwnProperty(prop)){
+                        if(prop === trIdKey){
 
-                                cell = row[prop];
+                            rowObj[prop] = cell;
 
-                                if(prop === trIdKey){
+                        }else if((tableModelId = cell.tableModelId)){
 
-                                    rowObj[prop] = cell;
+                            value = cell.selectKey === undefined ? cell.val: cell.selectKey;
 
-                                }else if((tableModelId = cell.tableModelId)){
+                            !!cellCallBack ? val = cellCallBack(tableModelId, value) : val = value;
 
-                                    value = cell.selectKey === undefined ? cell.val: cell.selectKey;
+                            rowObj[tableModelId] = val;
 
-                                    !!cellCallBack ? val = cellCallBack(tableModelId, value) : val = value;
-
-                                    rowObj[tableModelId] = val;
-
-                                    val !== '' && (cell.isMust === true) && (isEmpty = false);
-
-                                }
-
-                            }
-
-                        }
-
-                        if(rowCallBack && (callBackData = rowCallBack(rowObj, isEmpty, row)) !== false){
-
-                            arr.push(callBackData);
-
-                        }else{
-
-                            isEmpty === false && arr.push(rowObj);
+                            val !== '' && (cell.isMust === true) && (isEmpty = false);
 
                         }
 
                     }
+
+                }
+
+                if(rowCallBack && (callBackData = rowCallBack(rowObj, isEmpty, row)) !== false){
+
+                    arr.push(callBackData);
+
+                }else{
+
+                    isEmpty === false && arr.push(rowObj);
 
                 }
 
@@ -1975,7 +1983,7 @@
 
             trId = td.parentNode.id,tableModel = this._getTableModel(thId),
 
-            rowData = this.tableData[trId],selectKey,
+            rowData = this._getTableDataRow(trId),selectKey,
 
             cellData = rowData[thId],edit = tableModel.edit,
 
@@ -2025,7 +2033,7 @@
 
             child,val,$tr = $(tr),edit,tdData,selectKey,thid,typeOption,
 
-            trId = tr.id,$td,tableData = this.tableData[trId],
+            trId = tr.id,$td,tableData = this._getTableDataRow(trId),
 
             trIndex = tableData.trIndex;
 
@@ -2445,6 +2453,24 @@
 
         },
 
+        _getTeams:function(){
+
+            var rowArr = this.tableData.rowArr;
+
+            if(!rowArr._init){
+
+                rowArr._init = true;
+
+                return $.extend(true, [], this.teamsData);
+
+            }else{
+
+                return rowArr;
+
+            }
+
+        },
+
         _bodyTableTbodyStr:function( pagerInfo ){
 
             if( !this.teamsData ){ return ''; }
@@ -2465,11 +2491,11 @@
 
                     i = 0;
 
-                    teams = this.teamsData.slice();
+                    teams = this._getTeams();
 
                 }else{
 
-                    teams = this.teamsData.slice(pagerInfo.fristItems, pagerInfo.lastItems + 1);
+                    teams = this._getTeams().slice(pagerInfo.fristItems, pagerInfo.lastItems + 1);
 
                 }
 
@@ -2485,7 +2511,7 @@
 
             }else{
 
-                teams = this.teams = this.createEmptyArray(this.teamsData.slice());
+                teams = this.teams = this.createEmptyArray(this._getTeams().slice());
 
                 length = teams.length;
 
@@ -2643,17 +2669,69 @@
 
         },
 
+        _copyTableDataRow:function(){
+
+            return $.extend(true, [], this.tableData.rowArr);
+
+        },
+
+        _removeTableDataRow:function(trid){
+
+            var rowArr = this.tableData.rowArr,i,row;
+
+            if((i = rowArr.length)){
+
+                while(i--){
+
+                    row = rowArr[i];
+
+                    if( row._trid === trid ){
+
+                        rowArr.splice(i, 1);
+
+                        break;
+
+                    }
+
+                }
+
+            }
+
+        },
+
+        _getTableDataRow:function(trid){
+
+            var rowArr = this.tableData.rowArr,i,row;
+
+            if((i = rowArr.length)){
+
+                while(i--){
+
+                    row = rowArr[i];
+
+                    if( row._trid === trid ){
+
+                        return row;
+
+                    }
+
+                }
+
+            }
+
+        },
+
         _tableTbodyTrStr:function( gridJsonTr, gridJsonTh, trIndex ){
 
             var str = '',i = 0,length = gridJsonTh.length,th,op = this.options,
 
             trId = gridJsonTr && gridJsonTr[op.trIdKey],
 
-            tableDatas = this.tableData,
+            rowArr = this.tableData.rowArr,
 
             evenClass = op.evenClass,
 
-            leoGrid = this.leoGrid,tableData,rowDatas,
+            leoGrid = this.leoGrid,rowData = {},rowDatas,
 
             id = leoGrid + this.leoGridTrId++,
 
@@ -2663,11 +2741,11 @@
 
             str += '>';
 
-            tableData = tableDatas[id] = {};
+            rowData._trid = id;
 
-            tableData._nullItem = gridJsonTr._nullItem;
+            rowData._nullItem = gridJsonTr._nullItem;
 
-            rowDatas = tableData.rowDatas = {};
+            rowDatas = rowData.rowDatas = {};
 
             !!rowDataKeys && rowDataKeys.replace(/[^, ]+/g,function(key){
 
@@ -2675,9 +2753,9 @@
 
             });
 
-            !!~trId && (tableData[op.trIdKey] = trId);
+            !!~trId && (rowData[op.trIdKey] = trId);
 
-            tableData.trIndex = trIndex;
+            rowData.trIndex = trIndex;
 
             for ( ; i < length; i++ ) {
 
@@ -2685,15 +2763,17 @@
 
                 value = gridJsonTr && gridJsonTr[th.id];
 
-                str += this._tableTdStr( value, th, trIndex, gridJsonTr, tableData );
+                str += this._tableTdStr( value, th, trIndex, gridJsonTr, rowData );
 
             }
+
+            rowArr.push(rowData);
 
             return str += '</tr>';
 
         },
 
-        _tableTdStr:function( value, tableModel, trIndex, tr, tableData ){
+        _tableTdStr:function( value, tableModel, trIndex, tr, rowData ){
 
             if( !tableModel ){ return; }
 
@@ -2707,7 +2787,7 @@
 
             className !== false && ( str += ' class="' + className + '"' );
 
-            !!edit && (tdData = tableData[thId] = {});
+            !!edit && (tdData = rowData[thId] = {});
 
             if(edit.type === 'select'){
 

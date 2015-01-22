@@ -29,7 +29,7 @@ leoUiLoad.config({
 
 })
 
-leoUiLoad.require('leoUi-tools,ready', function($) {
+leoUiLoad.require('leoUi-template,ready', function($) {
 
     var data={
             value1:'<span style="color:red;">http://wangxiao.github.com/BaiduTemplate/</span>',
@@ -61,7 +61,15 @@ leoUiLoad.require('leoUi-tools,ready', function($) {
         var timestart = new Date().getTime();
 
         //输出函数
-        var fun=bat('t:_1234-abcd-1');
+        var fun=bat('t:_1234-abcd-1',false, {
+
+            leftDelimit: '{{',
+
+            rightDelimit: '%>',
+
+            htmlEncode: true
+
+        });
 
         var timeend = new Date().getTime();
 

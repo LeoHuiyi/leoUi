@@ -650,17 +650,7 @@
 
             inheritPrototype = inherit.prototype;
 
-            if (leoToolsFn.isSupport__proto__) {
-
-                plugInPrototype = PlugIn.prototype;
-
-                plugInPrototype.__proto__ = inheritPrototype;
-
-            } else {
-
-                plugInPrototype = PlugIn.prototype = leoToolsFn.createPrototype(inheritPrototype, PlugIn);
-
-            }
+            plugInPrototype = PlugIn.prototype = leoToolsFn.createPrototype(inheritPrototype, PlugIn);
 
             li.defaults = leoToolsFn.extend({}, leoPlugIn[li.inherit]['prototype']['defaults'], li.defaults);
 
@@ -1212,7 +1202,7 @@
 
                         return method.apply(PlugInPrototype, args);
 
-                    }
+                    };
 
                 }(plugInPrototype, method);
 

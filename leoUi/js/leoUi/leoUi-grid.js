@@ -65,6 +65,10 @@
 
                 align:'center',//对齐方式
 
+                checkBoxId:'',//checkBoxId
+
+                radioBoxId:'',//radioBoxId
+
                 theadName:'',//对应的表头内容
 
                 className:false,//加上的class
@@ -151,6 +155,8 @@
 
             beforeAjaxMegCallback:$.noop,//ajax之前信息回调(init, changePager, getEditRowInfo, getEditTypeOption, getEditCellInfo)
 
+            afterGetData:false,//等到data之后回调
+
             ajaxMegCallback:$.noop,//ajax信息回调
 
             beforeSaveCell:false,//保存之前回调
@@ -191,9 +197,9 @@
 
         _getData:function(pagerInfo){
 
-            var op = this.options,dataType = op.dataType,ajax,This = this,teamsKey,
+            var op = this.options,dataType = op.dataType,ajax,
 
-            pagerCurrentPage;
+            This = this,teamsKey,pagerCurrentPage,afterGetData = op.afterGetData;
 
             if(dataType === 'ajax'){
 
@@ -237,6 +243,8 @@
 
                     teamsKey === false ? This.teamsData = data : This.teamsData = data[teamsKey];
 
+                    afterGetData && (This.teamsData = afterGetData(This.teamsData));
+
                     This._clearTableData();
 
                     if(op.isPage === true){
@@ -275,9 +283,11 @@
 
                 if(pagerInfo === 'init'){
 
-                    this.totalItems = op.gridData.length;
-
                     this.teamsData = op.gridData;
+
+                    afterGetData && (this.teamsData = afterGetData(this.teamsData));
+
+                    this.totalItems = this.teamsData.length;
 
                     op.isPage === true && (pagerInfo = this._getPagerInfo( op.currentPage, op.rowNum ));
 
@@ -677,7 +687,7 @@
 
             this.tableData.rowArr = [];
 
-            this.tableData.selectRowElArr = [];
+            this.tableData.selectRowArr = [];
 
             this.leoGridTrId = 0;
 
@@ -733,7 +743,7 @@
 
             this.tableData.rowArr = [];
 
-            this.tableData.selectRowElArr = [];
+            this.tableData.selectRowArr = [];
 
         },
 
@@ -912,9 +922,9 @@
 
         removeTableSelectRow:function(){
 
-            var selectRowElArr = this.tableData.selectRowElArr,
+            var selectRowArr = this.tableData.selectRowArr,
 
-            i = selectRowElArr.length;
+            i = selectRowArr.length,trid;
 
             if( i > 0 ){
 
@@ -922,9 +932,11 @@
 
                 while( i-- ){
 
-                    $(selectRowElArr[i]).remove();
+                    trid = selectRowArr[i];
 
-                    this._removeTableDataRow(selectRowElArr[i].id);
+                    $("#" + trid).remove();
+
+                    this._removeTableDataRow(trid);
 
                 }
 
@@ -972,13 +984,13 @@
 
         getSelectRowsTrId:function(){
 
-            var arr = [],selectRowElArr = this.tableData.selectRowElArr,
+            var arr = [],selectRowArr = this.tableData.selectRowArr,
 
-            i = selectRowElArr.length;
+            i = selectRowArr.length;
 
             while( i-- ){
 
-                arr.push( this.getTrId(selectRowElArr[i]) );
+                arr.push( this.getTrId(selectRowArr[i]) );
 
             }
 
@@ -986,9 +998,17 @@
 
         },
 
-        getTrId:function(tr){
+        getTrId:function(trid){
 
-            return (tr && this._getTableDataRow(tr.id)[this.options.trIdKey]) || '';
+            typeof trid !== 'string' && (trid = trid.id);
+
+            if(trid){
+
+                trid = this._getTableDataRow(trid)[this.options.trIdKey];
+
+            }
+
+            return trid;
 
         },
 
@@ -1759,13 +1779,13 @@
 
                         if(radioBoxRow){
 
-                            $(radioBoxRow).removeClass(activeClass).find('input[checkid="'+ radioBoxId +'"]').prop( 'checked', false );
+                            $("#" + radioBoxRow).removeClass(activeClass).find('input[checkid="'+ radioBoxId +'"]').prop( 'checked', false );
 
                         }
 
                         !radioBoxId ? $tr.addClass(activeClass) : $tr.addClass(activeClass).find('input[checkid="'+ radioBoxId +'"]').prop( 'checked', true );
 
-                        this.tableData.radioBoxRow = tr;
+                        this.tableData.radioBoxRow = tr.id;
 
                     }
 
@@ -1847,7 +1867,7 @@
 
             }
 
-            this.$bodyTable.find('tr').not('tr.jqgfirstrow').each(function(index, el) {
+            this.$bodyTable.find('tr.jqgrow ').each(function(index, el) {
 
                 var $el = $(this);
 
@@ -1915,37 +1935,45 @@
 
         },
 
-        _addSelectRowArr:function(el){
+        _addSelectRowArr:function(trid){
 
-            var selectRowElArr = this.tableData.selectRowElArr;
+            var selectRowArr = this.tableData.selectRowArr;
 
-            $.inArray( el, selectRowElArr ) === -1 && this.tableData.selectRowElArr.push(el);
+            typeof trid !== 'string' && (trid = trid.id);
+
+            trid && $.inArray( trid, selectRowArr ) === -1 && this.tableData.selectRowArr.push(trid);
 
         },
 
         _getSelectRowArrLength:function(){
 
-            return !!this.tableData.selectRowElArr && this.tableData.selectRowElArr.length || 0;
+            return !!this.tableData.selectRowArr && this.tableData.selectRowArr.length || 0;
 
         },
 
         _removeSelectAllRowArr:function(){
 
-            this.tableData.selectRowElArr = [];
+            this.tableData.selectRowArr = [];
 
         },
 
-        _removeSelectRowArr:function(el){
+        _removeSelectRowArr:function(trid){
 
-            var selectRowElArr = this.tableData.selectRowElArr,
+            var selectRowArr = this.tableData.selectRowArr,
 
-            i = selectRowElArr.length;
+            i = selectRowArr.length;
 
-            while( i-- ){
+            typeof trid !== 'string' && (trid = trid.id);
 
-                if( selectRowElArr[i] === el ){
+            if(trid){
 
-                    selectRowElArr.splice( i, 1 );
+                while( i-- ){
+
+                    if( selectRowArr[i] === trid ){
+
+                        selectRowArr.splice( i, 1 );
+
+                    }
 
                 }
 
@@ -2729,17 +2757,17 @@
 
             rowArr = this.tableData.rowArr,
 
-            evenClass = op.evenClass,
+            evenClass = op.evenClass,tdStr = '',
 
             leoGrid = this.leoGrid,rowData = {},rowDatas,
 
             id = leoGrid + this.leoGridTrId++,
 
+            _isCheck = id+'_isCheck',
+
             rowDataKeys = op.rowDataKeys,value;
 
-            typeof evenClass !== 'string' ? str = '<tr id="' + id + '" class="leoUi-widget-content jqgrow leoUi-row-ltr" tabindex="-1" ' : trIndex % 2 === 1 ? str = '<tr id="' + id + '" class="leoUi-widget-content jqgrow leoUi-row-ltr ' + evenClass + '" tabindex="-1" ' : str = '<tr id="' + id + '" class="leoUi-widget-content jqgrow leoUi-row-ltr" tabindex="-1"';
-
-            str += '>';
+            typeof evenClass !== 'string' ? str = '<tr id="' + id + '"   tabindex="-1" class="leoUi-widget-content jqgrow leoUi-row-ltr' : trIndex % 2 === 1 ? str = '<tr id="' + id + '" tabindex="-1"  class="leoUi-widget-content jqgrow leoUi-row-ltr ' + evenClass : str = '<tr id="' + id + '"  tabindex="-1" class="leoUi-widget-content jqgrow leoUi-row-ltr';
 
             rowData._trid = id;
 
@@ -2763,17 +2791,29 @@
 
                 value = gridJsonTr && gridJsonTr[th.id];
 
-                str += this._tableTdStr( value, th, trIndex, gridJsonTr, rowData );
+                tdStr += this._tableTdStr( value, th, trIndex, gridJsonTr, rowData );
+
+            }
+
+            if(rowData[_isCheck]){
+
+                str += ' ' + op.activeClass + '">';
+
+                delete rowData[_isCheck];
+
+            }else{
+
+                str += '">';
 
             }
 
             rowArr.push(rowData);
 
-            return str += '</tr>';
+            return str += tdStr + '</tr>';
 
         },
 
-        _tableTdStr:function( value, tableModel, trIndex, tr, rowData ){
+        _tableTdStr:function( value, tableModel, trIndex, gridJsonTr, rowData ){
 
             if( !tableModel ){ return; }
 
@@ -2791,7 +2831,7 @@
 
             if(edit.type === 'select'){
 
-                if(edit.selectKeyId && (selectKey = tr[edit.selectKeyId]) !== undefined){
+                if(edit.selectKeyId && (selectKey = gridJsonTr[edit.selectKeyId]) !== undefined){
 
                     !!tdData && (tdData.selectKey = selectKey);
 
@@ -2815,11 +2855,35 @@
 
             }else if( tableModel.boxType === 'checkBox' ){
 
-                str += '<input type="checkbox" checkid="'+ this.tableOption.checkBoxId +'">';
+                if(!gridJsonTr[tableModel.checkBoxId]){
+
+                    str += '<input type="checkbox" checkid="'+ this.tableOption.checkBoxId +'">';
+
+                }else{
+
+                    str += '<input type="checkbox" checkid="'+ this.tableOption.checkBoxId +'" checked>';
+
+                    this._addSelectRowArr(rowData._trid);
+
+                    rowData[rowData._trid+'_isCheck'] = true;
+
+                }
 
             }else if( tableModel.boxType === 'radioBox' ){
 
-                str += '<input type="checkbox" checkid="'+ this.tableOption.radioBoxId +'">';
+                if(!gridJsonTr[tableModel.radioBoxId]){
+
+                    str += '<input type="checkbox" checkid="'+ this.tableOption.radioBoxId +'">';
+
+                }else{
+
+                    str += '<input type="checkbox" checkid="'+ this.tableOption.radioBoxId +'" checked>';
+
+                    this.tableData.radioBoxRow = rowData._trid;
+
+                    rowData[rowData._trid+'_isCheck'] = true;
+
+                }
 
             }else if( tableModel.boxType === 'serialNumber' ){
 

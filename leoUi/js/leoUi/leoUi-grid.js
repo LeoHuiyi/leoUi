@@ -329,7 +329,7 @@
 
             isAjax = this.options.dataType === 'ajax';
 
-            totalItems = $.isNumeric(+totalItems) ? +totalItems : +this.totalItems;
+            totalItems = $.isNumeric(+totalItems) ? +totalItems : this.totalItems >> 0;
 
             this.perPages = perPages = perPages >> 0 || this.perPages >> 0 || op.rowNum >> 0;
 
@@ -569,7 +569,7 @@
 
             }
 
-            var totalItems = (+this.totalItems) + (+this.nullItemsLen),
+            var totalItems = (this.totalItems >> 0) + (+this.nullItemsLen),
 
             lastItems,pagerLen = this.$bodyTable[0].rows.length - 1;
 

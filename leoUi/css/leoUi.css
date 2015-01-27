@@ -149,4 +149,38 @@
 .leoUiScrollbar .leoUiScrollbar-vbarcontainer{ position: absolute; width: 18px; padding-top: 18px; padding-bottom: 18px; border: none; font-size: 0px; background: #f8f8f8;-moz-box-shadow: inset 3px 0 10px rgba(0,0,0,0.25);-webkit-box-shadow: inset 3px 0 10px rgba(0,0,0,0.25);box-shadow: inset 3px 0 10px rgba(0,0,0,0.25); }
 .leoUiScrollbar .leoUiScrollbar-barcontainer-heade{text-shadow: 0px 1px 0px rgba(255,255,255,0.7);color: #333;font-weight: bold;}
 
+/*leoScrollbar*/
+.leoDatetimepicker{font-size: 1em;-moz-user-select: none;padding: 0.2em 0.2em 0;width: 17em;border-radius: 0;border: medium none;background: none repeat scroll 0% 0% #ffffff;color: #4f4f4f;font-family: Arial,sans-serif;margin: 0;}
+.leoDatetimepicker .leoDatetimepicker-header{position: relative;background: url("../img/leoUi-bg_highlight-soft_100_c0c0c0_1x100.png") repeat-x scroll center top #c0c0c0;text-shadow: 0 1px 0 rgba(255, 255, 255, 0.7);border-radius: 3px;border: 1px solid #a8a8a8;color: #333;font-weight: bold;margin: 0;padding: 0;}
+.leoDatetimepicker .leoDatetimepicker-header .leoDatetimepicker-header-button{height: 1.8em;position: absolute;top: 2px;width: 1.8em; cursor: pointer;border-radius: 3px;text-decoration: none;}
+.leoDatetimepicker .leoDatetimepicker-header .leoDatetimepicker-icon{ background-image: url("../img/leoUi-icons_898989_256x240.png");text-indent: -9999px;height: 16px;width: 16px;background-repeat: no-repeat;border-radius: 10px;overflow: hidden; display: block;left: 50%;margin-left: -8px;margin-top: -8px;position: absolute;top: 50%;}
+.leoDatetimepicker .leoDatetimepicker-header-prevYears{left: 2px;}
+.leoDatetimepicker .leoDatetimepicker-header-prevYears span{background-position: -48px -160px;}
+.leoDatetimepicker .leoDatetimepicker-header-button:hover{background: url("../img/leoUi-bg_highlight-soft_100_83b0ca_1x100.png") repeat-x scroll center top #83B0CA;box-shadow: 0px 0px 3px #85B2CB;border: 1px solid #8AB0C6;color: #313131;font-weight: bold;top:1px;}
+.leoDatetimepicker .leoDatetimepicker-header-button:hover span{background-image: url("../img/leoUi-icons_38667f_256x240.png") !important;}
+.leoDatetimepicker .leoDatetimepicker-header-nextYears{right:2px;}
+.leoDatetimepicker .leoDatetimepicker-header-nextYears span{background-position: -32px -160px;}
+.leoDatetimepicker .leoDatetimepicker-header-inner{box-shadow: 0 1px 0 #fff inset;border-radius: 0;position: relative;line-height: 1.8em;margin: 0 1.8em;background: none repeat scroll 0% 0% transparent;padding: 1px 1px 12px 1px;}
+.leoDatetimepicker .leoDatetimepicker-header-prevMonths{left: 2px;}
+.leoDatetimepicker .leoDatetimepicker-header-prevMonths span{background-position: -80px -192px;}
+.leoDatetimepicker .leoDatetimepicker-header-nextMonths{right:2px;}
+.leoDatetimepicker .leoDatetimepicker-header-nextMonths span{background-position: -48px -192px;}
+.leoDatetimepicker .leoDatetimepicker-header-inner-title{color: #545454;font-weight: 700;text-shadow: 1px 1px 0px rgba(255, 255, 255, 0.75);background: none repeat scroll 0% 0% transparent;box-shadow: none;margin: 0px 2.3em;line-height: 1.8em;text-align: center;cursor: pointer;border-radius: 3px;}
 
+
+.leoDatetimepicker .leoDatetimepicker-calendar{table-layout: fixed;width: 100%;
+font-size: 0.9em;border-collapse: collapse;margin: 0px 0px 0.4em;position: relative;z-index: 99;}
+.leoDatetimepicker .leoDatetimepicker-calendar thead{border-left: 1px solid #A8A8A8;border-right: 1px solid #A8A8A8;border-bottom: 1px solid #AAAEB6;color: #545454;font-size: 10px;line-height: 4px;position: relative;text-shadow: 1px 1px 0px rgba(255, 255, 255, 0.5);z-index: 5;}
+.leoDatetimepicker .leoDatetimepicker-calendar th{padding: 0.7em 0.3em;text-align: center;font-weight: bold;border: 0px none;}
+.leoDatetimepicker .leoDatetimepicker-calendar tbody{border: 1px solid #A8A8A8;}
+.leoDatetimepicker .leoDatetimepicker-calendar td{border: 0px none;padding: 1px;}
+.leoDatetimepicker .leoDatetimepicker-calendar td a{display: block;padding: 0.2em;text-align: right;text-decoration: none;}
+.leoDatetimepicker .leoDatetimepicker-calendar .leoDatetimepicker-monthselector{cursor: pointer;}
+.leoDatetimepicker .leoDatetimepicker-calendar .leoDatetimepicker-monthselector a{height: 12px;margin-top: -8px;position: relative;top: 2px;width: 12px;background-image: url("../img/leoUi-icons_38667f_256x240.png");text-indent: -9999px;color: #4f4f4f;background-position: -48px -16px;display: block;}
+.leoDatetimepicker .leoDatetimepicker-calendar .leoDatetimepicker-week-col{border: 1px solid #A8A8A8;}
+.leoDatetimepicker .leoDatetimepicker-calendar .leoDatetimepicker-other-month{text-align: right;}
+.leoDatetimepicker .leoDatetimepicker-calendar .leoDatetimepicker-other-month a{opacity: 0.25;filter:alpha(opacity=25);text-shadow: 0px 1px 0px rgba(255, 255, 255, 0.7);font-weight: normal;box-shadow: 0px 1px 0px rgba(255, 255, 255, 0.25) inset;}
+.leoDatetimepicker .leoDatetimepicker-calendar .leoDatetimepicker-day-default{-moz-border-bottom-colors: none;-moz-border-left-colors: none;-moz-border-right-colors: none;-moz-border-top-colors: none;background: none repeat scroll 0% 0% #dfdee2;border-color: -moz-use-text-color #a7aab3 #a7aab3 -moz-use-text-color;border-image: none;border-style: none solid solid none;border-width: medium 1px 1px medium;color: #374452;text-shadow: 0px 1px 0px rgba(255, 255, 255, 0.7);font-weight: bold;box-shadow: 0px 1px 0px rgba(255, 255, 255, 0.25) inset;}
+.leoDatetimepicker .leoDatetimepicker-calendar .leoDatetimepicker-today .leoDatetimepicker-day-default{background: none repeat scroll 0% 0% #7389A5;box-shadow: 0px 0px 5px #364F72 inset;color: #FFF;}
+.leoDatetimepicker .leoDatetimepicker-calendar .leoDatetimepicker-current-day .leoDatetimepicker-day-default{background: none repeat scroll 0% 0% #7389A5;box-shadow: none;color: #FFF;text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.75);}
+.leoDatetimepicker .leoDatetimepicker-calendar .leoDatetimepicker-day-hover .leoDatetimepicker-day-default{background: none repeat scroll 0% 0% #5F83B9;box-shadow: none;color: #FFF;text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.75);}

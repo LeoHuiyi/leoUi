@@ -2005,6 +2005,18 @@
 
         },
 
+        getRowCell: function(modelId, tr){
+
+            if(modelId && tr){
+
+                var thid = this.leoGrid + modelId;
+
+                return $(tr).find('td[thid="'+ thid +'"]')[0];
+
+            }
+
+        },
+
         editCell:function(td, val){
 
             if(!td && (val === undefined)){return;}

@@ -2017,6 +2017,22 @@
 
         },
 
+        getRowCellData: function(modelId, tr){
+
+            if(modelId && tr){
+
+                var rowData = this._getTableDataRow(tr.id);
+
+                if(rowData){
+
+                    return rowData[this.leoGrid + modelId];
+
+                }
+
+            }
+
+        },
+
         editCell:function(td, val){
 
             if(!td && (val === undefined)){return;}

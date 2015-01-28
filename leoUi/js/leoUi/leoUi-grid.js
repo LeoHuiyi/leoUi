@@ -2025,7 +2025,7 @@
 
                 if(rowData){
 
-                    return rowData[this.leoGrid + modelId];
+                    return $.extend(true, {}, rowData[this.leoGrid + modelId]);
 
                 }
 

@@ -708,7 +708,7 @@
 
             });
 
-            plugInPrototype.superClass = inheritPrototype;
+            plugInPrototype.superClass = leoToolsFn.createPrototype(inheritPrototype, inherit);
 
         } else {
 

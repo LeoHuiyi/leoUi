@@ -37,7 +37,7 @@ leoUiLoad.config({
 
 leoUiLoad.require('leoUi-datetimepicker,leoUi, ready', function($) {
 
-    
+    $('.calendar').leoDatetimepicker();
 
 });
 

@@ -139,9 +139,9 @@
 
             isPage:true,//是否要分页功能
 
-            rowNum:10,//每一页条数
+            rowNum:20,//每一页条数
 
-            rowList:[10,20,30],//每一页可选条数
+            rowList:[20,30,50],//每一页可选条数
 
             currentPage:1,//当前选中的页面 (按照人们日常习惯,非计算机常识,是从1开始)
 
@@ -2069,7 +2069,7 @@
 
                 if( typeof tableModel.renderCell === 'function' ){
 
-                    $td.html(tableModel.renderCell(val, trIndex, selectKey));
+                    $td.html(tableModel.renderCell(val, trIndex, selectKey, rowData));
 
                 }else{
 
@@ -2092,6 +2092,8 @@
             child,val,$tr = $(tr),edit,tdData,selectKey,thid,typeOption,
 
             trId = tr.id,$td,tableData = this._getTableDataRow(trId),
+
+            rowData = this._getTableDataRow(trId),
 
             trIndex = tableData.trIndex;
 
@@ -2137,7 +2139,7 @@
 
                     if( typeof child.renderCell === 'function' ){
 
-                        $td.html(child.renderCell(val, trIndex, selectKey));
+                        $td.html(child.renderCell(val, trIndex, selectKey, rowData));
 
                     }else{
 
@@ -2877,7 +2879,7 @@
 
             str += '>';
 
-            if( typeof renderCell === 'function' && typeof ( renderCell = renderCell( value, trIndex, selectKey ) ) === 'string' ){
+            if( typeof renderCell === 'function' && typeof ( renderCell = renderCell( value, trIndex, selectKey, rowData ) ) === 'string' ){
 
                 str += renderCell;
 

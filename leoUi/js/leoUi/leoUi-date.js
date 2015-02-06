@@ -225,7 +225,7 @@
 
         },
 
-        getDate:function(date, format){
+        getDate:function(date, format, notGetNow){
 
             var d;
 
@@ -239,19 +239,19 @@
 
             }
 
-            !d && (d = new Date());
+            !notGetNow && !d && (d = new Date());
 
             return d;
 
         },
 
-        getMaxDate: function(date, format){
+        getMaxDate: function(date, format, notGetNow){
 
             if(date !== false){
 
-                var maxDate = leoDate.getDate(date, format);
+                var maxDate = leoDate.getDate(date, format, notGetNow);
 
-                date = new Date(maxDate.getFullYear(), maxDate.getMonth(), maxDate.getDate(), 23, 59, 59, 999);
+                !maxDate ? date = false : date = new Date(maxDate.getFullYear(), maxDate.getMonth(), maxDate.getDate(), 23, 59, 59, 999);
 
             }
 
@@ -259,13 +259,13 @@
 
         },
 
-        getMinDate: function(date, format){
+        getMinDate: function(date, format, notGetNow){
 
             if(date !== false){
 
-                var minDate = leoDate.getDate(date, format);
+                var minDate = leoDate.getDate(date, format, notGetNow);
 
-                date = new Date(minDate.getFullYear(), minDate.getMonth(), minDate.getDate(), 0, 0, 0, 0);
+                !minDate ? date = false : date = new Date(minDate.getFullYear(), minDate.getMonth(), minDate.getDate(), 0, 0, 0, 0);
 
             }
 
@@ -275,11 +275,29 @@
 
         between: function(date, minDate, maxDate){
 
-            var isValidDate = leoDate.isValidDate;
+            var isValidDate = leoDate.isValidDate,
 
-            if(isValidDate(date) && isValidDate(minDate) && isValidDate(minDate)){
+            isValidDateMax, isValidDateMin;
 
-                return date.getTime() >= minDate.getTime() && date.getTime() <= maxDate.getTime();
+            if(isValidDate(date)){
+
+            	isValidDateMin = isValidDate(minDate);
+
+            	isValidDateMax = isValidDate(maxDate);
+
+            	if(isValidDateMin && isValidDateMax){
+
+            		return date.getTime() >= minDate.getTime() && date.getTime() <= maxDate.getTime();
+
+            	}else if(!isValidDateMin && isValidDateMax){
+
+	            	return date.getTime() <= maxDate.getTime();
+
+	            }else if(!isValidDateMax && isValidDateMin){
+
+	            	return date.getTime() >= minDate.getTime();
+
+	            }
 
             }
 

@@ -275,6 +275,8 @@
 
                 }).fail(function(data){
 
+                    This._loading();
+
                     op.ajaxMegCallback(data, "fail");
 
                 });
@@ -1108,6 +1110,8 @@
 
                 }).fail(function(failData){
 
+                    This._loading();
+
                     op.ajaxMegCallback(data, 'fail');
 
                     typeOptionFailCallBack && typeOptionFailCallBack(failData);
@@ -1147,6 +1151,8 @@
                         doneCallBack && doneCallBack(prop.typeOption);
 
                     }).fail(function(data){
+
+                        This._loading();
 
                         op.ajaxMegCallback(data, 'fail');
 
@@ -1241,6 +1247,8 @@
                     typeOptionDoneCallBack && typeOptionDoneCallBack(data, 'done');
 
                 }).fail(function(failData){
+
+                    This._loading();
 
                     op.ajaxMegCallback(data, 'fail');
 

@@ -77,6 +77,8 @@
 
             this.previewsArr = [];
 
+            this.previewsState = "stop";
+
             this.$target.append(this.options.uploadHtml);
 
         	this._addEvent();
@@ -209,7 +211,7 @@
 
 			}
 
-			this._appendPreview();
+			this.previewsState === "stop" && this._appendPreview();
 
 			if(this.fileFilter.length > 0){
 
@@ -418,9 +420,15 @@
 
         	if(file){
 
+                this.previewsState = "start";
+
         		file.type.indexOf('image') === -1 ? this._appendOther(file) : this._appendImage(file);
 
-        	}
+        	}else{
+
+                this.previewsState = "stop";
+
+            }
 
         },
 

@@ -36,9 +36,27 @@
 
         init: function(date, option){
 
+            var defaultDate;
+
             this.options = $.extend({}, leoDate.defaultOp, option);
 
             this.currentDate = leoDate.getDate(date, this.options.parseFormat);
+
+            if(!this.currentDate){
+
+                defaultDate = this.options.defaultDate;
+
+                if(leoDate.isValidDate(defaultDate)){
+
+                    this.currentDate = defaultDate;
+
+                }else if(defaultDate === 'now'){
+
+                    this.currentDate = new Date();
+
+                }
+
+            }
 
             return this;
 
@@ -208,8 +226,9 @@
 
             strFormat: "yyyy-MM-dd HH:mm:ss",
 
-            parseFormat: "yyyy-MM-dd HH:mm:ss"
+            parseFormat: "yyyy-MM-dd HH:mm:ss",
 
+            defaultDate: "now"
 
         },
 
@@ -225,33 +244,33 @@
 
         },
 
-        getDate:function(date, format, notGetNow){
+        getDate:function(date, format){
 
             var d;
 
             if(leoDate.isValidDate(date)){
 
-                d = date;
+                return date;
 
             }else if(typeof date ==='string'){
 
-                d = Date.parseExact(date, format);
+                return Date.parseExact(date, format);
+
+            }else{
+
+                return null;
 
             }
 
-            !notGetNow && !d && (d = new Date());
-
-            return d;
-
         },
 
-        getMaxDate: function(date, format, notGetNow){
+        getMaxDate:function(date, format){
 
             if(date !== false){
 
-                var maxDate = leoDate.getDate(date, format, notGetNow);
+                var maxDate = leoDate.getDate(date, format);
 
-                !maxDate ? date = false : date = new Date(maxDate.getFullYear(), maxDate.getMonth(), maxDate.getDate(), 23, 59, 59, 999);
+                maxDate && (date = new Date(maxDate.getFullYear(), maxDate.getMonth(), maxDate.getDate(), 23, 59, 59, 999));
 
             }
 
@@ -259,13 +278,13 @@
 
         },
 
-        getMinDate: function(date, format, notGetNow){
+        getMinDate: function(date, format){
 
             if(date !== false){
 
-                var minDate = leoDate.getDate(date, format, notGetNow);
+                var minDate = leoDate.getDate(date, format);
 
-                !minDate ? date = false : date = new Date(minDate.getFullYear(), minDate.getMonth(), minDate.getDate(), 0, 0, 0, 0);
+                minDate && (date = new Date(minDate.getFullYear(), minDate.getMonth(), minDate.getDate(), 0, 0, 0, 0));
 
             }
 

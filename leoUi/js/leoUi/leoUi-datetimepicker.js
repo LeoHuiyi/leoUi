@@ -336,15 +336,15 @@
 
                         cellText = monthsName[index];
 
-                        console.log((minDate !== false && (startMonth + index) < (minDate.getFullYear() * 12 + minDate.getMonth())))
+                        console.log((minDate !== false && (startMonth + index) > (minDate.getFullYear() * 12 + minDate.getMonth())))
 
-                        console.log((maxDate !== false && (startMonth + index) > (maxDate.getFullYear() * 12 + maxDate.getMonth())))
+                        console.log((maxDate !== false && (startMonth + index) < (maxDate.getFullYear() * 12 + maxDate.getMonth())))
 
                         console.log(index)
 
                         outofRange = (minDate !== false && (startMonth + index) < (minDate.getFullYear() * 12 + minDate.getMonth())) || (maxDate !== false && (startMonth + index) > (maxDate.getFullYear() * 12 + maxDate.getMonth()));
 
-                        console.log(outofRange)
+                        // console.log(outofRange)
 
                         break;
 
@@ -379,6 +379,135 @@
             }
 
             return tableStr;
+
+        },
+
+        _rangeDateCreate:function(type, start){
+
+            var op = this.options, maxDate = op.maxDate,
+
+            minDate = op.minDate, leoDate = $.leoTools.Date,
+
+            maxMineFormat = op.maxMineFormat;
+
+            switch (type) {
+
+                case "day":
+
+                    if(maxDate !== false){
+
+                        maxDate = leoDate.getMaxDate(maxDate, maxMineFormat, true);
+
+                    }
+
+                    if(minDate !== false){
+
+                        minDate = leoDate.getMinDate(minDate, maxMineFormat, true);
+
+                    }
+
+                break;
+
+                case "month":
+
+                    if(maxDate !== false){
+
+                        maxDate = leoDate.getDate(maxDate, maxMineFormat, true);
+
+                        maxDate && (maxDate = maxDate.getFullYear() * 12 + maxDate.getMonth());
+
+                    }
+
+                    if(minDate !== false){
+
+                        minDate = leoDate.getDate(minDate, maxMineFormat, true);
+
+                        minDate && (minDate = minDate.getFullYear() * 12 + minDate.getMonth());
+
+                    }
+
+                    start = start.getFullYear() * 12;
+
+                break;
+
+                case "year":
+
+                    if(maxDate !== false){
+
+                        maxDate = leoDate.getDate(maxDate, maxMineFormat, true);
+
+                        maxDate && (maxDate = maxDate.getFullYear());
+
+                    }
+
+                    if(minDate !== false){
+
+                        minDate = leoDate.getDate(minDate, maxMineFormat, true);
+
+                        maxDate && (maxDate = maxDate.getFullYear());
+
+                    }
+
+                    start = start.getFullYear();
+
+                break;
+
+            }
+
+            return function(date){
+
+                var returnVal;
+
+                switch (type) {
+
+                    case "day":
+
+                    if(((maxDate !== false && startDate > maxDate) || (minDate !== false && startDate < minDate))){
+
+                        returnVal = false;
+
+                    }else{
+
+                        returnVal = true;
+
+                    }
+
+                    break;
+
+                    case "month":
+
+                    cellText = monthsName[index];
+
+                    console.log((minDate !== false && (startMonth + index) > (minDate.getFullYear() * 12 + minDate.getMonth())))
+
+                    console.log((maxDate !== false && (startMonth + index) < (maxDate.getFullYear() * 12 + maxDate.getMonth())))
+
+                    console.log(index)
+
+                    outofRange = (minDate !== false && (startMonth + index) < (minDate.getFullYear() * 12 + minDate.getMonth())) || (maxDate !== false && (startMonth + index) > (maxDate.getFullYear() * 12 + maxDate.getMonth()));
+
+                    // console.log(outofRange)
+
+                    break;
+
+                    case "year":
+
+                            v = startYear + index;
+
+                            if ((minDate !== false && (v < o.minDate.getFullYear())) || (maxDate !== false && (v > o.maxDate.getFullYear()))) {
+
+                                outofRange = true;
+
+                            }
+
+                            cellText = v.toString();
+
+                    break;
+
+                }
+
+
+            }
 
         },
 

@@ -255,7 +255,7 @@
 
                     }else{
 
-                        This.totalItems = data[ajax.teamsCountKey] || This.teamsData.length;
+                        This.totalItems = data[ajax.teamsCountKey] || (This.teamsData && This.teamsData.length) || 0;
 
                         This._bodyTableAppendContent();
 
@@ -289,7 +289,7 @@
 
                     afterGetData && (this.teamsData = afterGetData(this.teamsData));
 
-                    this.totalItems = this.teamsData.length;
+                    this.totalItems = (this.teamsData && this.teamsData.length) || 0;
 
                     op.isPage === true && (pagerInfo = this._getPagerInfo( op.currentPage, op.rowNum ));
 

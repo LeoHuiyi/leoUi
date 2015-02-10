@@ -2355,6 +2355,8 @@
 
                     !s ? result = 0 : result = Date.parse(s.replace(/\-/g,'/'));
 
+                    !result && (result = 0);
+
                     break;
 
             }

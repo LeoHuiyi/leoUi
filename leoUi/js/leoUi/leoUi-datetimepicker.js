@@ -61,9 +61,9 @@
 
         	maxMineFormat:"yyyy-MM-dd",
 
-        	maxDate:"2015-02-04",
+        	maxDate:false,
 
-        	minDate:"2015-02-04",
+        	minDate:false,
 
             viewSelect:'day'//'year', 'month', 'day'
 
@@ -130,7 +130,9 @@
 
         _setHeader:function(){
 
-            var headerTitle = this._getHeaderTitle();
+            var headerTitle = this._getHeaderTitle(),
+
+            quickButton = this.options.quickButton;
 
             this.$datetimepickerHeaderTitle.html(this._getHeaderTitle());
 
@@ -142,9 +144,13 @@
 
                     this.$datetimepickerHeaderNext.attr('event', "nextMonths");
 
-                    this.$datetimepickerHeaderQuickPrev.show();
+                    if(quickButton){
 
-                    this.$datetimepickerHeaderQuickNext.show();
+                        this.$datetimepickerHeaderQuickPrev.attr('event', "prevYears");
+
+                        this.$datetimepickerHeaderQuickNext.attr('event', "nextYears");
+
+                    }
 
                     break;
 
@@ -154,9 +160,13 @@
 
                     this.$datetimepickerHeaderNext.attr('event', "nextYears");
 
-                    this.$datetimepickerHeaderQuickPrev.hide();
+                    if(quickButton){
 
-                    this.$datetimepickerHeaderQuickNext.hide();
+                        this.$datetimepickerHeaderQuickPrev.attr('event', "prevYears");
+
+                        this.$datetimepickerHeaderQuickNext.attr('event', "nextYears");
+
+                    }
 
                     break;
 
@@ -166,9 +176,13 @@
 
                     this.$datetimepickerHeaderNext.attr('event', "nextTenYears");
 
-                    this.$datetimepickerHeaderQuickPrev.hide();
+                    if(quickButton){
 
-                    this.$datetimepickerHeaderQuickNext.hide();
+                        this.$datetimepickerHeaderQuickPrev.attr('event', "prevTenYears");
+
+                        this.$datetimepickerHeaderQuickNext.attr('event', "nextTenYears");
+
+                    }
 
                     break;
 
@@ -229,7 +243,7 @@
 
                 case "year":
 
-                    year = currentDate.getFullYear();
+                    year = Math.floor(currentDate.getFullYear() / 10) * 10 - 1;
 
                     returnVal = (year + 1) + " - " + (year + 10);
 
@@ -271,15 +285,15 @@
 
             this.$datetimepickerHeaderTitle = $datetimepickerHeader.find('div[role="headerTitle"]');
 
-            this.$datetimepickerHeaderPrev = $datetimepickerHeader.find('div[role="prev"]');
+            this.$datetimepickerHeaderPrev = $datetimepickerHeader.find('a[role="prev"]');
 
-            this.$datetimepickerHeaderNext = $datetimepickerHeader.find('div[role="next"]');
+            this.$datetimepickerHeaderNext = $datetimepickerHeader.find('a[role="next"]');
 
             if(quickButton){
 
-                this.$datetimepickerHeaderQuickPrev = $datetimepickerHeader.find('div[role="quickPrev"]');
+                this.$datetimepickerHeaderQuickPrev = $datetimepickerHeader.find('a[role="quickPrev"]');
 
-                this.$datetimepickerHeaderQuickNext = $datetimepickerHeader.find('div[role="quickNext"]');
+                this.$datetimepickerHeaderQuickNext = $datetimepickerHeader.find('a[role="quickNext"]');
 
             }
 
@@ -458,6 +472,8 @@
                             range = rangeDateCreate(index);
 
                             cellText = year.toString();
+
+                            ;(index === 0 || index === 11) && (cls += 'leoDatetimepicker-grid-other');
 
                             break;
 

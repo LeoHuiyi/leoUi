@@ -223,7 +223,7 @@
 
                 case "month":
 
-                    returnVal = op.monthsName[currentDate.getMonth()];
+                    returnVal = currentDate.getFullYear();
 
                     break;
 

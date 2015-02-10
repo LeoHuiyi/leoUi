@@ -1292,7 +1292,7 @@
 
         _resizeTableWidth:function( first, firstTableWidth ){
 
-            if(this.$target.is(':hidden')){return;}
+            if(first !== true && this.$target.is(':hidden')){return;}
 
             var tableOption = this.tableOption,resizeGetWidth,
 

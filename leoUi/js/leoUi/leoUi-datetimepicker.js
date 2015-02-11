@@ -61,9 +61,9 @@
 
         	maxMineFormat:"yyyy-MM-dd",
 
-        	maxDate:false,
+        	maxDate:false,//"2015-02-04"
 
-        	minDate:false,
+            minDate:false,//"2015-02-04"
 
             viewSelect:'day'//'year', 'month', 'day'
 
@@ -73,6 +73,12 @@
         _init:function(){
 
             this.viewSelect = this.options.viewSelect;
+
+            this._selectDay = false;
+
+            this._selectMonth= false;
+
+            this._selectYear = false;
 
         	this._getDateValue();
 
@@ -313,6 +319,8 @@
 
         	leoDate = $.leoTools.Date,
 
+            strFormat = op.strFormat,
+
         	maxMineFormat = op.maxMineFormat,
 
         	startDate = this._getDaysTableDayStart(),
@@ -327,7 +335,9 @@
 
         	d, y, m, classes, i = 0, j = 0, z,
 
-        	equals = Date.equals,
+        	equals = Date.equals,role,
+
+            currentVal = this._currentVal,
 
             rangeDateCreate = this._rangeDateCreate('day'),
 
@@ -393,7 +403,21 @@
 
 						classes.push('leoDatetimepicker-disabled');
 
-					}
+                        role = "disabled";
+
+					}else{
+
+                        role = "select";
+
+                    }
+
+                    console.log()
+
+                    if(currentVal && equals(startDate, currentVal)){
+
+                        classes.push('leoDatetimepicker-current-day');
+
+                    }
 
 					if(equals(startDate, today)){
 
@@ -401,7 +425,7 @@
 
 					}
 
-					tableStr += '<td class="' + classes.join(' ') + '" title="' +  startDate.toString(dayTitleFormat) + '"><a href="#" class="leoDatetimepicker-day-default">' + d + '</a></td>';
+					tableStr += '<td class="' + classes.join(' ') + '" title="' +  startDate.toString(dayTitleFormat) + '" value="' + startDate.toString(strFormat) + '" role="' + role + '"><a href="#" class="leoDatetimepicker-day-default">' + d + '</a></td>';
 
 					startDate.addDays(1);
 
@@ -425,9 +449,9 @@
 
             date = this._currentDate.getCurrentDate(true),
 
-            monthsName = op.monthsName,
+            monthsName = op.monthsName,value,
 
-            leoDate = $.leoTools.Date, cls = '',
+            leoDate = $.leoTools.Date, cls = [],
 
             maxMineFormat = op.maxMineFormat,
 
@@ -435,9 +459,17 @@
 
             viewSelect = this.viewSelect, startDate, rangeDateCreate;
 
-            viewSelect === 'month' ? startDate = date : startDate = Math.floor(date.getFullYear() / 10) * 10 - 1;
-
             rangeDateCreate = this._rangeDateCreate(viewSelect, startDate);
+
+            if(viewSelect === 'month'){
+
+                startDate = date;
+
+            }else{
+
+                startDate = Math.floor(date.getFullYear() / 10) * 10 - 1;
+
+            }
 
             for(i = 0; i < rows; i++){
 
@@ -453,7 +485,7 @@
 
                     year = null;
 
-                    cls = '';
+                    cls = [];
 
                     switch (viewSelect) {
 
@@ -462,6 +494,8 @@
                             cellText = monthsName[index];
 
                             range = rangeDateCreate(index);
+
+                            value = index;
 
                             break;
 
@@ -473,7 +507,9 @@
 
                             cellText = year.toString();
 
-                            ;(index === 0 || index === 11) && (cls += 'leoDatetimepicker-grid-other');
+                            value = cellText;
+
+                            ;(index === 0 || index === 11) && (cls.push('leoDatetimepicker-grid-other'));
 
                             break;
 
@@ -481,11 +517,11 @@
 
                     if(!range){
 
-                        cls += 'leoDatetimepicker-disabled';
+                        cls.push('leoDatetimepicker-disabled');
 
                     }
 
-                    tableStr += '<td class="leoDatetimepicker-day-default '+cls+'"><a href="###">' + cellText + '</a></td>';
+                    tableStr += '<td class="leoDatetimepicker-day-default '+cls.join(' ')+'" value="'+value+'"><a href="###">' + cellText + '</a></td>';
 
                 }
 
@@ -503,7 +539,11 @@
 
             minDate = op.minDate, leoDate = $.leoTools.Date,
 
-            maxMineFormat = op.maxMineFormat;
+            maxMineFormat = op.maxMineFormat,
+
+            currentVal = this._currentVal;
+
+            !currentVal && (currentVal = false);
 
             switch (type) {
 
@@ -543,6 +583,8 @@
 
                     start = start.getFullYear() * 12;
 
+                    currentVal && (currentVal = currentVal.getFullYear() * 12 + currentVal.getMonth());
+
                     break;
 
                 case "year":
@@ -563,7 +605,7 @@
 
                     }
 
-                    start = start;
+                    currentVal && (currentVal = currentVal.getFullYear());
 
                     break;
 
@@ -587,6 +629,16 @@
 
                         }
 
+                        if(currentVal !==false && currentVal === date){
+
+                            this._selectDay = true;
+
+                        }else{
+
+                            this._selectDay = false;
+
+                        }
+
                         break;
 
                     case "month":
@@ -601,6 +653,16 @@
 
                         }
 
+                        if(currentVal !==false && currentVal === date){
+
+                            this._selectMonth = true;
+
+                        }else{
+
+                            this._selectMonth = false;
+
+                        }
+
                         break;
 
                     case "year":
@@ -612,6 +674,16 @@
                         }else{
 
                             returnVal = true;
+
+                        }
+
+                        if(currentVal !==false && currentVal === date){
+
+                            this._selectYear = true;
+
+                        }else{
+
+                            this._selectYear = false;
 
                         }
 

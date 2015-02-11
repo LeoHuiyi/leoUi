@@ -767,7 +767,7 @@
 
             if( this.options.resizeWidth === false && isRiseze === true || this.$target.is(':hidden') ){ return; }
 
-            var tableWidth = this.options.width;
+            var tableWidth = this.options.width, width;
 
             if(tableWidth === false){return;}
 
@@ -775,31 +775,15 @@
 
             if(typeof tableWidth === 'number'){
 
-                this.$gridBox.width(tableWidth);
+                width = this.$gridBox.setOuterWidth(tableWidth).width();
 
-                this.$gviewGrid.width(tableWidth);
-
-                this.$uiJqgridHdiv.width(tableWidth);
-
-                this.$uiJqgridBdiv.width(tableWidth);
-
-                !!this.$footer && this.$footer.width(tableWidth);
-
-                this.tableOption.boxWidth = tableWidth;
+                this.tableOption.boxWidth = width;
 
             }else if(typeof tableWidth === 'string'){
 
-                this.$gridBox.width(tableWidth);
+                this.$gridBox.setOuterWidth(tableWidth);
 
                 tableWidth = this.tableOption.boxWidth = this.$gridBox.width();
-
-                this.$gviewGrid.width(tableWidth);
-
-                this.$uiJqgridHdiv.width(tableWidth);
-
-                this.$uiJqgridBdiv.width(tableWidth);
-
-                !!this.$footer && this.$footer.width(tableWidth);
 
             }
 
@@ -807,27 +791,19 @@
 
         setTableWidthOrHeight:function(tableWidth, tableHeight){
 
-            var flag = false;
+            var flag = false, width;
 
             if(typeof tableWidth === 'number'){
 
-                this.$gridBox.width(tableWidth);
+                width = this.$gridBox.setOuterWidth(tableWidth).width();
 
-                this.$gviewGrid.width(tableWidth);
-
-                this.$uiJqgridHdiv.width(tableWidth);
-
-                this.$uiJqgridBdiv.width(tableWidth);
-
-                !!this.$footer && this.$footer.width(tableWidth);
-
-                this.tableOption.boxWidth = tableWidth;
+                this.tableOption.boxWidth = width;
 
                 flag = true;
 
             }else if(typeof tableWidth === 'string'){
 
-                this.$gridBox.width(tableWidth);
+                this.$gridBox.setOuterWidth(tableWidth);
 
                 tableWidth = this.tableOption.boxWidth = this.$gridBox.width();
 
@@ -854,7 +830,7 @@
 
             }else if(typeof tableHeight === 'string'){
 
-                this.$gridBox.height(tableHeight);
+                this.$gridBox.setOuterHeight(tableHeight);
 
                 tableHeight = this.$gridBox.height();
 
@@ -888,7 +864,7 @@
 
             }else if(typeof tableHeight === 'string'){
 
-                this.$gridBox.height(tableHeight);
+                this.$gridBox.setOuterHeight(tableHeight);
 
                 tableHeight = this.$gridBox.height();
 

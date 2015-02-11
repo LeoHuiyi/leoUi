@@ -121,7 +121,7 @@
 
         getCurrentDate: function(isClone){
 
-            return !isClone ? this.currentDate.clone() : this.currentDate;
+            return !isClone ? this.currentDate : this.currentDate.clone();
 
         },
 

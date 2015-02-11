@@ -719,17 +719,17 @@
 
             this._addEvent();
 
-            this._setTableWidth();
-
-            this._setTableHeight();
-
-            this._tableWidthAuto();
-
             if(this.options.onlyInit){
 
                 this.$gridBox.hide().css( 'visibility', '' );
 
             }else{
+
+                this._setTableWidth();
+
+                this._setTableHeight();
+
+                this._tableWidthAuto();
 
                 this.$gridBox.css( 'visibility', '' );
 

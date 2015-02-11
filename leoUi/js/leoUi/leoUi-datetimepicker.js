@@ -47,9 +47,9 @@
 
         	weekStart:0,//一周从哪一天开始。0（星期日）到6（星期六）
 
-        	quickButton:true,
+        	quickButton:false,
 
-        	showWeekDays:true,
+        	showWeekDays:false,
 
         	showOtherMonthDays:true,
 
@@ -66,7 +66,6 @@
             minDate:false,//"2015-02-04"
 
             viewSelect:'day'//'year', 'month', 'day'
-
 
         },
 
@@ -100,7 +99,7 @@
 
         	var leoDate = $.leoTools.Date, op = this.options;
 
-        	this._currentDate = new leoDate(this._currentVal, {
+        	this._currentDate = new leoDate(this._currentVal && this._currentVal.clone(), {
 
         		parseFormat:op.parseFormat,
 
@@ -126,11 +125,10 @@
 
             this._createHeader();
 
-        	this.$datetimepicker = $('<div class="leoDatetimepicker leoUi_clearfix"></div>').append(this.$datetimepickerHeader);
+        	this.$datetimepicker = $('<div class="leoDatetimepicker leoUi_clearfix"></div>').append(this.$datetimepickerHeader).appendTo(this.$target);
 
             this._setViewSelectTable();
 
-            this.$datetimepicker.appendTo(this.$target);
 
         },
 
@@ -206,19 +204,19 @@
 
                 case "day":
 
-                    this.$datetimepicker.find('table[role="leoDatetimepickerTable"]').remove().end().append(this._createDaysTable());
+                    this.dayTableHeight = $(this._createDaysTable()).appendTo(this.$datetimepicker.find('table[role="leoDatetimepickerTable"]').remove().end()).height();
 
                     break;
 
                 case "month":
 
-                    this.$datetimepicker.find('table[role="leoDatetimepickerTable"]').remove().end().append(this._createMonthsYearsTable());
+                    $(this._createMonthsYearsTable()).appendTo(this.$datetimepicker.find('table[role="leoDatetimepickerTable"]').remove().end()).setOuterHeight(this.dayTableHeight);
 
                     break;
 
                 case "year":
 
-                    this.$datetimepicker.find('table[role="leoDatetimepickerTable"]').remove().end().append(this._createMonthsYearsTable());
+                    $(this._createMonthsYearsTable()).appendTo(this.$datetimepicker.find('table[role="leoDatetimepickerTable"]').remove().end()).setOuterHeight(this.dayTableHeight);
 
                     break;
 
@@ -319,8 +317,6 @@
 
         	leoDate = $.leoTools.Date,
 
-            strFormat = op.strFormat,
-
         	maxMineFormat = op.maxMineFormat,
 
         	startDate = this._getDaysTableDayStart(),
@@ -333,7 +329,7 @@
 
         	dayTitleFormat = op.dayTitleFormat,
 
-        	d, y, m, classes, i = 0, j = 0, z,
+        	d, m, classes, i = 0, j = 0, z,
 
         	equals = Date.equals,role,
 
@@ -369,8 +365,6 @@
 
 					d = startDate.getDate();
 
-					y = startDate.getFullYear();
-
 					m = startDate.getMonth();
 
 					if(showWeekDays && z === 0){
@@ -389,7 +383,7 @@
 
 						}else{
 
-							tableStr += '<td class="leoDatetimepicker-day-gap"></td>';
+							tableStr += '<td class="leoDatetimepicker-day-gap">&nbsp;</td>';
 
 							startDate.addDays(1);
 
@@ -409,23 +403,21 @@
 
                         role = "select";
 
+                        if(currentVal && equals(startDate, currentVal)){
+
+                            classes.push('leoDatetimepicker-current-day');
+
+                        }
+
+                        if(equals(startDate, today)){
+
+                            classes.push('leoDatetimepicker-today');
+
+                        }
+
                     }
 
-                    console.log()
-
-                    if(currentVal && equals(startDate, currentVal)){
-
-                        classes.push('leoDatetimepicker-current-day');
-
-                    }
-
-					if(equals(startDate, today)){
-
-						classes.push('leoDatetimepicker-today');
-
-					}
-
-					tableStr += '<td class="' + classes.join(' ') + '" title="' +  startDate.toString(dayTitleFormat) + '" value="' + startDate.toString(strFormat) + '" role="' + role + '"><a href="#" class="leoDatetimepicker-day-default">' + d + '</a></td>';
+					tableStr += '<td class="' + classes.join(' ') + '" title="' +  startDate.toString(dayTitleFormat) + '" value="' + startDate.getTime() + '" role="' + role + '"><a href="#" class="leoDatetimepicker-day-default">' + d + '</a></td>';
 
 					startDate.addDays(1);
 
@@ -445,21 +437,19 @@
 
             var op = this.options, rows = 3, cols = 4, i, j,
 
-            tableStr = '<table class="leoDatetimepicker-calendar leoDatetimepicker-grid" style="height:187px" role="leoDatetimepickerTable"><tbody>',
+            tableStr = '<table class="leoDatetimepicker-calendar leoDatetimepicker-grid" role="leoDatetimepickerTable"><tbody>',
 
             date = this._currentDate.getCurrentDate(true),
 
-            monthsName = op.monthsName,value,
+            monthsName = op.monthsName,value,role,
 
             leoDate = $.leoTools.Date, cls = [],
 
-            maxMineFormat = op.maxMineFormat,
+            maxMineFormat = op.maxMineFormat,select,
 
             index,outofRange,cellText,year,range,
 
             viewSelect = this.viewSelect, startDate, rangeDateCreate;
-
-            rangeDateCreate = this._rangeDateCreate(viewSelect, startDate);
 
             if(viewSelect === 'month'){
 
@@ -470,6 +460,8 @@
                 startDate = Math.floor(date.getFullYear() / 10) * 10 - 1;
 
             }
+
+            rangeDateCreate = this._rangeDateCreate(viewSelect, startDate);
 
             for(i = 0; i < rows; i++){
 
@@ -497,6 +489,8 @@
 
                             value = index;
 
+                            select = this._selectMonth;
+
                             break;
 
                         case "year":
@@ -509,6 +503,8 @@
 
                             value = cellText;
 
+                            select = this._selectYear;
+
                             ;(index === 0 || index === 11) && (cls.push('leoDatetimepicker-grid-other'));
 
                             break;
@@ -519,9 +515,17 @@
 
                         cls.push('leoDatetimepicker-disabled');
 
+                        role = "disabled";
+
+                    }else{
+
+                        role = "select";
+
+                        select && cls.push('leoDatetimepicker-grid-active');
+
                     }
 
-                    tableStr += '<td class="leoDatetimepicker-day-default '+cls.join(' ')+'" value="'+value+'"><a href="###">' + cellText + '</a></td>';
+                    tableStr += '<td class="leoDatetimepicker-day-default '+cls.join(' ')+'" value="'+value+'" role="' + role + '"><a href="###">' + cellText + '</a></td>';
 
                 }
 
@@ -541,7 +545,7 @@
 
             maxMineFormat = op.maxMineFormat,
 
-            currentVal = this._currentVal;
+            This = this, currentVal = this._currentVal;
 
             !currentVal && (currentVal = false);
 
@@ -560,6 +564,8 @@
                         minDate = leoDate.getMinDate(minDate, maxMineFormat, true);
 
                     }
+
+                    currentVal && (currentVal = currentVal.clearTime());
 
                     break;
 
@@ -613,7 +619,7 @@
 
             return function(date){
 
-                var returnVal;
+                var returnVal, value;
 
                 switch (type) {
 
@@ -629,13 +635,13 @@
 
                         }
 
-                        if(currentVal !==false && currentVal === date){
+                        if(currentVal !== false && currentVal === date){
 
-                            this._selectDay = true;
+                            This._selectDay = true;
 
                         }else{
 
-                            this._selectDay = false;
+                            This._selectDay = false;
 
                         }
 
@@ -643,7 +649,9 @@
 
                     case "month":
 
-                        if((minDate !== false && (start + date) < minDate) || (maxDate !== false && (start + date) > maxDate)){
+                        value = start + date;
+
+                        if((minDate !== false && value < minDate) || (maxDate !== false && value > maxDate)){
 
                             returnVal = false;
 
@@ -653,13 +661,13 @@
 
                         }
 
-                        if(currentVal !==false && currentVal === date){
+                        if(currentVal !== false && currentVal === value){
 
-                            this._selectMonth = true;
+                            This._selectMonth = true;
 
                         }else{
 
-                            this._selectMonth = false;
+                            This._selectMonth = false;
 
                         }
 
@@ -667,7 +675,9 @@
 
                     case "year":
 
-                        if((minDate !== false && (start + date) < minDate) || maxDate !== false && ((start + date) > maxDate)){
+                        value = start + date;
+
+                        if((minDate !== false && value < minDate) || (maxDate !== false && value > maxDate)){
 
                             returnVal = false;
 
@@ -677,13 +687,13 @@
 
                         }
 
-                        if(currentVal !==false && currentVal === date){
+                        if(currentVal !== false && currentVal === value){
 
-                            this._selectYear = true;
+                            This._selectYear = true;
 
                         }else{
 
-                            this._selectYear = false;
+                            This._selectYear = false;
 
                         }
 
@@ -730,6 +740,12 @@
         _currentDateNextTenYears:function(){
 
             this._currentDate.addYears(10);
+
+        },
+
+        _setCurrentVal:function(){
+
+            this._currentVal = this._currentDate.getCurrentDate(true);
 
         },
 
@@ -789,9 +805,7 @@
 
                 This._setViewSelectTable();
 
-        	});
-
-            this._on(this.$datetimepickerHeaderTitle, 'click', function(event){
+        	})._on(this.$datetimepickerHeaderTitle, 'click', function(event){
 
                 switch(This.viewSelect) {
 
@@ -812,6 +826,42 @@
                         break;
 
                     case "year":
+
+                        break;
+
+                }
+
+            })._on(this.$datetimepicker, 'click', 'td[role="select"]', function(event){
+
+                switch(This.viewSelect) {
+
+                    case "day":
+
+                        This._currentDate.getCurrentDate().setTime($(this).attr('value'));
+
+                        This._setCurrentVal();
+
+                        This._setViewSelectTable();
+
+                        break;
+
+                    case "month":
+
+                        This.viewSelect = 'day';
+
+                        This._currentDate.getCurrentDate().setMonth($(this).attr('value'));
+
+                        This._setViewSelectTable();
+
+                        break;
+
+                    case "year":
+
+                        This.viewSelect = 'month';
+
+                        This._currentDate.getCurrentDate().setFullYear($(this).attr('value'));
+
+                        This._setViewSelectTable();
 
                         break;
 

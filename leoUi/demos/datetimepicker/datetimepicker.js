@@ -41,10 +41,19 @@ leoUiLoad.require('leoUi-datetimepicker,leoUi, ready', function($) {
 
     $('#button').on('click', function(event) {
         event.preventDefault();
-        console.log($('.calendar').leoDatetimepicker('getCurrentVal'))
-    });
+        console.log($('.calendar').leoDatetimepicker('state'))
 
-    
+        if($('.calendar').leoDatetimepicker('state')==='open'){
+
+            $('.calendar').leoDatetimepicker('hide');
+
+        }else{
+
+            $('.calendar').leoDatetimepicker('show');
+
+        }
+
+    });
 
 });
 

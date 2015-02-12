@@ -43,13 +43,17 @@
 				"日", "一", "二", "三", "四", "五", "六"
 			],
 
-			weeksName:"周数",
+			weeksName:"周",
+
+            append:'body',
+
+            autoOpen:true,
 
         	weekStart:0,//一周从哪一天开始。0（星期日）到6（星期六）
 
-        	quickButton:false,
+        	quickButton:true,
 
-        	showWeekDays:false,
+        	showWeekDays:true,
 
         	showOtherMonthDays:true,
 
@@ -60,6 +64,48 @@
         	dayTitleFormat:"yyyy-MM-dd",
 
         	maxMineFormat:"yyyy-MM-dd",
+
+            defaultDateFormat:"yyyy-MM-dd",
+
+            defaultDate:"now",
+
+            position:{//参考jqueryUi的API（其中of和within属性设置成“window”或者“document”使用当前框架的window或者document）
+
+                my:"center",
+
+                at:"center",
+
+                of:'window',
+
+                collision:"fit",
+
+                within:'window'
+
+            },
+
+            showDelay:0,//打开延迟的时间
+
+            hideDelay:0,//关闭延迟的时间
+
+            showAnimation: function(callBack, state) {
+
+                this.show( { effect: "explode", duration: "slow", complete: callBack } );
+
+                // this.show();
+
+                // callBack();
+
+            },//显示的回调，可自定义动画等，在显示完毕必须调用callBack（this: $target, arguments: callBack, state）
+
+            hideAnimation: function(callBack, state) {
+
+                this.hide( { effect: "clip", duration: "slow", complete: callBack } );
+
+                // this.hide();
+
+                // callBack();
+
+            },//关闭的回调，可自定义动画等，在显示完毕必须调用callBack（this: $target, arguments: callBack, state）
 
         	maxDate:false,//"2015-02-04"
 
@@ -75,13 +121,17 @@
 
         _init:function(){
 
-            this.viewSelect = this.options.startView;
-
             this._selectDay = false;
 
             this._selectMonth= false;
 
             this._selectYear = false;
+
+            this._state = 'hide';
+
+            this._changePosition();
+
+            this._getViewGrade();
 
         	this._getDateValue();
 
@@ -93,7 +143,17 @@
 
         _getDateValue:function(){
 
-            this._currentVal = $.leoTools.Date.getDate(this.$target.val(), this.options.parseFormat);
+            var op = this.options, defaultDate = op.defaultDate,
+
+            leoDate = $.leoTools.Date;
+
+            this._currentVal = leoDate.getDate(this.$target.val(), op.parseFormat);
+
+            if(!this._currentVal){
+
+                defaultDate === 'now' ? this._currentVal = new Date() : this._currentVal = leoDate.getDate(defaultDate, op.defaultDateFormat);
+
+            }
 
             this._initLeoDate();
 
@@ -101,9 +161,9 @@
 
         _initLeoDate:function(){
 
-        	var leoDate = $.leoTools.Date, op = this.options;
+        	var op = this.options;
 
-        	this._currentDate = new leoDate(this._currentVal && this._currentVal.clone(), {
+        	this._currentDate = new $.leoTools.Date(this._currentVal && this._currentVal.clone(), {
 
         		parseFormat:op.parseFormat,
 
@@ -125,11 +185,167 @@
 
         },
 
+        _changePosition:function(){
+
+            var position = this.options.position;
+
+            if(position.of === 'window'){
+
+                position.of = this.window;
+
+            }else if(position.of === 'document'){
+
+                position.of = this.document;
+
+            }
+
+            if(position.within === 'window'){
+
+                position.within = this.window;
+
+            }else if(position.within === 'document'){
+
+                position.within = this.document;
+
+            }
+
+        },
+
+        _setPosition:function(){
+
+            if( this.options.disabled ){ return; }
+
+            var isVisible = this._state === 'open',
+
+            $datetimepicker = this.$datetimepicker;
+
+            !!this.options.arrow && $target.css( 'margin', '' );
+
+            !isVisible && $datetimepicker.show();
+
+            $datetimepicker.position( this.options.position );
+
+            !isVisible && $datetimepicker.hide();
+
+        },
+
+        state:function(){
+
+            return this._state;
+
+        },
+
+        show:function(){
+
+            if( this.options.disabled ){ return; }
+
+            this._setPosition();
+
+            this._showFn();
+
+        },
+
+        hide:function(){
+
+            if( this.options.disabled ){ return; }
+
+            this._hideFn();
+
+        },
+
+        _hideFn:function(){
+
+            this.delayHideTimeId = this._delay(function(){
+
+                delete this.delayHideTimeId;
+
+                if( this.options.disabled ){ return; }
+
+                var This = this;
+
+                this._state = 'closeing';
+
+                this.options.hideAnimation.call( this.$datetimepicker, function(){
+
+                    This._state = 'close';
+
+                }, this._state );
+
+            }, this.options.hideDelay );
+
+        },
+
+        _showFn:function(){
+
+            this.delayShowTimeId = this._delay(function(){
+
+                delete this.delayShowTimeId;
+
+                if( this.options.disabled ){ return; }
+
+                var This = this;
+
+                this._state = 'opening';
+
+                this.options.showAnimation.call( this.$datetimepicker, function(){
+
+                    This._state = 'open';
+
+                }, this._state );
+
+            },this.options.showDelay);
+
+        },
+
+        _clearTimeout:function(id){
+
+            if(id === 'show' && this.delayShowTimeId){
+
+                clearTimeout(this.delayShowTimeId);
+
+                delete this.delayShowTimeId;
+
+            }else if(id === 'hide' && this.delayHideTimeId){
+
+                clearTimeout(this.delayHideTimeId);
+
+                delete this.delayHideTimeId;
+
+            }
+
+        },
+
+        clearTimeout:function(id){
+
+            if(typeof id !== 'string'){return;}
+
+            var This = this;
+
+            id.replace(/[^, ]+/g, function(name){
+
+                This._clearTimeout(name);
+
+            });
+
+        },
+
         _createDatetimepicker:function(){
+
+            var op = this.options, $datetimepicker;
 
             this._createHeader();
 
-        	this.$datetimepicker = $('<div class="leoDatetimepicker leoUi_clearfix"></div>').append(this.$datetimepickerHeader).appendTo(this.$target);
+        	$datetimepicker = this.$datetimepicker = $('<div class="leoDatetimepicker leoUi_clearfix"></div>').append(this.$datetimepickerHeader).hide().appendTo(this.options.append || this.$target);
+
+            if(op.autoOpen){
+
+                this._setPosition();
+
+                $datetimepicker.show();
+
+                this._state = 'open';
+
+            }
 
             this._setViewSelectTable();
 
@@ -204,7 +420,27 @@
 
             viewGrade = {'day': 1, 'month': 2, 'year': 3},
 
-            viewSelectGrade = viewGrade[viewSelect || this.viewSelect];
+            viewSelectGrade = viewGrade[viewSelect || this.viewSelect || op.startView];
+
+            if(!this.viewSelect){
+
+                if(viewGrade[op.minView] > viewSelectGrade){
+
+                    this.viewSelect = op.minView;
+
+                }else if(viewGrade[op.maxView] < viewSelectGrade){
+
+                    this.viewSelect = op.maxView;
+
+                }else{
+
+                    this.viewSelect = op.startView;
+
+                }
+
+                return;
+
+            }
 
             if(viewGrade[op.minView] > viewSelectGrade || viewGrade[op.maxView] < viewSelectGrade ){
 

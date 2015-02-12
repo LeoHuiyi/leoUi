@@ -80,7 +80,7 @@
 
             hideDelay:0,//关闭tooltip延迟的时间
 
-            showAnimation: function(callBack, publicEvent) {
+            showAnimation: function(callBack, state) {
 
                 this.show( { effect: "explode", duration: "slow", complete: callBack } );
 
@@ -88,9 +88,9 @@
 
                 // callBack();
 
-            },//tooltip显示的回调，可自定义动画等，在显示完毕必须调用callBack（this: $target, arguments: callBack, publicEvent）
+            },//tooltip显示的回调，可自定义动画等，在显示完毕必须调用callBack（this: $target, arguments: callBack, state）
 
-            hideAnimation: function(callBack, publicEvent) {
+            hideAnimation: function(callBack, state) {
 
                 this.hide( { effect: "clip", duration: "slow", complete: callBack } );
 
@@ -98,7 +98,7 @@
 
                 // callBack();
 
-            },//tooltip关闭的回调，可自定义动画等，在显示完毕必须调用callBack（this: $target, arguments: callBack, publicEvent）
+            },//tooltip关闭的回调，可自定义动画等，在显示完毕必须调用callBack（this: $target, arguments: callBack, state）
 
             beforeShow:$.noop//dialog组件显示之前回调（arguments: target ）
 
@@ -552,7 +552,7 @@
 
                     This._tooltipState = 'close';
 
-                }, this.publicEvent );
+                }, this._tooltipState);
 
             }, this.options.hideDelay );
 
@@ -574,7 +574,7 @@
 
                     This._tooltipState = 'open';
 
-                }, this.publicEvent );
+                }, this._tooltipState);
 
             },this.options.showDelay);
 

@@ -76,7 +76,6 @@
 
         },
 
-
         today: function(){
 
             this.currentDate = Date.today();

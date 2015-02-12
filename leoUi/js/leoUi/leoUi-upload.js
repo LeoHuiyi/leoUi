@@ -444,7 +444,7 @@
 
                 This.$target.find(This.options.previewSelector).append('<div id="'+leoUploadId+'list-'+ index +'" class="append-list">'+
                     '<a href="javascript:" class="filedeleteicon" title="删除" data-index="'+ index +'"></a>' +
-                    '<img id="uploadImage-' + index + '" src="' + event.target.result + '"/><span title="' + file.name + '">' + file.name + '</span>'+
+                    '<img src="' + event.target.result + '"/><span title="' + file.name + '">' + file.name + '</span>'+
                     '<span id="'+leoUploadId+'progress-' + index + '" class="progress"></span>' +
                 '</div>');
 
@@ -466,7 +466,7 @@
 
 			this.$target.find(this.options.previewSelector).append('<div id="'+leoUploadId+'list-'+ index +'" class="append-list">'+
                 '<a href="javascript:" class="filedeleteicon" title="删除" data-index="'+ index +'"></a>' +
-                '<img id="uploadImage-' + index + '" src="../images/leoUi/leoUi-leoUpload-fileicon.png"/><span title="' + file.name + '">' + file.name + '</span>'+
+                '<img src="../images/leoUi/leoUi-leoUpload-fileicon.png"/><span title="' + file.name + '">' + file.name + '</span>'+
                 '<span id="'+leoUploadId+'progress-' + index + '" class="progress"></span>' +
             '</div>');
 

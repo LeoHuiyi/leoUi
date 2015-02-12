@@ -39,5 +39,12 @@ leoUiLoad.require('leoUi-datetimepicker,leoUi, ready', function($) {
 
     $('.calendar').leoDatetimepicker();
 
+    $('#button').on('click', function(event) {
+        event.preventDefault();
+        console.log($('.calendar').leoDatetimepicker('getCurrentVal'))
+    });
+
+    
+
 });
 

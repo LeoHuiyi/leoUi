@@ -12,7 +12,7 @@
     if (typeof define === "function" && define.amd) {
 
         // AMD. Register as an anonymous module.
-        define(["leoUi-position","leoUi-date","leoUi-tools","leoUi-effects"], factory);
+        define(["leoUi-position","jqueryMousewheel","leoUi-date","leoUi-tools","leoUi-effects"], factory);
 
     } else {
 
@@ -47,19 +47,17 @@
 
             append:'body',
 
-            autoOpen:true,
+            autoClose:false,
 
         	weekStart:0,//一周从哪一天开始。0（星期日）到6（星期六）
 
-        	quickButton:true,
+        	quickButton:false,
 
         	showWeekDays:true,
 
         	showOtherMonthDays:true,
 
-        	parseFormat:"yyyy-MM-dd",
-
-        	strFormat:"yyyy-MM-dd",
+        	dateFormat:"yyyy-MM-dd",
 
         	dayTitleFormat:"yyyy-MM-dd",
 
@@ -67,15 +65,15 @@
 
             defaultDateFormat:"yyyy-MM-dd",
 
-            defaultDate:"now",
+            defaultDate:"",
 
             position:{//参考jqueryUi的API（其中of和within属性设置成“window”或者“document”使用当前框架的window或者document）
 
-                my:"center",
+                my:"left top",
 
-                at:"center",
+                at:"left bottom",
 
-                of:'window',
+                of:'target',
 
                 collision:"fit",
 
@@ -89,7 +87,7 @@
 
             showAnimation: function(callBack, state) {
 
-                this.show( { effect: "explode", duration: "slow", complete: callBack } );
+                this.show( { effect: "clip", duration: 200, complete: callBack } );
 
                 // this.show();
 
@@ -99,7 +97,7 @@
 
             hideAnimation: function(callBack, state) {
 
-                this.hide( { effect: "clip", duration: "slow", complete: callBack } );
+                this.hide( { effect: "clip", duration: 200, complete: callBack } );
 
                 // this.hide();
 
@@ -115,7 +113,11 @@
 
             minView:'day',//'year', 'month', 'day'
 
-            maxView:'year'//'year', 'month', 'day'
+            maxView:'year',//'year', 'month', 'day'
+
+            beforeShowDay:false,
+
+            selectChange:$.noop
 
         },
 
@@ -129,11 +131,9 @@
 
             this._state = 'hide';
 
+            this.isInput = this.$target.is('input');
+
             this._changePosition();
-
-            this._getViewGrade();
-
-        	this._getDateValue();
 
         	this._createDatetimepicker();
 
@@ -147,7 +147,7 @@
 
             leoDate = $.leoTools.Date;
 
-            this._currentVal = leoDate.getDate(this.$target.val(), op.parseFormat);
+            this._currentVal = leoDate.getDate(this.$target.val(), op.dateFormat);
 
             if(!this._currentVal){
 
@@ -155,19 +155,19 @@
 
             }
 
-            this._initLeoDate();
+            this._getCurrentDate();
 
         },
 
-        _initLeoDate:function(){
+        _getCurrentDate:function(){
 
         	var op = this.options;
 
         	this._currentDate = new $.leoTools.Date(this._currentVal && this._currentVal.clone(), {
 
-        		parseFormat:op.parseFormat,
+        		parseFormat:op.dateFormat,
 
-        		strFormat:op.strFormat
+        		strFormat:op.dateFormat
 
         	});
 
@@ -197,6 +197,10 @@
 
                 position.of = this.document;
 
+            }else if(position.of === 'target'){
+
+                position.of = this.$target;
+
             }
 
             if(position.within === 'window'){
@@ -211,15 +215,13 @@
 
         },
 
-        _setPosition:function(){
+        setPosition:function(){
 
             if( this.options.disabled ){ return; }
 
             var isVisible = this._state === 'open',
 
             $datetimepicker = this.$datetimepicker;
-
-            !!this.options.arrow && $target.css( 'margin', '' );
 
             !isVisible && $datetimepicker.show();
 
@@ -239,8 +241,6 @@
 
             if( this.options.disabled ){ return; }
 
-            this._setPosition();
-
             this._showFn();
 
         },
@@ -259,7 +259,7 @@
 
                 delete this.delayHideTimeId;
 
-                if( this.options.disabled ){ return; }
+                if( this.options.disabled || this._state === 'close' ){ return; }
 
                 var This = this;
 
@@ -281,9 +281,17 @@
 
                 delete this.delayShowTimeId;
 
-                if( this.options.disabled ){ return; }
+                if( this.options.disabled || this._state === 'open' ){ return; }
 
                 var This = this;
+
+                this._getDateValue();
+
+                this._getViewGrade('init');
+
+                this._setViewSelectTable();
+
+                this.setPosition();
 
                 this._state = 'opening';
 
@@ -301,13 +309,13 @@
 
             if(id === 'show' && this.delayShowTimeId){
 
-                clearTimeout(this.delayShowTimeId);
+                window.clearTimeout(this.delayShowTimeId);
 
                 delete this.delayShowTimeId;
 
             }else if(id === 'hide' && this.delayHideTimeId){
 
-                clearTimeout(this.delayHideTimeId);
+                window.clearTimeout(this.delayHideTimeId);
 
                 delete this.delayHideTimeId;
 
@@ -337,17 +345,21 @@
 
         	$datetimepicker = this.$datetimepicker = $('<div class="leoDatetimepicker leoUi_clearfix"></div>').append(this.$datetimepickerHeader).hide().appendTo(this.options.append || this.$target);
 
-            if(op.autoOpen){
+            if(this.isInput){
 
-                this._setPosition();
+                $datetimepicker.css('position', 'absolute');
+
+            }else{
+
+                this._getDateValue();
+
+                this._getViewGrade('init');
+
+                this._setViewSelectTable();
 
                 $datetimepicker.show();
 
-                this._state = 'open';
-
             }
-
-            this._setViewSelectTable();
 
 
         },
@@ -420,9 +432,11 @@
 
             viewGrade = {'day': 1, 'month': 2, 'year': 3},
 
-            viewSelectGrade = viewGrade[viewSelect || this.viewSelect || op.startView];
+            viewSelectGrade;
 
-            if(!this.viewSelect){
+            if(viewSelect === 'init'){
+
+                viewSelectGrade = viewGrade[op.startView]
 
                 if(viewGrade[op.minView] > viewSelectGrade){
 
@@ -441,6 +455,8 @@
                 return;
 
             }
+
+            viewSelectGrade = viewGrade[viewSelect || this.viewSelect || op.startView];
 
             if(viewGrade[op.minView] > viewSelectGrade || viewGrade[op.maxView] < viewSelectGrade ){
 
@@ -493,7 +509,7 @@
 
                 case "day":
 
-                    returnVal = op.monthsName[currentDate.getMonth()] + '&nbsp&nbsp' + currentDate.getFullYear();
+                    returnVal = op.monthsName[currentDate.getMonth()] + '&nbsp;&nbsp;' + currentDate.getFullYear();
 
                     break;
 
@@ -519,7 +535,7 @@
 
         _createHeader:function(){
 
-        	var str, innerStr = '<div class="leoDatetimepicker-header-inner"><a href="#" class="leoDatetimepicker-header-prevMonths leoDatetimepicker-header-button" role="prev"  event="prevMonths"><span class="leoDatetimepicker-icon"></span></a><div class="leoDatetimepicker-header-inner-title" role="headerTitle">' + this._getHeaderTitle() +'</div><a href="#" class="leoDatetimepicker-header-nextMonths leoDatetimepicker-header-button" role="next"  event="nextMonths"><span class="leoDatetimepicker-icon"></span></a></div>',
+        	var str, innerStr = '<div class="leoDatetimepicker-header-inner"><a href="#" class="leoDatetimepicker-header-prevMonths leoDatetimepicker-header-button" role="prev"  event="prevMonths"><span class="leoDatetimepicker-icon"></span></a><div class="leoDatetimepicker-header-inner-title" role="headerTitle"></div><a href="#" class="leoDatetimepicker-header-nextMonths leoDatetimepicker-header-button" role="next"  event="nextMonths"><span class="leoDatetimepicker-icon"></span></a></div>',
 
             $datetimepickerHeader,
 
@@ -589,9 +605,9 @@
 
         	d, m, y, classes, i = 0, j = 0, z,
 
-        	equals = Date.equals,role,
+        	equals = Date.equals,role, beforeShowDay = op.beforeShowDay,
 
-            currentVal = this._currentVal,
+            currentVal = this._currentVal, beforeShowDayObj,
 
             rangeDateCreate = this._rangeDateCreate('day'),
 
@@ -607,7 +623,7 @@
 
         	for (; i < 7; i++) {
 
-				tableStr += '<th>' + dayOfWeekName[(i + weekStart) > 6 ? 0 : i + weekStart] + '</th>';
+				tableStr += '<th>' + dayOfWeekName[(i + weekStart)%7] + '</th>';
 
 			}
 
@@ -625,7 +641,15 @@
 
 					m = startDate.getMonth();
 
-                    y = startDate.getFullYear()
+                    y = startDate.getFullYear();
+
+                    if(beforeShowDay){
+
+                        beforeShowDayObj = beforeShowDay(startDate.clone());
+
+                        console.log(beforeShowDayObj)
+
+                    }
 
 					if(showWeekDays && z === 0){
 
@@ -665,7 +689,7 @@
 
                         if(currentVal && equals(startDate, currentVal)){
 
-                            classes.push('leoDatetimepicker-current-day');
+                            classes.push('leoDatetimepicker-active');
 
                         }
 
@@ -781,7 +805,7 @@
 
                         role = "select";
 
-                        select && cls.push('leoDatetimepicker-grid-active');
+                        select && cls.push('leoDatetimepicker-active');
 
                     }
 
@@ -867,7 +891,7 @@
 
                         minDate = leoDate.getDate(minDate, maxMineFormat, true);
 
-                        maxDate && (minDate = minDate.getFullYear());
+                        minDate && (minDate = minDate.getFullYear());
 
                     }
 
@@ -1005,73 +1029,203 @@
 
         getCurrentVal:function(format){
 
-            return this._currentVal && this._currentVal.toString(format || this.options.strFormat);
+            return this._currentVal && this._currentVal.toString(format || this.options.dateFormat);
 
         },
 
         _setCurrentVal:function(){
 
+            var op = this.options;
+
             this._currentVal = this._currentDate.getCurrentDate(true);
+
+            if(this.isInput){
+
+                this.$target.val(this.getCurrentVal());
+
+                op.autoClose ? this.hide() : this._setViewSelectTable();
+
+            }else{
+
+                this._setViewSelectTable()
+
+            }
+
+            op.selectChange(this._currentVal.clone());
+
+        },
+
+        _activeClass:function(elem){
+
+            $datetimepicker.find('.leoDatetimepicker-active').removeClass('leoDatetimepicker-active');
+
+            $(elem).addClass('leoDatetimepicker-active');
+
+        },
+
+        _isMinView:function(){
+
+            return this.viewSelect === this.minView;
+
+        },
+
+        _rollViewTable:function(eventName){
+
+            switch(eventName) {
+
+                case "prevMonths":
+
+                    this._currentDatePrevMonths();
+
+                    this._setViewSelectTable();
+
+                    break;
+
+                case "nextMonths":
+
+                    this._currentDateNextMonths();
+
+                    this._setViewSelectTable();
+
+                    break;
+
+                case "prevYears":
+
+                    this._currentDatePrevYears();
+
+                    this._setViewSelectTable();
+
+                    break;
+
+                case "nextYears":
+
+                    this._currentDateNextYears();
+
+                    this._setViewSelectTable();
+
+                    break;
+
+                case "prevMonths":
+
+                    this._currentDateNextYears();
+
+                    this._setViewSelectTable();
+
+                    break;
+
+                case "prevTenYears":
+
+                    this._currentDatePrevTenYears();
+
+                    this._setViewSelectTable();
+
+                    break;
+
+                case "nextTenYears":
+
+                    this._currentDateNextTenYears();
+
+                    this._setViewSelectTable();
+
+                    break;
+
+            }
+
+        },
+
+        _destroy:function(){
+
+            this.$datetimepicker.remove();
 
         },
 
         addEvent:function(){
 
-        	var This = this;
+        	var This = this, $datetimepicker = this.$datetimepicker,
 
-        	this._on(this.$datetimepicker, 'click', 'a', function(event){
+            isClose = false, timeId, isRoll = false;
 
-        		var $this = $(this);
+        	this._on($datetimepicker, 'click', 'a', function(event){
 
-                switch($this.attr('event')) {
+                event.preventDefault();
 
-                    case "prevMonths":
+                !isRoll && This._rollViewTable($(this).attr('event'));
 
-                        This._currentDatePrevMonths();
+        	})._on($datetimepicker, 'mousedown', 'a', function(event){
+
+                event.preventDefault();
+
+                var $this = $(this);
+
+                isRoll = false;
+
+                timeId && window.clearInterval(timeId);
+
+                timeId = window.setInterval(function(){
+
+                    isRoll = true;
+
+                    This._rollViewTable($this.attr('event'));
+
+                }, 100);
+
+            })._on($datetimepicker, 'mouseup', 'a', function(event){
+
+                event.preventDefault();
+
+                timeId && window.clearInterval(timeId);
+
+            })._on($datetimepicker, 'mousewheel', function(event, delta, deltaX, deltaY){
+
+                switch(This.viewSelect) {
+
+                    case "day":
+
+                        if(delta < 0){
+
+                            This._rollViewTable("nextMonths")
+
+                        }else{
+
+                            This._rollViewTable("prevMonths")
+
+                        }
 
                         break;
 
-                    case "nextMonths":
+                    case "month":
 
-                        This._currentDateNextMonths();
+                        if(delta < 0){
 
-                        break;
+                            This._rollViewTable("nextYears")
 
-                    case "prevYears":
+                        }else{
 
-                        This._currentDatePrevYears();
+                            This._rollViewTable("prevYears")
 
-                        break;
-
-                    case "nextYears":
-
-                        This._currentDateNextYears();
+                        }
 
                         break;
 
-                    case "prevMonths":
+                    case "year":
 
-                        This._currentDateNextYears();
+                        if(delta < 0){
 
-                        break;
+                            This._rollViewTable("nextTenYears")
 
-                    case "prevTenYears":
+                        }else{
 
-                        This._currentDatePrevTenYears();
+                            This._rollViewTable("prevTenYears")
 
-                        break;
-
-                    case "nextTenYears":
-
-                        This._currentDateNextTenYears();
+                        }
 
                         break;
 
                 }
 
-                This._setViewSelectTable();
+            })._on(this.$datetimepickerHeaderTitle, 'click', function(event){
 
-        	})._on(this.$datetimepickerHeaderTitle, 'click', function(event){
+                event.preventDefault();
 
                 switch(This.viewSelect) {
 
@@ -1101,7 +1255,9 @@
 
                 }
 
-            })._on(this.$datetimepicker, 'click', 'td[role="select"]', function(event){
+            })._on($datetimepicker, 'click', 'td[role="select"]', function(event){
+
+                event.preventDefault();
 
                 switch(This.viewSelect) {
 
@@ -1113,13 +1269,11 @@
 
                             month: +$(this).attr('month'),
 
-                            day: +$(this).attr('day'),
+                            day: +$(this).attr('day')
 
                         });
 
                         This._setCurrentVal();
-
-                        This._setViewSelectTable();
 
                         break;
 
@@ -1133,13 +1287,13 @@
 
                             This._setViewSelectTable();
 
+                            isClose = true;
+
                         }else{
 
                             This._currentDate.set({month: +$(this).attr('value')});
 
                             This._setCurrentVal();
-
-                            This._setViewSelectTable();
 
                         }
 
@@ -1155,13 +1309,13 @@
 
                             This._setViewSelectTable();
 
+                            isClose = true;
+
                         }else{
 
                             This._currentDate.set({year: +$(this).attr('value')});
 
                             This._setCurrentVal();
-
-                            This._setViewSelectTable();
 
                         }
 
@@ -1169,16 +1323,45 @@
 
                 }
 
-            })._on(this.$datetimepicker, 'mouseenter', 'td[role="select"]', function(event){
+            })._on($datetimepicker, 'mouseenter', 'td[role="select"]', function(event){
 
                 $(this).addClass('leoDatetimepicker-hover');
 
-
-            })._on(this.$datetimepicker, 'mouseleave', 'td[role="select"]', function(event){
+            })._on($datetimepicker, 'mouseleave', 'td[role="select"]', function(event){
 
                 $(this).removeClass('leoDatetimepicker-hover');
 
             });
+
+            if(this.isInput){
+
+                this._on(this.$target, 'focus', function(event){
+
+                    This.show();
+
+                })._on(this.$target, 'click', function(event){
+
+                    isClose = true;
+
+                    This._state === 'close' && This.show();
+
+                })._on(document, 'click', function(event){
+
+                    var $evTarget = $(event.target);
+
+                    if(!isClose && !$evTarget.closest($datetimepicker)[0]){
+
+                        This.hide();
+
+                    }else{
+
+                        isClose = false;
+
+                    }
+
+                });
+
+            }
 
         }
 

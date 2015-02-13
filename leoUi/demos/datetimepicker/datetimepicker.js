@@ -9,7 +9,9 @@ leoUiLoad.config({
 
         base: '../../css/base.css',
 
-        leoUi: '../../css/leoUi.css'
+        leoUi: '../../css/leoUi.css',
+
+        'jqueryMousewheel': '../jquery/jquery-mousewheel'
 
     },
 
@@ -37,21 +39,60 @@ leoUiLoad.config({
 
 leoUiLoad.require('leoUi-datetimepicker,leoUi, ready', function($) {
 
-    $('.calendar').leoDatetimepicker();
+    $('.calendar').leoDatetimepicker({
+
+        append:'.calendar',
+
+        beforeShowDay:function(date){
+
+            if(date.getDate() === 4){
+
+                return {
+
+                    classes:[],
+
+                    html:''
+
+
+                }
+
+            }
+
+        }
+
+    });
+
+    $('#input').leoDatetimepicker({selectChange:function(date){
+
+        // console.log(date)
+
+        $('#input1').leoDatetimepicker('option','minDate',date);
+
+
+    }});
+
+    $('#input1').leoDatetimepicker({selectChange:function(date){
+
+        $('#input').leoDatetimepicker('option','maxDate',date);
+
+
+    }});
 
     $('#button').on('click', function(event) {
         event.preventDefault();
-        console.log($('.calendar').leoDatetimepicker('state'))
+        // console.log($('.calendar').leoDatetimepicker('state'))
 
-        if($('.calendar').leoDatetimepicker('state')==='open'){
+        // if($('.calendar').leoDatetimepicker('state')==='open'){
 
-            $('.calendar').leoDatetimepicker('hide');
+        //     $('.calendar').leoDatetimepicker('hide');
 
-        }else{
+        // }else{
 
-            $('.calendar').leoDatetimepicker('show');
+        //     $('.calendar').leoDatetimepicker('show');
 
-        }
+        // }
+
+        $('.calendar').leoDatetimepicker('destroy')
 
     });
 

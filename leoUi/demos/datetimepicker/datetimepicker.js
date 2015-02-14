@@ -43,16 +43,47 @@ leoUiLoad.require('leoUi-datetimepicker,leoUi, ready', function($) {
 
         append:'.calendar',
 
-        beforeShowDay:function(date){
+        beforeShowDay:function(dateObj){
 
-            if(date.getDate() === 4){
+            if(dateObj.date.getDate() === 4 && !dateObj.isWeekCell){
 
                 return {
 
-                    classes:[],
+                    classes:'a 23432',
 
-                    html:''
+                    html:'34534'
 
+                }
+
+            }
+
+        },
+
+        beforeShowMonth:function(dateObj){
+
+            if(dateObj.year === 2014 && dateObj.month === 8){
+
+                return {
+
+                    classes:'a 23432',
+
+                    html:'34534'
+
+                }
+
+            }
+
+        },
+
+        beforeShowYear:function(dateObj){
+
+            if(dateObj.year === 2014){
+
+                return {
+
+                    classes:'a 23432',
+
+                    html:'34534'
 
                 }
 
@@ -91,8 +122,8 @@ leoUiLoad.require('leoUi-datetimepicker,leoUi, ready', function($) {
         //     $('.calendar').leoDatetimepicker('show');
 
         // }
-
-        $('.calendar').leoDatetimepicker('destroy')
+         console.log($('.calendar').leoDatetimepicker('getCurrentVal', "yyyy-MM-dd HH:mm:ss"))
+        // $('.calendar').leoDatetimepicker('destroy')
 
     });
 

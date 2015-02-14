@@ -47,7 +47,7 @@
 
             append:'body',
 
-            autoClose:false,
+            autoClose:true,
 
             weekStart:0,//一周从哪一天开始。0（星期日）到6（星期六）
 

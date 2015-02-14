@@ -47,7 +47,7 @@
 
             append:'body',
 
-            autoClose:true,
+            autoClose:false,
 
             weekStart:0,//一周从哪一天开始。0（星期日）到6（星期六）
 
@@ -1414,9 +1414,11 @@
 
                         }else{
 
+                            !autoClose && (isClose = true);
+
                             This._currentDate.set({month: +$(this).attr('value')});
 
-                            This._setCurrentVal(elem);
+                            This._setCurrentVal(this);
 
                         }
 
@@ -1436,9 +1438,11 @@
 
                         }else{
 
+                            !autoClose && (isClose = true);
+
                             This._currentDate.set({year: +$(this).attr('value')});
 
-                            This._setCurrentVal(elem);
+                            This._setCurrentVal(this);
 
                         }
 

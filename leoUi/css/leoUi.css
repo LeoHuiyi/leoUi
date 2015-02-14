@@ -222,5 +222,3 @@
 .leoDatetimepicker .leoDatetimepicker-timePick-input:hover{box-shadow: 0 0 0.2em #85b2cb}
 .leoDatetimepicker .leoDatetimepicker-timePick-input:focus{background: #fff !important;box-shadow: 0 0 0.2em #85b2cb, inset 0 0.1em 0.1em #8f8f8f;border: solid 0.1em #8ab0c6;font-weight: bold;color: #313131;}
 .leoDatetimepicker .leoDatetimepicker-timePick-span{padding:0 0.3em;font-size: 1em;font-weight: bold;}
-
-.leoDatetimepicker .leoDatetimepicker-timePick-span{}

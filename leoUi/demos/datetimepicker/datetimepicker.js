@@ -43,6 +43,8 @@ leoUiLoad.require('leoUi-datetimepicker,leoUi, ready', function($) {
 
         append:'.calendar',
 
+        quickButton:true,
+
         beforeShowDay:function(dateObj){
 
             if(dateObj.date.getDate() === 4 && !dateObj.isWeekCell){

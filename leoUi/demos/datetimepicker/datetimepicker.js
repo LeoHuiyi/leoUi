@@ -100,14 +100,14 @@ leoUiLoad.require('leoUi-datetimepicker,leoUi, ready', function($) {
         $('#input1').leoDatetimepicker('option','minDate',date);
 
 
-    }});
+    },dateFormat:"yyyy-MM-dd",isTimePicker:false});
 
     $('#input1').leoDatetimepicker({selectChange:function(date){
 
         $('#input').leoDatetimepicker('option','maxDate',date);
 
 
-    }});
+    },dateFormat:"yyyy-MM-dd",isTimePicker:false});
 
     $('#button').on('click', function(event) {
         event.preventDefault();

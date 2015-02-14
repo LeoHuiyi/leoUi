@@ -1492,13 +1492,10 @@
 
                         This._upDateTimePickerVal(this, 'down');
 
-                        return;
 
                     }else if(event.which === 40){
 
                         This._upDateTimePickerVal(this, 'up');
-
-                        return;
 
                     }
 

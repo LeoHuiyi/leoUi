@@ -214,7 +214,7 @@
 .leoDatetimepicker .leoDatetimepicker-grid .leoDatetimepicker-day-default a{display: block;text-align: center;text-decoration: none;padding: 0;color: inherit;}
 .leoDatetimepicker .leoDatetimepicker-grid .leoDatetimepicker-grid-other{font-weight: normal;opacity: 0.25;filter:alpha(opacity=25);font-weight: normal;}
 .leoDatetimepicker .leoDatetimepicker-grid .leoDatetimepicker-hover{background: #5f83b9;color: #fff;text-shadow: 1px 1px 1px rgba(0,0,0,0.75);-moz-box-shadow: none;-webkit-box-shadow: none;box-shadow: none;}
-.leoDatetimepicker .leoDatetimepicker-grid .leoDatetimepicker-grid-active{ background: #7389a5;color: #fff;text-shadow: 1px 1px 1px rgba(0,0,0,0.75);-moz-box-shadow: none;-webkit-box-shadow: none;box-shadow: none;}
+.leoDatetimepicker .leoDatetimepicker-grid .leoDatetimepicker-active{ background: #7389a5;color: #fff;text-shadow: 1px 1px 1px rgba(0,0,0,0.75);-moz-box-shadow: none;-webkit-box-shadow: none;box-shadow: none;}
 
 .leoDatetimepicker .leoDatetimepicker-timePick{text-align: center;margin: 0.1em 0;}
 .leoDatetimepicker .leoDatetimepicker-timePick-inner{display: inline;margin: 0 auto;}

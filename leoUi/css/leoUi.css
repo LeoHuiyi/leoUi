@@ -192,7 +192,7 @@
 .leoDatetimepicker .leoDatetimepicker-calendar thead{border-left: 1px solid #A8A8A8;border-right: 1px solid #A8A8A8;border-bottom: 1px solid #AAAEB6;color: #545454;font-size: 10px;line-height: 4px;position: relative;text-shadow: 1px 1px 0px rgba(255, 255, 255, 0.5);z-index: 5;}
 .leoDatetimepicker .leoDatetimepicker-calendar th{padding: 0.7em 0.3em;text-align: center;font-weight: bold;border: 0px none;}
 .leoDatetimepicker .leoDatetimepicker-calendar tbody{border: 1px solid #A8A8A8;}
-.leoDatetimepicker .leoDatetimepicker-calendar td{border: 0px none;padding: 1px;}
+.leoDatetimepicker .leoDatetimepicker-calendar td{border: 0px none;padding: 1px;overflow: hidden;}
 .leoDatetimepicker .leoDatetimepicker-calendar td a{display: block;padding: 0.2em;text-align: right;text-decoration: none;}
 .leoDatetimepicker .leoDatetimepicker-calendar .leoDatetimepicker-monthselector{cursor: pointer;}
 .leoDatetimepicker .leoDatetimepicker-calendar .leoDatetimepicker-monthselector a{height: 12px;margin-top: -8px;position: relative;top: 2px;width: 12px;background-image: url("../img/leoUi-icons_38667f_256x240.png");text-indent: -9999px;color: #4f4f4f;background-position: -48px -16px;display: block;}
@@ -208,10 +208,19 @@
 
 .leoDatetimepicker .leoDatetimepicker-grid{border-collapse: separate;table-layout: fixed;border: 1px solid #A8A8A8;background-color: #fff}
 .leoDatetimepicker .leoDatetimepicker-grid .leoDatetimepicker-day-default{cursor: pointer;}
-.leoDatetimepicker .leoDatetimepicker-grid td{height: 4em;}
+.leoDatetimepicker .leoDatetimepicker-grid td{height: 4em;overflow: hidden;}
 .leoDatetimepicker .leoDatetimepicker-grid .leoDatetimepicker-disabled{opacity: 0.35 !important;filter:alpha(opacity=35) !important;background-image: none;cursor: default}
 .leoDatetimepicker .leoDatetimepicker-grid .leoDatetimepicker-disabled a{cursor: default}
 .leoDatetimepicker .leoDatetimepicker-grid .leoDatetimepicker-day-default a{display: block;text-align: center;text-decoration: none;padding: 0;color: inherit;}
 .leoDatetimepicker .leoDatetimepicker-grid .leoDatetimepicker-grid-other{font-weight: normal;opacity: 0.25;filter:alpha(opacity=25);font-weight: normal;}
 .leoDatetimepicker .leoDatetimepicker-grid .leoDatetimepicker-hover{background: #5f83b9;color: #fff;text-shadow: 1px 1px 1px rgba(0,0,0,0.75);-moz-box-shadow: none;-webkit-box-shadow: none;box-shadow: none;}
 .leoDatetimepicker .leoDatetimepicker-grid .leoDatetimepicker-grid-active{ background: #7389a5;color: #fff;text-shadow: 1px 1px 1px rgba(0,0,0,0.75);-moz-box-shadow: none;-webkit-box-shadow: none;box-shadow: none;}
+
+.leoDatetimepicker .leoDatetimepicker-timePick{text-align: center;margin: 0.1em 0;}
+.leoDatetimepicker .leoDatetimepicker-timePick-inner{display: inline;margin: 0 auto;}
+.leoDatetimepicker .leoDatetimepicker-timePick-input{text-shadow: 0 0.1em 0 rgba(255, 255, 255, 0.7);box-shadow: 0px 0.1em 0.1em rgba(143, 143, 143, 0.5) inset;background: none repeat scroll 0% 0% #FFF !important;;border: 0.1em solid #a8a8a8;color: #4f4f4f;font-weight: bold;font-size: 1em;margin: 0;outline: medium none;display: inline-block;width: 2em;text-align: center;border-radius: 0.1em;}
+.leoDatetimepicker .leoDatetimepicker-timePick-input:hover{box-shadow: 0 0 0.2em #85b2cb}
+.leoDatetimepicker .leoDatetimepicker-timePick-input:focus{background: #fff !important;box-shadow: 0 0 0.2em #85b2cb, inset 0 0.1em 0.1em #8f8f8f;border: solid 0.1em #8ab0c6;font-weight: bold;color: #313131;}
+.leoDatetimepicker .leoDatetimepicker-timePick-span{padding:0 0.3em;font-size: 1em;font-weight: bold;}
+
+.leoDatetimepicker .leoDatetimepicker-timePick-span{}

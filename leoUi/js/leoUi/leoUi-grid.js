@@ -1002,6 +1002,8 @@
 
             data[trIdKey] = tableData[trIdKey];
 
+            data.rowDatas = tableData.rowDatas;
+
             for( ;i < length; i++ ){
 
                 child = tableModel[i];

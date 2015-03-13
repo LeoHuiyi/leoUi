@@ -41,5 +41,17 @@ leoUiLoad.require('leoUi-imagePlayer,leoUi, ready', function($) {
 
     $('#images').leoImagePlayer();
 
+    $('#reset').on('click', function(event) {
+        event.preventDefault();
+        $('#images').leoImagePlayer('resetBox');
+    });
+    $('#destroy').on('click', function(event) {
+        event.preventDefault();
+        $('#images').leoImagePlayer('destroy');
+    });
+    $('#add').on('click', function(event) {
+        event.preventDefault();
+        $('.images_lists').append('<li class="list" id="1123"><dl><dt class="photo"><a href="###"><img src="http://img5.cache.netease.com/photo/0003/2014-12-12/AD9DN1JD00AJ0003.jpg"></a></dt></dl></li>');
+    });
 });
 

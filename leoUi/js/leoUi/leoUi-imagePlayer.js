@@ -35,33 +35,47 @@
 
         defaults:{
 
-			dataSrc:'src',//img属性上的大图地址
+            carouselSrc:'src',//img属性上的大图地址
 
-			rollBoxSrc:'src',//img属性上的缩略图地址
+            rollBoxSrc:'src',//img属性上的缩略图地址
 
             imgSelector:'img',
 
+            carouselLoadingSrc:'../../img/loading32.gif',
+
+            rollLoadingSrc:'../../img/loading.gif',
+
             bgOpacity:'0.7',
 
-			boxScale:0.6,// h/w
+            boxScale:0.6,// h/w
 
-			winScale:0.95,//box/win
+            winScale:0.95,//box/win
 
-			topScale:0.5,//画布Top居中
+            topScale:0.5,//画布Top居中
 
-			leftScale:0.5,//画布Left居中
+            leftScale:0.5,//画布Left居中
 
-			rollBoxLength:11,//缩略图显示的个数
+            rollBoxLength:11,//缩略图显示的个数
 
-			playTime:5000
+            playTime:3000
 
-		},
+        },
 
         _init:function(){
 
-			this.urlArr = [];
+            this.urlArr = [];
+
+            this.isShow = false;
 
             this._getData()._createHtml()._createBox()._rollBoxinit()._playBoxInit()._addEvent();
+
+        },
+
+        resetBox:function(){
+
+            this.urlArr = [];
+
+            this._getData()._rollBoxinit();
 
         },
 
@@ -81,6 +95,8 @@
 
             })._on(this.window, 'resize', function(){
 
+                if(This.isShow === false)return;
+
                 if(lastTimer)clearTimeout(lastTimer);
 
                 lastTimer = setTimeout(function(){
@@ -90,6 +106,8 @@
                 }, 200);
 
             })._on(this.window, 'dragstart', function(){
+
+                if(This.isShow === false)return;
 
                 return false;
 
@@ -103,7 +121,7 @@
 
         _createHtml:function(){
 
-            this.bg = $('<div class="leoImagePlayerBg"></div>').appendTo('body');
+            this.bg = $('<div class="leoImagePlayerBg"></div>').css('opacity', this.options.bgOpacity).appendTo('body');
 
             return this;
 
@@ -111,7 +129,7 @@
 
         _createBox:function(){
 
-            this.box = $('<div class="leoImagePlayer"><div class="leo_imagePlayer_loading"></div><div class="pic"><img></div><a class="prev control" href="javascript:;"><span><</span></a><a class="next control" href="javascript:;"><span>></span></a><div class="leo_imagePlayer_roll"><div class="roll_inner"><div class="roll_bg"></div><a class="roll_prev roll_control default" href="javascript:;"><span><</span></a><a class="roll_next roll_control default" href="javascript:;"><span>></span></a><div class="roll_list"><ul class="leoUi_clearfix"></ul></div></div></div><div class="leo_imagePlayer_play"><div class="playBox"><div class="pause"><span class="pause_left"></span><span class="pause_right"></span></div><span class="play"></span></div></div></div>').appendTo('body');
+            this.box = $('<div class="leoImagePlayer"><div class="leo_imagePlayer_loading"><img src="'+this.options.carouselLoadingSrc+'"></div><div class="pic"><img></div><a class="prev control" href="###"><span><</span></a><a class="next control" href="###"><span>></span></a><div class="leo_imagePlayer_roll"><div class="roll_inner"><div class="roll_bg"></div><a class="roll_prev roll_control default" href="###"><span><</span></a><a class="roll_next roll_control default" href="###"><span>></span></a><div class="roll_list"><ul class="leoUi_clearfix"></ul></div></div></div><div class="leo_imagePlayer_play"><div class="playBox"><div class="pause"><span class="pause_left"></span><span class="pause_right"></span></div><span class="play"></span></div></div></div>').appendTo('body');
 
             this.img = this.box.find('.pic>img');
 
@@ -123,13 +141,11 @@
 
         _getIndex:function(elem){
 
-            var urlArr = this.urlArr, i = 0, len = urlArr.length,
-
-            dataSrc = $(elem).attr(this.options.dataSrc);
+            var urlArr = this.urlArr, i = 0, len = urlArr.length;
 
             for(; i < len; i++){
 
-                if(urlArr[i].dataSrc === dataSrc){
+                if(urlArr[i].el === elem){
 
                     this.index = i;
 
@@ -149,11 +165,13 @@
 
             this.$target.find(op.imgSelector).each(function(index, el) {
 
-                var $el = $(el), dataSrc = $el.attr(op.dataSrc), rollBoxSrc = $el.attr(op.rollBoxSrc);
+                var $el = $(el), carouselSrc = $el.attr(op.carouselSrc), rollBoxSrc = $el.attr(op.rollBoxSrc);
 
-                !!dataSrc && (This.urlArr[This.urlArr.length] = {
+                !!carouselSrc && (This.urlArr[This.urlArr.length] = {
 
-                    dataSrc: dataSrc,
+                    el:el,
+
+                    carouselSrc: carouselSrc,
 
                     rollBoxSrc: rollBoxSrc
 
@@ -174,6 +192,8 @@
             this.bg.show();
 
             this.box.show();
+
+            this.isShow = true;
 
             return this;
 
@@ -271,11 +291,15 @@
 
             })._on($box, 'click', '.prev', function(e){
 
+                e.preventDefault();
+
                 !!This.controlTime && clearTimeout(This.controlTime);
 
                 This.prev();
 
             })._on($box, 'click', '.next', function(e){
+
+                e.preventDefault();
 
                 !!This.controlTime&&clearTimeout(This.controlTime);
 
@@ -283,17 +307,25 @@
 
             })._on($box, 'click', '.roll_li', function(e){
 
+                e.preventDefault();
+
                 This._rollBoxClick($(this));
 
             })._on($box, 'click', '.roll_prev:not(a.default)', function(e){
+
+                e.preventDefault();
 
                 This._rollBoxPrev();
 
             })._on($box, 'click', '.roll_next:not(a.default)', function(e){
 
+                e.preventDefault();
+
                 This._rollBoxNext();
 
             })._on($box, 'click', '.playBox', function(e){
+
+                e.preventDefault();
 
                 This._playBoxClick();
 
@@ -305,7 +337,7 @@
 
         _playBoxInit:function(){
 
-            this.playBar = this.box.find('.leo_imagePlayer_play')
+            this.playBar = this.box.find('.leo_imagePlayer_play');
 
             this.playBox = this.playBar.find('div.playBox');
 
@@ -355,21 +387,19 @@
 
             this.bg.stop(true,false).animate({opacity:1}, 1000);
 
-            this.playBar.stop(true,false).animate({top:-this.playBarHeight}, 1000);
+            this.playBar.stop(true,false).animate({top:-this.playBarHeight}, 1000, function(){
 
-            this.rollInner.stop(true,false).animate({top:0}, 1000);
-
-            setTimeout(function(){
+                !!This.controlTime&&clearTimeout(This.controlTime);
 
                 This.controlAppear = false;
 
-                This.control.filter('.prev').stop(true,false).animate({left:'-15%'}, 400).end().filter('.next').stop(true,false).animate({right:'-15%'}, 400,function(){
+                This.box.css('cursor','none');
 
-                    This.box.css('cursor','none');
+            });
 
-                });
+            this.rollInner.stop(true,false).animate({top:0}, 1000);
 
-            },0)
+            This.control.filter('.prev').stop(true,false).animate({left:'-15%'}, 400).end().filter('.next').stop(true,false).animate({right:'-15%'}, 400);
 
             this.playBoxTime = setInterval(function(){
 
@@ -391,7 +421,7 @@
 
             this.box.css('cursor','auto');
 
-            this.bg.stop(true,false).animate({opacity:this.options.bgOpacity}, 400);
+            this.bg.stop(true,false).animate({opacity: this.options.bgOpacity}, 400);
 
             this.playBar.stop(true,false).delay(300).animate({top:0}, 400);
 
@@ -427,11 +457,11 @@
 
         _createRollBox:function(){
 
-            var This = this, i = 0, liStr = '' ,len = this.urlArrLength + 1;
+            var This = this, i = 0, liStr = '' ,len = this.urlArrLength + 1, rollLoadingSrc = this.options.rollLoadingSrc;
 
             for(;i < len; i++){
 
-                liStr += '<li class="roll_li" style="float:left"><a href="javascript:;"><img src=""></a></li>';
+                liStr += '<li class="roll_li" style="float:left"><a href="javascript:;"><img src="'+rollLoadingSrc+'"></a></li>';
 
             }
 
@@ -439,7 +469,7 @@
 
                 This._rollBoxImgLoad(This.urlArr[index].rollBoxSrc,$(el).find('img'));
 
-            }).appendTo(this.rollInner.find('ul'));
+            }).appendTo(this.rollInner.find('ul').empty());
 
             return this;
 
@@ -465,7 +495,7 @@
 
             this.appear = true;
 
-            this._rollBoxCount(len)._rollBoxGo()._imgLoad(this.urlArr[this.index].dataSrc);
+            this._rollBoxCount(len)._rollBoxGo()._imgLoad(this.urlArr[this.index].carouselSrc);
 
             return this;
 
@@ -536,9 +566,9 @@
 
             this.index = $this.index();
 
-            this._rollBoxGo()._imgLoad(this.urlArr[$this.index()].dataSrc);
+            this._rollBoxGo()._imgLoad(this.urlArr[$this.index()].carouselSrc);
 
-            return this
+            return this;
 
         },
 
@@ -588,7 +618,7 @@
 
                 img = img.onload = img.onerror = null;
 
-            }
+            };
 
             img.src = src;
 
@@ -624,7 +654,7 @@
 
                 return this;
 
-            };
+            }
 
             this.load.stop(true, true).delay(100).animate({'opacity':1}, 100);
 
@@ -658,7 +688,7 @@
 
                 img = img.onload = img.onerror = null;
 
-            }
+            };
 
             return this;
 
@@ -668,7 +698,7 @@
 
             this.urlArrLength === this.index?this.index = 0:this.index = this.index+1;
 
-            this._rollBoxGo()._imgLoad(this.urlArr[this.index].dataSrc);
+            this._rollBoxGo()._imgLoad(this.urlArr[this.index].carouselSrc);
 
         },
 
@@ -676,7 +706,7 @@
 
             this.index === 0?this.index = this.urlArrLength:this.index = this.index-1;
 
-            this._rollBoxGo()._imgLoad(this.urlArr[this.index].dataSrc);
+            this._rollBoxGo()._imgLoad(this.urlArr[this.index].carouselSrc);
 
         },
 
@@ -782,9 +812,13 @@
 
             this.img.attr('src','');
 
+            this.isShow = false;
+
         },
 
         _destroy:function(){
+
+            this.urlArr = [];
 
             this.hide();
 

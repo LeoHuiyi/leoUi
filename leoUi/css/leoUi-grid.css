@@ -435,7 +435,7 @@ tr.leoUi-search-toolbar select {
     display: none;
     border: 2px solid #aaa;
     font-size: 14px;
-    background: url(../images/indicator.gif) no-repeat scroll 8px center #fff
+    background: url(../img/loading.gif) no-repeat scroll 8px center #fff
 }
 .leoUi-jqgrid .jqgrid-overlay {
     display: none;
@@ -603,13 +603,13 @@ tr.leoUi-search-toolbar select {
     width: 16px;
 }
 .leoUi-icon, .leoUi-widget-content .leoUi-icon {
-    background-image: url("../images/ui-icons.png");
+    background-image: url("../img/leoUi-icons.png");
 }
 .leoUi-state-default .leoUi-icon {
-    background-image: url("../images/ui-icons.png");
+    background-image: url("../img/leoUi-icons.png");
 }
 .leoUi-state-hover .leoUi-icon, .leoUi-state-focus .leoUi-icon {
-    background-image: url("../images/ui-icons.png");
+    background-image: url("../img/leoUi-icons.png");
 }
 .leoUi-icon-seek-next {
     background-position: 0 -16px;

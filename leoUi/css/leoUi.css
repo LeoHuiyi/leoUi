@@ -91,11 +91,11 @@
 .leoSelect{display: inline-block;vertical-align: middle;outline:none}
 .leoSelect .leoSelect_tit{background: none repeat scroll 0 0 #fff;border: 1px solid #dbdbdb;display: block;height: 20px;line-height: 20px;padding: 5px 38px 5px 10px;position: relative;text-decoration: none;white-space: nowrap;word-break: break-all;cursor: pointer;-moz-user-select: none; -webkit-user-select: none;-ms-user-select: none;-khtml-user-select: none;user-select: none;}
 .leoSelect .leoSelect_tit_val{color: #333;display: inline-block;vertical-align: middle;}
-.leoSelect .leoSelect_tit_icon{background: url("../img/skin_icons.png") no-repeat scroll -49px -160px #fafafa;border-left: 1px solid #dbdbdb;display: block;height: 100%;position: absolute;right: 0;top: 0;width: 28px;}
+.leoSelect .leoSelect_tit_icon{background: url("../img/leoComboBox_button.png") no-repeat center;border-left: 1px solid #dbdbdb;display: block;height: 100%;position: absolute;right: 0;top: 0;width: 28px;}
 .leoSelect .leoSelect_items, .leoSelect_items_clone{background: none repeat scroll 0 0 #fff;border: 1px solid #dbdbdb;position: absolute;top: 0;left:0;overflow: auto;}
-.leoSelect_items .leoSelect_items_ul{padding: 5px;position: relative;}
+.leoSelect_items .leoSelect_items_ul{padding:5px;position: relative;margin: 0;}
 .leoSelect_items .leoSelect_items_ul li{color: #666;cursor: pointer;display: block;line-height: 18px;padding: 6px 10px;white-space: nowrap;float:none;margin: 0;height: 20px;}
-.leoSelect_items .leoSelect_items_ul li.select{background: none repeat scroll 0 0 #16a0d3;color: #fff;}
+.leoSelect_items .leoSelect_items_ul .selected{background: none repeat scroll 0 0 #16a0d3;color: #fff;}
 
 /*leoListMenu*/
 .leoListMenu{border:1px solid #7bbff2;color: #333;overflow: auto;background: none repeat scroll 0 0 #fff;position: absolute;}
@@ -263,4 +263,5 @@
 .leoTabs{position:relative;}
 .leoTabs .leoTabs_nav{height: 32px;margin: 0 18px -1px;overflow: hidden;position: relative;z-index: 1;}
 .leoTabs .leoTabs_nav ul{left: 0;list-style: outside none none;overflow: hidden;position: absolute;top: 0;width: 9999px;}
-.leoTabs .leoTabs_nav li{}
+.leoTabs .leoTabs_nav li{ border: 1px solid #e5e5e5;height: 28px;line-height: 28px;cursor: pointer;display: inline;float: left;margin: 0;overflow: hidden;padding: 0;position: relative;}
+.leoTabs .leoTabs_nav .leoTabs_nav_selected{background-color: #f4f4f4;border-color: #3da8b9 #e5e5e5 #f5f5f5;border-image: none;border-left: 1px solid #e5e5e5;border-right: 1px solid #e5e5e5;border-style: solid;border-top-left-radius: 2px;border-top-right-radius: 2px;border-width: 2px 1px 1px;height: 32px;top: -2px;}

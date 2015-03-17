@@ -260,8 +260,19 @@
 .leoImagePlayer .roll_list img{width: 88%;height: 88%;padding:2%;margin:4%;background-color: #fff;border-radius: 4%;}
 
 /*leoTabs*/
-.leoTabs{position:relative;}
+.leoTabs{position:relative;height: 450px;font-size: 12px}
 .leoTabs .leoTabs_nav{height: 32px;margin: 0 18px -1px;overflow: hidden;position: relative;z-index: 1;}
-.leoTabs .leoTabs_nav ul{left: 0;list-style: outside none none;overflow: hidden;position: absolute;top: 0;width: 9999px;}
+.leoTabs .leoTabs_nav ul{left: 0;list-style: outside none none;overflow: hidden;position: absolute;top: 0;width: 9999px;margin: 0;padding: 2px 0 0;}
 .leoTabs .leoTabs_nav li{ border: 1px solid #e5e5e5;height: 28px;line-height: 28px;cursor: pointer;display: inline;float: left;margin: 0;overflow: hidden;padding: 0;position: relative;}
-.leoTabs .leoTabs_nav .leoTabs_nav_selected{background-color: #f4f4f4;border-color: #3da8b9 #e5e5e5 #f5f5f5;border-image: none;border-left: 1px solid #e5e5e5;border-right: 1px solid #e5e5e5;border-style: solid;border-top-left-radius: 2px;border-top-right-radius: 2px;border-width: 2px 1px 1px;height: 32px;top: -2px;}
+.leoTabs .leoTabs_nav li a{display: block; margin: 0 30px 0 10px; text-decoration: none; -moz-user-select: none; -webkit-user-select: none; -ms-user-select: none; -khtml-user-select: none; user-select: none;color: #aaa;}
+.leoTabs .leoTabs_nav .leoTabs_nav_selected{background-color: #f4f4f4;border-color: #3da8b9 #e5e5e5 #f5f5f5;border-image: none;border-left: 1px solid #e5e5e5;border-right: 1px solid #e5e5e5;border-style: solid;border-top-left-radius: 2px;border-top-right-radius: 2px;border-width: 2px 1px 1px;height: 32px;top: -2px;line-height: 28px;}
+.leoTabs .leoTabs_nav .leoTabs_nav_selected a{color: #333;font-size: 12px;font-weight: bold;}
+.leoTabs .leoTabs_nav .leoTabs_nav_tabManage{background-color:#fff;border-top-right-radius: 3px;width: 26px;}
+.leoTabs .leoTabs_nav .leoTabs_nav_tabManage i{border-style: solid; border-width: 4px; font-size: 0; height: 0; margin: 13px 0 0 8px; display:block;width:0;height:0;overflow:hidden;border-color: #888 #fff #fff;}
+.leoTabs .leoTabs_nav .leoTabs_nav_leftBtn, .leoTabs .leoTabs_nav .leoTabs_nav_rightBtn{background-color:#fff;border: 1px solid #dedede;height: 28px;top: 2px;cursor: pointer;overflow: hidden;position: absolute;width: 16px;z-index: 13;}
+.leoTabs .leoTabs_nav .leoTabs_nav_leftBtn i, .leoTabs .leoTabs_nav .leoTabs_nav_rightBtn i{border-style: solid;border-width: 5px;display: block;font-size: 0;height: 0;margin: 10px 0 0;overflow: hidden;width: 0;}
+.leoTabs .leoTabs_nav .leoTabs_nav_leftBtn{border-top-left-radius: 2px;left: 0;}
+.leoTabs .leoTabs_nav .leoTabs_nav_leftBtn i{border-color: #fff #555 #fff #fff;}
+.leoTabs .leoTabs_nav .leoTabs_nav_rightBtn{border-top-right-radius: 2px;right: 0;}
+.leoTabs .leoTabs_nav .leoTabs_nav_rightBtn i{border-color: #fff #fff #fff #555;margin: 10px 0 0 5px;}
+.leoTabs .leoTabs_content{border-top: 1px solid #e5e5e5;background-color:#f5f5f5;margin: 0 auto;padding: 0;width: 100%;}

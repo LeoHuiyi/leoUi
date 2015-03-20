@@ -1,278 +1,2001 @@
 @charset "UTF-8";
-
 /*leoUi*/
-.leoUi_clearfix:before, .leoUi_clearfix:after {content:"";display:table;}
-.leoUi_clearfix:after{clear:both;}
-.leoUi_helper_reset{border-width: 0;font-size: 100%;line-height: 1.3;list-style: none outside none;margin: 0;outline: 0 none;padding: 0;text-decoration: none;}
 
-/*leoDialog*/
-.leoDialog{padding:0;border-radius: 3px;overflow: hidden;position:absolute;border: 1px solid #A8A8A8;box-shadow: 0 5px 10px rgba(0, 0, 0, 0.8);background-color: #ffffff;color: #4F4F4F;font-family: Arial,sans-serif;font-size: 100%;outline: none;}
-.leoDialog_inherit .leoDialog_titlebar{cursor: inherit !important}
-.leoDialog_titlebar{border-left: medium none;border-radius: 0;border-right: medium none;border-top: medium none;background: url("../img/leoUi-bg_highlight-soft_100_c0c0c0_1x100.png") repeat-x scroll center top #C0C0C0;position:relative;overflow: hidden;cursor: move;padding: 0.5em 1em 0.3em;text-align: right;text-shadow: 0 1px 0 rgba(255, 255, 255, 0.7);border-bottom: 1px solid #A8A8A8;z-index:0;}
-.leoDialog_title{color: #333333;font-weight: bold;float: left;width: auto; margin: 0.1em 16px 0.2em 0;font-size: 18px}
-.leoDialog_titlebar_button{display: inline-block;height: 18px;outline: medium none;padding: 1px;text-align: left;width: 19px;border-radius: 3px;text-decoration: none;color: #4F4F4F;}
-.leoDialog_titlebar_button:hover{background: url("../img/leoUi-bg_highlight-soft_100_83b0ca_1x100.png") repeat-x scroll center top #83B0CA;box-shadow: 0 0 3px #85B2CB;border: 1px solid #8AB0C6;padding:0;}
-.leoDialog_titlebar_button:hover span{background-image: url("../img/leoUi-icons_38667f_256x240.png");}
-.leoDialog_titlebar_button_span{margin: 1px;background-image: url("../img/leoUi-icons_898989_256x240.png");text-indent: -9999px;height: 16px;width: 16px;background-repeat: no-repeat;border-radius: 10px;display: block;overflow: hidden;margin: 1px;}
-.leoDialog_close_span{background-position: -80px -128px; }
-.leoDialog_maximize_span{background-position: -32px -80px; }
-.leoDialog_minimize_span{background-position: -48px -128px; }
-.leoDialog_toggle_span_show{background-position: 0 0; }
-.leoDialog_toggle_span_hide{background-position:  -64px 0; }
-.leoDialog_pin_span_on{background-position: -128px -144px; }
-.leoDialog_pin_span_off{background-position: -144px -144px; }
-.leoDialog_restore_span{background-position: -48px -80px; }
-.leoDialog_refresh_span{background-position: -64px -80px; }
-.leoDialog_content{overflow: auto;display: block;border: 0 none;padding: 0.5em 1em;position: relative;margin:0 3px 3px 3px;z-index:0;}
-.leoDialog_content_iframe{overflow: hidden;padding:0;}
-
-/*leoDialog content*/
-.leoDialog_content .icon{vertical-align: middle;background: url("../img/ico_warn.png") no-repeat scroll -50px -204px;display: inline-block;height: 25px;width: 25px;}
-.leoDialog_content .iconOk{vertical-align: middle;background: url("../img/ico_warn.png") no-repeat scroll -50px -3px;display: inline-block;height: 25px;width: 25px;}
-.leoDialog_content .iconNo{vertical-align: middle;background: url("../img/ico_warn.png") no-repeat scroll -50px -53px;display: inline-block;height: 25px;width: 25px;}
-#delete_image{background-color: #ffffff;border-radius: 3px;height: 100%;overflow: auto;}
-#delete_image .send_content{background-color: #ffffff;position: relative;padding: 28px 50px 30px;width: auto;height: auto}
-#delete_image .send_content .text{text-align: left;cursor: default;color: #222222;}
-#delete_image .send_content .text .title{vertical-align: middle;padding-left: 10px;color: #415b80;font-weight: 700}
-#delete_image .send_bottom{margin:20px 0 0 0;position: relative;height: 30px }
-#delete_image .send_submit{position: absolute;left: 76px;top:0;background-color: #87BEDC;height: 26px;width: 62px;line-height: 26px;border: none;cursor: pointer;color: #fff;}
-#delete_image .send_off{position: absolute;left: 154px;top:0;height: 26px;width: 62px;line-height: 26px;border: none;cursor: pointer;background-color: #e1e1e1;color: #555555;}
-
-/*leoSelectable*/
-.ui_state_default{background: #e6e6e6;border: 1px solid #d3d3d3;color: #555555;font-weight: normal;}
-.leoUi_selecting{background: none repeat scroll 0 0 #feca40;}
-.leoUi_selected{background: none repeat scroll 0 0 #f39814;color: white;}
-.leoUi_selectable_helper {position: absolute;z-index: 100;border: 1px dotted black;}
-
-/*leoTooltip*/
-.leoTooltip{position: absolute;z-index: 99999;margin: 0;background: none repeat scroll 0 0 rgba(0, 0, 0, 0.8);background: none repeat scroll 0 0 rgb(0, 0, 0)\9;box-shadow: 0 0 8px #85b2cb;color: #fff;border-radius: 3px;}
-.leoTooltip_close{ background: none repeat scroll 0 0 transparent;border: medium none;display: block;height: 16px;position: absolute;right: 3px;top: 3px;width: 16px;cursor: pointer;}
-.leoTooltip_content{overflow: hidden;padding: 1em;margin:0;padding:1em;white-space:nowrap;  }
-.leoTooltip_titlebar{background: none repeat scroll 0 0 transparent;border: medium none;color: inherit;padding: 0.4em;}
-.leoTooltip_arrow{position: absolute; width:0;height: 0;font-size: 0;line-height: 0;border-width:0;background: none repeat scroll 0 0 rgba(0, 0, 0, 0);}
-.leoTooltip_arrow_right{top:50%;left:-10px;border-bottom: 8px solid transparent;border-top: 8px solid transparent;border-right: 10px solid #000;margin-top: -8px;}
-.leoTooltip_arrow_left{top:50%;right:-10px;border-bottom: 8px solid transparent;border-top: 8px solid transparent;border-left: 10px solid #000;margin-top: -8px;}
-.leoTooltip_arrow_top{left:50%;bottom:-10px;border-left: 8px solid transparent;border-right: 8px solid transparent;border-top: 10px solid #000;margin-left: -8px;}
-.leoTooltip_arrow_bottom{left:50%;top:-10px;border-left: 8px solid transparent;border-right: 8px solid transparent;border-bottom: 10px solid #000;margin-left: -8px;}
-
-/*leoTree*/
-.leoTree{width:360px;overflow: auto; border:2px solid red;}
-.leoTree_child{margin-left: 32px}
-.leoTree_state_default, .leoTree_state_default a{ color: inherit; text-shadow: 0 1px 0 rgba(255, 255, 255, 0.8); }
-.leoTree_icon{width:16px;height: 16px;text-indent:-9999px;}
-.leoTree_icon_triangle{background-image: url("../img/leoUi-icons_38667f_256x240.png");cursor: pointer;}
-.leoTree_inner_open .leoTree_icon_triangle{background-position: -48px -16px;}
-.leoTree_inner_close .leoTree_icon_triangle{background-position: -32px -16px;}
-.leoTree_icon_folder{background-image: url("../img/leoUi-icons_38667f_256x240.png");}
-.leoTree_inner_open .leoTree_icon_folder{background-position: -16px -96px;}
-.leoTree_inner_close .leoTree_icon_folder{background-position: 0 -96px;}
-.leoTree_icon_document{background-image: url("../img/leoUi-icons_38667f_256x240.png");background-position: -32px -96px;}
-.leoTree_list{float: left;padding: 0.5em;width: 100%;}
-.leoTree_list .leoTree_node{background: none repeat scroll 0 0 rgba(0, 0, 0, 0);border: 0 none;clear: both;display: block;float: left;font-weight: normal;margin: 0 20px 0 0;line-height: 16px}
-.leoTree_list .leoTree_item{clear: left;display: inline;float: left;margin: 0 0 0 16px;padding: 0;width: 100%;}
-.leoTree_parent{clear: left;float: left;margin: 0;padding: 0;width: 100%;}
-.leoTree_parent span, .leoTree_item span{float:left;}
-.leoTree_inner{border: 1px solid transparent;display: block;padding: 3px;vertical-align: middle; border-radius: 3px;margin:2px 0;}
-.leoTree_inner a{color: inherit;display: block;float: left;margin: 0 0.5em;outline: medium none;text-decoration: none;cursor: pointer;}
-.leoTree_active{background-color:rgb(131, 176, 202);background: linear-gradient(to bottom, rgba(131, 176, 202, 1) 0%, rgba(185, 224, 245, 1) 100%) repeat scroll 0 0;border: 1px solid #7096ab;color: #1c4257;box-shadow: 0 1px 0 rgba(255, 255, 255, 0.25) inset;}
-.leoTree_inner_hover{background: url("../img/leoUi-bg_highlight-soft_100_83b0ca_1x100.png") repeat-x scroll center top #83b0ca;border: 1px solid #8ab0c6;box-shadow: 0 0 3px #85b2cb;color: #313131;font-weight: bold; font-weight: 400;}
-.leoTree_arrow{border-width: 0px;background: none repeat scroll 0 0 transparent;box-shadow: none;padding: 0;margin:0;text-shadow: none;position:absolute;}
-.leoTree_arrow img{position: absolute; display: block; height: 30px; margin-top: -12px;right: 4px}
-.leoTree_loading{background: url("../img/indicator.gif") no-repeat scroll 8px center #fff;border: 2px solid #aaa;display: none;font-size: 14px;font-weight: bold;left: 45%;padding: 6px 20px 6px 30px;position: absolute;text-align: center;top: 45%;width: auto;z-index: 101;}
-.leoTree_checkbox{float:left;margin:0;}
-.leoTree_checkbox .leoTree_checkbox_box{position: relative;border-radius: 2px;bottom: 0;height: 16px;left: 0;margin-right: 3px;width: 16px;box-shadow: 0 1px 1px rgba(0, 0, 0, 0.25); background: linear-gradient(to bottom, rgba(243, 243, 243, 1) 0%, rgba(204, 204, 204, 1) 100%) repeat scroll 0 0 rgba(0, 0, 0, 0);border: 1px solid #a8a8a8;}
-.leoTree_checkbox .leoTree_checkbox_active{ background: linear-gradient(to bottom, rgba(131, 176, 202, 1) 0%, rgba(185, 224, 245, 1) 100%) repeat scroll 0 0 rgba(0, 0, 0, 0);border: 1px solid #7096ab;text-shadow: 0 1px 0 rgba(255, 255, 255, 0.7);}
-.leoTree_checkbox .leoTree_checkbox_hover{background: url("../img/leoUi-bg_highlight-soft_100_83b0ca_1x100.png") repeat-x scroll center top #83b0ca;}
-.leoTree_checkbox .leoTree_checkbox_icon{float: left;border-radius: 3px;background-image: url("../img/leoUi-icons_38667f_256x240.png");text-indent: -9999px;height: 16px;width: 16px;background-repeat: no-repeat;display: block;overflow: hidden;}
-.leoTree_checkbox .leoTree_checkbox_check{ background-position: -64px -144px;}
-.leoTree_checkbox .leoTree_checkbox_halfCheck{ background-position: -96px -160px;}
-
-/*leoSelect*/
-.leoSelect{display: inline-block;vertical-align: middle;outline:none}
-.leoSelect .leoSelect_tit{background: none repeat scroll 0 0 #fff;border: 1px solid #dbdbdb;display: block;height: 20px;line-height: 20px;padding: 5px 38px 5px 10px;position: relative;text-decoration: none;white-space: nowrap;word-break: break-all;cursor: pointer;-moz-user-select: none; -webkit-user-select: none;-ms-user-select: none;-khtml-user-select: none;user-select: none;}
-.leoSelect .leoSelect_tit_val{color: #333;display: inline-block;vertical-align: middle;}
-.leoSelect .leoSelect_tit_icon{background: url("../img/leoComboBox_button.png") no-repeat center;border-left: 1px solid #dbdbdb;display: block;height: 100%;position: absolute;right: 0;top: 0;width: 28px;}
-.leoSelect .leoSelect_items, .leoSelect_items_clone{background: none repeat scroll 0 0 #fff;border: 1px solid #dbdbdb;position: absolute;top: 0;left:0;overflow: auto;}
-.leoSelect_items .leoSelect_items_ul{padding:5px;position: relative;margin: 0;}
-.leoSelect_items .leoSelect_items_ul li{color: #666;cursor: pointer;display: block;line-height: 18px;padding: 6px 10px;white-space: nowrap;float:none;margin: 0;height: 20px;}
-.leoSelect_items .leoSelect_items_ul .selected{background: none repeat scroll 0 0 #16a0d3;color: #fff;}
-
-/*leoListMenu*/
-.leoListMenu{border:1px solid #7bbff2;color: #333;overflow: auto;background: none repeat scroll 0 0 #fff;position: absolute;}
-.leoListMenu .leoListMenu_menuContentIn{overflow: auto;height: 200px}
-.leoListMenu .leoListMenu_menuContent{}
-.leoListMenu .leoListMenu_item{color: #666;cursor: pointer;display: block;line-height: 18px;padding: 6px 10px;white-space: nowrap;float:none;margin: 0;height: 20px;}
-.leoListMenu .leoListMenu_focus{background-color: #7bbfd0;color: #fff;}
-.leoListMenu .leoListMenu_focus span{animation:myfirst 1s;-moz-animation:a 1s;-webkit-animation:myfirst 1s;-o-animation:myfirst 1s;}
-@keyframes a{
-	0%   {margin-left: 0px;}
-	50%  {margin-left: 30px;}
-	100% {margin-left: 0;}
+.leoUi_clearfix:before,
+.leoUi_clearfix:after {
+    content: "";
+    display: table;
 }
-.leoListMenu .leoListMenu_select{background-color: #7bbff2;color: #fff;}
 
+.leoUi_clearfix:after {
+    clear: both;
+}
+
+.leoUi_helper_reset {
+    border-width: 0;
+    font-size: 100%;
+    line-height: 1.3;
+    list-style: none outside none;
+    margin: 0;
+    outline: 0 none;
+    padding: 0;
+    text-decoration: none;
+}
+/*leoDialog*/
+
+.leoDialog {
+    padding: 0;
+    border-radius: 3px;
+    overflow: hidden;
+    position: absolute;
+    border: 1px solid #A8A8A8;
+    box-shadow: 0 5px 10px rgba(0, 0, 0, 0.8);
+    background-color: #ffffff;
+    color: #4F4F4F;
+    font-family: Arial, sans-serif;
+    font-size: 100%;
+    outline: none;
+}
+
+.leoDialog_inherit .leoDialog_titlebar {
+    cursor: inherit !important
+}
+
+.leoDialog_titlebar {
+    border-left: medium none;
+    border-radius: 0;
+    border-right: medium none;
+    border-top: medium none;
+    background: url("../img/leoUi-bg_highlight-soft_100_c0c0c0_1x100.png") repeat-x scroll center top #C0C0C0;
+    position: relative;
+    overflow: hidden;
+    cursor: move;
+    padding: 0.5em 1em 0.3em;
+    text-align: right;
+    text-shadow: 0 1px 0 rgba(255, 255, 255, 0.7);
+    border-bottom: 1px solid #A8A8A8;
+    z-index: 0;
+}
+
+.leoDialog_title {
+    color: #333333;
+    font-weight: bold;
+    float: left;
+    width: auto;
+    margin: 0.1em 16px 0.2em 0;
+    font-size: 18px
+}
+
+.leoDialog_titlebar_button {
+    display: inline-block;
+    height: 18px;
+    outline: medium none;
+    padding: 1px;
+    text-align: left;
+    width: 19px;
+    border-radius: 3px;
+    text-decoration: none;
+    color: #4F4F4F;
+}
+
+.leoDialog_titlebar_button:hover {
+    background: url("../img/leoUi-bg_highlight-soft_100_83b0ca_1x100.png") repeat-x scroll center top #83B0CA;
+    box-shadow: 0 0 3px #85B2CB;
+    border: 1px solid #8AB0C6;
+    padding: 0;
+}
+
+.leoDialog_titlebar_button:hover span {
+    background-image: url("../img/leoUi-icons_38667f_256x240.png");
+}
+
+.leoDialog_titlebar_button_span {
+    margin: 1px;
+    background-image: url("../img/leoUi-icons_898989_256x240.png");
+    text-indent: -9999px;
+    height: 16px;
+    width: 16px;
+    background-repeat: no-repeat;
+    border-radius: 10px;
+    display: block;
+    overflow: hidden;
+    margin: 1px;
+}
+
+.leoDialog_close_span {
+    background-position: -80px -128px;
+}
+
+.leoDialog_maximize_span {
+    background-position: -32px -80px;
+}
+
+.leoDialog_minimize_span {
+    background-position: -48px -128px;
+}
+
+.leoDialog_toggle_span_show {
+    background-position: 0 0;
+}
+
+.leoDialog_toggle_span_hide {
+    background-position: -64px 0;
+}
+
+.leoDialog_pin_span_on {
+    background-position: -128px -144px;
+}
+
+.leoDialog_pin_span_off {
+    background-position: -144px -144px;
+}
+
+.leoDialog_restore_span {
+    background-position: -48px -80px;
+}
+
+.leoDialog_refresh_span {
+    background-position: -64px -80px;
+}
+
+.leoDialog_content {
+    overflow: auto;
+    display: block;
+    border: 0 none;
+    padding: 0.5em 1em;
+    position: relative;
+    margin: 0 3px 3px 3px;
+    z-index: 0;
+}
+
+.leoDialog_content_iframe {
+    overflow: hidden;
+    padding: 0;
+}
+/*leoDialog content*/
+
+.leoDialog_content .icon {
+    vertical-align: middle;
+    background: url("../img/ico_warn.png") no-repeat scroll -50px -204px;
+    display: inline-block;
+    height: 25px;
+    width: 25px;
+}
+
+.leoDialog_content .iconOk {
+    vertical-align: middle;
+    background: url("../img/ico_warn.png") no-repeat scroll -50px -3px;
+    display: inline-block;
+    height: 25px;
+    width: 25px;
+}
+
+.leoDialog_content .iconNo {
+    vertical-align: middle;
+    background: url("../img/ico_warn.png") no-repeat scroll -50px -53px;
+    display: inline-block;
+    height: 25px;
+    width: 25px;
+}
+
+#delete_image {
+    background-color: #ffffff;
+    border-radius: 3px;
+    height: 100%;
+    overflow: auto;
+}
+
+#delete_image .send_content {
+    background-color: #ffffff;
+    position: relative;
+    padding: 28px 50px 30px;
+    width: auto;
+    height: auto
+}
+
+#delete_image .send_content .text {
+    text-align: left;
+    cursor: default;
+    color: #222222;
+}
+
+#delete_image .send_content .text .title {
+    vertical-align: middle;
+    padding-left: 10px;
+    color: #415b80;
+    font-weight: 700
+}
+
+#delete_image .send_bottom {
+    margin: 20px 0 0 0;
+    position: relative;
+    height: 30px
+}
+
+#delete_image .send_submit {
+    position: absolute;
+    left: 76px;
+    top: 0;
+    background-color: #87BEDC;
+    height: 26px;
+    width: 62px;
+    line-height: 26px;
+    border: none;
+    cursor: pointer;
+    color: #fff;
+}
+
+#delete_image .send_off {
+    position: absolute;
+    left: 154px;
+    top: 0;
+    height: 26px;
+    width: 62px;
+    line-height: 26px;
+    border: none;
+    cursor: pointer;
+    background-color: #e1e1e1;
+    color: #555555;
+}
+/*leoSelectable*/
+
+.ui_state_default {
+    background: #e6e6e6;
+    border: 1px solid #d3d3d3;
+    color: #555555;
+    font-weight: normal;
+}
+
+.leoUi_selecting {
+    background: none repeat scroll 0 0 #feca40;
+}
+
+.leoUi_selected {
+    background: none repeat scroll 0 0 #f39814;
+    color: white;
+}
+
+.leoUi_selectable_helper {
+    position: absolute;
+    z-index: 100;
+    border: 1px dotted black;
+}
+/*leoTooltip*/
+
+.leoTooltip {
+    position: absolute;
+    z-index: 99999;
+    margin: 0;
+    background: none repeat scroll 0 0 rgba(0, 0, 0, 0.8);
+    background: none repeat scroll 0 0 rgb(0, 0, 0)\9;
+    box-shadow: 0 0 8px #85b2cb;
+    color: #fff;
+    border-radius: 3px;
+}
+
+.leoTooltip_close {
+    background: none repeat scroll 0 0 transparent;
+    border: medium none;
+    display: block;
+    height: 16px;
+    position: absolute;
+    right: 3px;
+    top: 3px;
+    width: 16px;
+    cursor: pointer;
+}
+
+.leoTooltip_content {
+    overflow: hidden;
+    padding: 1em;
+    margin: 0;
+    padding: 1em;
+    white-space: nowrap;
+}
+
+.leoTooltip_titlebar {
+    background: none repeat scroll 0 0 transparent;
+    border: medium none;
+    color: inherit;
+    padding: 0.4em;
+}
+
+.leoTooltip_arrow {
+    position: absolute;
+    width: 0;
+    height: 0;
+    font-size: 0;
+    line-height: 0;
+    border-width: 0;
+    background: none repeat scroll 0 0 rgba(0, 0, 0, 0);
+}
+
+.leoTooltip_arrow_right {
+    top: 50%;
+    left: -10px;
+    border-bottom: 8px solid transparent;
+    border-top: 8px solid transparent;
+    border-right: 10px solid #000;
+    margin-top: -8px;
+}
+
+.leoTooltip_arrow_left {
+    top: 50%;
+    right: -10px;
+    border-bottom: 8px solid transparent;
+    border-top: 8px solid transparent;
+    border-left: 10px solid #000;
+    margin-top: -8px;
+}
+
+.leoTooltip_arrow_top {
+    left: 50%;
+    bottom: -10px;
+    border-left: 8px solid transparent;
+    border-right: 8px solid transparent;
+    border-top: 10px solid #000;
+    margin-left: -8px;
+}
+
+.leoTooltip_arrow_bottom {
+    left: 50%;
+    top: -10px;
+    border-left: 8px solid transparent;
+    border-right: 8px solid transparent;
+    border-bottom: 10px solid #000;
+    margin-left: -8px;
+}
+/*leoTree*/
+
+.leoTree {
+    width: 360px;
+    overflow: auto;
+    border: 2px solid red;
+}
+
+.leoTree_child {
+    margin-left: 32px
+}
+
+.leoTree_state_default,
+.leoTree_state_default a {
+    color: inherit;
+    text-shadow: 0 1px 0 rgba(255, 255, 255, 0.8);
+}
+
+.leoTree_icon {
+    width: 16px;
+    height: 16px;
+    text-indent: -9999px;
+}
+
+.leoTree_icon_triangle {
+    background-image: url("../img/leoUi-icons_38667f_256x240.png");
+    cursor: pointer;
+}
+
+.leoTree_inner_open .leoTree_icon_triangle {
+    background-position: -48px -16px;
+}
+
+.leoTree_inner_close .leoTree_icon_triangle {
+    background-position: -32px -16px;
+}
+
+.leoTree_icon_folder {
+    background-image: url("../img/leoUi-icons_38667f_256x240.png");
+}
+
+.leoTree_inner_open .leoTree_icon_folder {
+    background-position: -16px -96px;
+}
+
+.leoTree_inner_close .leoTree_icon_folder {
+    background-position: 0 -96px;
+}
+
+.leoTree_icon_document {
+    background-image: url("../img/leoUi-icons_38667f_256x240.png");
+    background-position: -32px -96px;
+}
+
+.leoTree_list {
+    float: left;
+    padding: 0.5em;
+    width: 100%;
+}
+
+.leoTree_list .leoTree_node {
+    background: none repeat scroll 0 0 rgba(0, 0, 0, 0);
+    border: 0 none;
+    clear: both;
+    display: block;
+    float: left;
+    font-weight: normal;
+    margin: 0 20px 0 0;
+    line-height: 16px
+}
+
+.leoTree_list .leoTree_item {
+    clear: left;
+    display: inline;
+    float: left;
+    margin: 0 0 0 16px;
+    padding: 0;
+    width: 100%;
+}
+
+.leoTree_parent {
+    clear: left;
+    float: left;
+    margin: 0;
+    padding: 0;
+    width: 100%;
+}
+
+.leoTree_parent span,
+.leoTree_item span {
+    float: left;
+}
+
+.leoTree_inner {
+    border: 1px solid transparent;
+    display: block;
+    padding: 3px;
+    vertical-align: middle;
+    border-radius: 3px;
+    margin: 2px 0;
+}
+
+.leoTree_inner a {
+    color: inherit;
+    display: block;
+    float: left;
+    margin: 0 0.5em;
+    outline: medium none;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.leoTree_active {
+    background-color: rgb(131, 176, 202);
+    background: linear-gradient(to bottom, rgba(131, 176, 202, 1) 0%, rgba(185, 224, 245, 1) 100%) repeat scroll 0 0;
+    border: 1px solid #7096ab;
+    color: #1c4257;
+    box-shadow: 0 1px 0 rgba(255, 255, 255, 0.25) inset;
+}
+
+.leoTree_inner_hover {
+    background: url("../img/leoUi-bg_highlight-soft_100_83b0ca_1x100.png") repeat-x scroll center top #83b0ca;
+    border: 1px solid #8ab0c6;
+    box-shadow: 0 0 3px #85b2cb;
+    color: #313131;
+    font-weight: bold;
+    font-weight: 400;
+}
+
+.leoTree_arrow {
+    border-width: 0px;
+    background: none repeat scroll 0 0 transparent;
+    box-shadow: none;
+    padding: 0;
+    margin: 0;
+    text-shadow: none;
+    position: absolute;
+}
+
+.leoTree_arrow img {
+    position: absolute;
+    display: block;
+    height: 30px;
+    margin-top: -12px;
+    right: 4px
+}
+
+.leoTree_loading {
+    background: url("../img/indicator.gif") no-repeat scroll 8px center #fff;
+    border: 2px solid #aaa;
+    display: none;
+    font-size: 14px;
+    font-weight: bold;
+    left: 45%;
+    padding: 6px 20px 6px 30px;
+    position: absolute;
+    text-align: center;
+    top: 45%;
+    width: auto;
+    z-index: 101;
+}
+
+.leoTree_checkbox {
+    float: left;
+    margin: 0;
+}
+
+.leoTree_checkbox .leoTree_checkbox_box {
+    position: relative;
+    border-radius: 2px;
+    bottom: 0;
+    height: 16px;
+    left: 0;
+    margin-right: 3px;
+    width: 16px;
+    box-shadow: 0 1px 1px rgba(0, 0, 0, 0.25);
+    background: linear-gradient(to bottom, rgba(243, 243, 243, 1) 0%, rgba(204, 204, 204, 1) 100%) repeat scroll 0 0 rgba(0, 0, 0, 0);
+    border: 1px solid #a8a8a8;
+}
+
+.leoTree_checkbox .leoTree_checkbox_active {
+    background: linear-gradient(to bottom, rgba(131, 176, 202, 1) 0%, rgba(185, 224, 245, 1) 100%) repeat scroll 0 0 rgba(0, 0, 0, 0);
+    border: 1px solid #7096ab;
+    text-shadow: 0 1px 0 rgba(255, 255, 255, 0.7);
+}
+
+.leoTree_checkbox .leoTree_checkbox_hover {
+    background: url("../img/leoUi-bg_highlight-soft_100_83b0ca_1x100.png") repeat-x scroll center top #83b0ca;
+}
+
+.leoTree_checkbox .leoTree_checkbox_icon {
+    float: left;
+    border-radius: 3px;
+    background-image: url("../img/leoUi-icons_38667f_256x240.png");
+    text-indent: -9999px;
+    height: 16px;
+    width: 16px;
+    background-repeat: no-repeat;
+    display: block;
+    overflow: hidden;
+}
+
+.leoTree_checkbox .leoTree_checkbox_check {
+    background-position: -64px -144px;
+}
+
+.leoTree_checkbox .leoTree_checkbox_halfCheck {
+    background-position: -96px -160px;
+}
+/*leoSelect*/
+
+.leoSelect {
+    display: inline-block;
+    vertical-align: middle;
+    outline: none
+}
+
+.leoSelect .leoSelect_tit {
+    background: none repeat scroll 0 0 #fff;
+    border: 1px solid #dbdbdb;
+    display: block;
+    height: 20px;
+    line-height: 20px;
+    padding: 5px 38px 5px 10px;
+    position: relative;
+    text-decoration: none;
+    white-space: nowrap;
+    word-break: break-all;
+    cursor: pointer;
+    -moz-user-select: none;
+    -webkit-user-select: none;
+    -ms-user-select: none;
+    -khtml-user-select: none;
+    user-select: none;
+}
+
+.leoSelect .leoSelect_tit_val {
+    color: #333;
+    display: inline-block;
+    vertical-align: middle;
+}
+
+.leoSelect .leoSelect_tit_icon {
+    background: url("../img/leoComboBox_button.png") no-repeat center;
+    border-left: 1px solid #dbdbdb;
+    display: block;
+    height: 100%;
+    position: absolute;
+    right: 0;
+    top: 0;
+    width: 28px;
+}
+
+.leoSelect .leoSelect_items,
+.leoSelect_items_clone {
+    background: none repeat scroll 0 0 #fff;
+    border: 1px solid #dbdbdb;
+    position: absolute;
+    top: 0;
+    left: 0;
+    overflow: auto;
+}
+
+.leoSelect_items .leoSelect_items_ul {
+    padding: 5px;
+    position: relative;
+    margin: 0;
+}
+
+.leoSelect_items .leoSelect_items_ul li {
+    color: #666;
+    cursor: pointer;
+    display: block;
+    line-height: 18px;
+    padding: 6px 10px;
+    white-space: nowrap;
+    float: none;
+    margin: 0;
+    height: 20px;
+}
+
+.leoSelect_items .leoSelect_items_ul .selected {
+    background: none repeat scroll 0 0 #16a0d3;
+    color: #fff;
+}
+/*leoListMenu*/
+
+.leoListMenu {
+    border: 1px solid #7bbff2;
+    color: #333;
+    overflow: auto;
+    background: none repeat scroll 0 0 #fff;
+    position: absolute;
+}
+
+.leoListMenu .leoListMenu_menuContentIn {
+    overflow: auto;
+    height: 200px
+}
+
+.leoListMenu .leoListMenu_menuContent {}
+
+.leoListMenu .leoListMenu_item {
+    color: #666;
+    cursor: pointer;
+    display: block;
+    line-height: 18px;
+    padding: 6px 10px;
+    white-space: nowrap;
+    float: none;
+    margin: 0;
+    height: 20px;
+}
+
+.leoListMenu .leoListMenu_focus {
+    background-color: #7bbfd0;
+    color: #fff;
+}
+
+.leoListMenu .leoListMenu_focus span {
+    animation: myfirst 1s;
+    -moz-animation: a 1s;
+    -webkit-animation: myfirst 1s;
+    -o-animation: myfirst 1s;
+}
+
+@keyframes a {
+    0% {
+        margin-left: 0px;
+    }
+    50% {
+        margin-left: 30px;
+    }
+    100% {
+        margin-left: 0;
+    }
+}
+
+.leoListMenu .leoListMenu_select {
+    background-color: #7bbff2;
+    color: #fff;
+}
 /*leoComboBox*/
-.leoComboBox_wrop .leoComboBox{background: none repeat scroll 0 0 #fff;border: 1px solid #d4d4d4;color: #999;font-size: 14px;line-height: 20px;min-height: 20px;vertical-align: middle;width: 200px;height: 30px;}
-.leoComboBox_wrop .leoComboBox_input{border: 0 none;color: #999;float: left;height: 18px;line-height: 20px;outline: 0 none;padding: 5px 4px;font-size: 14px;min-height: 20px;vertical-align: middle;background: none repeat scroll 0 0 #fff;}
-.leoComboBox_wrop .leoComboBox_input:focus{background: none repeat scroll 0 0 #fffbde;color: #333;border-color: #7bbff2;}
-.leoComboBox_wrop .leoComboBox_button{background: url("../img/leoComboBox_button.png") no-repeat center;height: 100%;width: 16px;float: right;cursor: pointer;}
-.leoComboBox_wrop .leoComboBox_hover{border:1px solid #7bbff2;}
-.leoComboBox_wrop .leoComboBox_focus{border:1px solid #7bbff2;}
 
+.leoComboBox_wrop .leoComboBox {
+    background: none repeat scroll 0 0 #fff;
+    border: 1px solid #d4d4d4;
+    color: #999;
+    font-size: 14px;
+    line-height: 20px;
+    min-height: 20px;
+    vertical-align: middle;
+    width: 200px;
+    height: 30px;
+}
+
+.leoComboBox_wrop .leoComboBox_input {
+    border: 0 none;
+    color: #999;
+    float: left;
+    height: 18px;
+    line-height: 20px;
+    outline: 0 none;
+    padding: 5px 4px;
+    font-size: 14px;
+    min-height: 20px;
+    vertical-align: middle;
+    background: none repeat scroll 0 0 #fff;
+}
+
+.leoComboBox_wrop .leoComboBox_input:focus {
+    background: none repeat scroll 0 0 #fffbde;
+    color: #333;
+    border-color: #7bbff2;
+}
+
+.leoComboBox_wrop .leoComboBox_button {
+    background: url("../img/leoComboBox_button.png") no-repeat center;
+    height: 100%;
+    width: 16px;
+    float: right;
+    cursor: pointer;
+}
+
+.leoComboBox_wrop .leoComboBox_hover {
+    border: 1px solid #7bbff2;
+}
+
+.leoComboBox_wrop .leoComboBox_focus {
+    border: 1px solid #7bbff2;
+}
 /*leoGrid*/
-.leoUi-sort-asc, .leoUi-sort-desc, .leoUi-sort-ndb { width: 16px; height: 16px; line-height: 1; vertical-align: middle; display: -moz-inline-stack; display: inline-block; vertical-align: middle; *vertical-align: auto; zoom: 1; *display: inline; position: relative; cursor: pointer; }
-.leoUi-sort-asc span,.leoUi-sort-desc span,.leoUi-sort-ndb span { position: absolute; top: 0px; left: 4px; }
-.leoUi-sort-ndb .leoUi-sort-top, .leoUi-sort-desc .leoUi-sort-top { width: 0; height: 0; line-height: 0; font-size: 0; border-top: 0 none; border-right: 6px dashed transparent; border-bottom: 6px solid #cccccc; border-left: 6px dashed transparent; top: 0px; }
-.leoUi-sort-asc .leoUi-sort-top { width: 0; height: 0; line-height: 0; font-size: 0; border-top: 0 none; border-right: 6px dashed transparent; border-bottom: 6px solid black; border-left: 6px dashed transparent; top: 0px; }
-.leoUi-sort-ndb .leoUi-sort-bottom, .leoUi-sort-asc .leoUi-sort-bottom { width: 0; height: 0; line-height: 0; font-size: 0; border-top: 6px solid #cccccc; border-right: 6px dashed transparent; border-bottom: 0; border-left: 6px dashed transparent; top: 8px; }
-.leoUi-sort-desc .leoUi-sort-bottom { width: 0; height: 0; line-height: 0; font-size: 0; border-top: 6px solid black; border-right: 6px dashed transparent; border-bottom: 0; border-left: 6px dashed transparent; top: 8px; }
 
+.leoUi-sort-asc,
+.leoUi-sort-desc,
+.leoUi-sort-ndb {
+    width: 16px;
+    height: 16px;
+    line-height: 1;
+    vertical-align: middle;
+    display: -moz-inline-stack;
+    display: inline-block;
+    vertical-align: middle;
+    *vertical-align: auto;
+    zoom: 1;
+    *display: inline;
+    position: relative;
+    cursor: pointer;
+}
+
+.leoUi-sort-asc span,
+.leoUi-sort-desc span,
+.leoUi-sort-ndb span {
+    position: absolute;
+    top: 0px;
+    left: 4px;
+}
+
+.leoUi-sort-ndb .leoUi-sort-top,
+.leoUi-sort-desc .leoUi-sort-top {
+    width: 0;
+    height: 0;
+    line-height: 0;
+    font-size: 0;
+    border-top: 0 none;
+    border-right: 6px dashed transparent;
+    border-bottom: 6px solid #cccccc;
+    border-left: 6px dashed transparent;
+    top: 0px;
+}
+
+.leoUi-sort-asc .leoUi-sort-top {
+    width: 0;
+    height: 0;
+    line-height: 0;
+    font-size: 0;
+    border-top: 0 none;
+    border-right: 6px dashed transparent;
+    border-bottom: 6px solid black;
+    border-left: 6px dashed transparent;
+    top: 0px;
+}
+
+.leoUi-sort-ndb .leoUi-sort-bottom,
+.leoUi-sort-asc .leoUi-sort-bottom {
+    width: 0;
+    height: 0;
+    line-height: 0;
+    font-size: 0;
+    border-top: 6px solid #cccccc;
+    border-right: 6px dashed transparent;
+    border-bottom: 0;
+    border-left: 6px dashed transparent;
+    top: 8px;
+}
+
+.leoUi-sort-desc .leoUi-sort-bottom {
+    width: 0;
+    height: 0;
+    line-height: 0;
+    font-size: 0;
+    border-top: 6px solid black;
+    border-right: 6px dashed transparent;
+    border-bottom: 0;
+    border-left: 6px dashed transparent;
+    top: 8px;
+}
 /*leoScrollbar*/
-.leoUiScrollbar{font-size: 1em;overflow: hidden;outline: none;background-image: none;border-radius: 3px;border: 1px solid #a8a8a8;background: #ffffff;color: #4f4f4f;font-family: Arial,sans-serif;}
-.leoUiScrollbar .leoUiScrollbar-container{overflow: hidden;position: relative;zoom: 1;}
-.leoUiScrollbar .leoUiScrollbar-state-default{position: absolute;text-shadow: 0px 1px 0px rgba(255,255,255,0.7);color: #4f4f4f;font-weight: bold;}
-.leoUiScrollbar .leoUiScrollbar-state-default .leoUiScrollbar-icon{background-image: url(../img/ui-icons_38667f_256x240.png); width: 16px;height: 16px;display: block;text-indent: -99999px;overflow: hidden;background-repeat: no-repeat;-moz-border-radius: 10px;-webkit-border-radius: 10px;border-radius: 10px;}
-.leoUiScrollbar .leoUiScrollbar-hbar-buttontop{top: 0;background: url(../img/scroller-up-arrow.png) no-repeat top;height: 25px;border: none;-moz-box-shadow: none;-webkit-box-shadow: none;box-shadow: none;width: 18px;}
-.leoUiScrollbar .leoUiScrollbar-icon-triangle-1-n {background-position: 0 -16px;}
-.leoUiScrollbar .leoUiScrollbar-hbar-buttonbottom{bottom: 0;background: url(../img/scroller-down-arrow.png) no-repeat bottom;height: 25px;border: none;-moz-box-shadow: none;-webkit-box-shadow: none;box-shadow: none;width: 18px;}
-.leoUiScrollbar .leoUiScrollbar-hbar-buttonbottom .leoUiScrollbar-icon{margin-top: 10px;}
-.leoUiScrollbar .leoUiScrollbar-icon-triangle-1-s{background-position: -64px -16px;}
-.leoUiScrollbar .leoUiScrollbar-hbar-buttonleft{left: 0;background: url(../img/scroller-left-arrow.png) no-repeat left;width: 25px;border: none;-moz-box-shadow: none;-webkit-box-shadow: none;box-shadow: none;height: 18px;}
-.leoUiScrollbar .leoUiScrollbar-icon-triangle-1-w{background-position: -96px -16px;}
-.leoUiScrollbar .leoUiScrollbar-hbar-buttonright{bottom: 0;background: url(../img/scroller-right-arrow.png) no-repeat right;width: 25px;border: none;-moz-box-shadow: none;-webkit-box-shadow: none;box-shadow: none;height: 18px;}
-.leoUiScrollbar .leoUiScrollbar-hbar-buttonright .leoUiScrollbar-icon{margin-left: 10px;}
-.leoUiScrollbar .leoUiScrollbar-icon-triangle-1-e{background-position: -32px -16px;}
-.leoUiScrollbar .leoUiScrollbar-handle{background: url(../img/scrollbar-vertical.png) repeat-y left;-moz-border-radius: 12px;-webkit-border-radius: 12px;border-radius: 12px;-moz-box-shadow: inset 1px 0 0 rgba(255,255,255,0.25);z-index: 9;border-color: #a5a9ae;margin: -5px 0;position: absolute; font-size:0px; overflow:hidden;}
-.leoUiScrollbar .leoUiScrollbar-handle .leoUiScrollbar-icon{display: none}
-.leoUiScrollbar .leoUiScrollbar-icon-grip-solid-horizontal{background-position: -48px -224px;}
-.leoUiScrollbar .leoUiScrollbar-hbarcontainer{ position: absolute; height: 18px; padding-left: 18px; padding-right: 18px; border: none;font-size: 0px; background: #f8f8f8;-moz-box-shadow: inset 3px 0 10px rgba(0,0,0,0.25);-webkit-box-shadow: inset 3px 0 10px rgba(0,0,0,0.25);box-shadow: inset 3px 0 10px rgba(0,0,0,0.25); }
-.leoUiScrollbar .leoUiScrollbar-vbarcontainer{ position: absolute; width: 18px; padding-top: 18px; padding-bottom: 18px; border: none; font-size: 0px; background: #f8f8f8;-moz-box-shadow: inset 3px 0 10px rgba(0,0,0,0.25);-webkit-box-shadow: inset 3px 0 10px rgba(0,0,0,0.25);box-shadow: inset 3px 0 10px rgba(0,0,0,0.25); }
-.leoUiScrollbar .leoUiScrollbar-barcontainer-heade{text-shadow: 0px 1px 0px rgba(255,255,255,0.7);color: #333;font-weight: bold;}
 
+.leoUiScrollbar {
+    font-size: 1em;
+    overflow: hidden;
+    outline: none;
+    background-image: none;
+    border-radius: 3px;
+    border: 1px solid #a8a8a8;
+    background: #ffffff;
+    color: #4f4f4f;
+    font-family: Arial, sans-serif;
+}
+
+.leoUiScrollbar .leoUiScrollbar-container {
+    overflow: hidden;
+    position: relative;
+    zoom: 1;
+}
+
+.leoUiScrollbar .leoUiScrollbar-state-default {
+    position: absolute;
+    text-shadow: 0px 1px 0px rgba(255, 255, 255, 0.7);
+    color: #4f4f4f;
+    font-weight: bold;
+}
+
+.leoUiScrollbar .leoUiScrollbar-state-default .leoUiScrollbar-icon {
+    background-image: url(../img/ui-icons_38667f_256x240.png);
+    width: 16px;
+    height: 16px;
+    display: block;
+    text-indent: -99999px;
+    overflow: hidden;
+    background-repeat: no-repeat;
+    -moz-border-radius: 10px;
+    -webkit-border-radius: 10px;
+    border-radius: 10px;
+}
+
+.leoUiScrollbar .leoUiScrollbar-hbar-buttontop {
+    top: 0;
+    background: url(../img/scroller-up-arrow.png) no-repeat top;
+    height: 25px;
+    border: none;
+    -moz-box-shadow: none;
+    -webkit-box-shadow: none;
+    box-shadow: none;
+    width: 18px;
+}
+
+.leoUiScrollbar .leoUiScrollbar-icon-triangle-1-n {
+    background-position: 0 -16px;
+}
+
+.leoUiScrollbar .leoUiScrollbar-hbar-buttonbottom {
+    bottom: 0;
+    background: url(../img/scroller-down-arrow.png) no-repeat bottom;
+    height: 25px;
+    border: none;
+    -moz-box-shadow: none;
+    -webkit-box-shadow: none;
+    box-shadow: none;
+    width: 18px;
+}
+
+.leoUiScrollbar .leoUiScrollbar-hbar-buttonbottom .leoUiScrollbar-icon {
+    margin-top: 10px;
+}
+
+.leoUiScrollbar .leoUiScrollbar-icon-triangle-1-s {
+    background-position: -64px -16px;
+}
+
+.leoUiScrollbar .leoUiScrollbar-hbar-buttonleft {
+    left: 0;
+    background: url(../img/scroller-left-arrow.png) no-repeat left;
+    width: 25px;
+    border: none;
+    -moz-box-shadow: none;
+    -webkit-box-shadow: none;
+    box-shadow: none;
+    height: 18px;
+}
+
+.leoUiScrollbar .leoUiScrollbar-icon-triangle-1-w {
+    background-position: -96px -16px;
+}
+
+.leoUiScrollbar .leoUiScrollbar-hbar-buttonright {
+    bottom: 0;
+    background: url(../img/scroller-right-arrow.png) no-repeat right;
+    width: 25px;
+    border: none;
+    -moz-box-shadow: none;
+    -webkit-box-shadow: none;
+    box-shadow: none;
+    height: 18px;
+}
+
+.leoUiScrollbar .leoUiScrollbar-hbar-buttonright .leoUiScrollbar-icon {
+    margin-left: 10px;
+}
+
+.leoUiScrollbar .leoUiScrollbar-icon-triangle-1-e {
+    background-position: -32px -16px;
+}
+
+.leoUiScrollbar .leoUiScrollbar-handle {
+    background: url(../img/scrollbar-vertical.png) repeat-y left;
+    -moz-border-radius: 12px;
+    -webkit-border-radius: 12px;
+    border-radius: 12px;
+    -moz-box-shadow: inset 1px 0 0 rgba(255, 255, 255, 0.25);
+    z-index: 9;
+    border-color: #a5a9ae;
+    margin: -5px 0;
+    position: absolute;
+    font-size: 0px;
+    overflow: hidden;
+}
+
+.leoUiScrollbar .leoUiScrollbar-handle .leoUiScrollbar-icon {
+    display: none
+}
+
+.leoUiScrollbar .leoUiScrollbar-icon-grip-solid-horizontal {
+    background-position: -48px -224px;
+}
+
+.leoUiScrollbar .leoUiScrollbar-hbarcontainer {
+    position: absolute;
+    height: 18px;
+    padding-left: 18px;
+    padding-right: 18px;
+    border: none;
+    font-size: 0px;
+    background: #f8f8f8;
+    -moz-box-shadow: inset 3px 0 10px rgba(0, 0, 0, 0.25);
+    -webkit-box-shadow: inset 3px 0 10px rgba(0, 0, 0, 0.25);
+    box-shadow: inset 3px 0 10px rgba(0, 0, 0, 0.25);
+}
+
+.leoUiScrollbar .leoUiScrollbar-vbarcontainer {
+    position: absolute;
+    width: 18px;
+    padding-top: 18px;
+    padding-bottom: 18px;
+    border: none;
+    font-size: 0px;
+    background: #f8f8f8;
+    -moz-box-shadow: inset 3px 0 10px rgba(0, 0, 0, 0.25);
+    -webkit-box-shadow: inset 3px 0 10px rgba(0, 0, 0, 0.25);
+    box-shadow: inset 3px 0 10px rgba(0, 0, 0, 0.25);
+}
+
+.leoUiScrollbar .leoUiScrollbar-barcontainer-heade {
+    text-shadow: 0px 1px 0px rgba(255, 255, 255, 0.7);
+    color: #333;
+    font-weight: bold;
+}
 /*leoUpload*/
-.leoUpload{width:800px; margin:1em auto;}
-.leoUpload .main{border-width:1px 1px 2px; border-style:solid; border-color:#ccc #ccc #ddd; background-color:#fbfbfb;}
-.leoUpload .choose{padding:1em;border-bottom:1px solid #bbb;}
-.leoUpload .fileButton{width:36%;}
-.leoUpload .drag-area{display:inline-block; width:60%; padding:4em 0; margin-left:.5em; border:1px dashed #ddd; background:#fff; color:#999; text-align:center; vertical-align:middle;}
-.leoUpload .drag-hover{border-color:#069; box-shadow:inset 2px 2px 4px rgba(0, 0, 0, .5); color:#333;}
-.leoUpload .preview{background-color:#fff;margin: 0 auto;overflow: hidden;width:762px;}
-.leoUpload .append-list{float: left;height: 120px;margin: 10px 0 10px 10px;overflow: hidden;position: relative;text-align: center;text-overflow: ellipsis;width: 119px;background-color: #f5f5f5;padding: 10px;}
-.leoUpload .append-list img{display: block;height: 100px;margin: 0 auto 5px;width: 100px;border: 0 none;}
-.leoUpload .append-list span{white-space: nowrap;}
-.leoUpload .fileicon{background: url("../images/leoUi/leoUi-leoUpload-fileicon.png") no-repeat scroll 0 0 ;}
-.leoUpload .append-list .filedeleteicon{background: url("../images/leoUi/leoUi-leoUpload-filedeleticon.png") no-repeat scroll 0 0 ;display: block;height: 16px;position: absolute;right: 0;top: 0;width: 16px;}
-.leoUpload .image{max-height:250px; padding:5px;}
-.leoUpload .submit{padding-top:1em; padding-left:1em;}
-.leoUpload .submit-btn{display:none; height:32px; font-size:14px;}
-.leoUpload .progress{display:none; padding:5px; border-radius:10px; color:#fff; background-color:rgba(0,0,0,.6); position:absolute; left:25px; top:45px;}
 
+.leoUpload {
+    width: 800px;
+    margin: 1em auto;
+}
 
+.leoUpload .main {
+    border-width: 1px 1px 2px;
+    border-style: solid;
+    border-color: #ccc #ccc #ddd;
+    background-color: #fbfbfb;
+}
+
+.leoUpload .choose {
+    padding: 1em;
+    border-bottom: 1px solid #bbb;
+}
+
+.leoUpload .fileButton {
+    width: 36%;
+}
+
+.leoUpload .drag-area {
+    display: inline-block;
+    width: 60%;
+    padding: 4em 0;
+    margin-left: .5em;
+    border: 1px dashed #ddd;
+    background: #fff;
+    color: #999;
+    text-align: center;
+    vertical-align: middle;
+}
+
+.leoUpload .drag-hover {
+    border-color: #069;
+    box-shadow: inset 2px 2px 4px rgba(0, 0, 0, .5);
+    color: #333;
+}
+
+.leoUpload .preview {
+    background-color: #fff;
+    margin: 0 auto;
+    overflow: hidden;
+    width: 762px;
+}
+
+.leoUpload .append-list {
+    float: left;
+    height: 120px;
+    margin: 10px 0 10px 10px;
+    overflow: hidden;
+    position: relative;
+    text-align: center;
+    text-overflow: ellipsis;
+    width: 119px;
+    background-color: #f5f5f5;
+    padding: 10px;
+}
+
+.leoUpload .append-list img {
+    display: block;
+    height: 100px;
+    margin: 0 auto 5px;
+    width: 100px;
+    border: 0 none;
+}
+
+.leoUpload .append-list span {
+    white-space: nowrap;
+}
+
+.leoUpload .fileicon {
+    background: url("../images/leoUi/leoUi-leoUpload-fileicon.png") no-repeat scroll 0 0;
+}
+
+.leoUpload .append-list .filedeleteicon {
+    background: url("../images/leoUi/leoUi-leoUpload-filedeleticon.png") no-repeat scroll 0 0;
+    display: block;
+    height: 16px;
+    position: absolute;
+    right: 0;
+    top: 0;
+    width: 16px;
+}
+
+.leoUpload .image {
+    max-height: 250px;
+    padding: 5px;
+}
+
+.leoUpload .submit {
+    padding-top: 1em;
+    padding-left: 1em;
+}
+
+.leoUpload .submit-btn {
+    display: none;
+    height: 32px;
+    font-size: 14px;
+}
+
+.leoUpload .progress {
+    display: none;
+    padding: 5px;
+    border-radius: 10px;
+    color: #fff;
+    background-color: rgba(0, 0, 0, .6);
+    position: absolute;
+    left: 25px;
+    top: 45px;
+}
 /*leoDatetimepicker*/
-.leoDatetimepicker{font-size: 1em;-moz-user-select: none;-webkit-user-select: none;display: block;padding: 0.2em 0.2em 0;width: 17em;border: none;font-family: Arial,sans-serif;margin: 0;padding: 0px;-moz-border-radius: 0;-webkit-border-radius: 0;border-radius: 0;background: #ffffff;color: #4f4f4f;}
-.leoDatetimepicker .leoDatetimepicker-header{position: relative;background: url("../img/leoUi-bg_highlight-soft_100_c0c0c0_1x100.png") repeat-x scroll center top #c0c0c0;text-shadow: 0 1px 0 rgba(255, 255, 255, 0.7);border-radius: 3px;border: 1px solid #a8a8a8;color: #333;font-weight: bold;margin: 0;padding: 0;}
-.leoDatetimepicker .leoDatetimepicker-header-yearsbutton .leoDatetimepicker-header-inner{margin: 0 1.8em;}
-.leoDatetimepicker .leoDatetimepicker-header .leoDatetimepicker-header-button{height: 1.8em;position: absolute;top: 2px;width: 1.8em; cursor: pointer;border-radius: 3px;text-decoration: none;}
-.leoDatetimepicker .leoDatetimepicker-header .leoDatetimepicker-icon{ background-image: url("../img/leoUi-icons_898989_256x240.png");text-indent: -9999px;height: 16px;width: 16px;background-repeat: no-repeat;border-radius: 10px;overflow: hidden; display: block;left: 50%;margin-left: -8px;margin-top: -8px;position: absolute;top: 50%;}
-.leoDatetimepicker .leoDatetimepicker-header-prevYears{left: 2px;}
-.leoDatetimepicker .leoDatetimepicker-header-prevYears span{background-position: -48px -160px;}
-.leoDatetimepicker .leoDatetimepicker-header-button:hover{background: url("../img/leoUi-bg_highlight-soft_100_83b0ca_1x100.png") repeat-x scroll center top #83B0CA;box-shadow: 0px 0px 3px #85B2CB;border: 1px solid #8AB0C6;color: #313131;font-weight: bold;top:1px;}
-.leoDatetimepicker .leoDatetimepicker-header-button:hover span{background-image: url("../img/leoUi-icons_38667f_256x240.png") !important;}
-.leoDatetimepicker .leoDatetimepicker-header-nextYears{right:2px;}
-.leoDatetimepicker .leoDatetimepicker-header-nextYears span{background-position: -32px -160px;}
-.leoDatetimepicker .leoDatetimepicker-header-inner{box-shadow: 0 1px 0 #fff inset;border-radius: 0;position: relative;line-height: 1.8em;background: none repeat scroll 0% 0% transparent;padding: 1px 1px 12px 1px;}
-.leoDatetimepicker .leoDatetimepicker-header-prevMonths{left: 2px;}
-.leoDatetimepicker .leoDatetimepicker-header-prevMonths span{background-position: -80px -192px;}
-.leoDatetimepicker .leoDatetimepicker-header-nextMonths{right:2px;}
-.leoDatetimepicker .leoDatetimepicker-header-nextMonths span{background-position: -48px -192px;}
-.leoDatetimepicker .leoDatetimepicker-header-inner-title{font-weight: 700;text-shadow: 1px 1px 0px rgba(255, 255, 255, 0.75);margin: 0px 2.3em;line-height: 1.8em;text-align: center;cursor: pointer;border-color: transparent;background: none;color: #545454;-moz-box-shadow: none;-webkit-box-shadow: none;box-shadow: none;-moz-border-radius: 3px;-webkit-border-radius: 3px;border-radius: 3px;}
 
+.leoDatetimepicker {
+    font-size: 1em;
+    -moz-user-select: none;
+    -webkit-user-select: none;
+    display: block;
+    padding: 0.2em 0.2em 0;
+    width: 17em;
+    border: none;
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0px;
+    -moz-border-radius: 0;
+    -webkit-border-radius: 0;
+    border-radius: 0;
+    background: #ffffff;
+    color: #4f4f4f;
+}
 
-.leoDatetimepicker .leoDatetimepicker-calendar{table-layout: fixed;width: 100%;font-size: 0.9em;border-collapse: collapse;margin: 0px 0px 0.4em;position: relative;z-index: 99;background-color: #fff}
-.leoDatetimepicker .leoDatetimepicker-calendar thead{border-left: 1px solid #A8A8A8;border-right: 1px solid #A8A8A8;border-bottom: 1px solid #AAAEB6;color: #545454;font-size: 10px;line-height: 4px;position: relative;text-shadow: 1px 1px 0px rgba(255, 255, 255, 0.5);z-index: 5;}
-.leoDatetimepicker .leoDatetimepicker-calendar th{padding: 0.7em 0.3em;text-align: center;font-weight: bold;border: 0px none;}
-.leoDatetimepicker .leoDatetimepicker-calendar tbody{border: 1px solid #A8A8A8;}
-.leoDatetimepicker .leoDatetimepicker-calendar td{border: 0px none;padding: 1px;overflow: hidden;}
-.leoDatetimepicker .leoDatetimepicker-calendar td a{display: block;padding: 0.2em;text-align: right;text-decoration: none;}
-.leoDatetimepicker .leoDatetimepicker-calendar .leoDatetimepicker-monthselector{cursor: pointer;}
-.leoDatetimepicker .leoDatetimepicker-calendar .leoDatetimepicker-monthselector a{height: 12px;margin-top: -8px;position: relative;top: 2px;width: 12px;background-image: url("../img/leoUi-icons_38667f_256x240.png");text-indent: -9999px;color: #4f4f4f;background-position: -48px -16px;display: block;}
-.leoDatetimepicker .leoDatetimepicker-calendar .leoDatetimepicker-week-col{border: 1px solid #A8A8A8;}
-.leoDatetimepicker .leoDatetimepicker-calendar .leoDatetimepicker-other-month{text-align: right;}
-.leoDatetimepicker .leoDatetimepicker-calendar .leoDatetimepicker-other-month .leoDatetimepicker-day-default{opacity: 0.25;filter:alpha(opacity=25);font-weight: normal;}
-.leoDatetimepicker .leoDatetimepicker-calendar .leoDatetimepicker-day-default{background: #dfdee2;border: none;border-bottom: solid 1px #a7aab3;border-right: solid 1px #a7aab3;color: #374452;-moz-box-shadow: inset 0 1px #fff;text-shadow: 0px 1px 0px rgba(255, 255, 255, 0.7);font-weight: bold;-moz-box-shadow: inset 0px 1px 0px rgba(255,255,255,0.25);-webkit-box-shadow: inset 0px 1px 0px rgba(255,255,255,0.25);box-shadow: inset 0px 1px 0px rgba(255,255,255,0.25);}
-.leoDatetimepicker .leoDatetimepicker-calendar .leoDatetimepicker-today .leoDatetimepicker-day-default{background: none repeat scroll 0% 0% #7389A5;box-shadow: 0px 0px 5px #364F72 inset;color: #FFF;}
-.leoDatetimepicker .leoDatetimepicker-calendar .leoDatetimepicker-hover .leoDatetimepicker-day-default{background: #5f83b9;color: #fff;text-shadow: 1px 1px 1px rgba(0,0,0,0.75);-moz-box-shadow: none;-webkit-box-shadow: none;box-shadow: none;}
-.leoDatetimepicker .leoDatetimepicker-calendar .leoDatetimepicker-active .leoDatetimepicker-day-default{ background: #7389a5;color: #fff;text-shadow: 1px 1px 1px rgba(0,0,0,0.75);-moz-box-shadow: none;-webkit-box-shadow: none;box-shadow: none;}
-.leoDatetimepicker .leoDatetimepicker-disabled .leoDatetimepicker-day-default{opacity: 0.35 !important;filter:alpha(opacity=35) !important;background-image: none;cursor: default}
-.leoDatetimepicker .leoDatetimepicker-day-gap{border-bottom: 1px solid #a7aab3 !important;border-right: 1px solid #a7aab3 !important;}
+.leoDatetimepicker .leoDatetimepicker-header {
+    position: relative;
+    background: url("../img/leoUi-bg_highlight-soft_100_c0c0c0_1x100.png") repeat-x scroll center top #c0c0c0;
+    text-shadow: 0 1px 0 rgba(255, 255, 255, 0.7);
+    border-radius: 3px;
+    border: 1px solid #a8a8a8;
+    color: #333;
+    font-weight: bold;
+    margin: 0;
+    padding: 0;
+}
 
-.leoDatetimepicker .leoDatetimepicker-grid{border-collapse: separate;table-layout: fixed;border: 1px solid #A8A8A8;background-color: #fff}
-.leoDatetimepicker .leoDatetimepicker-grid .leoDatetimepicker-day-default{cursor: pointer;}
-.leoDatetimepicker .leoDatetimepicker-grid td{height: 4em;overflow: hidden;}
-.leoDatetimepicker .leoDatetimepicker-grid .leoDatetimepicker-disabled{opacity: 0.35 !important;filter:alpha(opacity=35) !important;background-image: none;cursor: default}
-.leoDatetimepicker .leoDatetimepicker-grid .leoDatetimepicker-disabled a{cursor: default}
-.leoDatetimepicker .leoDatetimepicker-grid .leoDatetimepicker-day-default a{display: block;text-align: center;text-decoration: none;padding: 0;color: inherit;}
-.leoDatetimepicker .leoDatetimepicker-grid .leoDatetimepicker-grid-other{font-weight: normal;opacity: 0.25;filter:alpha(opacity=25);font-weight: normal;}
-.leoDatetimepicker .leoDatetimepicker-grid .leoDatetimepicker-hover{background: #5f83b9;color: #fff;text-shadow: 1px 1px 1px rgba(0,0,0,0.75);-moz-box-shadow: none;-webkit-box-shadow: none;box-shadow: none;}
-.leoDatetimepicker .leoDatetimepicker-grid .leoDatetimepicker-active{ background: #7389a5;color: #fff;text-shadow: 1px 1px 1px rgba(0,0,0,0.75);-moz-box-shadow: none;-webkit-box-shadow: none;box-shadow: none;}
+.leoDatetimepicker .leoDatetimepicker-header-yearsbutton .leoDatetimepicker-header-inner {
+    margin: 0 1.8em;
+}
 
-.leoDatetimepicker .leoDatetimepicker-timePick{text-align: center;margin: 0.1em 0;}
-.leoDatetimepicker .leoDatetimepicker-timePick-inner{display: inline;margin: 0 auto;}
-.leoDatetimepicker .leoDatetimepicker-timePick-input{text-shadow: 0 0.1em 0 rgba(255, 255, 255, 0.7);box-shadow: 0px 0.1em 0.1em rgba(143, 143, 143, 0.5) inset;background: none repeat scroll 0% 0% #FFF !important;;border: 0.1em solid #a8a8a8;color: #4f4f4f;font-weight: bold;font-size: 1em;margin: 0;outline: medium none;display: inline-block;width: 2em;text-align: center;border-radius: 0.1em;}
-.leoDatetimepicker .leoDatetimepicker-timePick-input:hover{box-shadow: 0 0 0.2em #85b2cb}
-.leoDatetimepicker .leoDatetimepicker-timePick-input:focus{background: #fff !important;box-shadow: 0 0 0.2em #85b2cb, inset 0 0.1em 0.1em #8f8f8f;border: solid 0.1em #8ab0c6;font-weight: bold;color: #313131;}
-.leoDatetimepicker .leoDatetimepicker-timePick-span{padding:0 0.3em;font-size: 1em;font-weight: bold;}
+.leoDatetimepicker .leoDatetimepicker-header .leoDatetimepicker-header-button {
+    height: 1.8em;
+    position: absolute;
+    top: 2px;
+    width: 1.8em;
+    cursor: pointer;
+    border-radius: 3px;
+    text-decoration: none;
+}
 
+.leoDatetimepicker .leoDatetimepicker-header .leoDatetimepicker-icon {
+    background-image: url("../img/leoUi-icons_898989_256x240.png");
+    text-indent: -9999px;
+    height: 16px;
+    width: 16px;
+    background-repeat: no-repeat;
+    border-radius: 10px;
+    overflow: hidden;
+    display: block;
+    left: 50%;
+    margin-left: -8px;
+    margin-top: -8px;
+    position: absolute;
+    top: 50%;
+}
+
+.leoDatetimepicker .leoDatetimepicker-header-prevYears {
+    left: 2px;
+}
+
+.leoDatetimepicker .leoDatetimepicker-header-prevYears span {
+    background-position: -48px -160px;
+}
+
+.leoDatetimepicker .leoDatetimepicker-header-button:hover {
+    background: url("../img/leoUi-bg_highlight-soft_100_83b0ca_1x100.png") repeat-x scroll center top #83B0CA;
+    box-shadow: 0px 0px 3px #85B2CB;
+    border: 1px solid #8AB0C6;
+    color: #313131;
+    font-weight: bold;
+    top: 1px;
+}
+
+.leoDatetimepicker .leoDatetimepicker-header-button:hover span {
+    background-image: url("../img/leoUi-icons_38667f_256x240.png") !important;
+}
+
+.leoDatetimepicker .leoDatetimepicker-header-nextYears {
+    right: 2px;
+}
+
+.leoDatetimepicker .leoDatetimepicker-header-nextYears span {
+    background-position: -32px -160px;
+}
+
+.leoDatetimepicker .leoDatetimepicker-header-inner {
+    box-shadow: 0 1px 0 #fff inset;
+    border-radius: 0;
+    position: relative;
+    line-height: 1.8em;
+    background: none repeat scroll 0% 0% transparent;
+    padding: 1px 1px 12px 1px;
+}
+
+.leoDatetimepicker .leoDatetimepicker-header-prevMonths {
+    left: 2px;
+}
+
+.leoDatetimepicker .leoDatetimepicker-header-prevMonths span {
+    background-position: -80px -192px;
+}
+
+.leoDatetimepicker .leoDatetimepicker-header-nextMonths {
+    right: 2px;
+}
+
+.leoDatetimepicker .leoDatetimepicker-header-nextMonths span {
+    background-position: -48px -192px;
+}
+
+.leoDatetimepicker .leoDatetimepicker-header-inner-title {
+    font-weight: 700;
+    text-shadow: 1px 1px 0px rgba(255, 255, 255, 0.75);
+    margin: 0px 2.3em;
+    line-height: 1.8em;
+    text-align: center;
+    cursor: pointer;
+    border-color: transparent;
+    background: none;
+    color: #545454;
+    -moz-box-shadow: none;
+    -webkit-box-shadow: none;
+    box-shadow: none;
+    -moz-border-radius: 3px;
+    -webkit-border-radius: 3px;
+    border-radius: 3px;
+}
+
+.leoDatetimepicker .leoDatetimepicker-calendar {
+    table-layout: fixed;
+    width: 100%;
+    font-size: 0.9em;
+    border-collapse: collapse;
+    margin: 0px 0px 0.4em;
+    position: relative;
+    z-index: 99;
+    background-color: #fff
+}
+
+.leoDatetimepicker .leoDatetimepicker-calendar thead {
+    border-left: 1px solid #A8A8A8;
+    border-right: 1px solid #A8A8A8;
+    border-bottom: 1px solid #AAAEB6;
+    color: #545454;
+    font-size: 10px;
+    line-height: 4px;
+    position: relative;
+    text-shadow: 1px 1px 0px rgba(255, 255, 255, 0.5);
+    z-index: 5;
+}
+
+.leoDatetimepicker .leoDatetimepicker-calendar th {
+    padding: 0.7em 0.3em;
+    text-align: center;
+    font-weight: bold;
+    border: 0px none;
+}
+
+.leoDatetimepicker .leoDatetimepicker-calendar tbody {
+    border: 1px solid #A8A8A8;
+}
+
+.leoDatetimepicker .leoDatetimepicker-calendar td {
+    border: 0px none;
+    padding: 1px;
+    overflow: hidden;
+}
+
+.leoDatetimepicker .leoDatetimepicker-calendar td a {
+    display: block;
+    padding: 0.2em;
+    text-align: right;
+    text-decoration: none;
+}
+
+.leoDatetimepicker .leoDatetimepicker-calendar .leoDatetimepicker-monthselector {
+    cursor: pointer;
+}
+
+.leoDatetimepicker .leoDatetimepicker-calendar .leoDatetimepicker-monthselector a {
+    height: 12px;
+    margin-top: -8px;
+    position: relative;
+    top: 2px;
+    width: 12px;
+    background-image: url("../img/leoUi-icons_38667f_256x240.png");
+    text-indent: -9999px;
+    color: #4f4f4f;
+    background-position: -48px -16px;
+    display: block;
+}
+
+.leoDatetimepicker .leoDatetimepicker-calendar .leoDatetimepicker-week-col {
+    border: 1px solid #A8A8A8;
+}
+
+.leoDatetimepicker .leoDatetimepicker-calendar .leoDatetimepicker-other-month {
+    text-align: right;
+}
+
+.leoDatetimepicker .leoDatetimepicker-calendar .leoDatetimepicker-other-month .leoDatetimepicker-day-default {
+    opacity: 0.25;
+    filter: alpha(opacity=25);
+    font-weight: normal;
+}
+
+.leoDatetimepicker .leoDatetimepicker-calendar .leoDatetimepicker-day-default {
+    background: #dfdee2;
+    border: none;
+    border-bottom: solid 1px #a7aab3;
+    border-right: solid 1px #a7aab3;
+    color: #374452;
+    -moz-box-shadow: inset 0 1px #fff;
+    text-shadow: 0px 1px 0px rgba(255, 255, 255, 0.7);
+    font-weight: bold;
+    -moz-box-shadow: inset 0px 1px 0px rgba(255, 255, 255, 0.25);
+    -webkit-box-shadow: inset 0px 1px 0px rgba(255, 255, 255, 0.25);
+    box-shadow: inset 0px 1px 0px rgba(255, 255, 255, 0.25);
+}
+
+.leoDatetimepicker .leoDatetimepicker-calendar .leoDatetimepicker-today .leoDatetimepicker-day-default {
+    background: none repeat scroll 0% 0% #7389A5;
+    box-shadow: 0px 0px 5px #364F72 inset;
+    color: #FFF;
+}
+
+.leoDatetimepicker .leoDatetimepicker-calendar .leoDatetimepicker-hover .leoDatetimepicker-day-default {
+    background: #5f83b9;
+    color: #fff;
+    text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.75);
+    -moz-box-shadow: none;
+    -webkit-box-shadow: none;
+    box-shadow: none;
+}
+
+.leoDatetimepicker .leoDatetimepicker-calendar .leoDatetimepicker-active .leoDatetimepicker-day-default {
+    background: #7389a5;
+    color: #fff;
+    text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.75);
+    -moz-box-shadow: none;
+    -webkit-box-shadow: none;
+    box-shadow: none;
+}
+
+.leoDatetimepicker .leoDatetimepicker-disabled .leoDatetimepicker-day-default {
+    opacity: 0.35 !important;
+    filter: alpha(opacity=35) !important;
+    background-image: none;
+    cursor: default
+}
+
+.leoDatetimepicker .leoDatetimepicker-day-gap {
+    border-bottom: 1px solid #a7aab3 !important;
+    border-right: 1px solid #a7aab3 !important;
+}
+
+.leoDatetimepicker .leoDatetimepicker-grid {
+    border-collapse: separate;
+    table-layout: fixed;
+    border: 1px solid #A8A8A8;
+    background-color: #fff
+}
+
+.leoDatetimepicker .leoDatetimepicker-grid .leoDatetimepicker-day-default {
+    cursor: pointer;
+}
+
+.leoDatetimepicker .leoDatetimepicker-grid td {
+    height: 4em;
+    overflow: hidden;
+}
+
+.leoDatetimepicker .leoDatetimepicker-grid .leoDatetimepicker-disabled {
+    opacity: 0.35 !important;
+    filter: alpha(opacity=35) !important;
+    background-image: none;
+    cursor: default
+}
+
+.leoDatetimepicker .leoDatetimepicker-grid .leoDatetimepicker-disabled a {
+    cursor: default
+}
+
+.leoDatetimepicker .leoDatetimepicker-grid .leoDatetimepicker-day-default a {
+    display: block;
+    text-align: center;
+    text-decoration: none;
+    padding: 0;
+    color: inherit;
+}
+
+.leoDatetimepicker .leoDatetimepicker-grid .leoDatetimepicker-grid-other {
+    font-weight: normal;
+    opacity: 0.25;
+    filter: alpha(opacity=25);
+    font-weight: normal;
+}
+
+.leoDatetimepicker .leoDatetimepicker-grid .leoDatetimepicker-hover {
+    background: #5f83b9;
+    color: #fff;
+    text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.75);
+    -moz-box-shadow: none;
+    -webkit-box-shadow: none;
+    box-shadow: none;
+}
+
+.leoDatetimepicker .leoDatetimepicker-grid .leoDatetimepicker-active {
+    background: #7389a5;
+    color: #fff;
+    text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.75);
+    -moz-box-shadow: none;
+    -webkit-box-shadow: none;
+    box-shadow: none;
+}
+
+.leoDatetimepicker .leoDatetimepicker-timePick {
+    text-align: center;
+    margin: 0.1em 0;
+}
+
+.leoDatetimepicker .leoDatetimepicker-timePick-inner {
+    display: inline;
+    margin: 0 auto;
+}
+
+.leoDatetimepicker .leoDatetimepicker-timePick-input {
+    text-shadow: 0 0.1em 0 rgba(255, 255, 255, 0.7);
+    box-shadow: 0px 0.1em 0.1em rgba(143, 143, 143, 0.5) inset;
+    background: none repeat scroll 0% 0% #FFF !important;
+    ;
+    border: 0.1em solid #a8a8a8;
+    color: #4f4f4f;
+    font-weight: bold;
+    font-size: 1em;
+    margin: 0;
+    outline: medium none;
+    display: inline-block;
+    width: 2em;
+    text-align: center;
+    border-radius: 0.1em;
+}
+
+.leoDatetimepicker .leoDatetimepicker-timePick-input:hover {
+    box-shadow: 0 0 0.2em #85b2cb
+}
+
+.leoDatetimepicker .leoDatetimepicker-timePick-input:focus {
+    background: #fff !important;
+    box-shadow: 0 0 0.2em #85b2cb, inset 0 0.1em 0.1em #8f8f8f;
+    border: solid 0.1em #8ab0c6;
+    font-weight: bold;
+    color: #313131;
+}
+
+.leoDatetimepicker .leoDatetimepicker-timePick-span {
+    padding: 0 0.3em;
+    font-size: 1em;
+    font-weight: bold;
+}
 /*leoImagePlayer*/
-.leoImagePlayerBg{position: fixed;top: 0;left: 0;width:100%;height:100%;background-color:black; z-index: 999;overflow:hidden;display:none;background-color:black; z-index: 9999;filter: progid:DXImageTransform.Microsoft.Alpha(opacity=70);opacity: 0.7;}
-.leoImagePlayer{display:none;position:fixed;background-color:black;z-index: 10000;overflow:hidden}
-.leoImagePlayer .leo_imagePlayer_loading{position:absolute;top:50%;left:50%;width:32px;height:32px;margin-top:-16px;margin-left:-16px;}
-.leoImagePlayer .pic{width:100%;height:100%;position:relative;top:0;left:0;}
-.leoImagePlayer .pic img{display:block;position: absolute;}
-.leoImagePlayer .leo_imagePlayer_roll{width:100%;position:relative;}
-.leoImagePlayer .roll_inner{overflow:hidden;position:absolute;top:0;left:0;width:100%;}
-.leoImagePlayer .roll_bg{background-color: #484848;position: absolute;top:0;left: 0;width: 100%;height: 100%;}
-.leoImagePlayer .prev{background-image: linear-gradient(to right, rgba(0, 0, 0, 0.5) 0px, rgba(0, 0, 0, 0) 100%);background-repeat: repeat-x;left: 0;}
-.leoImagePlayer .next{background-image: linear-gradient(to right, rgba(0, 0, 0, 0) 0px, rgba(0, 0, 0, 0.5) 100%);background-repeat: repeat-x;left: auto;right: 0;}
-.leoImagePlayer .prev span{left: 0;position: absolute;top: 50%;text-align: left;cursor: pointer;line-height: 1}
-.leoImagePlayer .next span{right: 0;position: absolute;top: 50%;text-align: right;cursor: pointer;line-height: 1}
-.leoImagePlayer .control{font-family: "Microsoft YaHei";color: #CCC;opacity: 0.5;position: absolute;text-shadow: 0 1px 2px rgba(0, 0, 0, 0.6);top: 0;width: 15%;height: 100%;filter: progid:DXImageTransform.Microsoft.Alpha(opacity=50);}
-.leoImagePlayer .control:hover{filter: progid:DXImageTransform.Microsoft.Alpha(opacity=90);opacity: 0.9;outline: 0 none;text-decoration: none;}
-.leoImagePlayer .control:active{*background-color: transparent;}
-.leoImagePlayer .roll_prev{left: 0;border-right: 1px solid #484848}
-.leoImagePlayer .roll_next{left: auto;right: 0;border-left: 1px solid #484848}
-.leoImagePlayer .roll_prev span{right: 30%;position: absolute;top: 50%;cursor: pointer;line-height: 1}
-.leoImagePlayer .roll_next span{left: 30%;position: absolute;top: 50%;cursor: pointer;line-height: 1}
-.leoImagePlayer .roll_control{background-color: #2F2F2F; font-family:"SimSun";color: #696969;opacity: 0.5;position: absolute;text-shadow: 0 1px 2px rgba(0, 0, 0, 0.6);top: 0;width: 2%;height: 100%;filter: progid:DXImageTransform.Microsoft.Alpha(opacity=50);font-size: 20px;text-align: center;font-weight: 900;}
-.leoImagePlayer .roll_control:hover{filter: progid:DXImageTransform.Microsoft.Alpha(opacity=100);opacity: 1;color:#fff;outline: 0 none;text-decoration: none;}
-.leoImagePlayer .default, .leoImagePlayer .default span{cursor: default;}
-.leoImagePlayer .default:hover{outline: 0 none;text-decoration: none;filter: progid:DXImageTransform.Microsoft.Alpha(opacity=50);opacity: 0.5;color:#696969;}
-.leoImagePlayer .leo_imagePlayer_play{position:absolute;top:0;left:0;height:20%;width:100%;background-color:black;opacity:0.5;filter: progid:DXImageTransform.Microsoft.Alpha(opacity=50)}
-.leoImagePlayer .playBox{background-color:#505050;border-radius:5px;text-align:center;padding:1%;margin:0 auto;position:relative;top:40%;cursor:pointer;box-shadow:0 0 10px #FFFFFF}
-.leoImagePlayer .pause{width:100%;height:100%;display:none}
-.leoImagePlayer .pause_left{width:25%;height:100%;background-color:#fff;display:inline-block;margin-right:5%;}
-.leoImagePlayer .pause_right{width:25%;height:100%;background-color:#fff;display:inline-block;margin-left:5%;}
-.leoImagePlayer .play{border-style:dashed  dashed dashed solid;border-color:transparent  transparent  transparent #fff;display:block;height:0;width:0;position:absolute;top:50%;left:50%;}
-.leoImagePlayer .roll_list{overflow:hidden;margin:0 auto;height:100%;position: relative;}
-.leoImagePlayer .roll_list ul{margin:0 auto;position:relative;left:0;top:0;padding:0;}
-.leoImagePlayer .roll_list a{display: inline-block;width: 92%;height: 92%;opacity: 0.5;filter: progid:DXImageTransform.Microsoft.Alpha(opacity=50);margin:4%;border-radius: 4%;}
-.leoImagePlayer .roll_list a:hover ,.leoImagePlayer .roll_list .active a{opacity: 1;outline: 0 none;text-decoration: none;background-color: #FFA306;filter:alpha(opacity=100);}
-.leoImagePlayer .roll_list img{width: 88%;height: 88%;padding:2%;margin:4%;background-color: #fff;border-radius: 4%;}
 
+.leoImagePlayerBg {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: black;
+    z-index: 999;
+    overflow: hidden;
+    display: none;
+    background-color: black;
+    z-index: 9999;
+    filter: progid: DXImageTransform.Microsoft.Alpha(opacity=70);
+    opacity: 0.7;
+}
+
+.leoImagePlayer {
+    display: none;
+    position: fixed;
+    background-color: black;
+    z-index: 10000;
+    overflow: hidden
+}
+
+.leoImagePlayer .leo_imagePlayer_loading {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 32px;
+    height: 32px;
+    margin-top: -16px;
+    margin-left: -16px;
+}
+
+.leoImagePlayer .pic {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    top: 0;
+    left: 0;
+}
+
+.leoImagePlayer .pic img {
+    display: block;
+    position: absolute;
+}
+
+.leoImagePlayer .leo_imagePlayer_roll {
+    width: 100%;
+    position: relative;
+}
+
+.leoImagePlayer .roll_inner {
+    overflow: hidden;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+}
+
+.leoImagePlayer .roll_bg {
+    background-color: #484848;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+
+.leoImagePlayer .prev {
+    background-image: linear-gradient(to right, rgba(0, 0, 0, 0.5) 0px, rgba(0, 0, 0, 0) 100%);
+    background-repeat: repeat-x;
+    left: 0;
+}
+
+.leoImagePlayer .next {
+    background-image: linear-gradient(to right, rgba(0, 0, 0, 0) 0px, rgba(0, 0, 0, 0.5) 100%);
+    background-repeat: repeat-x;
+    left: auto;
+    right: 0;
+}
+
+.leoImagePlayer .prev span {
+    left: 0;
+    position: absolute;
+    top: 50%;
+    text-align: left;
+    cursor: pointer;
+    line-height: 1
+}
+
+.leoImagePlayer .next span {
+    right: 0;
+    position: absolute;
+    top: 50%;
+    text-align: right;
+    cursor: pointer;
+    line-height: 1
+}
+
+.leoImagePlayer .control {
+    font-family: "Microsoft YaHei";
+    color: #CCC;
+    opacity: 0.5;
+    position: absolute;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.6);
+    top: 0;
+    width: 15%;
+    height: 100%;
+    filter: progid: DXImageTransform.Microsoft.Alpha(opacity=50);
+}
+
+.leoImagePlayer .control:hover {
+    filter: progid: DXImageTransform.Microsoft.Alpha(opacity=90);
+    opacity: 0.9;
+    outline: 0 none;
+    text-decoration: none;
+}
+
+.leoImagePlayer .control:active {
+    *background-color: transparent;
+}
+
+.leoImagePlayer .roll_prev {
+    left: 0;
+    border-right: 1px solid #484848
+}
+
+.leoImagePlayer .roll_next {
+    left: auto;
+    right: 0;
+    border-left: 1px solid #484848
+}
+
+.leoImagePlayer .roll_prev span {
+    right: 30%;
+    position: absolute;
+    top: 50%;
+    cursor: pointer;
+    line-height: 1
+}
+
+.leoImagePlayer .roll_next span {
+    left: 30%;
+    position: absolute;
+    top: 50%;
+    cursor: pointer;
+    line-height: 1
+}
+
+.leoImagePlayer .roll_control {
+    background-color: #2F2F2F;
+    font-family: "SimSun";
+    color: #696969;
+    opacity: 0.5;
+    position: absolute;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.6);
+    top: 0;
+    width: 2%;
+    height: 100%;
+    filter: progid: DXImageTransform.Microsoft.Alpha(opacity=50);
+    font-size: 20px;
+    text-align: center;
+    font-weight: 900;
+}
+
+.leoImagePlayer .roll_control:hover {
+    filter: progid: DXImageTransform.Microsoft.Alpha(opacity=100);
+    opacity: 1;
+    color: #fff;
+    outline: 0 none;
+    text-decoration: none;
+}
+
+.leoImagePlayer .default,
+.leoImagePlayer .default span {
+    cursor: default;
+}
+
+.leoImagePlayer .default:hover {
+    outline: 0 none;
+    text-decoration: none;
+    filter: progid: DXImageTransform.Microsoft.Alpha(opacity=50);
+    opacity: 0.5;
+    color: #696969;
+}
+
+.leoImagePlayer .leo_imagePlayer_play {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 20%;
+    width: 100%;
+    background-color: black;
+    opacity: 0.5;
+    filter: progid: DXImageTransform.Microsoft.Alpha(opacity=50)
+}
+
+.leoImagePlayer .playBox {
+    background-color: #505050;
+    border-radius: 5px;
+    text-align: center;
+    padding: 1%;
+    margin: 0 auto;
+    position: relative;
+    top: 40%;
+    cursor: pointer;
+    box-shadow: 0 0 10px #FFFFFF
+}
+
+.leoImagePlayer .pause {
+    width: 100%;
+    height: 100%;
+    display: none
+}
+
+.leoImagePlayer .pause_left {
+    width: 25%;
+    height: 100%;
+    background-color: #fff;
+    display: inline-block;
+    margin-right: 5%;
+}
+
+.leoImagePlayer .pause_right {
+    width: 25%;
+    height: 100%;
+    background-color: #fff;
+    display: inline-block;
+    margin-left: 5%;
+}
+
+.leoImagePlayer .play {
+    border-style: dashed dashed dashed solid;
+    border-color: transparent transparent transparent #fff;
+    display: block;
+    height: 0;
+    width: 0;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+}
+
+.leoImagePlayer .roll_list {
+    overflow: hidden;
+    margin: 0 auto;
+    height: 100%;
+    position: relative;
+}
+
+.leoImagePlayer .roll_list ul {
+    margin: 0 auto;
+    position: relative;
+    left: 0;
+    top: 0;
+    padding: 0;
+}
+
+.leoImagePlayer .roll_list a {
+    display: inline-block;
+    width: 92%;
+    height: 92%;
+    opacity: 0.5;
+    filter: progid: DXImageTransform.Microsoft.Alpha(opacity=50);
+    margin: 4%;
+    border-radius: 4%;
+}
+
+.leoImagePlayer .roll_list a:hover,
+.leoImagePlayer .roll_list .active a {
+    opacity: 1;
+    outline: 0 none;
+    text-decoration: none;
+    background-color: #FFA306;
+    filter: alpha(opacity=100);
+}
+
+.leoImagePlayer .roll_list img {
+    width: 88%;
+    height: 88%;
+    padding: 2%;
+    margin: 4%;
+    background-color: #fff;
+    border-radius: 4%;
+}
 /*leoTabs*/
-.leoTabs{position:relative;height: 450px;font-size: 12px}
-.leoTabs .leoTabs_nav{height: 32px;margin: 0 18px -1px;overflow: hidden;position: relative;z-index: 1;}
-.leoTabs .leoTabs_nav ul{left: 0;list-style: outside none none;overflow: hidden;position: absolute;top: 0;width: 9999px;margin: 0;padding: 2px 0 0;}
-.leoTabs .leoTabs_nav li{ border: 1px solid #e5e5e5;height: 28px;line-height: 28px;cursor: pointer;display: inline;float: left;margin: 0;overflow: hidden;padding: 0;position: relative;}
-.leoTabs .leoTabs_nav li a{display: block; margin: 0 30px 0 10px; text-decoration: none; -moz-user-select: none; -webkit-user-select: none; -ms-user-select: none; -khtml-user-select: none; user-select: none;color: #aaa;}
-.leoTabs .leoTabs_nav .leoTabs_nav_selected{background-color: #f4f4f4;border-color: #3da8b9 #e5e5e5 #f5f5f5;border-image: none;border-left: 1px solid #e5e5e5;border-right: 1px solid #e5e5e5;border-style: solid;border-top-left-radius: 2px;border-top-right-radius: 2px;border-width: 2px 1px 1px;height: 32px;top: -2px;line-height: 28px;}
-.leoTabs .leoTabs_nav .leoTabs_nav_selected a{color: #333;font-size: 12px;font-weight: bold;}
-.leoTabs .leoTabs_nav .leoTabs_nav_tabManage{background-color:#fff;border-top-right-radius: 3px;width: 26px;}
-.leoTabs .leoTabs_nav .leoTabs_nav_tabManage i{border-style: solid; border-width: 4px; font-size: 0; height: 0; margin: 13px 0 0 8px; display:block;width:0;height:0;overflow:hidden;border-color: #888 #fff #fff;}
-.leoTabs .leoTabs_nav .leoTabs_nav_leftBtn, .leoTabs .leoTabs_nav .leoTabs_nav_rightBtn{background-color:#fff;border: 1px solid #dedede;height: 28px;top: 2px;cursor: pointer;overflow: hidden;position: absolute;width: 16px;z-index: 13;}
-.leoTabs .leoTabs_nav .leoTabs_nav_leftBtn i, .leoTabs .leoTabs_nav .leoTabs_nav_rightBtn i{border-style: solid;border-width: 5px;display: block;font-size: 0;height: 0;margin: 10px 0 0;overflow: hidden;width: 0;}
-.leoTabs .leoTabs_nav .leoTabs_nav_leftBtn{border-top-left-radius: 2px;left: 0;}
-.leoTabs .leoTabs_nav .leoTabs_nav_leftBtn i{border-color: #fff #555 #fff #fff;}
-.leoTabs .leoTabs_nav .leoTabs_nav_rightBtn{border-top-right-radius: 2px;right: 0;}
-.leoTabs .leoTabs_nav .leoTabs_nav_rightBtn i{border-color: #fff #fff #fff #555;margin: 10px 0 0 5px;}
-.leoTabs .leoTabs_content{border-top: 1px solid #e5e5e5;background-color:#f5f5f5;margin: 0 auto;padding: 0;width: 100%;}
+
+.leoTabs {
+    position: relative;
+    height: 450px;
+    font-size: 12px
+}
+
+.leoTabs .leoTabs_nav {
+    height: 32px;
+    margin: 0 18px -1px;
+    overflow: hidden;
+    position: relative;
+    z-index: 1;
+}
+
+.leoTabs .leoTabs_nav ul {
+    left: 0;
+    list-style: outside none none;
+    overflow: hidden;
+    position: absolute;
+    top: 0;
+    width: 9999px;
+    margin: 0;
+    padding: 2px 0 0;
+}
+
+.leoTabs .leoTabs_nav li {
+    border: 1px solid #e5e5e5;
+    height: 28px;
+    line-height: 28px;
+    cursor: pointer;
+    display: inline;
+    float: left;
+    margin: 0;
+    overflow: hidden;
+    padding: 0;
+    position: relative;
+}
+
+.leoTabs .leoTabs_nav li:first-child {
+    border-top-left-radius: 2px;
+}
+
+.leoTabs .leoTabs_nav li:last-child {
+    border-top-right-radius: 2px;
+}
+
+.leoTabs .leoTabs_nav li a {
+    display: block;
+    margin: 0 30px 0 10px;
+    text-decoration: none;
+    -moz-user-select: none;
+    -webkit-user-select: none;
+    -ms-user-select: none;
+    -khtml-user-select: none;
+    user-select: none;
+    color: #aaa;
+}
+
+.leoTabs .leoTabs_nav .leoTabs_nav_close {
+    cursor: pointer;
+    height: 12px;
+    overflow: hidden;
+    position: absolute;
+    right: 5px;
+    top: 8px;
+    width: 12px;
+    z-index: 12;
+    background: url("../img/tab_close.png") no-repeat scroll 0 0 rgba(0, 0, 0, 0);
+}
+
+.leoTabs .leoTabs_nav .leoTabs_nav_close:hover {
+    background-color: #ddd;
+    background-position: 0 -12px;
+    border-radius: 1px;
+    color: #c5160b;
+}
+
+.leoTabs .leoTabs_nav .leoTabs_nav_selected {
+    background-color: #f4f4f4;
+    border-color: #3da8b9 #e5e5e5 #f5f5f5;
+    border-image: none;
+    border-left: 1px solid #e5e5e5;
+    border-right: 1px solid #e5e5e5;
+    border-style: solid;
+    border-top-left-radius: 2px;
+    border-top-right-radius: 2px;
+    border-width: 2px 1px 1px;
+    height: 32px;
+    top: -2px;
+    line-height: 28px;
+}
+
+.leoTabs .leoTabs_nav .leoTabs_nav_selected a {
+    color: #333;
+    font-size: 12px;
+    font-weight: bold;
+}
+
+.leoTabs .leoTabs_nav .leoTabs_nav_tabManage {
+    background-color: #fff;
+    border-top-right-radius: 3px;
+    width: 26px;
+}
+
+.leoTabs .leoTabs_nav .leoTabs_nav_tabManage i {
+    border-style: solid;
+    border-width: 4px;
+    font-size: 0;
+    height: 0;
+    margin: 13px 0 0 8px;
+    display: block;
+    width: 0;
+    height: 0;
+    overflow: hidden;
+    border-color: #888 #fff #fff;
+}
+
+.leoTabs .leoTabs_nav .leoTabs_nav_leftBtn,
+.leoTabs .leoTabs_nav .leoTabs_nav_rightBtn {
+    background-color: #fff;
+    border: 1px solid #dedede;
+    height: 28px;
+    top: 2px;
+    cursor: pointer;
+    overflow: hidden;
+    position: absolute;
+    width: 16px;
+    z-index: 13;
+}
+
+.leoTabs .leoTabs_nav .leoTabs_nav_leftBtn i,
+.leoTabs .leoTabs_nav .leoTabs_nav_rightBtn i {
+    border-style: solid;
+    border-width: 5px;
+    display: block;
+    font-size: 0;
+    height: 0;
+    margin: 10px 0 0;
+    overflow: hidden;
+    width: 0;
+}
+
+.leoTabs .leoTabs_nav .leoTabs_nav_wrap {
+    float: left;
+    margin: 0;
+    padding: 0;
+}
+
+.leoTabs .leoTabs_nav .leoTabs_nav_leftBtn {
+    border-top-left-radius: 2px;
+    left: 0;
+}
+
+.leoTabs .leoTabs_nav .leoTabs_nav_leftBtn i {
+    border-color: #fff #555 #fff #fff;
+}
+
+.leoTabs .leoTabs_nav .leoTabs_nav_rightBtn {
+    border-top-right-radius: 2px;
+    right: 0;
+}
+
+.leoTabs .leoTabs_nav .leoTabs_nav_rightBtn i {
+    border-color: #fff #fff #fff #555;
+    margin: 10px 0 0 5px;
+}
+
+.leoTabs .leoTabs_content {
+    border-top: 1px solid #e5e5e5;
+    background-color: #f5f5f5;
+    margin: 0 auto;
+    padding: 0;
+    width: 100%;
+    height: 100%
+}
+
+.leoTabs .leoTabs_content_item {
+    width: 100%;
+    height: 100%
+}
+
+.leoTabs .leoTabs_menu {
+    border: 1px solid #979797;
+    background: #F5F5F5;
+    position: absolute;
+    overflow: hidden;
+    padding-bottom: 2px;
+    z-index: 1001;
+    width: 100px;
+}
+
+.leoTabs .leoTabs_menu_yline {
+    background: url('../img/menu-line-y.gif') repeat-y;
+    width: 2px;
+    height: 2000px;
+    position: absolute;
+    left: 28px;
+    top: 1px;
+    z-index: 101;
+}
+
+.leoTabs .leoTabs_menu_over {
+    position: absolute;
+    top: -30px;
+    left: 2px;
+    z-index: 102;
+    height: 22px;
+    overflow: hidden;
+    background: url('../img/menu-item-over-m.gif') repeat-x;
+    width: 97%;
+}
+
+.leoTabs .leoTabs_menu_over_l {
+    background: url('../img/menu-item-over-l.gif') no-repeat;
+    width: 28px;
+    height: 22px;
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+
+.leoTabs .leoTabs_menu_over_r {
+    background: url('../img/menu-item-over-r.gif') no-repeat;
+    width: 3px;
+    height: 22px;
+    position: absolute;
+    top: 0;
+    right: 0;
+}
+
+.leoTabs .leoTabs_menu_inner {
+    position: relative;
+    width: 100%;
+    z-index: 103;
+}
+
+.leoTabs .leoTabs_menu_item {
+    position: relative;
+    height: 23px;
+    line-height: 23px;
+    width: 100%;
+    cursor: pointer;
+}
+
+.leoTabs .leoTabs_menu_item_text {
+    color: #000000;
+    left: 33px;
+    position: absolute;
+    top: 0;
+}
+
+.leoTabs .leoTabs_menu_item_disable {
+    cursor: default;
+}
+
+.leoTabs .leoTabs_menu_item_disable .leoTabs_menu_item_text {
+    color: #A1A1A1;
+}

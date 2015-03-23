@@ -11,7 +11,7 @@
     if (typeof define === "function" && define.amd) {
 
         // AMD. Register as an anonymous module.
-        define(["leoUi-tools"], factory);
+        define(["leoUi-droppable", "jqueryMousewheel"], factory);
 
     } else {
 
@@ -21,14 +21,6 @@
     }
 
 }(function($) {
-
-    var mouseHandled = false;
-
-    $( document ).mouseup( function() {
-
-        mouseHandled = false;
-
-    });
 
     $.leoTools.plugIn({
 
@@ -43,6 +35,10 @@
         defaults:{
 
             append:'body',
+
+            limitLen:10,
+
+            ellipsisStr:'...',
 
             initCallback:$.noop,
 
@@ -59,8 +55,6 @@
             this.currentTid = null;
 
             this._initTabs();
-
-            this._addEvent();
 
         },
 
@@ -84,9 +78,13 @@
 
             this.$menu = this.$tab.find('.leoTabs_menu');
 
-            op.initCallback(this.$target);
-
             this.$tab.appendTo(op.append);
+
+            this._slide = this._slideCreate();
+
+            this._addEvent();
+
+            op.initCallback(this.$target);
 
         },
 
@@ -94,9 +92,7 @@
 
             var This = this, $menu = this.$menu,
 
-            $menuClickLi = null, $menuOver = $menu.find('.leoTabs_menu_over'),
-
-            slide = this._slide();
+            $menuClickLi = null, $menuOver = $menu.find('.leoTabs_menu_over'), $tab = this.$tab;
 
             this._on(this.$ul, 'mouseup', 'li', function(event){
 
@@ -128,7 +124,7 @@
 
                 }
 
-                $menu.css( { left: event.pageX, top: event.pageY} ).show();
+                $menu.show().offset( { left: event.pageX, top: event.pageY} );
 
             })._on($menu, 'mouseenter', 'div[leoui-disable="false"]', function(event) {
 
@@ -178,6 +174,52 @@
 
             });
 
+            this.$nav.leoDraggable({
+
+                mouseDownSelector:'li',
+
+                cancel:'.leoTabs_nav_close',
+
+                distance:4,
+
+                droppableScope:'tab',
+
+                bClone: true,
+
+                revert: false,
+
+                revertAnimate: true,
+
+                bCloneAnimate: true,
+
+                dragBoxReturnToTarget: true,
+
+                useLeoDroppable: true,
+
+                stopMouseWheel: false,
+
+                containment:this.$nav,
+
+                iframeFix:true,
+
+                axis:'x',
+
+                proxy: function(source) {
+
+                    var $source = $(source),className;
+
+                    $source.attr('class') === 'leoTabs_nav_selected' ? className = 'leoTabs_nav_dragSelected' : className = 'leoTabs_nav_dragSelecte';
+
+                    return $('<div><a>'+ $source.find('a').text() +'</a></div>').css({
+                        'z-index': 1000,
+                        width: $source.width(),
+                        position: 'absolute'
+                    }).addClass(className).appendTo($tab);
+
+                }
+
+            });
+
         },
 
         openTab:function(option){
@@ -212,11 +254,13 @@
 
         _tabCloseOther:function($li){
 
-            this._tabChage($li);
+            var $content = this._tabActive({$li: $li, returnContent: true}) || this.$content.find("div[leoUi-tid ='" + this.currentTid + "']");
 
-            this.$ul.find("li[leoUi-remove ='true']").not($li).remove();
+            this.$ul.find("li[leoUi-remove ='true']").not($li).leoDroppable('destroy').remove();
 
-            this.$content.find("div[leoUi-remove ='true']").not($li).remove();
+            this.$content.find("div[leoUi-remove ='true']").not($content).remove();
+
+            this._slide.slideHide();
 
         },
 
@@ -226,7 +270,7 @@
 
             if(!$removeLi[0])return;
 
-            if(el = this.$ul.find("li[leoUi-remove ='false']")[0]){
+            if((el = this.$ul.find("li[leoUi-remove ='false']")[0])){
 
                 this._tabActive({$li: $(el), notHide: true});
 
@@ -236,9 +280,11 @@
 
             }
 
-            $removeLi.remove();
+            $removeLi.leoDroppable('destroy').remove();
 
             this.$content.find("div[leoUi-remove ='true']").remove();
+
+            this._slide.slideHide();
 
         },
 
@@ -251,6 +297,10 @@
         _tabChage:function($li, tid){
 
             this._tabActive({$li: $li, tid: tid});
+
+            this._slide.isAlignRightFun();
+
+            this._slide.activeTab( $li, true );
 
         },
 
@@ -268,7 +318,7 @@
 
                     this._tabActive({$li: $prevLi, notHide: true});
 
-                }else if(el = this.$ul.find("li[leoUi-remove ='false']")[0]){
+                }else if((el = this.$ul.find("li[leoUi-remove ='false']")[0])){
 
                     this._tabActive({$li: $(el), notHide: true});
 
@@ -282,11 +332,13 @@
 
             this._tabRemove(tid, $li);
 
+            this._slide.slideHide();
+
         },
 
         _tabRemove:function(tid, $li){
 
-            ;($li || this.$ul.find("li[leoUi-tid ='" + tid + "']")).remove();
+            ($li || this.$ul.find("li[leoUi-tid ='" + tid + "']")).leoDroppable('destroy').remove();
 
             this.$content.find("div[leoUi-tid ='" + tid + "']").remove();
 
@@ -296,7 +348,7 @@
 
             var oldTid, tid = option.tid, $li = option.$li,
 
-            notHide;
+            notHide, $content;
 
             if(!tid && tid !== 0){
 
@@ -312,11 +364,13 @@
 
                 notHide && this.$content.find("div[leoUi-tid ='" + oldTid + "']").hide();
 
-                ;($li || this.$ul.find("li[leoUi-tid ='" + tid + "']")).addClass('leoTabs_nav_selected');
+                ($li || this.$ul.find("li[leoUi-tid ='" + tid + "']")).addClass('leoTabs_nav_selected');
 
-                ;(option.$content || this.$content.find("div[leoUi-tid ='" + tid + "']")).show();
+                $content = (option.$content || this.$content.find("div[leoUi-tid ='" + tid + "']")).show();
 
                 this.currentTid = tid;
+
+                if(option.returnContent)return $content;
 
             }
 
@@ -324,15 +378,45 @@
 
         _createTab:function(option){
 
-            var $li = $(this._creatNavLiHtml(option)),
+            var $li, $content = $(this._creatContentItemHtml(option)).appendTo(this.$content), $nav = this.$nav;
 
-            $content = $(this._creatContentItemHtml(option));
+            $li = $(this._creatNavLiHtml(option)).leoDroppable({
 
-            this.$wrap.append($li);
+                scope:'tab',
 
-            this.$content.append($content);
+                checkFirst:false,
+
+                onDragEnter: function(e, drop, dargBox) {
+
+                    var source = dargBox.box,$drag,$drop;
+
+                    if (source !== this) {
+
+                        $drag = $(source);
+
+                        $drop = $(this);
+
+                        if($drop.index() < $drag.index()){
+
+                            $drag.insertBefore(this);
+
+                        }else{
+
+                            $drag.insertAfter(this);
+
+                        }
+
+                        $nav.leoDraggable('setDropsProp');
+
+                    }
+
+                }
+
+            }).appendTo(this.$wrap);
 
             this._tabActive({tid: option.tid, $li: $li, $content: $content});
+
+            this._slide.slideShow();
 
             this.options.createTabCallback($li, $content);
 
@@ -362,11 +446,11 @@
 
             if(option.remove){
 
-                str = '<div class="leoTabs_content_item" leoUi-tid="'+option.tid+'" leoUi-remove="true">'+option.contentHtml+'</div>'
+                str = '<div class="leoTabs_content_item" leoUi-tid="'+option.tid+'" leoUi-remove="true">'+option.contentHtml+'</div>';
 
             }else{
 
-                str = '<div class="leoTabs_content_item" leoUi-tid="'+option.tid+'" leoUi-remove="false">'+option.contentHtml+'</div>'
+                str = '<div class="leoTabs_content_item" leoUi-tid="'+option.tid+'" leoUi-remove="false">'+option.contentHtml+'</div>';
 
             }
 
@@ -376,7 +460,9 @@
 
         _setNavLiOp:function(option){
 
-            var name, option = typeof option === 'object' ? option : {};
+            var name;
+
+            option = typeof option === 'object' ? option : {};
 
             return option = {
 
@@ -390,21 +476,23 @@
 
                 remove: typeof option.remove === 'undefined' ? true : option.remove
 
-            }
+            };
 
         },
 
         _getTid:function(){
 
-            return $.leoTools.getId('tab' + this.id);
+            return $.leoTools.getId('tab');
 
         },
 
         _textOverflow:function(text, limitLen, ellipsisStr){
 
-            limitLen = limitLen >> 0 || 5;
+            var op = this.options;
 
-            ellipsisStr = ellipsisStr || '…';
+            limitLen = limitLen >> 0 || op.limitLen || 5;
+
+            ellipsisStr = ellipsisStr || op.ellipsisStr  || '…';
 
             if(text.length > limitLen){
 
@@ -416,7 +504,17 @@
 
         },
 
-        _slide:function(){
+        _destroy:function(){
+
+            this.$wrap.find('li').leoDroppable('destroy');
+
+            this.$nav.leoDraggable('destroy');
+
+            this.$tab.remove();
+
+        },
+
+        _slideCreate:function(){
 
             function Slide(option){
 
@@ -430,13 +528,15 @@
 
                 this.$slideRight = option.$slideRight;
 
+                this.selectedClass = option.selectedClass;
+
                 this.slideWidth = this.$slideLeft.outerWidth();
 
                 this.slideIsShow = false;
 
                 this.init(option.leoUi);
 
-            };
+            }
 
             Slide.prototype = {
 
@@ -474,7 +574,7 @@
 
                         This.sildeAnimateStop('right');
 
-                    })._on(this.$tabLinksWrap, 'mousewheel', function(event) {
+                    })._on(this.$tabLinksWrap, 'mousewheel', function(event, delta) {
 
                         event.preventDefault();
 
@@ -522,11 +622,9 @@
 
                     if( this.slideIsShow === false ){ return }
 
-                    var liProp = this.getLeftRight( ($li = $li || this.$tabLinksUl.find("li.l-selected"))),
+                    var liProp = this.getLeftRight( ($li = $li || this.$tabLinksUl.find(this.selectedClass))),
 
                     linksLR = this.linksLR,left,right,center;
-
-                    isLast = isLast || $li.index() === this.$tabLinksUl.find('li').length - 2;
 
                     if( ( left = linksLR.left - liProp.left ) > 0 ){
 
@@ -684,7 +782,7 @@
 
                     var $li = this.$tabLinksUl.find('li'),liProp,right,
 
-                    linksLR = this.linksLR,i = 0,length = $li.length - 1;
+                    linksLR = this.linksLR,i = 0,length = $li.length;
 
                     for( ; i < length; i++ ){
 
@@ -714,7 +812,7 @@
 
                         right: elLeft + $tabLinks.outerWidth() - slideWidth
 
-                    }
+                    };
 
                 },
 
@@ -728,7 +826,7 @@
 
                         right : elLeft + $el.outerWidth()
 
-                    }
+                    };
 
                 },
 
@@ -807,6 +905,8 @@
                 $slideLeft: this.$leftBtn,
 
                 $slideRight: this.$rightBtn,
+
+                selectedClass: '.leoTabs_nav_selected',
 
                 leoUi: this
 

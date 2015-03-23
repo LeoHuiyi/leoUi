@@ -31,24 +31,34 @@ leoUiLoad.config({
 })
 
 leoUiLoad.require('leoUi-tabs,leoUi,ready', function($) {
-
+    var name = 'tab',i=1;
     $('#tabs').leoTabs({
 
         append:'#tabs',
 
         initCallback:function($target){
 
-            $target.leoTabs('openTab',{tid:'tab1',name:'131221',contentHtml:'<iframe id="leoUiManageTabId_15" frameborder="0" style="height:100%;width:100%" src=""></iframe>'});
+            $target.leoTabs('openTab',{tid:'tab1',name:'131221',contentHtml:'<iframe id="leoUiManageTabId_15" frameborder="0" style="height:100%;width:100%" src="3434543"></iframe>'});
 
-            $target.leoTabs('openTab');
+            $target.leoTabs('openTab',{contentHtml:'newTab1'});
 
-            $target.leoTabs('openTab', {tid:'tab2', remove: false});
+            $target.leoTabs('openTab', {tid:'tab2', remove: false,contentHtml:'newTab2'});
 
-            $target.leoTabs('openTab', {remove: false});
+            $target.leoTabs('openTab', {remove: false,contentHtml:'newTab3'});
 
             $target.leoTabs('openTab',{tid:'tab1'});
         }
 
     });
 
+    $('#button').on('click', function(event) {
+        event.preventDefault();
+        var str = name + i++;
+        $('#tabs').leoTabs('openTab',{name: str,contentHtml:str});
+    });
+
+    $('#destroy').on('click', function(event) {
+        event.preventDefault();
+        $('#tabs').leoTabs('destroy');
+    });
 });

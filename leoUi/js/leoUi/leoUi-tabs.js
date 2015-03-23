@@ -272,7 +272,7 @@
 
             if((el = this.$ul.find("li[leoUi-remove ='false']")[0])){
 
-                this._tabActive({$li: $(el), notHide: true});
+                this._tabActive({$li: $(el)});
 
             }else{
 
@@ -348,7 +348,7 @@
 
             var oldTid, tid = option.tid, $li = option.$li,
 
-            notHide, $content;
+            $content;
 
             if(!tid && tid !== 0){
 
@@ -360,9 +360,9 @@
 
             if(tid !== (oldTid = this.currentTid)){
 
-                notHide = !option.notHide && this.$ul.find("li[leoUi-tid ='" + oldTid + "']").removeClass('leoTabs_nav_selected');
+                this.$ul.find("li[leoUi-tid ='" + oldTid + "']").removeClass('leoTabs_nav_selected');
 
-                notHide && this.$content.find("div[leoUi-tid ='" + oldTid + "']").hide();
+                this.$content.find("div[leoUi-tid ='" + oldTid + "']").hide();
 
                 ($li || this.$ul.find("li[leoUi-tid ='" + tid + "']")).addClass('leoTabs_nav_selected');
 

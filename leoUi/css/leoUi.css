@@ -1761,7 +1761,7 @@
     overflow: hidden;
     position: absolute;
     top: 0;
-    width: 9999px;
+    width: 999999px;
     margin: 0;
     padding: 2px 0 0;
 }
@@ -1818,7 +1818,8 @@
     color: #c5160b;
 }
 
-.leoTabs .leoTabs_nav .leoTabs_nav_selected {
+.leoTabs .leoTabs_nav .leoTabs_nav_selected,
+.leoTabs .leoTabs_nav_dragSelected {
     background-color: #f4f4f4;
     border-color: #3da8b9 #e5e5e5 #f5f5f5;
     border-image: none;
@@ -1831,6 +1832,40 @@
     height: 32px;
     top: -2px;
     line-height: 28px;
+}
+
+.leoTabs .leoTabs_nav_dragSelected {
+    height: 28px;
+    line-height: 28px
+}
+
+.leoTabs .leoTabs_nav_dragSelected a {
+    font-family: "Lucida Console";
+    color: #555;
+    font-size: 12px;
+    font-weight: bold;
+    display: block;
+    margin: 0 0 0 10px;
+    text-decoration: none;
+    overflow: hidden;
+    white-space: pre;
+}
+
+.leoTabs .leoTabs_nav_dragSelecte {
+    background: #f4f4f4;
+    border: 1px solid #e5e5e5;
+    height: 28px;
+    line-height: 28px;
+}
+
+.leoTabs .leoTabs_nav_dragSelecte a {
+    font-family: "Lucida Console";
+    display: block;
+    margin: 0 0 0 10px;
+    text-decoration: none;
+    color: #aaa;
+    overflow: hidden;
+    white-space: pre;
 }
 
 .leoTabs .leoTabs_nav .leoTabs_nav_selected a {

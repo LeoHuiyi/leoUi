@@ -34,11 +34,11 @@
 
         defaults:{
 
-            append:'body',
+            append:'body',//添加到哪里
 
-            limitLen:10,
+            limitLen:10,//tabname长度
 
-            ellipsisStr:'...',
+            ellipsisStr:'...',//tabname后缀
 
             initCallback:$.noop,
 
@@ -296,9 +296,7 @@
 
         _tabChage:function($li, tid){
 
-            this._tabActive({$li: $li, tid: tid});
-
-            this._slide.isAlignRightFun();
+            this._tabActive({$li: $li, tid: tid, isAlignRightFun: true});
 
             this._slide.activeTab( $li, true );
 
@@ -360,11 +358,15 @@
 
             if(tid !== (oldTid = this.currentTid)){
 
+                $li = ($li || this.$ul.find("li[leoUi-tid ='" + tid + "']"));
+
+                !!option.isAlignRightFun && this._slide.isAlignRightFun($li.index() === this.$ul.find('li').length - 1);
+
                 this.$ul.find("li[leoUi-tid ='" + oldTid + "']").removeClass('leoTabs_nav_selected');
 
                 this.$content.find("div[leoUi-tid ='" + oldTid + "']").hide();
 
-                ($li || this.$ul.find("li[leoUi-tid ='" + tid + "']")).addClass('leoTabs_nav_selected');
+                $li.addClass('leoTabs_nav_selected');
 
                 $content = (option.$content || this.$content.find("div[leoUi-tid ='" + tid + "']")).show();
 
@@ -577,6 +579,8 @@
                     })._on(this.$tabLinksWrap, 'mousewheel', function(event, delta) {
 
                         event.preventDefault();
+
+                        if(This.slideIsShow === false)return;
 
                         This.slideIsShow === true && delta === 1 ? This.slideLeftWheel() : This.slideRightWheel();
 
@@ -856,11 +860,15 @@
 
                             this.slideIsShow = true;
 
+                            this.isAlignRight = false;
+
                             this.activeTab();
 
                         }
 
                     }else{
+
+                        this.isAlignRight = false;
 
                         this.activeTab();
 

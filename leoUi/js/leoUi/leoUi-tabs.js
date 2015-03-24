@@ -626,11 +626,11 @@
 
                     if( this.slideIsShow === false ){ return }
 
-                    var liProp = this.getLeftRight( ($li = $li || this.$tabLinksUl.find(this.selectedClass))),
+                    var linksLR = this.linksLR,left,right,center;
 
-                    linksLR = this.linksLR,left,right,center;
+                    $li = $li || this.$tabLinksUl.find(this.selectedClass);
 
-                    if( ( left = linksLR.left - liProp.left ) > 0 ){
+                    if( ( left = linksLR.left - this.getLeftRight($li, 'left') ) > 0 ){
 
                         if( ( center = this.linksLR.right - this.$tabLinksWrap.offset().left - this.$tabLinksWrap.outerWidth() ) > left ){
 
@@ -642,7 +642,7 @@
 
                         }
 
-                    }else if( ( right = liProp.right - linksLR.right ) > 0 ){
+                    }else if( ( right =  this.getLeftRight($li, 'right') - linksLR.right ) > 0 ){
 
                         this.isAlignRight === true ? this.$tabLinksUl.css( 'left', '-=' + right ) : this.sildeAnimate( '-=' + right, 200 );
 
@@ -746,7 +746,7 @@
 
                     var left = this.sildeDetectionLeft();
 
-                    left !==false && this.sildeAnimate( this.sildeDetectionLeft(), 40 );
+                    left !== false && this.sildeAnimate( this.sildeDetectionLeft(), 40 );
 
                 },
 
@@ -754,25 +754,37 @@
 
                     var right = this.sildeDetectionRight();
 
-                    right !==false && this.sildeAnimate( this.sildeDetectionRight(), 40 );
+                    right !== false && this.sildeAnimate( this.sildeDetectionRight(), 40 );
 
                 },
 
                 sildeDetectionLeft:function(){
 
-                    var $li = this.$tabLinksUl.find('li'),liProp,
+                    var $li = this.$tabLinksUl.find('li'),
 
-                    linksLR = this.linksLR,i = $li.length,
+                    linksLR = this.linksLR, i = 0, left, li;
 
-                    left;
+                    this.lastDistance = 0;
 
-                    while(i--){
+                    while((li = $li[i++])){
 
-                        liProp = this.getLeftRight( $( $li[i] ) );
+                        left = this.getLeftRight($(li), 'left') - linksLR.left;
 
-                        if( (left = linksLR.left - liProp.left) >= 1 ){
+                        if(left >= 0){
 
-                            return  '+=' + left;
+                            if(i === 1){
+
+                                return false;
+
+                            }else{
+
+                                return  '-=' + this.lastDistance;
+
+                            }
+
+                        }else{
+
+                            this.lastDistance = left;
 
                         }
 
@@ -784,17 +796,33 @@
 
                 sildeDetectionRight:function(){
 
-                    var $li = this.$tabLinksUl.find('li'),liProp,right,
+                    var $li = this.$tabLinksUl.find('li'),
 
-                    linksLR = this.linksLR,i = 0,length = $li.length;
+                    linksLR = this.linksLR,
 
-                    for( ; i < length; i++ ){
+                    right, li, i = $li.length - 1, last = i - 1;
 
-                        liProp = this.getLeftRight($($li[i]));
+                    this.lastDistance = 0;
 
-                        if( ( right = liProp.right - linksLR.right ) >= 1 ){
+                    while((li = $li[i--])){
 
-                            return '-=' + right;
+                        right = this.getLeftRight($(li), 'right') - linksLR.right;
+
+                        if(right <= 0){
+
+                            if(i === last){
+
+                                return false;
+
+                            }else{
+
+                                return  '-=' + this.lastDistance;
+
+                            }
+
+                        }else{
+
+                            this.lastDistance = right;
 
                         }
 
@@ -820,17 +848,19 @@
 
                 },
 
-                getLeftRight:function($el){
+                getLeftRight:function($el, direction){
 
-                    var elLeft = $el.offset().left;
+                    if(direction === 'left'){
 
-                    return{
+                        return $el.offset().left;
 
-                        left: elLeft,
+                    }
 
-                        right : elLeft + $el.outerWidth()
+                    if(direction === 'right'){
 
-                    };
+                        return $el.offset().left + $el.outerWidth();
+
+                    }
 
                 },
 

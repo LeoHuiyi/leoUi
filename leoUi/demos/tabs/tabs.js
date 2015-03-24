@@ -31,7 +31,7 @@ leoUiLoad.config({
 })
 
 leoUiLoad.require('leoUi-tabs,leoUi,ready', function($) {
-    var name = 'tab',i=1;
+    var name = 'tab_1111111111111',i=1;
     $('#tabs').leoTabs({
 
         append:'#tabs',
@@ -47,13 +47,16 @@ leoUiLoad.require('leoUi-tabs,leoUi,ready', function($) {
             $target.leoTabs('openTab', {remove: false,contentHtml:'newTab3'});
 
             $target.leoTabs('openTab',{tid:'tab1'});
-        }
+        },
+
+        limitLen:100
 
     });
 
     $('#button').on('click', function(event) {
         event.preventDefault();
         var str = name + i++;
+        str = str.slice(0,$.leoTools.random(7,20));
         $('#tabs').leoTabs('openTab',{name: str,contentHtml:str});
     });
 

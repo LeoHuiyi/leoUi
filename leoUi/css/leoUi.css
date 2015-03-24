@@ -1869,6 +1869,7 @@
 }
 
 .leoTabs .leoTabs_nav .leoTabs_nav_selected a {
+	font-family: "Lucida Console";
     color: #333;
     font-size: 12px;
     font-weight: bold;

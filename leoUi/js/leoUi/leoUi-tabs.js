@@ -520,19 +520,21 @@
 
             function Slide(option){
 
-                this.$tabLinksUl = option.$tabLinksUl;
+                this.$ul = option.$ul;
 
-                this.$tabLinks = option.$tabLinks;
+                this.$nav = option.$nav;
 
-                this.$tabLinksWrap = option.$tabLinksWrap;
+                this.$wrap = option.$wrap;
 
-                this.$slideLeft = option.$slideLeft;
+                this.$leftBtn = option.$leftBtn;
 
-                this.$slideRight = option.$slideRight;
+                this.$rightBtn = option.$rightBtn;
 
                 this.selectedClass = option.selectedClass;
 
-                this.slideWidth = this.$slideLeft.outerWidth();
+                this.leftBtnWidth = this.$leftBtn.outerWidth();
+
+                this.rightBtnWidth = this.$rightBtn.outerWidth();
 
                 this.slideIsShow = false;
 
@@ -552,31 +554,31 @@
 
                     this.getTabLinksWidth();
 
-                    leoUi._on(this.$slideLeft, 'mousedown', function(event) {
+                    leoUi._on(this.$leftBtn, 'mousedown', function(event) {
 
                         event.preventDefault();
 
                         This.slideLeft();
 
-                    })._on(this.$slideLeft, 'mouseup', function(event) {
+                    })._on(this.$leftBtn, 'mouseup', function(event) {
 
                         event.preventDefault();
 
                         This.sildeAnimateStop('left');
 
-                    })._on(this.$slideRight, 'mousedown', function(event) {
+                    })._on(this.$rightBtn, 'mousedown', function(event) {
 
                         event.preventDefault();
 
                         This.slideRight();
 
-                    })._on(this.$slideRight, 'mouseup', function(event) {
+                    })._on(this.$rightBtn, 'mouseup', function(event) {
 
                         event.preventDefault();
 
                         This.sildeAnimateStop('right');
 
-                    })._on(this.$tabLinksWrap, 'mousewheel', function(event, delta) {
+                    })._on(this.$wrap, 'mousewheel', function(event, delta) {
 
                         event.preventDefault();
 
@@ -602,13 +604,13 @@
 
                 getTabLinksWidth:function(){
 
-                    this.tabLinksWidth = this.$tabLinks.width();
+                    this.tabLinksWidth = this.$nav.width();
 
                 },
 
                 sildeAnimate:function( prop, speed, fun ){
 
-                    !fun ? this.$tabLinksUl.stop( true, false ).animate( { left : prop || 0 }, speed || 200 ) : this.$tabLinksUl.stop( true, false ).animate( { left : prop || 0 }, speed || 200, fun );
+                    !fun ? this.$ul.stop( true, false ).animate( { left : prop || 0 }, speed || 200 ) : this.$ul.stop( true, false ).animate( { left : prop || 0 }, speed || 200, fun );
 
                 },
 
@@ -618,7 +620,7 @@
 
                     flag === 'right' && ( this.rightFlag = false );
 
-                    this.$tabLinksUl.stop( true, true );
+                    this.$ul.stop( true, true );
 
                 },
 
@@ -628,11 +630,11 @@
 
                     var linksLR = this.linksLR,left,right,center;
 
-                    $li = $li || this.$tabLinksUl.find(this.selectedClass);
+                    $li = $li || this.$ul.find(this.selectedClass);
 
                     if( ( left = linksLR.left - this.getLeftRight($li, 'left') ) > 0 ){
 
-                        if( ( center = this.linksLR.right - this.$tabLinksWrap.offset().left - this.$tabLinksWrap.outerWidth() ) > left ){
+                        if( ( center = this.linksLR.right - this.$wrap.offset().left - this.$wrap.outerWidth() ) > left ){
 
                             this.sildeAnimate( '+=' + center, 200 );
 
@@ -644,7 +646,7 @@
 
                     }else if( ( right =  this.getLeftRight($li, 'right') - linksLR.right ) > 0 ){
 
-                        this.isAlignRight === true ? this.$tabLinksUl.css( 'left', '-=' + right ) : this.sildeAnimate( '-=' + right, 200 );
+                        this.isAlignRight === true ? this.$ul.css( 'left', '-=' + right ) : this.sildeAnimate( '-=' + right, 200 );
 
                     }else{
 
@@ -666,7 +668,7 @@
 
                     }
 
-                    if( ( this.linksLR.right - this.$tabLinksWrap.offset().left - this.$tabLinksWrap.outerWidth() ) === 0 ){
+                    if( ( this.linksLR.right - this.$wrap.offset().left - this.$wrap.outerWidth() ) >= -1 ){
 
                         this.isAlignRight = true;
 
@@ -680,11 +682,11 @@
 
                 alignRight:function( notAnimate ){
 
-                    var left = this.linksLR.right - this.$tabLinksWrap.offset().left - this.$tabLinksWrap.outerWidth();
+                    var left = this.linksLR.right - this.$wrap.offset().left - this.$wrap.outerWidth();
 
                     if( left > 0 ){
 
-                        notAnimate === true ? this.$tabLinksUl.css( 'left', '+=' + left ) : this.sildeAnimate( '+=' + left, 200 );
+                        notAnimate === true ? this.$ul.css( 'left', '+=' + left ) : this.sildeAnimate( '+=' + left, 200 );
 
                     }
 
@@ -704,13 +706,9 @@
 
                     this.sildeAnimate( left, 200, function(){
 
-                        setTimeout( function(){
+                        if( This.leftFlag === false ){ return; }
 
-                            if( This.leftFlag === false ){ return; }
-
-                            This.slideLeft();
-
-                        }, 50 );
+                        This.slideLeft();
 
                     } );
 
@@ -730,13 +728,9 @@
 
                     this.sildeAnimate( right, 200, function(){
 
-                        setTimeout( function(){
+                        if( This.rightFlag === false ){ return; }
 
-                            if( This.rightFlag === false ){ return; }
-
-                            This.slideRight();
-
-                        }, 50 );
+                        This.slideRight();
 
                     } );
 
@@ -760,7 +754,7 @@
 
                 sildeDetectionLeft:function(){
 
-                    var $li = this.$tabLinksUl.find('li'),
+                    var $li = this.$ul.find('li'),
 
                     linksLR = this.linksLR, i = 0, left, li;
 
@@ -770,7 +764,7 @@
 
                         left = this.getLeftRight($(li), 'left') - linksLR.left;
 
-                        if(left >= 0){
+                        if(left >= -1){
 
                             if(i === 0){
 
@@ -798,7 +792,7 @@
 
                 sildeDetectionRight:function(){
 
-                    var $li = this.$tabLinksUl.find('li'),
+                    var $li = this.$ul.find('li'),
 
                     linksLR = this.linksLR,
 
@@ -810,7 +804,7 @@
 
                         right = this.getLeftRight($(li), 'right') - linksLR.right;
 
-                        if(right <= 0){
+                        if(right <= 1){
 
                             if(i === last){
 
@@ -838,15 +832,13 @@
 
                 getlinksLR:function(){
 
-                    var $tabLinks = this.$tabLinks, elLeft = $tabLinks.offset().left,
-
-                    slideWidth = this.slideWidth;
+                    var $nav = this.$nav, elLeft = $nav.offset().left;
 
                     this.linksLR = {
 
-                        left: elLeft + slideWidth,
+                        left: elLeft + this.leftBtnWidth,
 
-                        right: elLeft + $tabLinks.outerWidth() - slideWidth
+                        right: elLeft + $nav.outerWidth() - this.rightBtnWidth
 
                     };
 
@@ -884,13 +876,13 @@
 
                     if( this.slideIsShow === false ){
 
-                        WrapWidth = this.$tabLinksWrap.width();
+                        WrapWidth = this.$wrap.width();
 
                         if( WrapWidth > this.tabLinksWidth ){
 
-                            this.$slideLeft.show();
+                            this.$leftBtn.show();
 
-                            this.$slideRight.show();
+                            this.$rightBtn.show();
 
                             this.slideIsShow = true;
 
@@ -914,11 +906,11 @@
 
                     if( this.slideIsShow === true ){
 
-                        if( this.$tabLinksWrap.width() < this.tabLinksWidth ){
+                        if( this.$wrap.width() < this.tabLinksWidth ){
 
-                            this.$slideLeft.hide();
+                            this.$leftBtn.hide();
 
-                            this.$slideRight.hide();
+                            this.$rightBtn.hide();
 
                             this.slideIsShow = false;
 
@@ -938,15 +930,15 @@
 
             return new Slide({
 
-                $tabLinksUl: this.$ul,
+                $ul: this.$ul,
 
-                $tabLinks: this.$nav,
+                $nav: this.$nav,
 
-                $tabLinksWrap: this.$wrap,
+                $wrap: this.$wrap,
 
-                $slideLeft: this.$leftBtn,
+                $leftBtn: this.$leftBtn,
 
-                $slideRight: this.$rightBtn,
+                $rightBtn: this.$rightBtn,
 
                 selectedClass: '.leoTabs_nav_selected',
 

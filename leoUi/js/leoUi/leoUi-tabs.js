@@ -766,13 +766,13 @@
 
                     this.lastDistance = 0;
 
-                    while((li = $li[i++])){
+                    while((li = $li[i])){
 
                         left = this.getLeftRight($(li), 'left') - linksLR.left;
 
                         if(left >= 0){
 
-                            if(i === 1){
+                            if(i === 0){
 
                                 return false;
 
@@ -788,6 +788,8 @@
 
                         }
 
+                        i++;
+
                     }
 
                     return false;
@@ -800,11 +802,11 @@
 
                     linksLR = this.linksLR,
 
-                    right, li, i = $li.length - 1, last = i - 1;
+                    right, li, i = $li.length - 1, last = i;
 
                     this.lastDistance = 0;
 
-                    while((li = $li[i--])){
+                    while((li = $li[i])){
 
                         right = this.getLeftRight($(li), 'right') - linksLR.right;
 
@@ -825,6 +827,8 @@
                             this.lastDistance = right;
 
                         }
+
+                        i--;
 
                     }
 

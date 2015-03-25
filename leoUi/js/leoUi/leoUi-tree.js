@@ -1272,7 +1272,7 @@
                 if((target = child.target)){
 
                     str += '<a id="' + aId + '" href="' + url + '" target = "' + target + '" class="leoTree_dblclick_a"';
-                    
+
                 }else{
 
                     str += '<a id="' + aId + '" href="' + url + '" class="leoTree_dblclick_a"';

@@ -43,7 +43,7 @@
 
              }
 
-        })
+        });
 
         return childrenArray;
 
@@ -372,9 +372,9 @@
                                 top: Math.ceil(position.top)
                             }, 500);
 
-                        }, 0)
+                        }, 0);
 
-                    };
+                    }
 
                 });
 
@@ -389,7 +389,7 @@
 
                 !! id && $win.off('resize.' + id) && $(el).removeData(dataId);
 
-            })
+            });
 
         }
 
@@ -475,13 +475,13 @@
 
                         !! boxPositionData && (boxPositionData = null);
 
-                    };
+                    }
 
                 }).triggerHandler('scroll.' + id);
 
-            })
+            });
 
-        };
+        }
 
     };
 
@@ -523,7 +523,7 @@
 
                     }, options.delay );
 
-                })
+                });
 
 
             }else{
@@ -532,7 +532,7 @@
 
                     options.handler.apply( this, arguments );
 
-                })
+                });
 
             }
 

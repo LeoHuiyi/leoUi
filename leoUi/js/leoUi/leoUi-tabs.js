@@ -4,6 +4,8 @@
 +-------------------------------------------------------------------
 * @version    1.0.0 beta
 * @author     leo
+*
+* 每次创建li的长度都不一样，li选中后的长度和之前的也不一样
 +-------------------------------------------------------------------
 */
 ;(function(factory) {
@@ -628,23 +630,21 @@
 
                     if( this.slideIsShow === false ){ return }
 
-                    var linksLR = this.linksLR,left,right,center;
+                    var linksLR = this.linksLR,left,right,offsetLeft;
 
                     $li = $li || this.$ul.find(this.selectedClass);
 
-                    if( ( left = linksLR.left - this.getLeftRight($li, 'left') ) > 0 ){
+                    offsetLeft = $li.offset().left;
 
-                        if( ( center = this.linksLR.right - this.$wrap.offset().left - this.$wrap.outerWidth() ) > left ){
+                    if( ( left = linksLR.left - offsetLeft ) >= 0 ){
 
-                            this.sildeAnimate( '+=' + center, 200 );
+                        if(left === 0)return;
 
-                        }else{
+                        this.sildeAnimate( '+=' + left, 200 );
 
-                            this.sildeAnimate( '+=' + left, 200 );
+                    }else if( ( right = offsetLeft + $li.outerWidth() - linksLR.right ) >= 0 ){
 
-                        }
-
-                    }else if( ( right =  this.getLeftRight($li, 'right') - linksLR.right ) > 0 ){
+                        if(right === 0)return;
 
                         this.isAlignRight === true ? this.$ul.css( 'left', '-=' + right ) : this.sildeAnimate( '-=' + right, 200 );
 
@@ -738,17 +738,21 @@
 
                 slideLeftWheel:function(){
 
+                    this.$ul.stop(true, true);
+
                     var left = this.sildeDetectionLeft();
 
-                    left !== false && this.sildeAnimate( this.sildeDetectionLeft(), 40 );
+                    left !== false && this.sildeAnimate(left, 200);
 
                 },
 
                 slideRightWheel:function(){
 
+                    this.$ul.stop(true, true);
+
                     var right = this.sildeDetectionRight();
 
-                    right !== false && this.sildeAnimate( this.sildeDetectionRight(), 40 );
+                    right !== false && this.sildeAnimate(right, 200);
 
                 },
 
@@ -918,7 +922,17 @@
 
                         }else{
 
-                            this.activeTab();
+                            var center, left;
+
+                            if( ( center = this.linksLR.right - this.$wrap.offset().left - this.$wrap.outerWidth() ) > ( left = this.linksLR.left - this.$ul.find(this.selectedClass).offset().left ) ){
+
+                                this.sildeAnimate( '+=' + center, 200 );
+
+                            }else{
+
+                                this.sildeAnimate( '+=' + left, 200 );
+
+                            }
 
                         }
 

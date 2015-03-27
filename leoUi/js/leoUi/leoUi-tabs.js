@@ -96,7 +96,11 @@
 
             $menuClickLi = null, $menuOver = $menu.find('.leoTabs_menu_over'), $tab = this.$tab;
 
-            this._on(this.$ul, 'mouseup', 'li', function(event){
+            this._on(this.$ul, 'mousedown', 'li', function(event){
+
+                event.which === 2 && event.preventDefault();
+
+            })._on(this.$ul, 'mouseup', 'li', function(event){
 
                 var $this = $(this);
 

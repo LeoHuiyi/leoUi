@@ -926,17 +926,7 @@
 
                         }else{
 
-                            var center, left;
-
-                            if( ( center = this.linksLR.right - this.$wrap.offset().left - this.$wrap.outerWidth() ) > ( left = this.linksLR.left - this.$ul.find(this.selectedClass).offset().left ) ){
-
-                                this.sildeAnimate( '+=' + center, 200 );
-
-                            }else{
-
-                                this.sildeAnimate( '+=' + left, 200 );
-
-                            }
+                            this.alignRight();
 
                         }
 

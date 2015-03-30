@@ -1739,8 +1739,8 @@
     background-color: #fff;
     border-radius: 4%;
 }
-/*leoTabs*/
 
+/*leoTabs*/
 .leoTabs {
     position: relative;
     height: 450px;
@@ -2035,3 +2035,6 @@
 .leoTabs .leoTabs_menu_item_disable .leoTabs_menu_item_text {
     color: #A1A1A1;
 }
+
+/*leoScrollbar*/
+.leoScrollbar{}

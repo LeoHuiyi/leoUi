@@ -58,6 +58,8 @@
 
             this.isSetCapture = this.options.isSetCapture ? 'setCapture' in this.document[0].documentElement : false;
 
+            this.userSelect = $.leoTools.getPrefixProperty('user-select');
+
             this._lockDrag = false;
 
             this._setMouseDownEvent();
@@ -142,11 +144,7 @@
 
         _textselect:function(bool) {
 
-            this[bool ? "_on" : "_off"]( this.document, 'selectstart.mouse', false );
-
-            this.document.css("-moz-user-select", bool ? "none" : "");
-
-            this.document[0].unselectable = bool ? "off" : "on";
+            this.userSelect ? this.document.css(this.userSelect, bool ? "none" : "") : this.document[0].unselectable = bool ? "off" : "on";
 
         },
 

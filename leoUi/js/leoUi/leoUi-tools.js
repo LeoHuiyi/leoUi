@@ -625,7 +625,8 @@
 
             },
             li = $.extend(true, {}, plugInDefaults, options),
-            inherit,
+
+            inherit, PlugIn,
 
             inheritPrototype, plugInPrototype, PlugInBasePrototypeKeys,
 
@@ -640,11 +641,11 @@
 
         if (!!leoPlugIn[li.inherit] && $.isFunction(inherit = leoPlugIn[li.inherit])) {
 
-            function PlugIn(hash, target, dataId) {
+            PlugIn = function(hash, target, dataId) {
 
                 inherit.apply(this, arguments);
 
-            }
+            };
 
             PlugInBasePrototypeKeys = leoPlugIn.PlugInBasePrototypeKeys;
 
@@ -712,7 +713,7 @@
 
         } else {
 
-            function PlugIn(hash, target, dataId) {
+            PlugIn = function(hash, target, dataId) {
 
                 this.options = leoToolsFn.extend({}, this.defaults, hash);
 
@@ -730,7 +731,7 @@
 
                 this._create();
 
-            }
+            };
 
             $.extend(PlugIn.prototype, {
 
@@ -1512,6 +1513,157 @@
         return value.replace(/[\-\[\]{}()*+?.,\\\^$|#\s]/g, "\\$&");
 
     };
+
+    //https://github.com/LeaVerou/prefixfree/blob/gh-pages/prefixfree.js
+    (function(leoTools) {
+
+        if(!window.getComputedStyle){
+
+            leoTools.getPrefixProperty = function(property) {
+
+                return false;
+
+            };
+
+            return;
+
+        }
+
+        var prefixes = {}, properties = [],
+
+            i, property, highest, prefix,
+
+            uses, len, unprefixed, prop, Prefix, props,
+
+            style = getComputedStyle(document.documentElement, null),
+
+            dummy = document.createElement('div').style,
+
+            iterate = function(property) {
+
+                if (property.charAt(0) === '-') {
+
+                    properties.push(property);
+
+                    var parts = property.split('-'),
+                        prefix = parts[1], shorthand;
+
+                    prefixes[prefix] = ++prefixes[prefix] || 1;
+
+                    while (parts.length > 3) {
+
+                        parts.pop();
+
+                        shorthand = parts.join('-');
+
+                        if (supported(shorthand) && properties.indexOf(shorthand) === -1) {
+
+                            properties.push(shorthand);
+
+                        }
+
+                    }
+
+                }
+
+            },
+
+            camelCase = function(str) {
+
+                return str.replace(/-([a-z])/g, function($0, $1) { return $1.toUpperCase(); }).replace('-','');
+
+            },
+
+            supported = function(property) {
+
+                return camelCase(property) in dummy;
+
+            },
+
+            deCamelCase = function(str) {
+
+                return str.replace(/[A-Z]/g, function($0) { return '-' + $0.toLowerCase() });
+
+            };
+
+        if (style.length > 0) {
+
+            for (i = 0, len = style.length; i < len; i++) {
+
+                iterate(style[i]);
+
+            }
+
+        } else {
+
+            for (property in style) {
+
+                iterate(deCamelCase(property));
+
+            }
+
+        }
+
+        highest = {uses: 0};
+
+        for (prefix in prefixes) {
+
+            uses = prefixes[prefix];
+
+            if (highest.uses < uses) {
+
+                highest = {
+
+                    prefix: prefix,
+
+                    uses: uses
+
+                };
+
+            }
+
+        }
+
+        prefix = '-' + highest.prefix + '-';
+
+        Prefix = camelCase(prefix);
+
+        props = [];
+
+        for (i = 0, len = properties.length; i < len; i++) {
+
+            prop = properties[i];
+
+            if (prop.indexOf(prefix) === 0) {
+
+                unprefixed = prop.slice(prefix.length);
+
+
+                if (!supported(unprefixed)) {
+
+                    props.push(unprefixed);
+
+                }
+
+            }
+
+        }
+
+        if (Prefix == 'Ms' && !('transform' in dummy) && !('MsTransform' in dummy) && ('msTransform' in dummy)) {
+
+            props.push('transform', 'transform-origin');
+
+        }
+
+        props.sort();
+
+        leoTools.getPrefixProperty = function(property) {
+
+            return (props.indexOf(property) >= 0 ? prefix : '') + property;
+
+        };
+
+    })($.leoTools || {});
 
     return $;
 

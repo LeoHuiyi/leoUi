@@ -20,7 +20,7 @@ leoUiLoad.config({
 
         jquery: {
 
-            src: '../jquery/jquery-1.9.1.js',
+            src: '../jquery/jquery-1.11.1-min.js',
 
             exports: "$"
 

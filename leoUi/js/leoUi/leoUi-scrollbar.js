@@ -26,22 +26,25 @@
 
 	$.leoTools.plugIn({
 
-		name: 'leoScrollbar',
+		name:'leoScrollbar',
 
-		version: '1.0',
+		version:'1.0',
 
-		addJquery: false,
+		addJquery:false,
 
-		addJqueryFn: true,
+		addJqueryFn:true,
 
-		defaults: {
+		defaults:{
 
-			showBarBtn: true,
+			showBarBtn:true,
 
+			limitRateV:1.5,//竖直方向，拖动头最小高度和拖动头宽度比率
+
+			limitRateH:1.5//水平方向，拖动头最小宽度和高度的比率
 
 		},
 
-		_init: function() {
+		_init:function() {
 
 			this._render();
 
@@ -52,17 +55,17 @@
 
 			var $target = this.$target,
 
-			$children = this.$children = $target.addClass('leoUi_helper_reset leoScrollbar').css({'overflow': 'hidden', 'position': 'relative'}).children().addClass('leoScrollbar_scroller leoUi_helper_reset');
+			$children = $target.addClass('leoUi_helper_reset leoScrollbar').css({'overflow': 'hidden', 'position': 'relative'}).children();
 
-			console.log($target.width())
+			this.$content = $('<div class="leoScrollbar_scroller leoUi_helper_reset"></div>').appendTo($target).append($children);
 
-			this.vWidth = parseInt($target.width(), 10);
+			this.vWidth = $target.width();
 
-			this.vHeight = parseInt($target.height(), 10);
+			this.vHeight = $target.height();
 
-			this.cWidth = parseInt($children.width(), 10);
+			this.cWidth = $children.width();
 
-			this.cHeight = parseInt($children.height(), 10);
+			this.cHeight = $children.height();
 
 			this._renderScrollbar();
 
@@ -74,18 +77,17 @@
 
 			if(this.options.showBarBtn){
 
-				$str = $('<div class="leoScrollbar_scrollbar leoUi_helper_reset leoUi_clearfix"><div class="leoScrollbar_arrow leoScrollbar_arrow_up"><b></b></div><div class="leoScrollbar_draggerpar"><div class="leoScrollbar_dragger"></div></div><div class="leoScrollbar_arrow leoScrollbar_arrow_down"><b></b></div></div>').hide();
+				$str = $('<div class="leoScrollbar_scrollbar leoUi_helper_reset leoUi_clearfix"><div class="leoScrollbar_arrow leoScrollbar_arrow_up"><b class="leoScrollbar_scrollbar_trangle_up"></b></div><div class="leoScrollbar_draggerpar"><div class="leoScrollbar_dragger"></div></div><div class="leoScrollbar_arrow leoScrollbar_arrow_down"><b class="leoScrollbar_scrollbar_trangle_down"></b></div></div>').hide();
 
 			}else{
 
-				$str = $('<div class="leoScrollbar_scrollbar leoUi_helper_reset leoUi_clearfix"><div class="leoScrollbar_draggerpar"><div class="leoScrollbar_dragger"></div></div></div>').hide()
-
+				$str = $('<div class="leoScrollbar_scrollbar leoUi_helper_reset leoUi_clearfix"><div class="leoScrollbar_draggerpar"><div class="leoScrollbar_dragger"></div></div></div>').hide();
 
 			}
 
 			if(direction === 'v'){
 
-				this.$vScrollbar = $str.appendTo(this.$target);
+				this.$vScrollbar = $str.addClass('leoScrollbar_scrollbar_right').appendTo(this.$target);
 
 			}else{
 
@@ -141,23 +143,73 @@
 
 			var $vScrollbar, $hScrollbar, vScrollbarH, hScrollbarW,
 
-			showBarBtn = this.options.showBarBtn;
+			showBarBtn = this.options.showBarBtn,
+
+			vScrollbarDraggerparLen, hScrollbarDraggerparLen,
+
+			vScrollbarArrowUpH, hScrollbarArrowUpW,
+
+			vScrollbarDraggerparH, hScrollbarDraggerparW,
+
+			vDraggerLen, hDraggerLen;
 
 			if(($vScrollbar = this.$vScrollbar) && ($hScrollbar = this.$hScrollbar)){
 
-				this.$vScrollbarDraggerpar = this.$vScrollbar.find('.leoScrollbar_draggerpar');
+				this.$vScrollbarDraggerpar = $vScrollbar.find('.leoScrollbar_draggerpar');
 
-				showBarBtn ? this.$vScrollbarDraggerpar.height(vScrollbarH - $vScrollbar.find('.leoScrollbar_arrow_up').outerHeight() - $vScrollbar.find('.leoScrollbar_arrow_down').outerHeight()) : this.$vScrollbarDraggerpar.height(vScrollbarH);
-
-				$vScrollbar.height((vScrollbarH = this.vHeight - this.scrollbarWidth)).show();
+				this.$vScrollbarDragger = this.$vScrollbarDraggerpar.find('.leoScrollbar_dragger');
 
 				this.$hScrollbarDraggerpar = $hScrollbar.find('.leoScrollbar_draggerpar');
 
-				showBarBtn ? this.$hScrollbarDraggerpar.width(hScrollbarW - $hScrollbar.find('.leoScrollbar_arrow_up').outerWidth() - $hScrollbar.find('.leoScrollbar_arrow_down').outerWidth()) : this.$hScrollbarDraggerpar.width(hScrollbarW);
+				this.$hScrollbarDragger = this.$hScrollbarDraggerpar.find('.leoScrollbar_dragger');
 
-				$hScrollbar.width((hScrollbarW = this.vWidth - this.scrollbarWidth)).show();
+				vScrollbarH = this.vHeight - this.scrollbarWidth;
 
-				this.$children.width(hScrollbarW).height(vScrollbarH);
+				hScrollbarW = this.vWidth - this.scrollbarWidth;
+
+				if(showBarBtn){
+
+					vScrollbarArrowUpH = $vScrollbar.find('.leoScrollbar_arrow_up').outerHeight();
+
+					hScrollbarArrowUpW = $hScrollbar.find('.leoScrollbar_arrow_up').outerWidth();
+
+					vScrollbarDraggerparH = vScrollbarH - vScrollbarArrowUpH - $vScrollbar.find('.leoScrollbar_arrow_down').outerHeight();
+
+					hScrollbarDraggerparW = hScrollbarW - $vScrollbar.find('.leoScrollbar_arrow_down').outerHeight() - hScrollbarArrowUpW;
+
+					this.$vScrollbarDraggerpar.css({top: vScrollbarArrowUpH, height: vScrollbarDraggerparH});
+
+					this.$hScrollbarDraggerpar.css({left: hScrollbarArrowUpW, width: hScrollbarDraggerparW});
+
+				}else{
+
+					this.$vScrollbarDraggerpar.css({top: 0, height: (vScrollbarDraggerparH = vScrollbarH)});
+
+					this.$hScrollbarDraggerpar.css({left: 0, width: (hScrollbarDraggerparW = hScrollbarW)});
+
+				}
+
+				this.$content.css({height: vScrollbarH, width: hScrollbarW});
+
+				$vScrollbar.css({height: vScrollbarH, 'visibility': 'hidden'}).height(vScrollbarH).show();
+
+				$hScrollbar.css({width: hScrollbarW, 'visibility': 'hidden'}).show();
+
+				vDraggerLen = this._getDraggerLen(vScrollbarDraggerparH, 'v');
+
+				hDraggerLen = this._getDraggerLen(hScrollbarDraggerparW, 'h');
+
+				this.vDraggerparLen = vScrollbarDraggerparH - vDraggerLen;
+
+				this.hDraggerparLen = hScrollbarDraggerparW - hDraggerLen;
+
+				console.log(this.vDraggerparLen)
+
+				console.log(this.hDraggerparLen)
+
+				this.$vScrollbarDragger.css({top:0, height: vDraggerLen, width: '100%'});
+
+				this.$hScrollbarDragger.css({left:0, width: hDraggerLen, height: '100%'});
 
 
 			}else if(($vScrollbar = this.$vScrollbar)){
@@ -171,6 +223,62 @@
 
 
 			}
+
+
+
+
+
+		},
+
+		_getDraggerLen:function(draggerparLen, direction){
+
+			var draggerLen = 0, minLen;
+
+			if(direction === 'v'){
+
+				draggerLen = draggerparLen*this.vHeight/this.cHeight;
+
+				minLen = this.options.limitRateV*this.$vScrollbarDraggerpar.outerWidth();
+
+				if(minLen > draggerLen){
+
+					return Math.round(minLen);
+
+				}else if(draggerLen > draggerparLen){
+
+					return Math.round(draggerparLen);
+
+				}else{
+
+					return Math.round(draggerLen);
+
+				}
+
+			}else if(direction === 'h'){
+
+				draggerLen = draggerparLen*this.vWidth/this.cWidth;
+
+				minLen = this.options.limitRateH*this.$vScrollbarDraggerpar.outerHeight();
+
+				if(minLen > draggerLen){
+
+					return Math.round(minLen);
+
+				}else if(draggerLen > draggerparLen){
+
+					return Math.round(draggerparLen);
+
+				}else{
+
+					return Math.round(draggerLen);
+
+				}
+
+			}
+
+		},
+
+		_getVScrollVal:function(){
 
 
 

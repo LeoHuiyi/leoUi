@@ -76,29 +76,29 @@
 
             distance:5,//tooltip(工具提示框)与目标的间隔
 
-            showDelay:0,//打开tooltip延迟的时间
+            showDelay:'none',//打开tooltip延迟的时间
 
-            hideDelay:0,//关闭tooltip延迟的时间
+            hideDelay:'none',//关闭tooltip延迟的时间
 
-            showAnimation: function(callBack, state) {
+            showAnimation: function(next, state) {
 
-                this.show( { effect: "explode", duration: "slow", complete: callBack } );
+                this.show( { effect: "explode", duration: "slow", complete: next } );
 
                 // this.show();
 
-                // callBack();
+                // next();
 
-            },//tooltip显示的回调，可自定义动画等，在显示完毕必须调用callBack（this: $target, arguments: callBack, state）
+            },//tooltip显示的回调，可自定义动画等，在显示完毕必须调用callBack（this: $target, arguments: next, state）
 
-            hideAnimation: function(callBack, state) {
+            hideAnimation: function(next, state) {
 
-                this.hide( { effect: "clip", duration: "slow", complete: callBack } );
+                this.hide( { effect: "clip", duration: "slow", complete: next } );
 
                 // this.hide();
 
-                // callBack();
+                // next();
 
-            },//tooltip关闭的回调，可自定义动画等，在显示完毕必须调用callBack（this: $target, arguments: callBack, state）
+            },//tooltip关闭的回调，可自定义动画等，在显示完毕必须调用callBack（this: $target, arguments: next, state）
 
             beforeShow:$.noop//dialog组件显示之前回调（arguments: target ）
 
@@ -556,6 +556,8 @@
 
             }, this.options.hideDelay );
 
+            this.options.hideDelay !== 'none' && (this._tooltipState = 'hideDelaying');
+
         },
 
         _tooltipShowFn:function(){
@@ -577,6 +579,8 @@
                 }, this._tooltipState);
 
             },this.options.showDelay);
+
+            this.options.showDelay !== 'none' && (this._tooltipState = 'showDelaying');
 
         },
 
@@ -601,6 +605,16 @@
         clearTooltipTimeout:function(id){
 
             if(typeof id !== 'string'){return;}
+
+            if(id === 'all'){
+
+                this._clearTooltipTimeout('show');
+
+                this._clearTooltipTimeout('hide');
+
+                return;
+
+            }
 
             var This = this;
 

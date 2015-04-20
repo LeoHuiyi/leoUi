@@ -28,9 +28,11 @@ leoUiLoad.config({
 
 })
 
-leoUiLoad.require('leoUi-dialog,base,leoUi,ready', function($) {
+leoUiLoad.require('leoUi-dialog,leoUi-mask,base,leoUi,ready', function($) {
 
     var flag = false;
+
+    var mask = $.leoMask();
 
     var a = $.leoDialog({
 
@@ -50,8 +52,6 @@ leoUiLoad.require('leoUi-dialog,base,leoUi,ready', function($) {
 
         hideDelay:1000,
 
-        modalHideDelay:1000,
-
         resizableOption: {
 
             containment: 'parent',
@@ -61,8 +61,6 @@ leoUiLoad.require('leoUi-dialog,base,leoUi,ready', function($) {
             iframeFix:true
 
         },
-
-        quickClose: true,
 
         isMoveToTop:true,
 
@@ -82,55 +80,27 @@ leoUiLoad.require('leoUi-dialog,base,leoUi,ready', function($) {
 
         restore: true,
 
-        modal: true,
-
         dialogFocus:function(target){
 
             $(target).find('input').focus();
 
         },
 
-        makeModelDialogShow:function( modelShowFn, dialogShowFn ){
+        beforeShow:function(target){
 
-            // dialogShowFn(!!flag && modelShowFn);
-
-           // modelShowFn(!!flag && dialogShowFn);
-
-           modelShowFn(dialogShowFn);
-
-        },//调整modal，dialog显示调用顺序（this: publicMethods, arguments: modelShowFn, dialogShowFn）
-
-        makeModelDialogHide:function( modelHideFn, dialogHideFn ){
-
-            // if(this.modalState() === 'close'){
-
-            //     this.destroyOverlay()
-
-            //     dialogHideFn();
-            // }else{
-
-            //     dialogHideFn(modelHideFn);
-
-            // }
-
-            if(this.dialogState() === 'close'){
-
-                modelHideFn();
-
-            }else{
-
-                dialogHideFn(modelHideFn);
-
-                this.clearDialogTimeout('modalShow,dialogShow'); 
-
-            }
+            mask.option('zIndex', $(target).css('zIndex')).show();
 
         },
 
-        modalDialogHideCallBack:function(){
+        hideCallBack:function(){
 
+            mask.hide();
 
-            console.log(this)
+        },
+
+        destroyCallBack:function(){
+
+            mask.destroy();
 
         }
 
@@ -159,8 +129,6 @@ leoUiLoad.require('leoUi-dialog,base,leoUi,ready', function($) {
             iframeFix:true
 
         },
-
-        quickClose: true,
 
         isMoveToTop:true,
 
@@ -242,8 +210,6 @@ leoUiLoad.require('leoUi-dialog,base,leoUi,ready', function($) {
 
         restore: false,
 
-        modal: false,
-
         dialogFocus:function(target){
 
             $(target).find('iframe').focus();
@@ -254,25 +220,27 @@ leoUiLoad.require('leoUi-dialog,base,leoUi,ready', function($) {
 
     $('#botton_1').on('click', function() {
 
+        console.log(a.state())
 
-        if (a.dialogState() === "close") {
 
-            a.dialogShow();
+        if (a.state() === "close") {
 
-        } else if (a.dialogState() === "open") {
+            a.show();
 
-            a.dialogHide();
+        } else if (a.state() === "open") {
+
+            a.hide();
         }
 
-        console.log(a.dialogState())
+        // console.log(a.dialogState())
 
         // console.log(b.instance().abc)
 
-        //  console.log(b.abc)
+        // console.log(b.abc)
 
         // console.log(b.instance().abc = 12312321)
 
-        //  console.log(b.instance().dialogShow)
+        // console.log(b.instance().dialogShow)
 
         // console.log(b.instance().dialogShow = null)
 
@@ -282,10 +250,9 @@ leoUiLoad.require('leoUi-dialog,base,leoUi,ready', function($) {
 
         // console.log(b.dialogShow)
 
-        //  console.log(b.abc)
+        // console.log(b.abc)
 
         // console.log(b.instance().abc)
-
 
         a.option('okCallBack', function(event, disabled, enable) {
 
@@ -326,18 +293,18 @@ leoUiLoad.require('leoUi-dialog,base,leoUi,ready', function($) {
 
         });
 
-        cDialog.option('initDraggable', true);
+        // cDialog.option('initDraggable', true);
 
-        b.option('contentHtml', '<iframe style="width:100%;height:100%;" frameborder="0" src="http://www.w3school.com.cn"></iframe>');
+        // b.option('contentHtml', '<iframe style="width:100%;height:100%;" frameborder="0" src="http://www.w3school.com.cn"></iframe>');
     })
 
     $('#botton_2').on('click', function() {
 
-        // console.log(b.dialogShow())
+        // console.log(b.show())
 
-        b.dialogShow();
+        b.show();
 
-        cDialog.dialogShow();
+        cDialog.show();
 
         b.option('disabled',flag)
 

@@ -68,8 +68,6 @@
             +       '</div>'
             +   '</div>',//leoDialog_content中的html标签
 
-            modal:true,//是否使用遮罩层
-
             contentSelector:'.leoDialog_content',
 
             titlebarSelector:'.leoDialog_titlebar',
@@ -78,21 +76,15 @@
 
             title:'标 题',//dialog标题的内容
 
-            quickClose: false,// 是否支持快捷关闭（点击遮罩层自动关闭）
-
             disabled:false,//是否禁止dialog
 
             titlebarDblclickMax:true,//是否支持双击标题栏最大化
 
             appendTo:'body',//dialog应该被appendTo到哪个元素
 
-            modalShowDelay:0,//打开遮罩层延迟的时间
+            showDelay:'none',//打开dialog延迟的时间
 
-            modalHideDelay:0,//关闭遮罩层延迟的时间
-
-            showDelay:0,//打开dialog延迟的时间
-
-            hideDelay:0,//关闭dialog延迟的时间
+            hideDelay:'none',//关闭dialog延迟的时间
 
             width:400,//设置dialog的宽度（数值或者auto）
 
@@ -182,6 +174,8 @@
 
             beforeShow:$.noop,//dialog组件显示之前回调（arguments: target ）
 
+            beforeHide:$.noop,//dialog组件消失之前回调（arguments: target ）
+
             okCallBack:$.noop,//点击ok按钮回调（event, bottunDisable, bottunEnable））
 
             cancelCallBack:$.noop,//点击cancel按钮回调（arguments: event, bottunDisable, bottunEnable））
@@ -200,9 +194,9 @@
 
             closeCallBack:$.noop,//点击close按钮回调（arguments: event, close）
 
-            quickCloseCallBack:$.noop,//点击罩盖层按钮回调（arguments: event, modal）
-
             iframeLoadCallBack:$.noop,//iframe load结束回调（arguments: event, iframe）
+
+            destroyCallBack:$.noop,//destroy回调（arguments: target）
 
             resize:$.noop,//dialog大小调整回调（arguments: target）
 
@@ -210,100 +204,44 @@
 
             dialogBlur:$.noop,//dialog丢失焦点（ arguments: target）
 
-            makeModel:function(target){
-
-                var zIndex = $(target).css('zIndex');
-
-                zIndex > 1 && ( zIndex = zIndex -1 );
-
-                return $('<div style = "position: fixed;top: 0px; left: 0px;width:100%;height:100%;background-color:black;overflow:hidden;z-index: '+ zIndex +';"></div>').hide().appendTo('body')[0];
-
-            },//创建罩盖层,必须返回elem或者jquery对象（arguments: target）
-
             makeDisabledDiv:function(target){
 
                 return $( "<div>" ).css( { position: "absolute", width: '100%', height: '100%', opacity: 0, 'backgroundColor':'#fff', 'overflow': 'hidden', 'visibility': 'visible', 'display': 'block', 'top': 0, 'left': 0, 'padding': 0, 'margin': 0, 'border': 0, 'outline': 'none' } )[0];
 
             },//创建disabled===true的罩盖层, appendTo->dialog,必须返回elem或者jquery对象（arguments: target）
 
-            modalShowAnimation:function(callBack)  {
+            showAnimation:function(next) {
 
-                this.css({
-                    "display": 'block',
-                    "position": "fixed",
-                    "opacity": 0
-                }).animate({
-                    "opacity": 0.8
-                }, 200, callBack);
-
-                // this.css("opacity", 0.8).show();
-
-                // callBack();
-
-            },//modal显示的回调，可自定义动画等，在显示完毕必须调用callBack（this: $modal, arguments: callBack)
-
-            modalHideAnimation:function(callBack) {
-
-                this.animate({
-                    "opacity": 0
-                }, 200, callBack);
-
-                // this.hide();
-
-                // callBack();
-
-            },//modal关闭的回调，可自定义动画等，在显示完毕必须调用callBack（this: $modal, arguments: callBack）
-
-            showAnimation:function(callBack) {
-
-                this.show( { effect: "clip", duration: "slow", complete: callBack } );
+                this.show( { effect: "clip", duration: "slow", complete: next } );
 
                 // this.show();
 
-                // callBack();
+                // next();
 
 
-            },//dialog显示的回调，可自定义动画等，在显示完毕必须调用callBack（this: $target, arguments: callBack）
+            },//dialog显示的回调，可自定义动画等，在显示完毕必须调用callBack（this: $target, arguments: next）
 
-            hideAnimation:function(callBack) {
+            hideAnimation:function(next) {
 
-                this.hide( { effect: "explode", duration: "slow", complete: callBack } );
+                this.hide( { effect: "explode", duration: "slow", complete: next } );
 
                 // this.hide();
 
-                // callBack();
+                // next();
 
-            },//dialog关闭的回调，可自定义动画等，在显示完毕必须调用callBack（this: $target, arguments: callBack）
+            },//dialog关闭的回调，可自定义动画等，在显示完毕必须调用callBack（this: $target, arguments: next）
 
-            makeModelDialogShow:function( modelShowFn, dialogShowFn ){
+            showCallBack:function(target){
 
-                modelShowFn(dialogShowFn);
 
-            },//调整modal，dialog显示调用顺序（arguments: modelShowFn, dialogShowFn）
-
-            makeModelDialogHide:function( modelHideFn, dialogHideFn ){
-
-                dialogHideFn(modelHideFn);
-
-            },//调整modal，dialog关闭调用顺序（arguments: modelHideFn, dialogHideFn）
-
-            dialogShowCallBack:function(target){
-
-                // this.dialogHide();
 
             },//dialog显示完毕回调（arguments: target）
 
-            dialogHideCallBack:function(clickCallBackName){
+            hideCallBack:function(target, clickCallBackName){
 
-                // this.modalHide();
 
-            },//dialog关闭完成回调，clickCallBackName：okCallBack, cancelCallBack, closeCallBack, quickCloseCallBack。（arguments: clickCallBackName）
 
-            modalDialogHideCallBack:function(clickCallBackName){
-
-                // console.log(this)
-
-            }//dialog和Model关闭完成回调，clickCallBackName：okCallBack, cancelCallBack, closeCallBack, quickCloseCallBack。（arguments: clickCallBackName）
+            },//dialog关闭完成回调，clickCallBackName：okCallBack, cancelCallBack, closeCallBack。（arguments: target, clickCallBackName）
 
         },
 
@@ -312,8 +250,6 @@
             var op = this.options;
 
             this._dialogState = 'close';
-
-            this.$modal = false;
 
             this.firstTime = true;
 
@@ -331,7 +267,7 @@
 
             this._changePosition();
 
-            this._saveOriginalPositionOfWidthAndHeight();
+            // this._saveOriginalPositionOfWidthAndHeight();
 
             this._createDialog();
 
@@ -652,7 +588,7 @@
 
                 close: {
 
-                    click: 'modalDialogHide',
+                    click: 'hide',
 
                     iconClassOn: "leoDialog_close_span"
 
@@ -1009,7 +945,11 @@
 
                 this.$innerIframe.each(function(index, el) {
 
-                    el.contentWindow.location.reload();
+                    try{
+
+                        el.contentWindow.location.reload();
+
+                    }catch(e){}
 
                 });
 
@@ -1555,19 +1495,15 @@
 
         },
 
-        dialogShow:function(){
+        show:function(){
 
-            if( this.options.disabled === false && this._dialogState === 'close' && !this.$modal ){
+            if(this.options.disabled === true){return;}
 
-                this._moveToTop(true);
+            this._moveToTop(true);
 
-                this._createOverlay();
+            this.options.beforeShow( this.$target[0] );
 
-                this.options.beforeShow( this.$target[0] );
-
-                !this.$modal ? this._dialogShow() : this.options.makeModelDialogShow( this._modalShowFn(), this._dialogShowFn() );
-
-            }
+            this._dialogShow();
 
         },
 
@@ -1577,7 +1513,7 @@
 
             this._setResizableDisabled(false);
 
-            this.options.dialogShowCallBack( this.$target[0] );
+            this.options.showCallBack( this.$target[0] );
 
         },
 
@@ -1935,63 +1871,9 @@
 
         },
 
-        modalDialogHide:function(){
-
-            if(this.options.disabled === true){return;}
-
-            !this.$modal ? this._dialogHide() : this.options.makeModelDialogHide( this._modalHideFn(), this._dialogHideFn() );
-
-        },
-
-        _createOverlay:function(){
-
-            var op = this.options, This;
-
-            if( op.modal && !this.$modal ){
-
-                This = this;
-
-                this.$modal = $(op.makeModel( this.$target[0] ));
-
-                this._modalState = 'close';
-
-                !!op.quickClose && this._on( this.$modal, 'click.quickClose', function(event){
-
-                    if( This._modalState === 'open' && This._dialogState === 'open' ){
-
-                        op.quickCloseCallBack( event, this );
-
-                        This.clickCallBackName = 'quickCloseCallBack';
-
-                        This.modalDialogHide();
-
-                        This._off( This.$modal, 'click.quickClose' );
-
-                    }
-
-                } );
-
-            }
-
-        },
-
-        _destroyOverlay:function(){
-
-            if( this.$modal ){
-
-                this.$modal.remove();
-
-                this.$modal = false;
-
-                delete this._modalState;
-
-            }
-
-        },
-
         _dialogHideCallback:function(){
 
-            this.options.dialogHideCallBack( this.clickCallBackName );
+            this.options.hideCallBack(this.$target[0], this.clickCallBackName );
 
         },
 
@@ -2033,27 +1915,9 @@
 
         },
 
-        dialogState:function(){
+        state:function(){
 
             return this._dialogState;
-
-        },
-
-        modalState:function(){
-
-            return this._modalState;
-
-        },
-
-        _modalShowFn:function(){
-
-            var This = this;
-
-            return function(callback){
-
-                This._modalShow(callback);
-
-            };
 
         },
 
@@ -2063,13 +1927,9 @@
 
             if(id === 'all'){
 
-                this._clearDialogTimeout('modalShow');
+                this._clearDialogTimeout('show');
 
-                this._clearDialogTimeout('modalHide');
-
-                this._clearDialogTimeout('dialogShow');
-
-                this._clearDialogTimeout('dialogHide');
+                this._clearDialogTimeout('hide');
 
                 return;
 
@@ -2087,25 +1947,13 @@
 
         _clearDialogTimeout:function(id){
 
-            if(id === 'modalShow' && this._modalShowTimeId){
-
-                clearTimeout(this._modalShowTimeId);
-
-                delete this._modalShowTimeId;
-
-            }else if(id === 'modalHide' && this._modalHideTimeId){
-
-                clearTimeout(this._modalHideTimeId);
-
-                delete this._modalHideTimeId;
-
-            }else if(id === 'dialogShow' && this._dialogShowTimeId){
+            if(id === 'show' && this._dialogShowTimeId){
 
                 clearTimeout(this._dialogShowTimeId);
 
                 delete this._dialogShowTimeId;
 
-            }else if(id === 'dialogHide' && this._dialogHideTimeId){
+            }else if(id === 'hide' && this._dialogHideTimeId){
 
                 clearTimeout(this._dialogHideTimeId);
 
@@ -2115,71 +1963,11 @@
 
         },
 
-        _modalShow:function(callback){
-
-            if( !this.$modal ){ return; }
-
-            this._modalShowTimeId = this._delay(function(){
-
-                delete this._modalShowTimeId;
-
-                if( !this.$modal || this._modalState === 'opening' ){ return; }
-
-                if( this._modalState === 'open' ){
-
-                    !!callback && callback.call(this);
-
-                    return;
-
-                }
-
-                var This = this;
-
-                this._modalState = 'opening';
-
-                this.options.modalShowAnimation.call(this.$modal,
-
-                    function(){
-
-                        This._modalState = 'open';
-
-                        !!callback && callback.call(This);
-
-                    }
-
-                );
-
-            },this.options.modalShowDelay);
-
-        },
-
-        _dialogShowFn:function(){
-
-            var This = this;
-
-            return function(callback){
-
-                This._dialogShow(callback);
-
-            };
-
-        },
-
         _dialogShow:function(callback){
 
             this._dialogShowTimeId = this._delay(function(){
 
                 delete this._dialogShowTimeId;
-
-                if( this._dialogState === 'closeing' ){return;}
-
-                if( this._dialogState === 'open' ){
-
-                    !!callback && callback.call(this);
-
-                    return;
-
-                }
 
                 var This = this,$target = this.$target;
 
@@ -2205,7 +1993,9 @@
 
                 );
 
-            },this.options.showDelay);
+            }, this.options.showDelay);
+
+            this.options.showDelay !== 'none' && (this._dialogState = 'showDelaying');
 
         },
 
@@ -2229,89 +2019,6 @@
 
         },
 
-        _modalDialogHideCallback:function(){
-
-            if( !this.$modal && this._dialogState === 'close' ){
-
-                this.options.modalDialogHideCallBack( this.clickCallBackName );
-
-            }
-
-        },
-
-        _modalHideFn:function(){
-
-            var This = this;
-
-            return function(callback){
-
-                This._modalHide(callback);
-
-            };
-
-        },
-
-        destroyOverlay:function(){
-
-            this._destroyOverlay();
-
-            this._modalDialogHideCallback.call(this);
-
-        },
-
-        _modalHide:function(callback){
-
-            if( !this.$modal ){ return; }
-
-            this._modalHideTimeId = this._delay(function(){
-
-                delete this._modalHideTimeId;
-
-                if( !this.$modal || this._modalState === 'closeing' ){ return; }
-
-                if( this._modalState === 'close' ){
-
-                    this._destroyOverlay();
-
-                    !!callback && callback.call(this);
-
-                    this._modalDialogHideCallback.call(this);
-
-                    return;
-
-                }
-
-                var This = this;
-
-                this._modalState = 'closeing';
-
-                this.options.modalHideAnimation.call( this.$modal,
-
-                    function(){
-
-                        This._modalState = 'close';
-
-                        This._destroyOverlay();
-
-                        !!callback && callback.call(This);
-
-                        This._modalDialogHideCallback.call(This);
-
-                    }
-
-                );
-
-            }, this.options.modalHideDelay );
-
-        },
-
-        modalHide:function(){
-
-            if(this.options.disabled === true){return;}
-
-            this._modalHide();
-
-        },
 
         _focusDialog:function(){
 
@@ -2330,16 +2037,6 @@
             this._dialogHideTimeId = this._delay( function(){
 
                 delete this._dialogHideTimeId;
-
-                if( this._dialogState === 'closeing' ){return;}
-
-                if( this._dialogState === 'close' ){
-
-                    !!callback && callback.call(this);
-
-                    return;
-
-                }
 
                 var This = this,$target = this.$target;
 
@@ -2361,33 +2058,23 @@
 
                         This._dialogHideCallback.call(This);
 
-                        This._modalDialogHideCallback.call(This);
-
                     }
 
                 );
 
-            }, this.options.hideDelay );
+            }, this.options.hideDelay);
+
+            this.options.hideDelay !== 'none' && (this._dialogState = 'hideDelaying');
 
         },
 
-        dialogHide:function(){
+        hide:function(){
 
             if(this.options.disabled === true){return;}
 
+            this.options.beforeHide( this.$target[0] );
+
             this._dialogHide();
-
-        },
-
-        _dialogHideFn:function(){
-
-            var This = this;
-
-            return function(callback){
-
-                This._dialogHide(callback);
-
-            };
 
         },
 
@@ -2413,9 +2100,9 @@
 
             this._destoryDisabledDiv();
 
-            this._destroyOverlay();
-
             this._deletDialogs( this.scope );
+
+            this.options.destroyCallBack(this.$target[0]);
 
         }
 
@@ -2437,13 +2124,13 @@
 
                 i = dialogs.length,el,target = this.$target[0];
 
-                 while( i-- ){
+                while( i-- ){
 
                     dialog = dialogs[i];
 
                     el = dialog.$target[0];
 
-                    target !== el && (dialog._dialogState === 'open' || dialog._dialogState === 'opening') && arr.push(el);
+                    target !== el && (dialog._dialogState != 'close') && arr.push(el);
 
                 }
 

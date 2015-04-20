@@ -759,6 +759,14 @@
 
                     }
 
+                    if(delay === 'none'){
+
+                        handlerProxy();
+
+                        return;
+
+                    }
+
                     return setTimeout(handlerProxy, delay || 0);
 
                 },

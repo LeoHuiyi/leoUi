@@ -1,6 +1,6 @@
 leoUiLoad.config({
 
-    debug: true,
+    debug: false,
 
     baseUrl: 'leoUi/',
 
@@ -12,7 +12,9 @@ leoUiLoad.config({
 
         leoUiGrid: '../../css/leoUi-grid.css',
 
-        jqueryMousewheel: '../jquery/jquery-mousewheel'
+        jqueryMousewheel: '../jquery/jquery-mousewheel',
+
+        template: '../jquery/template'
 
     },
 
@@ -30,7 +32,7 @@ leoUiLoad.config({
 
 })
 
-leoUiLoad.require('leoUi-grid,leoUi,leoUiGrid,ready', function($) {
+leoUiLoad.require('leoUi-grid-2.0,leoUi,leoUiGrid,ready', function($) {
 
     var tableModel = [{
 
@@ -40,7 +42,15 @@ leoUiLoad.require('leoUi-grid,leoUi,leoUiGrid,ready', function($) {
 
             align: "center",
 
-            checkBoxId: 'isCheck'
+            id: 'isCheck',
+
+            isCheck: true,
+
+            thStyle:'background-color:#fff',
+
+            thClass:'leo aaaa',
+
+            fixed: true,
 
         }, {
 
@@ -58,13 +68,17 @@ leoUiLoad.require('leoUi-grid,leoUi,leoUiGrid,ready', function($) {
 
             resize: true,
 
-            fixed: true,
+            thStyle:'background-color:#fff',
+
+            thClass:'leo aaaa',
 
             edit: {
 
                 type: 'text'
 
-            }
+            },
+
+            thTemplate:'<div style="color:red">{{theadName}}</div>'
 
         }, {
 
@@ -81,8 +95,6 @@ leoUiLoad.require('leoUi-grid,leoUi,leoUiGrid,ready', function($) {
             sortableType: 'string',
 
             resize: true,
-
-            fixed: true,
 
             edit: {
 
@@ -106,8 +118,6 @@ leoUiLoad.require('leoUi-grid,leoUi,leoUiGrid,ready', function($) {
 
             resize: true,
 
-            fixed: true,
-
             edit: {
 
                 type: 'text'
@@ -129,8 +139,6 @@ leoUiLoad.require('leoUi-grid,leoUi,leoUiGrid,ready', function($) {
             sortableType: 'string',
 
             resize: true,
-
-            fixed: true,
 
             edit: {
 
@@ -154,8 +162,6 @@ leoUiLoad.require('leoUi-grid,leoUi,leoUiGrid,ready', function($) {
 
             resize: true,
 
-            fixed: true,
-
             edit: {
 
                 type: 'text'
@@ -178,8 +184,6 @@ leoUiLoad.require('leoUi-grid,leoUi,leoUiGrid,ready', function($) {
 
             resize: true,
 
-            fixed: true,
-
             edit: {
 
                 type: 'text'
@@ -201,8 +205,6 @@ leoUiLoad.require('leoUi-grid,leoUi,leoUiGrid,ready', function($) {
             sortableType: 'string',
 
             resize: true,
-
-            fixed: true,
 
             edit: {
 
@@ -249,8 +251,6 @@ leoUiLoad.require('leoUi-grid,leoUi,leoUiGrid,ready', function($) {
             sortableType: 'string',
 
             resize: true,
-
-            fixed: true,
 
             edit: {
 
@@ -389,6 +389,8 @@ leoUiLoad.require('leoUi-grid,leoUi,leoUiGrid,ready', function($) {
 
         rowNum: 2,
 
+        rowList: [2,30,50],
+
         resizeHeight: true,
 
         width: function($grid) {
@@ -425,7 +427,7 @@ leoUiLoad.require('leoUi-grid,leoUi,leoUiGrid,ready', function($) {
 
                 //   $grid.leoGrid( 'getEditRowInfo', td.parentNode, function(data){
 
-                //      data.teams.push({
+                //   	data.teams.push({
 
                 //     id: 'cid',
 
@@ -437,9 +439,9 @@ leoUiLoad.require('leoUi-grid,leoUi,leoUiGrid,ready', function($) {
 
                 //       var edit = PU.edit( { text: '修改客户联系信息' }, data, {
 
-                //          'height': 400,
+                //       	'height': 400,
 
-                //          'width': 700,
+                //       	'width': 700,
 
                 //           'beforeShow': function(target){
 

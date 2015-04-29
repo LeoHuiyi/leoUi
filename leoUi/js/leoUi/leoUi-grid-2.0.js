@@ -175,11 +175,13 @@
 
             clickTdCallback:$.noop,//点击bodyTableTD回调
 
+            scrollWidth:18,
+
             gridTemplate:'<div id="{{leoUi_grid}}" class="leoUi-jqgrid leoUi-widget leoUi-widget-content leoUi-corner-all"><div id="{{lui_grid}}" class="leoUi-widget-overlay jqgrid-overlay"></div><div id="{{load_grid}}" class="loading leoUi-state-default leoUi-state-active">读取中...</div><div class="leoUi-jqgrid-view" id="{{gview_grid}}"><div class="leoUi-state-default leoUi-jqgrid-hdiv"><div class="leoUi-jqgrid-hbox"></div></div><div class="leoUi-jqgrid-bdiv"><div class="leoUi-jqgrid-hbox-inner" style="position:relative;"></div></div></div><div id="{{rs_mgrid}}" class="leoUi-jqgrid-resize-mark" ></div></div>',
 
             gridHeadTemplate:'<table class="leoUi-jqgrid-htable" cellspacing="0" cellpadding="0" border="0"><thead><tr class="leoUi-jqgrid-labels"></tr></thead></table>',
 
-            gridHeadThTemplate:'{{each tableModels as value index}}<th id = "{{value.thId}}" class="leoUi-state-default leoUi-th-column leoUi-th-ltr {{if value.thClass}}{{value.thClass}}{{/if}}" {{if value.thStyle}}style="{{value.thStyle}}"{{/if}}>{{if value.resize}}<span class="leoUi-jqgrid-resize leoUi-jqgrid-resize-ltr">&nbsp;</span>{{/if}}{{if value.sortable}}<div class="leoUi-jqgrid-sortable">{{else}}<div>{{/if}}{{if value.checkBoxId}}<input type="checkbox" id="{{value.checkBoxId}}"{{if value.isCheck}}checked{{/if}}>{{/if}}{{if value.thTemplate}}{{#value.thTemplate | getHtml:value}}{{else}}{{value.theadName}}{{/if}}{{if value.sortable}}<span class="leoUi-sort-ndb leoUi-sort"><span class="leoUi-sort-top"></span><span class="leoUi-sort-bottom"></span></span>{{/if}}</div></th>{{/each}}',
+            gridHeadThTemplate:'{{each tableModels as value index}}<th id = "{{value.thId}}" class="leoUi-state-default leoUi-th-column leoUi-th-ltr {{if value.thClass}}{{value.thClass}}{{/if}}" style="{{if value.thStyle}}{{value.thStyle}};{{/if}} {{if value.width}}width:{{value.width}}{{/if}}">{{if value.resize}}<span class="leoUi-jqgrid-resize leoUi-jqgrid-resize-ltr">&nbsp;</span>{{/if}}{{if value.sortable}}<div class="leoUi-jqgrid-sortable">{{else}}<div>{{/if}}{{if value.checkBoxId}}<input type="checkbox" id="{{value.checkBoxId}}"{{if value.isCheck}}checked{{/if}}>{{/if}}{{if value.thTemplate}}{{#value.thTemplate | getHtml:value}}{{else}}{{value.theadName}}{{/if}}{{if value.sortable}}<span class="leoUi-sort-ndb leoUi-sort"><span class="leoUi-sort-top"></span><span class="leoUi-sort-bottom"></span></span>{{/if}}</div></th>{{/each}}',
 
             gridBodyTemplate:'<table class="leoUi-jqgrid-btable" cellspacing="0" cellpadding="0" border="0"></table>'
 
@@ -201,9 +203,13 @@
 
             this.tableSize = {
 
-                changeWidth:0,
+                width:0,
 
-                changeCell:[]
+                fixedOuterWidth:0,
+
+                changeCellLen:0,
+
+                cellSize:[]
 
             };
 
@@ -225,12 +231,21 @@
 
         _createGridBox:function(){
 
-            this.$gridBox = $(this._renderGrid()).appendTo(this.$target);
+            this.$gridBox = $(this._renderGrid());
 
-            this.$uiJqgridHdiv = this.$gridBox.find('div.leoUi-jqgrid-hdiv').html(this._renderGridHead());
+            this.$gridHeadDiv = this.$gridBox.find('div.leoUi-jqgrid-hdiv').html(this._renderGridHead());
 
-            this.$uiJqgridBdiv = this.$gridBox.find('div.leoUi-jqgrid-bdiv').html(this._renderGridBody());
+            this.$gridBodyDiv = this.$gridBox.find('div.leoUi-jqgrid-bdiv').html(this._renderGridBody());
 
+            this._getChangeCellPercent();
+
+            this.$gridBox.appendTo(this.$target);
+
+            this._setTableWidth();
+
+            this._setTableHeight();
+
+            this._addEvent();
 
         },
 
@@ -238,7 +253,7 @@
 
             this.gridHeadCompile = this.gridHeadCompile || this.template.compile(this.options.gridHeadTemplate);
 
-            return $(this.gridHeadCompile(this.tableOption)).find('tr').html(this._renderGridHeadTh()).end();
+            return this.$gridHeadTable = $(this.gridHeadCompile(this.tableOption)).find('tr').html(this._renderGridHeadTh()).end();
 
         },
 
@@ -246,7 +261,7 @@
 
             this.gridBodyCompile = this.gridBodyCompile || this.template.compile(this.options.gridBodyTemplate);
 
-            return this.gridBodyCompile(this.tableOption);
+            return this.$gridBodyTable = $(this.gridBodyCompile(this.tableOption));
 
         },
 
@@ -280,15 +295,35 @@
 
         _getTableModel:function(opModel, i){
 
-            var model = $.extend({}, opModel, {
+            var model = $.extend({}, this.options.tableModelDefault, opModel, {
 
                 thId:this.leoGrid + ( opModel.id || opModel.boxType ),
 
                 serialNumber:i + 1
 
-            });
+            }), cellOuterWidth = model.width + model.cellLayout,
+
+            tableSize = this.tableSize;
 
             opModel.boxType === "checkBox" && ( model.checkBoxId = model.thId + '_input' );
+
+            if(model.fixed){
+
+                tableSize.fixedOuterWidth += cellOuterWidth;
+
+                tableSize.cellSize.push({id: model.thId, minWidth: model.minWidth, cellOuterWidth: cellOuterWidth, fixed: true, cellLayout: model.cellLayout});
+
+            }else{
+
+                tableSize.changeCellLen += 1;
+
+                tableSize.cellSize.push({id: model.thId, minWidth: model.minWidth, cellOuterWidth: cellOuterWidth, fixed: false, cellLayout: model.cellLayout});
+
+            }
+
+            tableSize.width += cellOuterWidth;
+
+            model.width && $.isNumeric(model.width) && (model.width = opModel.width + 'px');
 
             return model;
 
@@ -319,6 +354,172 @@
                 rs_mgrid: leoGrid + 'rs_mgrid',
 
             }
+
+        },
+
+        _getChangeCellPercent:function(){
+
+            if(this.tableSize.changeCellLen === 0)return;
+
+            var tableSize = this.tableSize, cellSizeObj,
+
+            cellSize = tableSize.cellSize;
+
+            i = cellSize.length, changeWidth = tableSize.width - tableSize.fixedOuterWidth;
+
+            while(i--){
+
+                cellSizeObj = cellSize[i];
+
+                !cellSizeObj.fixed && (cellSizeObj.changePercent = cellSizeObj.cellOuterWidth / changeWidth);
+
+            }
+
+        },
+
+        _setTableWidth:function(){
+
+            var tableWidth = this.options.width;
+
+            if(tableWidth === false){return;}
+
+            $.isFunction( tableWidth ) === true && ( tableWidth = tableWidth(this.$target));
+
+            tableWidth = tableWidth + '';
+
+            if(tableWidth.indexOf('%') === -1){
+
+                this.tableSize.width = this.$gridBox.setOuterWidth(tableWidth).width();
+
+            }else{
+
+                this.tableSize.width = this.$gridBox.width(tableWidth).width();
+
+            }
+
+            this._resizeCountWidth();
+
+        },
+
+        _setTableHeight:function(){
+
+            var tableHeight = this.options.height;
+
+            if(tableHeight === false){return;}
+
+            $.isFunction(tableHeight) === true && (tableHeight = tableHeight());
+
+            tableHeight = tableHeight + '';
+
+            if(tableHeight.indexOf('%') === -1){
+
+                this.$gridBodyDiv.height(this.$gridBox.setOuterHeight(num).height() - this._getHdivAndPagerHeight());
+
+            }else{
+
+                this.$gridBodyDiv.height(this.$gridBox.height(tableHeight).height() - this._getHdivAndPagerHeight());
+
+            }
+
+        },
+
+        _getHdivAndPagerHeight:function(){
+
+            return this.$gridHeadDiv.outerHeight() + (this.$footer && this.$footer.outerHeight() || 0);
+
+        },
+
+        _resizeCountWidth:function(){
+
+            if(this.tableSize.changeCellLen === 0)return;
+
+            var tableSize = this.tableSize,
+
+            cellSize = tableSize.cellSize,
+
+            i = cellSize.length, cellSizeObj,
+
+            changeCellLen = tableSize.changeCellLen,
+
+            oldCellOuterWidth = 0, cellOuterWidth = 0,
+
+            $gridBodyResizeRow = this.$gridBodyTable.find('tr.jqgfirstrow'),
+
+            $gridHeadResizeRow = this.$gridHeadResizeRow || this.$gridHeadTable.find('tr.leoUi-jqgrid-labels'),
+
+            tableWidth = tableSize.width,
+
+            changeWidth = tableWidth - tableSize.fixedOuterWidth;
+
+            while(i--){
+
+                cellSizeObj = cellSize[i];
+
+                if(cellSizeObj.fixed === false){
+
+                    if(changeCellLen === 1){
+
+                        cellOuterWidth = changeWidth - oldCellOuterWidth;
+
+                        cellSizeObj.minWidth > (cellOuterWidth - cellSizeObj.cellLayout) && (cellOuterWidth = cellSizeObj.minWidth + cellSizeObj.cellLayout, tableWidth += child.minWidth - width);
+
+                        cellSizeObj.cellOuterWidth = cellOuterWidth;
+
+                        $gridHeadResizeRow.children('#' + cellSizeObj.id ).setOuterWidth(cellOuterWidth);
+
+                        // $gridBodyResizeRow.children('td[firstid="'+ cellSizeObj.id +'"]').setOuterWidth(cellOuterWidth);
+
+                    }else{
+
+                        oldCellOuterWidth += cellOuterWidth =  Math.round( cellSizeObj.changePercent * changeWidth );
+
+                        cellSizeObj.minWidth > (tableWidth += child.minWidth - cellOuterWidth, cellOuterWidth - cellSizeObj.cellLayout) && (cellOuterWidth = cellSizeObj.minWidth + cellSizeObj.cellLayout);
+
+                        cellSizeObj.cellOuterWidth = cellOuterWidth;
+
+                        $gridHeadResizeRow.children('#' + cellSizeObj.id ).setOuterWidth(cellOuterWidth);
+
+                        // $gridBodyResizeRow.children('td[firstid="'+ cellSizeObj.id +'"]').setOuterWidth(cellOuterWidth);
+
+                    }
+
+                    changeCellLen --;
+
+                }else{
+
+                    $gridHeadResizeRow.children('#' + cellSizeObj.id ).setOuterWidth(cellSizeObj.cellOuterWidth);
+
+                        // $gridBodyResizeRow.children('td[firstid="'+ cellSizeObj.id +'"]').setOuterWidth(cellSizeObj.cellOuterWidth);
+
+                }
+
+            }
+
+            // this.$gridBodyTable.width(tableSize.width);
+
+            // this.$gridHeadTable.width(tableSize.width);
+
+        },
+
+        _addEvent:function(){
+
+            var time,This = this;
+
+            this._on(this.window, 'resize', function(event){
+
+                event.preventDefault();
+
+                !!time && clearTimeout(time);
+
+                time = setTimeout( function(){
+
+                    This._setTableHeight();
+
+                    This._setTableWidth();
+
+                }, 16);
+
+            } );
 
         }
 

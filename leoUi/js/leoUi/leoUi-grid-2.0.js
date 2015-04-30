@@ -461,7 +461,7 @@
 
                         cellOuterWidth = changeWidth - oldCellOuterWidth;
 
-                        cellSizeObj.minWidth > (cellOuterWidth - cellSizeObj.cellLayout) && (cellOuterWidth = cellSizeObj.minWidth + cellSizeObj.cellLayout, tableWidth += child.minWidth - width);
+                        cellSizeObj.minWidth > (cellOuterWidth - cellSizeObj.cellLayout) && (tableWidth += cellSizeObj.minWidth - cellOuterWidth + cellSizeObj.cellLayout, cellOuterWidth = cellSizeObj.minWidth + cellSizeObj.cellLayout);
 
                         cellSizeObj.cellOuterWidth = cellOuterWidth;
 
@@ -473,7 +473,7 @@
 
                         oldCellOuterWidth += cellOuterWidth =  Math.round( cellSizeObj.changePercent * changeWidth );
 
-                        cellSizeObj.minWidth > (tableWidth += child.minWidth - cellOuterWidth, cellOuterWidth - cellSizeObj.cellLayout) && (cellOuterWidth = cellSizeObj.minWidth + cellSizeObj.cellLayout);
+                        cellSizeObj.minWidth > (cellOuterWidth - cellSizeObj.cellLayout) && (tableWidth += cellSizeObj.minWidth - cellOuterWidth + cellSizeObj.cellLayout, cellOuterWidth = cellSizeObj.minWidth + cellSizeObj.cellLayout);
 
                         cellSizeObj.cellOuterWidth = cellOuterWidth;
 
@@ -495,9 +495,11 @@
 
             }
 
-            // this.$gridBodyTable.width(tableSize.width);
+            // this.$gridBodyTable.width(tableWidth);
 
-            // this.$gridHeadTable.width(tableSize.width);
+            this.$gridHeadTable.width(tableWidth);
+
+            tableSize.width = tableWidth;
 
         },
 

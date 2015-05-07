@@ -183,7 +183,11 @@
 
             gridHeadThTemplate:'{{each tableModels as value index}}<th id = "{{value.thId}}" class="leoUi-state-default leoUi-th-column leoUi-th-ltr {{if value.thClass}}{{value.thClass}}{{/if}}" style="{{if value.thStyle}}{{value.thStyle}};{{/if}} {{if value.width}}width:{{value.width}}{{/if}}">{{if value.resize}}<span class="leoUi-jqgrid-resize leoUi-jqgrid-resize-ltr">&nbsp;</span>{{/if}}{{if value.sortable}}<div class="leoUi-jqgrid-sortable">{{else}}<div>{{/if}}{{if value.checkBoxId}}<input type="checkbox" id="{{value.checkBoxId}}"{{if value.isCheck}}checked{{/if}}>{{/if}}{{if value.thTemplate}}{{#value.thTemplate | getHtml:value}}{{else}}{{value.theadName}}{{/if}}{{if value.sortable}}<span class="leoUi-sort-ndb leoUi-sort"><span class="leoUi-sort-top"></span><span class="leoUi-sort-bottom"></span></span>{{/if}}</div></th>{{/each}}',
 
-            gridBodyTemplate:'<table class="leoUi-jqgrid-btable" cellspacing="0" cellpadding="0" border="0"></table>'
+            gridBodyTemplate:'<table class="leoUi-jqgrid-btable" cellspacing="0" cellpadding="0" border="0"><tbody></tbody></table>',
+
+            gridBodySizeRowTemplate:'<tr class="{{sizeRowid}}" style="height:0">{{each tableModels as value index}}<td id="{{value.thId + sizeRowTdIdPostfix}}" style="height:0;width:0"></td>{{/each}}</tr>',
+
+            gridBodyTdTemplate:''
 
         },
 
@@ -204,6 +208,8 @@
             this.tableSize = {
 
                 width:0,
+
+                isScroll:false,
 
                 fixedOuterWidth:0,
 
@@ -245,6 +251,10 @@
 
             this._setTableHeight();
 
+            this._resizeCountWidth();
+
+            console.log(this._pager());
+
             this._addEvent();
 
         },
@@ -260,6 +270,8 @@
         _renderGridBody:function(){
 
             this.gridBodyCompile = this.gridBodyCompile || this.template.compile(this.options.gridBodyTemplate);
+
+            console.log(this._renderBodySizeTr());
 
             return this.$gridBodyTable = $(this.gridBodyCompile(this.tableOption));
 
@@ -287,19 +299,17 @@
 
             for (; i < opTableModelsLen; i++) {
 
-                tableModels.push(this._getTableModel(opTableModels[i], i));
+                tableModels.push(this._getTableModel(opTableModels[i]));
 
             };
 
         },
 
-        _getTableModel:function(opModel, i){
+        _getTableModel:function(opModel){
 
             var model = $.extend({}, this.options.tableModelDefault, opModel, {
 
-                thId:this.leoGrid + ( opModel.id || opModel.boxType ),
-
-                serialNumber:i + 1
+                thId:this.leoGrid + ( opModel.id || opModel.boxType )
 
             }), cellOuterWidth = model.width + model.cellLayout,
 
@@ -337,6 +347,12 @@
 
         },
 
+        _renderBodySizeTr:function(){
+
+            return this.gridBodySizeTrHtml = this.gridBodySizeTrHtml || this.template.compile(this.options.gridBodySizeRowTemplate)({sizeRowid: this.gridIds.sizeRowid, sizeRowTdIdPostfix: this.gridIds.sizeRowTdIdPostfix, tableModels: this.tableOption.tableModels});
+
+        },
+
         _getGridIds:function(){
 
             var  leoGrid = this.leoGrid;
@@ -352,6 +368,10 @@
                 gview_grid: leoGrid + 'gview_grid',
 
                 rs_mgrid: leoGrid + 'rs_mgrid',
+
+                sizeRowid: leoGrid + 'sizeRowid',
+
+                sizeRowTdIdPostfix: "_sizeRowTd"
 
             }
 
@@ -397,7 +417,25 @@
 
             }
 
-            this._resizeCountWidth();
+        },
+
+        _isScrollChange:function(){
+
+            if(this.tableSize.changeCellLen === 0)return;
+
+            var isScroll = this.$gridBodyDiv.height() < this.$bodyTable.outerHeight();
+
+            if(this.tableSize.isScroll === isScroll){
+
+                return false;
+
+            }else{
+
+                this.tableSize.isScroll = isScroll;
+
+                return true;
+
+            }
 
         },
 
@@ -513,15 +551,199 @@
 
                 !!time && clearTimeout(time);
 
-                time = setTimeout( function(){
+                time = setTimeout(function(){
 
                     This._setTableHeight();
 
                     This._setTableWidth();
 
+                    This._resizeCountWidth();
+
                 }, 16);
 
             } );
+
+        },
+
+        _pager:function(option){
+
+            return new function(option){
+
+                this.option = $.extend({
+
+                    pageNum:20,//每一页条数
+
+                    currentPage:1,
+
+                    totalItems:100,
+
+                    localdata:''
+
+                }, option);
+
+                this.isLocal = !!this.option.localdata;
+
+                this.getPager = function(){
+
+
+
+
+                };
+
+                this._getPagerInfo = function( page, perPages, totalItems ){
+
+                    var op = this.options,index,currentPage,
+
+                    last,totalpages,oldCurrentPage,isChange,
+
+                    isAjax = this.options.dataType === 'ajax';
+
+                    totalItems = $.isNumeric(+totalItems) ? +totalItems : this.totalItems >> 0;
+
+                    this.perPages = perPages = perPages >> 0 || this.perPages >> 0 || op.rowNum >> 0;
+
+                    totalpages = Math.ceil( totalItems/perPages );
+
+                    totalpages < 1 && ( totalpages = 1 );
+
+                    oldCurrentPage = currentPage = this.currentPage || + op.currentPage;
+
+                    switch(page){
+
+                        case 'now':
+
+                            break;
+
+                        case 'first_page':
+
+                            currentPage = 0;
+
+                            break;
+
+                        case 'prev_page':
+
+                            currentPage -= 1;
+
+                            break;
+
+                        case 'next_page':
+
+                            currentPage += 1;
+
+                            break;
+
+                        case 'last_page':
+
+                            currentPage = totalpages;
+
+                            break;
+
+                        default:
+
+                            if($.isNumeric(+page)){
+
+                                currentPage = +page;
+
+                            }
+
+                    }
+
+                    ;(isAjax || currentPage === oldCurrentPage) && (isChange = true);
+
+                    if( currentPage < 1 ){
+
+                        currentPage = 1;
+
+                    }else if( currentPage > totalpages ){
+
+                        currentPage = totalpages;
+
+                    }
+
+                    page !== 'now' && (this.currentPage =  currentPage);
+
+                    index = perPages * ( currentPage - 1 );
+
+                    index < 0 && ( index = 0 );
+
+                    last = index + perPages - 1;
+
+                    last + 1 > totalItems && ( last = totalItems - 1 );
+
+                    return{
+
+                        isChange: !isChange ? oldCurrentPage !== currentPage : isChange,
+
+                        totalItems: totalItems,
+
+                        perPages: perPages,
+
+                        length: last + 1 - index,
+
+                        currentPage: this.currentPage,
+
+                        totalpages: totalpages,
+
+                        isFristPage: isAjax ? false : this.currentPage <= 1,
+
+                        isLastPage: isAjax ? false : this.currentPage >= totalpages,
+
+                        fristItems: index,
+
+                        lastItems: last
+
+                    };
+
+                };
+
+            }();
+
+        },
+
+        _store:function(option){
+
+            var  leoGrid = this.leoGrid;
+
+            function Store(option){
+
+                this.option = $.extend({
+
+                    url:'',
+
+                    localdata:'',
+
+
+
+                }, option);
+
+                this._init();
+
+            }
+
+            $.extend(Store.prototype, {
+
+                _init:function(){
+
+                    
+
+
+                },
+
+                _getData:function(){
+
+                    this.option
+
+
+
+                }
+
+
+
+
+
+
+            })
+
 
         }
 

@@ -253,9 +253,32 @@
 
             this._resizeCountWidth();
 
-            console.log(this._pager());
+            this._storeInit();
 
             this._addEvent();
+
+        },
+
+        _storeInit:function(){
+
+            this.store = this._store({
+
+                localData: this.options.gridData,
+
+                getCollection:function(data){
+
+                    console.log(data)
+
+                }
+
+            }).triggerGetCollection();
+
+        },
+
+        _renderGridBodyTd:function(){
+
+            
+
 
         },
 
@@ -271,7 +294,7 @@
 
             this.gridBodyCompile = this.gridBodyCompile || this.template.compile(this.options.gridBodyTemplate);
 
-            console.log(this._renderBodySizeTr());
+            this._renderBodySizeTr();
 
             return this.$gridBodyTable = $(this.gridBodyCompile(this.tableOption));
 
@@ -349,7 +372,7 @@
 
         _renderBodySizeTr:function(){
 
-            return this.gridBodySizeTrHtml = this.gridBodySizeTrHtml || this.template.compile(this.options.gridBodySizeRowTemplate)({sizeRowid: this.gridIds.sizeRowid, sizeRowTdIdPostfix: this.gridIds.sizeRowTdIdPostfix, tableModels: this.tableOption.tableModels});
+            this.gridBodySizeTrHtml = this.gridBodySizeTrHtml || this.template.compile(this.options.gridBodySizeRowTemplate)({sizeRowid: this.gridIds.sizeRowid, sizeRowTdIdPostfix: this.gridIds.sizeRowTdIdPostfix, tableModels: this.tableOption.tableModels});
 
         },
 
@@ -565,184 +588,169 @@
 
         },
 
-        _pager:function(option){
+        _store:function(option){
 
             return new function(option){
 
-                this.option = $.extend({
+                option = $.extend({
+
+                    isPage:true,
 
                     pageNum:20,//每一页条数
 
                     currentPage:1,
 
-                    totalItems:100,
+                    localData:[],
 
-                    localdata:''
+                    ajax:{
 
-                }, option);
+                        url:'leoui.com',
 
-                this.isLocal = !!this.option.localdata;
+                        type: "GET"
 
-                this.getPager = function(){
+                    },
 
+                    ajaxParam:function(ajax, currentPage){},
 
+                    beforeAjax:function(){},
 
+                    afterAjax:function(){},
 
-                };
+                    getAjaxData:function(data){
 
-                this._getPagerInfo = function( page, perPages, totalItems ){
+                        return data;
 
-                    var op = this.options,index,currentPage,
+                    },
 
-                    last,totalpages,oldCurrentPage,isChange,
+                    getCollection:function(data){}
 
-                    isAjax = this.options.dataType === 'ajax';
+                }, option), obj = {};
 
-                    totalItems = $.isNumeric(+totalItems) ? +totalItems : this.totalItems >> 0;
+                function init(option){
 
-                    this.perPages = perPages = perPages >> 0 || this.perPages >> 0 || op.rowNum >> 0;
+                    obj.currentPage = option.currentPage;
 
-                    totalpages = Math.ceil( totalItems/perPages );
-
-                    totalpages < 1 && ( totalpages = 1 );
-
-                    oldCurrentPage = currentPage = this.currentPage || + op.currentPage;
-
-                    switch(page){
-
-                        case 'now':
-
-                            break;
-
-                        case 'first_page':
-
-                            currentPage = 0;
-
-                            break;
-
-                        case 'prev_page':
-
-                            currentPage -= 1;
-
-                            break;
-
-                        case 'next_page':
-
-                            currentPage += 1;
-
-                            break;
-
-                        case 'last_page':
-
-                            currentPage = totalpages;
-
-                            break;
-
-                        default:
-
-                            if($.isNumeric(+page)){
-
-                                currentPage = +page;
-
-                            }
-
-                    }
-
-                    ;(isAjax || currentPage === oldCurrentPage) && (isChange = true);
-
-                    if( currentPage < 1 ){
-
-                        currentPage = 1;
-
-                    }else if( currentPage > totalpages ){
-
-                        currentPage = totalpages;
-
-                    }
-
-                    page !== 'now' && (this.currentPage =  currentPage);
-
-                    index = perPages * ( currentPage - 1 );
-
-                    index < 0 && ( index = 0 );
-
-                    last = index + perPages - 1;
-
-                    last + 1 > totalItems && ( last = totalItems - 1 );
-
-                    return{
-
-                        isChange: !isChange ? oldCurrentPage !== currentPage : isChange,
-
-                        totalItems: totalItems,
-
-                        perPages: perPages,
-
-                        length: last + 1 - index,
-
-                        currentPage: this.currentPage,
-
-                        totalpages: totalpages,
-
-                        isFristPage: isAjax ? false : this.currentPage <= 1,
-
-                        isLastPage: isAjax ? false : this.currentPage >= totalpages,
-
-                        fristItems: index,
-
-                        lastItems: last
-
-                    };
+                    option.localData && (obj.localCollection = setCollection(option));
 
                 };
 
-            }();
+                function getData(option, page){
 
-        },
+                    page = page || obj.currentPage;
 
-        _store:function(option){
+                    if(option.localData){
 
-            var  leoGrid = this.leoGrid;
+                        if(option.isPage){
 
-            function Store(option){
+                            option.getCollection(getLocalPagerInfo(option, page || obj.currentPage, obj.localCollection));
 
-                this.option = $.extend({
+                            obj.currentPage = page;
 
-                    url:'',
+                        }else{
 
-                    localdata:'',
+                            option.getCollection(obj.localCollection);
 
+                        }
 
+                    }else{
 
-                }, option);
+                        $.ajax(beforeAjax(option, page)).done(function(data){
 
-                this._init();
+                            option.getCollection(setCollection(option, option.getAjaxData(data)));
 
-            }
+                        }).fail(function(data){
 
-            $.extend(Store.prototype, {
+                            option.getCollection(data);
 
-                _init:function(){
+                        }).always(function(){
 
-                    
+                            afterAjax(option);
 
+                        });
 
-                },
+                    }
 
-                _getData:function(){
+                };
 
-                    this.option
+                function beforeAjax(option, currentPage){
 
+                    var ajax = $.extend({}, ajaxParam),
 
+                    ajaxParam = option.ajaxParam(ajax, currentPage);
+
+                    !ajaxParam && (ajaxParam = ajax);
+
+                    option.beforeAjax();
+
+                    return ajaxParam;
 
                 }
 
+                function afterAjax(option){
 
+                    option.afterAjax();
 
+                }
 
+                function setCollection(option, data){
 
+                    var i = 0, collection = [], len;
 
-            })
+                    data = data || option.localData;
+
+                    len = data.length;
+
+                    for(; i < len; i++){
+
+                        collection.push({
+
+                            index:i,
+
+                            data:data[i]
+
+                        });
+
+                    }
+
+                    return collection;
+
+                };
+
+                function getLocalPagerInfo(option, page, collection){
+
+                    var totalItems = collection.length,
+
+                    pageNum = option.pageNum, fristItem, fristItems,
+
+                    totalpages = Math.ceil(totalItems/pageNum);
+
+                    if(page >= 1 && page <= totalpages){
+
+                        fristItem = pageNum*(page - 1);
+
+                        lastItem = fristItem + pageNum;
+
+                        return collection.slice(fristItem, lastItem);
+
+                    }else{
+
+                        return [];
+
+                    }
+
+                };
+
+                this.triggerGetCollection = function(page){
+
+                    getData(option, page);
+
+                    return this;
+
+                }
+
+                init(option);
+
+            }(option);
 
 
         }

@@ -50,7 +50,7 @@ leoUiLoad.require('leoUi-grid-2.0,leoUi,leoUiGrid,ready', function($) {
 
             thClass:'leo aaaa',
 
-            fixed: true,
+            fixed: true
 
         }, {
 
@@ -403,169 +403,9 @@ leoUiLoad.require('leoUi-grid-2.0,leoUi,leoUiGrid,ready', function($) {
 
         resizeWidth: true,
 
-        afterGetData: function(data) {
-
-            data[0].isCheck = true
-
-            return data;
-        },
-
         clickTdCallback: function(event, td, table) {
 
-            var $target = $(event.target),
-                tr = td.parentNode;
 
-            if ($target.is('a.dataDelBtn')) {
-
-                event.stopPropagation();
-
-                $grid.leoGrid('removeRow', tr);
-
-            } else if ($target.is('a.teamEditBtn')) {
-
-                event.stopPropagation();
-
-                //   $grid.leoGrid( 'getEditRowInfo', td.parentNode, function(data){
-
-                //   	data.teams.push({
-
-                //     id: 'cid',
-
-                //     edit:{ 'type': 'hidden' },
-
-                //     val:trid
-
-                // });
-
-                //       var edit = PU.edit( { text: '修改客户联系信息' }, data, {
-
-                //       	'height': 400,
-
-                //       	'width': 700,
-
-                //           'beforeShow': function(target){
-
-                //               var $content = edit.widget();
-
-                //               $content.find('select.edit').leoSelect({'selectItemsMinHeight': 50});
-
-                //               $content.find('select.edit').leoSelect('option',{'position.within':edit.widget()});
-
-                //           },
-
-                //           'dialogShowCallBack':function(){
-
-                //               $grid.leoGrid( 'setDisabledEvent', false );
-
-                //           },
-
-                //           'okCallBack':function( event, disable, enable ){
-
-                //               tipMsg.send('loadingShow');
-
-                //               edit.option('hideAnimation', function(callBack) {
-
-                //                   this.hide({
-                //                       effect: "explode",
-                //                       duration: 200,
-                //                       complete: callBack
-                //                   });
-
-                //               });
-
-                //               $.ajax({
-
-                //                   url: '../../index.php?m=home&c=client&a=contact_edit',
-
-                //                   type: "post",
-
-                //                   data: edit.widget().find('.edit').serialize()
-
-                //               }).done(function(data){
-
-                //                   if( +data.code === 0 ){
-
-                //                       tipMsg.send('ok', data.message);
-
-                //                       $grid.leoGrid( 'editRow', td.parentNode, data.contact[0] );
-
-                //                       edit.modalDialogHide();
-
-                //                   }else{
-
-                //                       tipMsg.send('error', data.message);
-
-                //                       enable();
-
-                //                   }
-
-                //               }).fail(function(data){
-
-                //                   tipMsg.send('error', data.statusText);
-
-                //                   enable();
-
-                //               });
-
-                //               disable();
-
-                //           },
-
-                //           'cancelCallBack': function() {
-
-                //               edit.option('hideAnimation', function(callBack) {
-
-                //                   this.hide({
-                //                       effect: "clip",
-                //                       duration: 200,
-                //                       complete: callBack
-                //                   });
-
-                //               });
-
-                //               edit.widget().find('select.edit').leoSelect( 'hide', true );
-
-                //               edit.modalDialogHide();
-
-                //           },
-
-                //           'closeCallBack':function(){
-
-                //               edit.option('hideAnimation', function(callBack) {
-
-                //                   this.hide({
-                //                       effect: "clip",
-                //                       duration: 200,
-                //                       complete: callBack
-                //                   });
-
-                //               });
-
-                //               edit.widget().find('select.edit').leoSelect( 'hide', true );
-
-                //           },
-
-                //           'modalDialogHideCallBack': function(isOKOrCancel) {
-
-                //               edit.widget().find('select.edit').leoSelect('destroy');
-
-                //               edit.destroy();
-
-                //           }
-
-                //       });
-
-                //       edit.dialogShow();
-
-                //   },function(data){
-
-                //       tipMsg.send('error', data.statusText);
-
-                //   } );
-
-                //   $grid.leoGrid( 'setDisabledEvent', true );
-
-            }
 
         }
 

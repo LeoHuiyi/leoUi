@@ -50,7 +50,11 @@ leoUiLoad.require('leoUi-grid-2.0,leoUi,leoUiGrid,ready', function($) {
 
             thClass:'leo aaaa',
 
-            fixed: true
+            fixed: true,
+
+            tdClass:'leo aaaa',
+
+            tdStyle:'text-align:center',
 
         }, {
 
@@ -78,7 +82,9 @@ leoUiLoad.require('leoUi-grid-2.0,leoUi,leoUiGrid,ready', function($) {
 
             },
 
-            thTemplate:'<div style="color:red">{{theadName}}</div>'
+            thTemplate:'<div style="color:red">{{theadName}}</div>',
+
+            tdTemplate:'<div style="color:red"></div>'
 
         }, {
 

@@ -4,7 +4,7 @@
 +-------------------------------------------------------------------
 * @version    2.0.0 beta
 * @author     leo
-*
+* 把数据层抽出来
 +-------------------------------------------------------------------
 */
 ;(function(factory) {
@@ -183,11 +183,11 @@
 
             gridHeadThTemplate:'{{each tableModels as value index}}<th id = "{{value.thId}}" class="leoUi-state-default leoUi-th-column leoUi-th-ltr {{if value.thClass}}{{value.thClass}}{{/if}}" style="{{if value.thStyle}}{{value.thStyle}};{{/if}} {{if value.width}}width:{{value.width}}{{/if}}">{{if value.resize}}<span class="leoUi-jqgrid-resize leoUi-jqgrid-resize-ltr">&nbsp;</span>{{/if}}{{if value.sortable}}<div class="leoUi-jqgrid-sortable">{{else}}<div>{{/if}}{{if value.checkBoxId}}<input type="checkbox" id="{{value.checkBoxId}}"{{if value.isCheck}}checked{{/if}}>{{/if}}{{if value.thTemplate}}{{#value.thTemplate | getHtml:value}}{{else}}{{value.theadName}}{{/if}}{{if value.sortable}}<span class="leoUi-sort-ndb leoUi-sort"><span class="leoUi-sort-top"></span><span class="leoUi-sort-bottom"></span></span>{{/if}}</div></th>{{/each}}',
 
-            gridBodyTemplate:'<table class="leoUi-jqgrid-btable" cellspacing="0" cellpadding="0" border="0"><tbody></tbody></table>',
+            gridBodyTemplate:'<table class="leoUi-jqgrid-btable" cellspacing="0" cellpadding="0" border="0"></table>',
 
-            gridBodySizeRowTemplate:'<tr class="{{sizeRowid}}" style="height:0">{{each tableModels as value index}}<td id="{{value.thId + sizeRowTdIdPostfix}}" style="height:0;width:0"></td>{{/each}}</tr>',
+            gridBodySizeRowTemplate:'<tr id="{{sizeRowid}}" style="height:0">{{each tableModels as value index}}<td id="{{value.thId + sizeRowTdIdPostfix}}" style="height:0;width:0"></td>{{/each}}</tr>',
 
-            gridBodyTdTemplate:''
+            gridBodyTdTemplate:'{{each tableModels as value index}}<td id="{{trId+tdIdPostfix+value.id}}" {{if value.tdStyle}}style="{{value.tdStyle}};"{{/if}} {{if value.tdClass}}class="{{value.tdClass}};"{{/if}}>{{if value.tdTemplate}}{{#value.tdTemplate | getHtml:data,value}}{{else}}{{if value.checkBoxId}}<input type="checkbox" {{if data[value.id]}}checked{{/if}}>{{else}}{{if data[value.id]}}{{data[value.id]}}{{else}}{{/if}}{{/if}}{{/if}}</td>{{/each}}'
 
         },
 
@@ -227,9 +227,15 @@
 
             this.template = template;
 
-            template.helper('getHtml', function(tmp, val) {
+            template.helper('getHtml', function(tmp) {
 
-                return template.compile(tmp)(val);
+                var arg = Array.slice(arguments);
+
+                arg.shift();
+
+                console.log(arg)
+
+                return template.compile(tmp).apply(null, arg);
 
             });
 
@@ -247,12 +253,6 @@
 
             this.$gridBox.appendTo(this.$target);
 
-            this._setTableWidth();
-
-            this._setTableHeight();
-
-            this._resizeCountWidth();
-
             this._storeInit();
 
             this._addEvent();
@@ -261,13 +261,21 @@
 
         _storeInit:function(){
 
+            var This = this;
+
             this.store = this._store({
 
                 localData: this.options.gridData,
 
                 getCollection:function(data){
 
-                    console.log(data)
+                    This._renderGridBodyTbody(data);
+
+                    This._setTableWidth();
+
+                    This._setTableHeight();
+
+                    This._resizeCountWidth();
 
                 }
 
@@ -275,10 +283,51 @@
 
         },
 
-        _renderGridBodyTd:function(){
+        _renderGridBodyTbody:function(data){
 
-            
+            var i = 0, len = data.length, obj, trId,
 
+            str = '<tbody>' + this.gridBodySizeTrHtml,
+
+            tableModels = this.tableOption.tableModels,
+
+            leoGrid = this.leoGrid, tdIdPostfix = this.gridIds.tdIdPostfix;
+
+            for(; i < len; i++){
+
+                obj = data[i];
+
+                trId = leoGrid + obj.index;
+
+                str += '<tr id="'+ trId +'" class="leoUi-widget-content jqgrow leoUi-row-ltr" tabindex="-1">';
+
+                str += this._renderGridBodyTd({
+
+                    tableModels: tableModels,
+
+                    data: obj.data,
+
+                    trId: trId,
+
+                    tdIdPostfix: tdIdPostfix
+
+                });
+
+                str += '</tr>';
+
+            }
+
+            str += '</tbody>';
+
+            this.$gridBodyTable.html(str);
+
+        },
+
+        _renderGridBodyTd:function(tdData){
+
+            this.gridBodyTdCompile = this.gridBodyTdCompile || this.template.compile(this.options.gridBodyTdTemplate);
+
+            return this.gridBodyTdCompile(tdData);
 
         },
 
@@ -394,7 +443,9 @@
 
                 sizeRowid: leoGrid + 'sizeRowid',
 
-                sizeRowTdIdPostfix: "_sizeRowTd"
+                sizeRowTdIdPostfix: '_sizeRowTd',
+
+                tdIdPostfix: '_leoUiTd_'
 
             }
 
@@ -422,7 +473,7 @@
 
         _setTableWidth:function(){
 
-            var tableWidth = this.options.width;
+            var tableWidth = this.options.width, scrollWidth = 0;
 
             if(tableWidth === false){return;}
 
@@ -430,15 +481,23 @@
 
             tableWidth = tableWidth + '';
 
+            this._resizeTableIsScroll() && (scrollWidth = this.options.scrollWidth);
+
             if(tableWidth.indexOf('%') === -1){
 
-                this.tableSize.width = this.$gridBox.setOuterWidth(tableWidth).width();
+                this.tableSize.width = this.$gridBox.setOuterWidth(tableWidth).width() - scrollWidth;
 
             }else{
 
-                this.tableSize.width = this.$gridBox.width(tableWidth).width();
+                this.tableSize.width = this.$gridBox.width(tableWidth).width() - scrollWidth;
 
             }
+
+        },
+
+        _resizeTableIsScroll:function(){
+
+            return this.$gridBodyDiv.height() < this.$gridBodyTable.outerHeight();
 
         },
 
@@ -446,7 +505,7 @@
 
             if(this.tableSize.changeCellLen === 0)return;
 
-            var isScroll = this.$gridBodyDiv.height() < this.$bodyTable.outerHeight();
+            var isScroll = this._resizeTableIsScroll();
 
             if(this.tableSize.isScroll === isScroll){
 
@@ -500,11 +559,15 @@
 
             i = cellSize.length, cellSizeObj,
 
+            gridIds = this.gridIds, sizeRowid = gridIds.sizeRowid,
+
             changeCellLen = tableSize.changeCellLen,
+
+            sizeRowTdIdPostfix = gridIds.sizeRowTdIdPostfix,
 
             oldCellOuterWidth = 0, cellOuterWidth = 0,
 
-            $gridBodyResizeRow = this.$gridBodyTable.find('tr.jqgfirstrow'),
+            $gridBodyResizeRow = this.$gridBodyTable.find('#' + sizeRowid),
 
             $gridHeadResizeRow = this.$gridHeadResizeRow || this.$gridHeadTable.find('tr.leoUi-jqgrid-labels'),
 
@@ -526,9 +589,9 @@
 
                         cellSizeObj.cellOuterWidth = cellOuterWidth;
 
-                        $gridHeadResizeRow.children('#' + cellSizeObj.id ).setOuterWidth(cellOuterWidth);
+                        $gridHeadResizeRow.children('#' + cellSizeObj.id).setOuterWidth(cellOuterWidth);
 
-                        // $gridBodyResizeRow.children('td[firstid="'+ cellSizeObj.id +'"]').setOuterWidth(cellOuterWidth);
+                        $gridBodyResizeRow.children('#' + cellSizeObj.id + sizeRowTdIdPostfix).setOuterWidth(cellOuterWidth);
 
                     }else{
 
@@ -538,9 +601,9 @@
 
                         cellSizeObj.cellOuterWidth = cellOuterWidth;
 
-                        $gridHeadResizeRow.children('#' + cellSizeObj.id ).setOuterWidth(cellOuterWidth);
+                        $gridHeadResizeRow.children('#' + cellSizeObj.id).setOuterWidth(cellOuterWidth);
 
-                        // $gridBodyResizeRow.children('td[firstid="'+ cellSizeObj.id +'"]').setOuterWidth(cellOuterWidth);
+                        $gridBodyResizeRow.children('#' + cellSizeObj.id + sizeRowTdIdPostfix).setOuterWidth(cellOuterWidth);
 
                     }
 
@@ -548,15 +611,15 @@
 
                 }else{
 
-                    $gridHeadResizeRow.children('#' + cellSizeObj.id ).setOuterWidth(cellSizeObj.cellOuterWidth);
+                    $gridHeadResizeRow.children('#' + cellSizeObj.id).setOuterWidth(cellSizeObj.cellOuterWidth);
 
-                        // $gridBodyResizeRow.children('td[firstid="'+ cellSizeObj.id +'"]').setOuterWidth(cellSizeObj.cellOuterWidth);
+                        $gridBodyResizeRow.children('#' + cellSizeObj.id + sizeRowTdIdPostfix).setOuterWidth(cellSizeObj.cellOuterWidth);
 
                 }
 
             }
 
-            // this.$gridBodyTable.width(tableWidth);
+            this.$gridBodyTable.width(tableWidth);
 
             this.$gridHeadTable.width(tableWidth);
 

@@ -175,7 +175,7 @@
 
             clickTdCallback:$.noop,//点击bodyTableTD回调
 
-            scrollWidth:18,
+            scrollWidth:20,
 
             gridTemplate:'<div id="{{leoUi_grid}}" class="leoUi-jqgrid leoUi-widget leoUi-widget-content leoUi-corner-all"><div id="{{lui_grid}}" class="leoUi-widget-overlay jqgrid-overlay"></div><div id="{{load_grid}}" class="loading leoUi-state-default leoUi-state-active">读取中...</div><div class="leoUi-jqgrid-view" id="{{gview_grid}}"><div class="leoUi-state-default leoUi-jqgrid-hdiv"><div class="leoUi-jqgrid-hbox"></div></div><div class="leoUi-jqgrid-bdiv"><div class="leoUi-jqgrid-hbox-inner" style="position:relative;"></div></div></div><div id="{{rs_mgrid}}" class="leoUi-jqgrid-resize-mark" ></div></div>',
 
@@ -187,7 +187,7 @@
 
             gridBodySizeRowTemplate:'<tr id="{{sizeRowid}}" style="height:0">{{each tableModels as value index}}<td id="{{value.thId + sizeRowTdIdPostfix}}" style="height:0;width:0"></td>{{/each}}</tr>',
 
-            gridBodyTdTemplate:'{{each tableModels as value index}}<td id="{{trId+tdIdPostfix+value.id}}" {{if value.tdStyle}}style="{{value.tdStyle}};"{{/if}} {{if value.tdClass}}class="{{value.tdClass}};"{{/if}}>{{if value.tdTemplate}}{{#value.tdTemplate | getHtml:data,value}}{{else}}{{if value.checkBoxId}}<input type="checkbox" {{if data[value.id]}}checked{{/if}}>{{else}}{{if data[value.id]}}{{data[value.id]}}{{else}}{{/if}}{{/if}}{{/if}}</td>{{/each}}'
+            gridBodyTdTemplate:'{{each tableModels as value index}}<td id="{{trId+tdIdPostfix+value.id}}" {{if value.tdStyle}}style="{{value.tdStyle}};"{{/if}} {{if value.tdClass}}class="{{value.tdClass}};"{{/if}}>{{if value.tdTemplate}}{{#value.tdTemplate | getHtml:data[value.id]}}{{else}}{{if value.checkBoxId}}<input type="checkbox" {{if data[value.id]}}checked{{/if}}>{{else}}{{if data[value.id]}}{{data[value.id]}}{{else}}{{" "}}{{/if}}{{/if}}{{/if}}</td>{{/each}}'
 
         },
 
@@ -229,13 +229,17 @@
 
             template.helper('getHtml', function(tmp) {
 
-                var arg = Array.slice(arguments);
+                var arg = Array.prototype.slice.call(arguments), data = {};
 
-                arg.shift();
+                arg.shift(), i = 0, len = arg.length, dataName = 'arg';
 
-                console.log(arg)
+                for(; i < len; i++){
 
-                return template.compile(tmp).apply(null, arg);
+                    data[dataName + (i + 1)] = arg[i];
+
+                }
+
+                return template.compile(tmp)(data);
 
             });
 
@@ -245,9 +249,13 @@
 
             this.$gridBox = $(this._renderGrid());
 
-            this.$gridHeadDiv = this.$gridBox.find('div.leoUi-jqgrid-hdiv').html(this._renderGridHead());
+            this.$gridHeadDiv = this.$gridBox.find('div.leoUi-jqgrid-hdiv');
 
-            this.$gridBodyDiv = this.$gridBox.find('div.leoUi-jqgrid-bdiv').html(this._renderGridBody());
+            this.$gridBodyDiv = this.$gridBox.find('div.leoUi-jqgrid-bdiv');
+
+            this._renderGridHead();
+
+            this._renderGridBody();
 
             this._getChangeCellPercent();
 
@@ -267,19 +275,21 @@
 
                 localData: this.options.gridData,
 
+                mode:this.tableOption.tableModels,
+
                 getCollection:function(data){
 
                     This._renderGridBodyTbody(data);
 
-                    This._setTableWidth();
-
                     This._setTableHeight();
+
+                    This._setTableWidth();
 
                     This._resizeCountWidth();
 
                 }
 
-            }).triggerGetCollection();
+            });
 
         },
 
@@ -335,7 +345,7 @@
 
             this.gridHeadCompile = this.gridHeadCompile || this.template.compile(this.options.gridHeadTemplate);
 
-            return this.$gridHeadTable = $(this.gridHeadCompile(this.tableOption)).find('tr').html(this._renderGridHeadTh()).end();
+            this.$gridHeadTable = $(this.gridHeadCompile(this.tableOption)).find('tr').html(this._renderGridHeadTh()).end().appendTo(this.$gridHeadDiv.find('div.leoUi-jqgrid-hbox'));
 
         },
 
@@ -345,7 +355,7 @@
 
             this._renderBodySizeTr();
 
-            return this.$gridBodyTable = $(this.gridBodyCompile(this.tableOption));
+            this.$gridBodyTable = $(this.gridBodyCompile(this.tableOption)).appendTo(this.$gridBodyDiv.find('div.leoUi-jqgrid-hbox-inner'));
 
         },
 
@@ -591,7 +601,7 @@
 
                         $gridHeadResizeRow.children('#' + cellSizeObj.id).setOuterWidth(cellOuterWidth);
 
-                        $gridBodyResizeRow.children('#' + cellSizeObj.id + sizeRowTdIdPostfix).setOuterWidth(cellOuterWidth);
+                        $gridBodyResizeRow.children('#' + cellSizeObj.id + sizeRowTdIdPostfix).width(cellOuterWidth);
 
                     }else{
 
@@ -603,7 +613,7 @@
 
                         $gridHeadResizeRow.children('#' + cellSizeObj.id).setOuterWidth(cellOuterWidth);
 
-                        $gridBodyResizeRow.children('#' + cellSizeObj.id + sizeRowTdIdPostfix).setOuterWidth(cellOuterWidth);
+                        $gridBodyResizeRow.children('#' + cellSizeObj.id + sizeRowTdIdPostfix).width(cellOuterWidth);
 
                     }
 
@@ -613,7 +623,7 @@
 
                     $gridHeadResizeRow.children('#' + cellSizeObj.id).setOuterWidth(cellSizeObj.cellOuterWidth);
 
-                        $gridBodyResizeRow.children('#' + cellSizeObj.id + sizeRowTdIdPostfix).setOuterWidth(cellSizeObj.cellOuterWidth);
+                    $gridBodyResizeRow.children('#' + cellSizeObj.id + sizeRowTdIdPostfix).width(cellSizeObj.cellOuterWidth);
 
                 }
 
@@ -647,15 +657,21 @@
 
                 }, 16);
 
-            } );
+            })._on(this.$gridBodyDiv, 'scroll', function(event){
+
+                event.preventDefault();
+
+                This.$gridHeadDiv.scrollLeft($(this).scrollLeft());
+
+            });
 
         },
 
         _store:function(option){
 
-            return new function(option){
+            function Store(option){
 
-                option = $.extend({
+                this.option = $.extend({
 
                     isPage:true,
 
@@ -664,6 +680,8 @@
                     currentPage:1,
 
                     localData:[],
+
+                    mode:[],
 
                     ajax:{
 
@@ -687,17 +705,87 @@
 
                     getCollection:function(data){}
 
-                }, option), obj = {};
+                }, option);
 
-                function init(option){
+                this._init();
 
-                    obj.currentPage = option.currentPage;
+            }
 
-                    option.localData && (obj.localCollection = setCollection(option));
+            $.extend(Store.prototype, {
 
-                };
+                _init:function(){
 
-                function getData(option, page){
+                    if(this.option.localData){
+
+                        this.localCollection = this._setCollection();
+
+                    }
+
+                    if(this.)
+
+                    
+
+                },
+
+                _beforeAjax: function(currentPage){
+
+                    var ajax = $.extend({}, ajaxParam),
+
+                    option = this.option,
+
+                    ajaxParam = option.ajaxParam(ajax, currentPage);
+
+                    !ajaxParam && (ajaxParam = ajax);
+
+                    option.beforeAjax();
+
+                    return ajaxParam;
+
+                },
+
+                _afterAjax:function(){
+
+                    this.option.afterAjax();
+
+                },
+
+                _getLocalPagerInfo:function(page, collection){
+
+                    var totalItems = collection.length,
+
+                    option = this.option,
+
+                    pageNum = option.pageNum, fristItem, fristItems,
+
+                    totalpages = Math.ceil(totalItems/pageNum);
+
+                    if(page >= 1 && page <= totalpages){
+
+                        fristItem = pageNum*(page - 1);
+
+                        lastItem = fristItem + pageNum;
+
+                        return collection.slice(fristItem, lastItem);
+
+                    }else{
+
+                        return [];
+
+                    }
+
+                },
+
+                triggerGetCollection:function(page){
+
+                    this.getData(page);
+
+                    return this;
+
+                },
+
+                _getData:function(page){
+
+                    var option = this.option;
 
                     page = page || obj.currentPage;
 
@@ -733,31 +821,17 @@
 
                     }
 
-                };
+                },
 
-                function beforeAjax(option, currentPage){
+                _setCollection:function(data){
 
-                    var ajax = $.extend({}, ajaxParam),
+                    var i = 0, collection = [], len, j, modeLen,
 
-                    ajaxParam = option.ajaxParam(ajax, currentPage);
+                    option = this.option, mode = this.option.mode,
 
-                    !ajaxParam && (ajaxParam = ajax);
+                    modeLen = mode.length,
 
-                    option.beforeAjax();
-
-                    return ajaxParam;
-
-                }
-
-                function afterAjax(option){
-
-                    option.afterAjax();
-
-                }
-
-                function setCollection(option, data){
-
-                    var i = 0, collection = [], len;
+                    collectionItem, dataItem, modeItem;
 
                     data = data || option.localData;
 
@@ -765,55 +839,57 @@
 
                     for(; i < len; i++){
 
-                        collection.push({
+                        dataItem = data[i];
 
-                            index:i,
+                        j = 0;
 
-                            data:data[i]
+                        collectionItem = [];
 
-                        });
+                        for(; j < modeLen; j++){
+
+                            modeItem = mode[j];
+
+                            collectionItem.push(this._setCollectionItem(modeItem.type, dataItem[modeItem.id], dataItem));
+
+                        }
+
+                        collection.push(collectionItem);
 
                     }
 
                     return collection;
 
-                };
+                },
 
-                function getLocalPagerInfo(option, page, collection){
+                _setCollectionItem:function(modeType, value, dataItem){
 
-                    var totalItems = collection.length,
+                    if(modeType === 'string'){
 
-                    pageNum = option.pageNum, fristItem, fristItems,
+                        return value + '';
 
-                    totalpages = Math.ceil(totalItems/pageNum);
+                    }else if(modeType === 'number'){
 
-                    if(page >= 1 && page <= totalpages){
+                        return +value || 0;
 
-                        fristItem = pageNum*(page - 1);
+                    }else if(modeType === 'boolean'){
 
-                        lastItem = fristItem + pageNum;
+                        return !!value;
 
-                        return collection.slice(fristItem, lastItem);
+                    }else if($.isFunction(modeType)){
+
+                        return modeType(value, dataItem);
 
                     }else{
 
-                        return [];
+                        return value;
 
                     }
 
-                };
-
-                this.triggerGetCollection = function(page){
-
-                    getData(option, page);
-
-                    return this;
-
                 }
 
-                init(option);
+            });
 
-            }(option);
+            return new Store(option);
 
 
         }

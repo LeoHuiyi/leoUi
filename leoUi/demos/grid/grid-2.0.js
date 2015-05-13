@@ -52,9 +52,11 @@ leoUiLoad.require('leoUi-grid-2.0,leoUi,leoUiGrid,ready', function($) {
 
             fixed: true,
 
+            type: 'boolean',
+
             tdClass:'leo aaaa',
 
-            tdStyle:'text-align:center',
+            tdStyle:'text-align:center'
 
         }, {
 
@@ -62,13 +64,13 @@ leoUiLoad.require('leoUi-grid-2.0,leoUi,leoUiGrid,ready', function($) {
 
             theadName: '联系人',
 
-            width: 150,
+            width: 133,
 
             minWidth: 100,
 
             sortable: true,
 
-            sortableType: 'string',
+            type: 'string',
 
             resize: true,
 
@@ -82,9 +84,9 @@ leoUiLoad.require('leoUi-grid-2.0,leoUi,leoUiGrid,ready', function($) {
 
             },
 
-            thTemplate:'<div style="color:red">{{theadName}}</div>',
+            thTemplate:'<div style="color:red">{{arg1.theadName}}</div>',
 
-            tdTemplate:'<div style="color:red"></div>'
+            tdTemplate:'<div style="color:red">{{arg1}}</div>'
 
         }, {
 
@@ -114,7 +116,7 @@ leoUiLoad.require('leoUi-grid-2.0,leoUi,leoUiGrid,ready', function($) {
 
             theadName: 'QQ',
 
-            width: 100,
+            width: 123,
 
             minWidth: 50,
 
@@ -136,7 +138,7 @@ leoUiLoad.require('leoUi-grid-2.0,leoUi,leoUiGrid,ready', function($) {
 
             theadName: '微信',
 
-            width: 100,
+            width: 144,
 
             minWidth: 50,
 
@@ -158,7 +160,7 @@ leoUiLoad.require('leoUi-grid-2.0,leoUi,leoUiGrid,ready', function($) {
 
             theadName: 'skype',
 
-            width: 100,
+            width: 132,
 
             minWidth: 50,
 
@@ -202,7 +204,7 @@ leoUiLoad.require('leoUi-grid-2.0,leoUi,leoUiGrid,ready', function($) {
 
             theadName: '座机',
 
-            width: 100,
+            width: 112,
 
             minWidth: 50,
 
@@ -228,9 +230,7 @@ leoUiLoad.require('leoUi-grid-2.0,leoUi,leoUiGrid,ready', function($) {
 
             resize: true,
 
-            fixed: true,
-
-            width: 200,
+            width: 122,
 
             minWidth: 100,
 
@@ -258,43 +258,13 @@ leoUiLoad.require('leoUi-grid-2.0,leoUi,leoUiGrid,ready', function($) {
 
             resize: true,
 
-            edit: {
-
-                type: 'select',
-
-                typeOption: {
-
-                    '1': '是',
-
-                    '0': '否'
-
-                },
-
-                isMust: false
-
-            },
-
-            renderCell: function(val, index, selectKey) {
-
-                if (+selectKey === 1) {
-
-                    val = '是';
-
-                } else {
-
-                    val = '';
-
-                }
-
-                return val;
-
-            }
+            tdTemplate:'{{if +arg1 === 1}}是{{else}}否{{/if}}'
 
         }, {
 
             id: 'operate',
 
-            width: 150,
+            width: 100,
 
             theadName: '修改',
 
@@ -302,16 +272,9 @@ leoUiLoad.require('leoUi-grid-2.0,leoUi,leoUiGrid,ready', function($) {
 
             minWidth: 100,
 
-            fixed: true,
+            tdTemplate:'<a class="teamEditBtn" href="javascript:;">修改</a><span>|</span><a class="dataDelBtn" href="javascript:;">删除</a>'
 
-            renderCell: function(val) {
-
-                return '<a class="teamEditBtn" href="javascript:;">修改</a><span>|</span><a class="dataDelBtn" href="javascript:;">删除</a>';
-
-            }
-
-        }],
-        $grid,
+        }], $grid,
 
         data = [{
             "id": "92",

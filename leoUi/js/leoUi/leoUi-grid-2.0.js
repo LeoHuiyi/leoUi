@@ -187,7 +187,7 @@
 
             gridBodySizeRowTemplate:'<tr id="{{sizeRowid}}" style="height:0">{{each tableModels as value index}}<td id="{{value.thId + sizeRowTdIdPostfix}}" style="height:0;width:0"></td>{{/each}}</tr>',
 
-            gridBodyTdTemplate:'{{each tableModels as value index}}<td id="{{trId+tdIdPostfix+value.id}}" {{if value.tdStyle}}style="{{value.tdStyle}};"{{/if}} {{if value.tdClass}}class="{{value.tdClass}};"{{/if}}>{{if value.tdTemplate}}{{#value.tdTemplate | getHtml:data[value.id]}}{{else}}{{if value.checkBoxId}}<input type="checkbox" {{if data[value.id]}}checked{{/if}}>{{else}}{{if data[value.id]}}{{data[value.id]}}{{else}}{{" "}}{{/if}}{{/if}}{{/if}}</td>{{/each}}'
+            gridBodyTdTemplate:'{{each tableModels as value index}}<td id="{{trId+tdIdPostfix+value.id}}" {{if value.tdStyle}}style="{{value.tdStyle}};"{{/if}} {{if value.tdClass}}class="{{value.tdClass}};"{{/if}}>{{if value.tdTemplate}}{{#value.tdTemplate | getHtml:data[index]}}{{else}}{{if value.checkBoxId}}<input type="checkbox" {{if data[index]}}checked{{/if}}>{{else}}{{if data[index]}}{{data[index]}}{{else}}{{" "}}{{/if}}{{/if}}{{/if}}</td>{{/each}}'
 
         },
 
@@ -289,7 +289,7 @@
 
                 }
 
-            });
+            }).triggerGetCollection();
 
         },
 
@@ -307,6 +307,8 @@
 
                 obj = data[i];
 
+                console.log(obj)
+
                 trId = leoGrid + obj.index;
 
                 str += '<tr id="'+ trId +'" class="leoUi-widget-content jqgrow leoUi-row-ltr" tabindex="-1">';
@@ -315,7 +317,7 @@
 
                     tableModels: tableModels,
 
-                    data: obj.data,
+                    data: obj,
 
                     trId: trId,
 
@@ -715,15 +717,23 @@
 
                 _init:function(){
 
-                    if(this.option.localData){
+                    var option = this.option;
 
-                        this.localCollection = this._setCollection();
+                    if(option.localData){
+
+                        this.collection = this._setCollection();
+
+                    }else{
+
+                        this.collection = [];
 
                     }
 
-                    if(this.)
+                    if(option.isPage){
 
-                    
+                        this.currentPage = option.currentPage;
+
+                    }
 
                 },
 
@@ -777,7 +787,7 @@
 
                 triggerGetCollection:function(page){
 
-                    this.getData(page);
+                    this._getData(page);
 
                     return this;
 
@@ -785,29 +795,29 @@
 
                 _getData:function(page){
 
-                    var option = this.option;
+                    var option = this.option, This = this;
 
-                    page = page || obj.currentPage;
+                    page = page || this.currentPage;
 
                     if(option.localData){
 
                         if(option.isPage){
 
-                            option.getCollection(getLocalPagerInfo(option, page || obj.currentPage, obj.localCollection));
+                            option.getCollection(this._getLocalPagerInfo(page, this.collection));
 
-                            obj.currentPage = page;
+                            this.currentPage = page;
 
                         }else{
 
-                            option.getCollection(obj.localCollection);
+                            option.getCollection(this.collection);
 
                         }
 
                     }else{
 
-                        $.ajax(beforeAjax(option, page)).done(function(data){
+                        $.ajax(this._beforeAjax(page)).done(function(data){
 
-                            option.getCollection(setCollection(option, option.getAjaxData(data)));
+                            option.getCollection(This.collection = setCollection(option, option.getAjaxData(data)));
 
                         }).fail(function(data){
 
@@ -815,7 +825,7 @@
 
                         }).always(function(){
 
-                            afterAjax(option);
+                            This._afterAjax();
 
                         });
 
@@ -890,7 +900,6 @@
             });
 
             return new Store(option);
-
 
         }
 

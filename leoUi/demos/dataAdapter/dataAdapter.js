@@ -106,16 +106,44 @@ leoUiLoad.require('leoUi-dataAdapter, ready', function($) {
             datatype: "array",
             mode: [{
                 name: 'id',
-                type: 'number'
+                type: 'number',
+                validator:"required number"
             }, {
                 name: 'contact',
-                type: 'number'
+                type: 'number',
+                validator:["required", "string"]
             }, {
                 name: 'mobile',
-                type: 'number'
+                type: 'number',
+                validator:function(value){
+
+                    if(value === 1){
+
+                        return {
+
+                            passed: true,
+
+                            info: ''
+
+                        };
+
+                    }else{
+
+                        return {
+
+                            passed: false,
+
+                            info: '不为1'
+
+                        }
+
+                    }
+
+                }
             }, {
                 name: 'phone',
-                type: 'number'
+                type: 'number',
+                validator:[["required": "1111"], ["number": "2222"]]
             }, {
                 name: 'address',
                 type: 'string'
@@ -126,6 +154,30 @@ leoUiLoad.require('leoUi-dataAdapter, ready', function($) {
                 console.log(data)
             }
         }, dataAdapter;
+
+        var b = new $.leoTools.dataAdapter.DataWrapper(data),
+
+        c = b.clone();
+
+        console.log(c.getData())
+
+        console.log(c.setData([]).getData())
+
+        console.log(b.map(function(val, i){
+
+            val.haha = i;
+
+            return val;
+
+        }).findRow(function(val, i){
+
+            return val.id > 100;
+
+        }).sortBy(function(a, b){
+
+            return a.id < b.id;
+
+        }).getRow(2).getData())
 
         dataAdapter = $.leoTools.dataAdapter(option);
 

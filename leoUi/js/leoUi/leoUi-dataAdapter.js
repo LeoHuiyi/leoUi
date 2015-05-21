@@ -27,11 +27,21 @@
 
         dataAdapter,
 
+        DataWrapper,
+
+        rnotwhite = (/\S+/g),
+
         setDataFns = {},
+
+        methodFns = {},
 
         formatDateFns = {},
 
         validatorFns = {},
+
+        collection = [],
+
+        splice = Array.prototype.splice,
 
         dataAdapterSettings = {
 
@@ -42,6 +52,8 @@
             currentPage: 1,
 
             datatype: 'array',
+
+            method: 'local', //local,ajax
 
             localData: [],
 
@@ -73,11 +85,19 @@
 
     function addToFns(structure) {
 
-        return function(dataType, func) {
+        return function(dataTypes, func) {
 
-            if (typeof dataType === "string" && $.isFunction(func)) {
+            if (typeof dataTypes === "string" && $.isFunction(func)) {
 
-                structure[dataType] = func;
+                var dataType, i = 0;
+
+                dataTypes = dataTypes.toLowerCase().match(rnotwhite) || [];
+
+                while ((dataType = dataTypes[i++])) {
+
+                    structure[dataType] = func;
+
+                }
 
             }
         };
@@ -103,16 +123,6 @@
         _init: function() {
 
             var option = this.option;
-
-            if (option.localData) {
-
-                this.collection = this._setCollection();
-
-            } else {
-
-                this.collection = [];
-
-            }
 
             if (option.isPage) {
 
@@ -141,6 +151,12 @@
         _afterAjax: function() {
 
             this.option.afterAjax();
+
+        },
+
+        _getCollection: function(clone) {
+
+            return clone ? $.extend(true, [], collection) : collection;
 
         },
 
@@ -184,49 +200,17 @@
 
             var option = this.option,
 
-                This = this;
+                methodFn = getFns(option.method, methodFns);
 
-            page = page || this.currentPage;
+            methodFn.call(this, option, page || this.currentPage, this);
 
-            if (option.localData) {
-
-                if (option.isPage) {
-
-                    option.loadComplete(this._getLocalPagerInfo(page, this.collection));
-
-                    this.currentPage = page;
-
-                } else {
-
-                    option.loadComplete(this.collection);
-
-                }
-
-            } else {
-
-                $.ajax(this._beforeAjax(page)).done(function(data) {
-
-                    option.loadComplete(This.collection = setCollection(option, option.getAjaxData(data)));
-
-                }).fail(function(data) {
-
-                    option.getCollection(data);
-
-                }).always(function() {
-
-                    This._afterAjax();
-
-                });
-
-            }
+            return this;
 
         },
 
         _setCollection: function(data) {
 
             var i = 0,
-
-                collection = [],
 
                 len, j, modeLen,
 
@@ -266,27 +250,110 @@
 
             }
 
-            return collection;
-
         },
 
         _setCollectionItem: function(modeType, value, dataItem) {
 
-            if(typeof modeType === 'string'){
+            if (typeof modeType === 'string') {
 
                 return getFns(modeType, formatDateFns)(value);
 
-            }else if ($.isFunction(modeType)) {
+            } else if ($.isFunction(modeType)) {
 
                 return modeType(value, dataItem);
 
             }
+
+        },
+
+        saveRow:function(data, index, isValidator){
+
+            if(typeof data !== 'object')return;
+
+            var option = this.option, i = 0, modeItem,
+
+            mode = option.mode, saveInfo = { passed: true, info: []},
+
+            len = mode.length;
+
+            index = index || 0;
+
+            for(; i < len; i++){
+
+                modeItem = mode[i];
+
+                this._validatorRow(data, modeItem, saveInfo);
+
+            }
+
+
+        },
+
+        _validatorRow:function(data, mode, saveInfo){
+
+            var validator = mode.validator, flag;
+
+            if(typeof validator === 'string'){
+
+                validator = validator.match(rnotwhite) || [];
+
+            }else if($.isArray(validator)){
+
+
+
+            }
+
+        },
+
+        _validator:function(val, name, validators){
+
+            var i = 0, len = validators.length, validator,
+
+            info = [], obj;
+
+            for(; i < len; i++){
+
+                if((validator = validators[i]){
+
+                    if((typeof validator === 'string') && $.isFunction(validatorFns[validator])){
+
+                        obj = validatorFns[validator](val);
+
+                        obj.name = name;
+
+                        info.push(obj);
+
+                    }else if((typeof validator === 'object') && $.isFunction(validatorFns[validator[0]])){
+
+                        obj = validatorFns[obj = validatorFns[validator](val, validator[1]);
+
+                        obj.name = name;
+
+                        info.push(obj);
+
+                    }else if($.isFunction(validator)){
+
+                        obj = validator(val);
+
+                        obj.name = name;
+
+                        info.push(obj);
+
+                    }
+
+                }
+
+            }
+
+            return info;
 
         }
 
     });
 
     $.extend(dataAdapter, {
+
+        addMethodFn: addToFns(methodFns),
 
         addSetDataFn: addToFns(setDataFns),
 
@@ -296,19 +363,143 @@
 
     });
 
-    dataAdapter.addSetDataFn('array', function(item, mode){
+    dataAdapter.addValidatorFn('*', function(val) {
+
+        return {
+
+            passed: true,
+
+            info: ''
+
+        };
+
+    });
+
+    dataAdapter.addValidatorFn('required', function(val, info) {
+
+        if(typeof val !== 'undefined'){
+
+            return {
+
+                passed: true,
+
+                info: ''
+
+            };
+
+        }else{
+
+            return {
+
+                passed: true,
+
+                info: info || '不能为空'
+
+            };
+
+        }
+
+    });
+
+    dataAdapter.addValidatorFn('number', function(val, info) {
+
+        if(typeof val === 'number'){
+
+            return {
+
+                passed: true,
+
+                info: ''
+
+            };
+
+        }else{
+
+            return {
+
+                passed: true,
+
+                info: info || '不是数字'
+
+            };
+
+        }
+
+    });
+
+    dataAdapter.addValidatorFn('string', function(val) {
+
+        if(typeof val === 'string'){
+
+            return {
+
+                passed: true,
+
+                info: ''
+
+            };
+
+        }else{
+
+            return {
+
+                passed: true,
+
+                info: info || '不是字符串'
+
+            };
+
+        }
+
+    });
+
+    dataAdapter.addMethodFn('local *', function(option, page, dataAdapter) {
+
+        this._setCollection();
+
+        if (option.isPage) {
+
+            option.loadComplete(this._getLocalPagerInfo(page, this._getCollection(true)));
+
+            this.currentPage = page;
+
+        } else {
+
+            option.loadComplete(this._getCollection(true));
+
+        }
+
+    });
+
+    dataAdapter.addMethodFn('ajax', function(option, page, dataAdapter) {
+
+        var This = this;
+
+        $.ajax(this._beforeAjax(page)).done(function(data) {
+
+            this._setCollection(option.getAjaxData(data));
+
+            option.loadComplete(this._getCollection(true));
+
+        }).fail(function(data) {
+
+            option.loadComplete(data);
+
+        }).always(function() {
+
+            This._afterAjax();
+
+        });
+
+    });
+
+    dataAdapter.addSetDataFn('array *', function(item, mode) {
 
         return item[mode.name];
 
     });
 
-    dataAdapter.addSetDataFn('*', function(item, mode){
-
-        return item[mode.name];
-
-    });
-
-    dataAdapter.addFormatDateFn('string', function(value){
+    dataAdapter.addFormatDateFn('string', function(value) {
 
         !value && (value = '');
 
@@ -316,29 +507,147 @@
 
     });
 
-    dataAdapter.addFormatDateFn('number', function(value){
+    dataAdapter.addFormatDateFn('number', function(value) {
 
         return +value || 0;
 
     });
 
-    dataAdapter.addFormatDateFn('bool', function(value){
+    dataAdapter.addFormatDateFn('bool', function(value) {
 
         return !!value;
 
     });
 
-    dataAdapter.addFormatDateFn('*', function(value){
+    dataAdapter.addFormatDateFn('*', function(value) {
 
         return value;
 
     });
 
-    leoTools.dataAdapter = function(option){
+    leoTools.dataAdapter = function(option) {
 
         return new dataAdapter(option);
 
     }
+
+    var MAX_ARRAY_INDEX = Math.pow(2, 53) - 1,
+
+        isArrayLike = function(collection) {
+
+            var length = collection && collection.length;
+
+            return typeof length == 'number' && length >= 0 && length <= MAX_ARRAY_INDEX;
+
+        };
+
+    DataWrapper = $.leoTools.dataAdapter.DataWrapper = function(data) {
+
+        this.setData(data);
+
+    };
+
+    DataWrapper.addMethodFn = function(names, fn) {
+
+        if (typeof names === "string" && $.isFunction(fn)) {
+
+            var name, i = 0;
+
+            names = names.toLowerCase().match(rnotwhite) || [];
+
+            while ((name = names[i++])) {
+
+                DataWrapper.prototype[name] = fn;
+
+            }
+
+        }
+
+    };
+
+    $.extend(DataWrapper.prototype, {
+
+        getRow: function(first, last) {
+
+            this.data = this.data.slice(first, last);
+
+            return this;
+
+        },
+
+        setData: function(data){
+
+            if (isArrayLike(data)) {
+
+                this.data = $.extend(true, [], data);
+
+            } else {
+
+                this.data = [];
+
+            }
+
+            return this;
+
+        },
+
+        getData: function() {
+
+            return $.extend(true, [], this.data);
+
+        },
+
+        clone: function() {
+
+            return new DataWrapper(this.getData());
+
+        },
+
+        splice: function() {
+
+            splice.apply(this.data, arguments);
+
+            return this;
+
+        },
+
+        findRow: function(predicate) {
+
+            if ($.isFunction(predicate)) {
+
+                this.data = $.grep(this.data, predicate);
+
+            }
+
+            return this;
+
+        },
+
+        map: function(predicate) {
+
+            if ($.isFunction(predicate)) {
+
+                this.data = $.map(this.data, predicate);
+
+            }
+
+            return this;
+
+        },
+
+        sortBy: function(iteratee) {
+
+            if ($.isFunction(iteratee)) {
+
+                this.data.sort(iteratee);
+
+            }
+
+            return this;
+
+        }
+
+    });
 
     return $;
 

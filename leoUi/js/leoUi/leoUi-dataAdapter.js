@@ -252,92 +252,237 @@
 
         },
 
-        _setCollectionItem: function(modeType, value, dataItem) {
+        _setCollectionItem: function(modeType, value) {
 
             if (typeof modeType === 'string') {
 
                 return getFns(modeType, formatDateFns)(value);
 
-            } else if ($.isFunction(modeType)) {
-
-                return modeType(value, dataItem);
-
             }
 
         },
 
-        saveRow:function(data, index, isValidator){
+        updateCell:function(val, cellIndex, rowIndex, notValidator){
 
-            if(typeof data !== 'object')return;
+            if(typeof val === 'undefined')return false;
+
+            if(typeof cellIndex === 'undefined'){
+
+                cellIndex = 0
+
+            }else if(!this._isCollectionCellIndex(rowIndex)){
+
+                return false;
+
+            }
+
+            if(typeof rowIndex === 'undefined'){
+
+                rowIndex = 0
+
+            }else if(!this._isCollectionRowIndex(rowIndex)){
+
+                return false;
+
+            }
+
+            var cellMode = this.option.mode[cellIndex],
+
+            name = cellMode.name, validatorVal,
+
+            saveInfo = {passed: true};
+
+            validatorVal = this._validatorCell(val, cellMode.validator, notValidator);
+
+            if(validatorVal === true){
+
+                this._updateCell(this._setCollectionItem(cellMode.type, val), cellIndex, rowIndex);
+
+            }else{
+
+                saveInfo.passed = false;
+
+                saveInfo[name] = validatorVal;
+
+            }
+
+            return saveInfo;
+
+        },
+
+        _isCollectionRowIndex:function(rowIndex){
+
+            return 0 <= rowIndex && rowIndex < this._getCollection().length;
+
+        },
+
+        _isCollectionCellIndex:function(cellIndex){
+
+            return 0 <= cellIndex && cellIndex < this.option.mode.length;
+
+        },
+
+        _updateCell:function(val, cellIndex, rowIndex){
+
+            this._getCollection()[rowIndex][cellIndex] = val;
+
+        },
+
+        updateRow:function(data, rowIndex, notValidator){
+
+            var saveInfo = this._validatorRow(data, rowIndex, notValidator);
+
+            if(saveInfo.passed === true){
+
+                this._updateRow(saveInfo.collectionItem, rowIndex);
+
+            }
+
+            delete saveInfo.collectionItem;
+
+            return saveInfo;
+
+        },
+
+        _validatorRow:function(data, rowIndex, notValidator){
+
+            if(typeof data !== 'object')return false;
+
+            if(typeof rowIndex === 'undefined'){
+
+                rowIndex = 0
+
+            }else if(!this._isCollectionRowIndex(rowIndex)){
+
+                return false;
+
+            }
 
             var option = this.option, i = 0, modeItem,
 
-            mode = option.mode, saveInfo = { passed: true, info: []},
+            mode = option.mode, saveInfo = { passed: true, info: {}, collectionItem: []},
 
-            len = mode.length;
-
-            index = index || 0;
+            len = mode.length, validatorVal, name, val;
 
             for(; i < len; i++){
 
                 modeItem = mode[i];
 
-                this._validatorRow(data, modeItem, saveInfo);
+                name = modeItem.name;
+
+                val = data[name];
+
+                validatorVal = this._validatorCell(val, modeItem.validator, notValidator);
+
+                if(validatorVal === true){
+
+                    saveInfo.collectionItem.push(this._setCollectionItem(modeItem.type, val));
+
+                }else{
+
+                    saveInfo.passed = false;
+
+                    saveInfo.info[name] = validatorVal;
+
+                }
 
             }
 
+            return saveInfo;
 
         },
 
-        _validatorRow:function(data, mode, saveInfo){
+        deleteRow:function(rowIndex){
 
-            var validator = mode.validator, flag;
+            if(typeof rowIndex === 'undefined'){
 
-            if(typeof validator === 'string'){
+                rowIndex = 0
+
+            }else if(!this._isCollectionRowIndex(rowIndex)){
+
+                return false;
+
+            }
+
+            this._getCollection().splice(rowIndex, 1);
+
+            return true;
+
+        },
+
+        _updateRow:function(data, rowIndex){
+
+            this._getCollection().splice(rowIndex, 1, data);
+
+        },
+
+        _validatorCell:function(val, validator, notValidator){
+
+            if(notValidator){
+
+                return true;
+
+            }else if(typeof validator === 'string'){
 
                 validator = validator.match(rnotwhite) || [];
 
+                return this._validator(val, validator);
+
             }else if($.isArray(validator)){
 
+                return this._validator(val, validator);
 
+            }else if($.isFunction(validator)){
+
+                return validator(val);
+
+            }else {
+
+                return true;
 
             }
 
         },
 
-        _validator:function(val, name, validators){
+        _validator:function(val, validators){
 
             var i = 0, len = validators.length, validator,
 
-            info = [], obj;
+            validatorVal;
 
             for(; i < len; i++){
 
-                if((validator = validators[i]){
+                if((validator = validators[i])){
 
                     if((typeof validator === 'string') && $.isFunction(validatorFns[validator])){
 
-                        obj = validatorFns[validator](val);
+                        validatorVal = validatorFns[validator](val);
 
-                        obj.name = name;
+                        if(validatorVal !== true){
 
-                        info.push(obj);
+                            return validatorVal;
+
+                        }
 
                     }else if((typeof validator === 'object') && $.isFunction(validatorFns[validator[0]])){
 
-                        obj = validatorFns[obj = validatorFns[validator](val, validator[1]);
+                        validatorVal = validatorFns[validator[0]](val, validator[1]);
 
-                        obj.name = name;
+                        if(validatorVal !== true){
 
-                        info.push(obj);
+                            return validatorVal;
+
+                        }
 
                     }else if($.isFunction(validator)){
 
-                        obj = validator(val);
+                        validatorVal = validator(val);
 
-                        obj.name = name;
+                        if(validatorVal !== true){
 
-                        info.push(obj);
+                            return validatorVal;
+
+                        }
 
                     }
 
@@ -345,7 +490,7 @@
 
             }
 
-            return info;
+            return true;
 
         }
 
@@ -365,13 +510,7 @@
 
     dataAdapter.addValidatorFn('*', function(val) {
 
-        return {
-
-            passed: true,
-
-            info: ''
-
-        };
+        return true;
 
     });
 
@@ -379,23 +518,11 @@
 
         if(typeof val !== 'undefined'){
 
-            return {
-
-                passed: true,
-
-                info: ''
-
-            };
+            return true
 
         }else{
 
-            return {
-
-                passed: true,
-
-                info: info || '不能为空'
-
-            };
+            return info || '必填字段';
 
         }
 
@@ -405,49 +532,25 @@
 
         if(typeof val === 'number'){
 
-            return {
-
-                passed: true,
-
-                info: ''
-
-            };
+            return true;
 
         }else{
 
-            return {
-
-                passed: true,
-
-                info: info || '不是数字'
-
-            };
+            return info || '不是数字';
 
         }
 
     });
 
-    dataAdapter.addValidatorFn('string', function(val) {
+    dataAdapter.addValidatorFn('string', function(val, info) {
 
         if(typeof val === 'string'){
 
-            return {
-
-                passed: true,
-
-                info: ''
-
-            };
+            return true;
 
         }else{
 
-            return {
-
-                passed: true,
-
-                info: info || '不是字符串'
-
-            };
+            return info || '不是字符串';
 
         }
 

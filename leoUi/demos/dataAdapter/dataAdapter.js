@@ -119,23 +119,11 @@ leoUiLoad.require('leoUi-dataAdapter, ready', function($) {
 
                     if(value === 1){
 
-                        return {
-
-                            passed: true,
-
-                            info: ''
-
-                        };
+                        return true
 
                     }else{
 
-                        return {
-
-                            passed: false,
-
-                            info: '不为1'
-
-                        }
+                        return '不为1';
 
                     }
 
@@ -143,7 +131,7 @@ leoUiLoad.require('leoUi-dataAdapter, ready', function($) {
             }, {
                 name: 'phone',
                 type: 'number',
-                validator:[["required": "1111"], ["number": "2222"]]
+                validator:[["required", "required"], ["number", "不是数字"]]
             }, {
                 name: 'address',
                 type: 'string'
@@ -181,7 +169,22 @@ leoUiLoad.require('leoUi-dataAdapter, ready', function($) {
 
         dataAdapter = $.leoTools.dataAdapter(option);
 
-        dataAdapter.dataBind();
+        console.log(dataAdapter.dataBind().updateRow({
+            "id": "121212121",
+            "contact": "2332423432432",
+            "mobile": "2332",
+            "phone": '',
+            "im": "0",
+            "weixin": "",
+            "skype": "",
+            "email": "",
+            "address": "asdasdsa",
+            "first": "0"
+        }));
+
+        console.log(dataAdapter.updateCell('122121'));
+
+        dataAdapter.deleteRow();
 
 
 });

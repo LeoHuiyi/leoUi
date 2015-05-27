@@ -310,6 +310,12 @@
 
         },
 
+        _validatorRow:function(){
+
+
+            
+        },
+
         _isCollectionRowIndex:function(rowIndex){
 
             return 0 <= rowIndex && rowIndex < this._getCollection().length;

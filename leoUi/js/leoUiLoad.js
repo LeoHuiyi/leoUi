@@ -530,14 +530,17 @@
 
 	}
 
-	function checkCycle( deps, nick ) {
+	function checkCycle(deps, nick) {
 
-		//检测是否存在循环依赖
-		for (var id in deps) {
+		if(deps){
 
-			if ( deps[id] === "leoUi" && modules[id].state !== 2 && ( id === nick || checkCycle( modules[id].deps, nick ) ) ) {
+			for (var id in deps) {
 
-				return true;
+				if (deps[id] === "leoUi" && modules[id].state !== 2 && ( id === nick || checkCycle(modules[id].deps, nick))) {
+
+					return id;
+
+				}
 
 			}
 
@@ -998,6 +1001,10 @@
 
 			args.push(id);
 
+			delete factory.delay; //释放内存
+
+			leoUiLoad.require.apply( null, args ); //0,1,2 --> 1,2,0
+
 			if( !!modules[id] && !!modules[id].deps ){
 
 				var isCycle = true;
@@ -1010,15 +1017,11 @@
 
 				if (isCycle) {
 
-					leoUiLoad.error( id + "模块与之前的某些模块存在循环依赖" );
+					leoUiLoad.error( id + "模块与" + isCycle +"模块存在循环依赖" );
 
 				}
 
 			}
-
-			delete factory.delay; //释放内存
-
-			leoUiLoad.require.apply( null, args ); //0,1,2 --> 1,2,0
 
 		};
 
@@ -1067,11 +1070,15 @@
 
 				module.state = 2;
 
+				delete module.factory;
+
 			}else{
 
 				module.exports = '';
 
 				module.state = 2;
+
+				delete module.factory;
 
 				leoUiLoad.log( "fireFactory中" + id + " 无输出" );
 

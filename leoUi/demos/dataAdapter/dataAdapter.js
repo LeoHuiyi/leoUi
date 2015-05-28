@@ -167,9 +167,74 @@ leoUiLoad.require('leoUi-dataAdapter, ready', function($) {
 
         }).getRow(2).getData())
 
-        dataAdapter = $.leoTools.dataAdapter(option);
+        dataAdapter = $.leoTools.dataAdapter(option).dataBind();
 
-        console.log(dataAdapter.dataBind().updateRow({
+        var data =  $.leoTools.dataAdapter({
+            localData:[{
+            "id": "123123211312",
+            "contact": "2332423432432",
+            "mobile": "2332",
+            "phone": "0",
+            "im": "0",
+            "weixin": "",
+            "skype": "",
+            "email": "",
+            "address": "asdasdsa",
+            "first": "0"
+        },
+        {
+            "id": "1231231123",
+            "contact": "2332423432432",
+            "mobile": "2332",
+            "phone": "0",
+            "im": "0",
+            "weixin": "",
+            "skype": "",
+            "email": "",
+            "address": "asdasdsa",
+            "first": "0"
+        }],
+            datatype: "array",
+            mode: [{
+                name: 'id',
+                type: 'number',
+                validator:"required number"
+            }, {
+                name: 'contact',
+                type: 'number',
+                validator:["required", "string"]
+            }, {
+                name: 'mobile',
+                type: 'number',
+                validator:function(value){
+
+                    if(value === 1){
+
+                        return true
+
+                    }else{
+
+                        return '不为1';
+
+                    }
+
+                }
+            }, {
+                name: 'phone',
+                type: 'number',
+                validator:[["required", "required"], ["number", "不是数字"]]
+            }, {
+                name: 'address',
+                type: 'string'
+            }],
+
+            loadComplete:function(data){
+
+                console.log(data)
+            }
+        }).dataBind();
+
+        console.log(dataAdapter.updateRow({
             "id": "121212121",
             "contact": "2332423432432",
             "mobile": "2332",
@@ -182,9 +247,35 @@ leoUiLoad.require('leoUi-dataAdapter, ready', function($) {
             "first": "0"
         }));
 
-        console.log(dataAdapter.updateCell('122121'));
+        console.log(dataAdapter.updateCell("3333333"));
 
         dataAdapter.deleteRow();
+
+        console.log(dataAdapter.appendRow({
+            "id": 11111111111,
+            "contact": "2332423432432",
+            "mobile": 1,
+            "phone": 12313213,
+            "im": "0",
+            "weixin": "",
+            "skype": "",
+            "email": "",
+            "address": "asdasdsa",
+            "first": "0"
+        },4))
+
+        console.log(dataAdapter.prependRow({
+            "id": 3333333333333333,
+            "contact": "2332423432432",
+            "mobile": 1,
+            "phone": 12313213,
+            "im": "0",
+            "weixin": "",
+            "skype": "",
+            "email": "",
+            "address": "asdasdsa",
+            "first": "0"
+        },5))
 
 
 });

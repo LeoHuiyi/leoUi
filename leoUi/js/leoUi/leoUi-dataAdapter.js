@@ -39,8 +39,6 @@
 
         validatorFns = {},
 
-        collection = [],
-
         splice = Array.prototype.splice,
 
         dataAdapterSettings = {
@@ -112,6 +110,20 @@
 
     dataAdapter = function(option) {
 
+        var collection = [];
+
+        this._getCollection = function(clone) {
+
+            return clone ? $.extend(true, [], collection) : collection;
+
+        }
+
+        this._setCollection = function(data) {
+
+            return collection = data;
+
+        }
+
         this.option = $.extend({}, dataAdapterSettings, option);
 
         this._init();
@@ -151,12 +163,6 @@
         _afterAjax: function() {
 
             this.option.afterAjax();
-
-        },
-
-        _getCollection: function(clone) {
-
-            return clone ? $.extend(true, [], collection) : collection;
 
         },
 
@@ -208,11 +214,11 @@
 
         },
 
-        _setCollection: function(data) {
+        _dataToCollection: function(data) {
 
             var i = 0,
 
-                len, j, modeLen,
+                len, j, modeLen, collection = [],
 
                 option = this.option,
 
@@ -236,19 +242,21 @@
 
                 j = 0;
 
-                collectionItem = [];
+                collectionItem = {};
 
                 for (; j < modeLen; j++) {
 
                     modeItem = mode[j];
 
-                    collectionItem.push(this._setCollectionItem(modeItem.type, setDataFn(dataItem, modeItem), dataItem));
+                    collectionItem[modeItem.name] = this._setCollectionItem(modeItem.type, setDataFn(dataItem, modeItem), dataItem);
 
                 }
 
                 collection.push(collectionItem);
 
             }
+
+            this._setCollection(collection);
 
         },
 
@@ -264,17 +272,51 @@
 
         updateCell:function(val, cellIndex, rowIndex, notValidator){
 
-            if(typeof val === 'undefined')return false;
+            var saveInfo = this.validatorCell(val, cellIndex, rowIndex, notValidator);
 
-            if(typeof cellIndex === 'undefined'){
+            if(saveInfo.passed === true){
 
-                cellIndex = 0
-
-            }else if(!this._isCollectionCellIndex(rowIndex)){
-
-                return false;
+                this._updateCell(saveInfo.item, saveInfo.cellName, saveInfo.rowIndex);
 
             }
+
+            return saveInfo;
+
+        },
+
+        _getMode:function(name){
+
+            var mode = this.option.mode, i;
+
+            if(typeof name === 'string'){
+
+                i = mode.length
+
+                while(i--){
+
+                    if(name === mode[i].name){
+
+                        return mode[i];
+
+                    }
+
+                }
+
+            }
+
+            if(typeof +name === 'number' && mode[name]){
+
+                return mode[name];
+
+            }
+
+        },
+
+        validatorCell:function(val, cellIndex, rowIndex, notValidator){
+
+            var cellMode, name, validatorVal, saveInfo;
+
+            if(typeof val === 'undefined')return false;
 
             if(typeof rowIndex === 'undefined'){
 
@@ -286,34 +328,42 @@
 
             }
 
-            var cellMode = this.option.mode[cellIndex],
+            if(typeof cellIndex === 'undefined'){
 
-            name = cellMode.name, validatorVal,
+                cellIndex = 0
 
-            saveInfo = {passed: true};
+            }
+
+            if(!(cellMode = this._getMode(cellIndex))){
+
+                return false;
+
+            }
+
+            name = cellMode.name;
+
+            saveInfo = {passed: true, validatorInfo:{}};
 
             validatorVal = this._validatorCell(val, cellMode.validator, notValidator);
 
             if(validatorVal === true){
 
-                this._updateCell(this._setCollectionItem(cellMode.type, val), cellIndex, rowIndex);
+                saveInfo.item = this._setCollectionItem(cellMode.type, val), cellIndex, rowIndex;
 
             }else{
 
                 saveInfo.passed = false;
 
-                saveInfo[name] = validatorVal;
-
             }
+
+            saveInfo.cellName = name;
+
+            saveInfo.validatorInfo[name] = validatorVal;
+
+            saveInfo.rowIndex = rowIndex;
 
             return saveInfo;
 
-        },
-
-        _validatorRow:function(){
-
-
-            
         },
 
         _isCollectionRowIndex:function(rowIndex){
@@ -322,35 +372,57 @@
 
         },
 
-        _isCollectionCellIndex:function(cellIndex){
+        _updateCell:function(val, cellName, rowIndex){
 
-            return 0 <= cellIndex && cellIndex < this.option.mode.length;
-
-        },
-
-        _updateCell:function(val, cellIndex, rowIndex){
-
-            this._getCollection()[rowIndex][cellIndex] = val;
+            this._getCollection()[rowIndex][cellName] = val;
 
         },
 
-        updateRow:function(data, rowIndex, notValidator){
+        _changeRow:function(data, rowIndex, method, notValidator){
 
-            var saveInfo = this._validatorRow(data, rowIndex, notValidator);
+            var saveInfo = this.validatorRow(data, rowIndex, notValidator);
 
             if(saveInfo.passed === true){
 
-                this._updateRow(saveInfo.collectionItem, rowIndex);
+                !!this[method] && this[method](saveInfo.collectionItem, saveInfo.rowIndex);
 
             }
-
-            delete saveInfo.collectionItem;
 
             return saveInfo;
 
         },
 
-        _validatorRow:function(data, rowIndex, notValidator){
+        updateRow:function(data, rowIndex, notValidator){
+
+            return this._changeRow(data, rowIndex, "_updateRow", notValidator);
+
+        },
+
+        appendRow:function(data, rowIndex, notValidator){
+
+            return this._changeRow(data, rowIndex, "_appendRow", notValidator);
+
+        },
+
+        prependRow:function(data, rowIndex, notValidator){
+
+            return this._changeRow(data, rowIndex, "_prependRow", notValidator);
+
+        },
+
+        _prependRow:function(data, rowIndex){
+
+            this._getCollection().splice(rowIndex, 0, data);
+
+        },
+
+        _appendRow:function(data, rowIndex){
+
+            this._getCollection().splice(rowIndex + 1, 0, data);
+
+        },
+
+        validatorRow:function(data, rowIndex, notValidator){
 
             if(typeof data !== 'object')return false;
 
@@ -366,7 +438,7 @@
 
             var option = this.option, i = 0, modeItem,
 
-            mode = option.mode, saveInfo = { passed: true, info: {}, collectionItem: []},
+            mode = option.mode, saveInfo = { passed: true, validatorInfo: {}, collectionItem: {}},
 
             len = mode.length, validatorVal, name, val;
 
@@ -382,17 +454,21 @@
 
                 if(validatorVal === true){
 
-                    saveInfo.collectionItem.push(this._setCollectionItem(modeItem.type, val));
+                    saveInfo.collectionItem[name] = this._setCollectionItem(modeItem.type, val);
 
                 }else{
 
                     saveInfo.passed = false;
 
-                    saveInfo.info[name] = validatorVal;
-
                 }
 
+                saveInfo.validatorInfo[name] = validatorVal;
+
             }
+
+            saveInfo.passed === false && (saveInfo.collectionItem = {});
+
+            saveInfo.rowIndex = rowIndex;
 
             return saveInfo;
 
@@ -564,7 +640,7 @@
 
     dataAdapter.addMethodFn('local *', function(option, page, dataAdapter) {
 
-        this._setCollection();
+        this._dataToCollection();
 
         if (option.isPage) {
 
@@ -586,7 +662,7 @@
 
         $.ajax(this._beforeAjax(page)).done(function(data) {
 
-            this._setCollection(option.getAjaxData(data));
+            this._dataToCollection(option.getAjaxData(data));
 
             option.loadComplete(this._getCollection(true));
 
@@ -642,13 +718,13 @@
 
     var MAX_ARRAY_INDEX = Math.pow(2, 53) - 1,
 
-        isArrayLike = function(collection) {
+    isArrayLike = function(collection) {
 
-            var length = collection && collection.length;
+        var length = collection && collection.length;
 
-            return typeof length == 'number' && length >= 0 && length <= MAX_ARRAY_INDEX;
+        return typeof length == 'number' && length >= 0 && length <= MAX_ARRAY_INDEX;
 
-        };
+    };
 
     DataWrapper = $.leoTools.dataAdapter.DataWrapper = function(data) {
 

@@ -49,7 +49,7 @@
 
             currentPage: 1,
 
-            datatype: 'array',
+            datatype: 'object',//object,array
 
             method: 'local', //local,ajax
 
@@ -71,11 +71,7 @@
 
             afterAjax: function() {},
 
-            getAjaxData: function(data) {
-
-                return data;
-
-            },
+            filterData: null,//data
 
             loadComplete: function(data) {}
 
@@ -136,33 +132,17 @@
 
             var option = this.option;
 
+            if(!$.isArray(option.mode) || option.mode.length === 0){
+
+                return $.error('mode不规范！');
+
+            }
+
             if (option.isPage) {
 
                 this.currentPage = option.currentPage;
 
             }
-
-        },
-
-        _beforeAjax: function(currentPage) {
-
-            var ajax = $.extend({}, ajaxParam),
-
-                option = this.option,
-
-                ajaxParam = option.ajaxParam(ajax, currentPage);
-
-            !ajaxParam && (ajaxParam = ajax);
-
-            option.beforeAjax();
-
-            return ajaxParam;
-
-        },
-
-        _afterAjax: function() {
-
-            this.option.afterAjax();
 
         },
 
@@ -216,23 +196,25 @@
 
         _dataToCollection: function(data) {
 
-            var i = 0,
+            var i = 0, len, j, modeLen, collection = [],
 
-                len, j, modeLen, collection = [],
+            option = this.option,
 
-                option = this.option,
+            filterData = option.filterData,
 
-                mode = this.option.mode,
+            mode = option.mode,
 
-                modeLen = mode.length,
+            modeLen = mode.length,
 
-                datatype = option.datatype,
+            datatype = option.datatype,
 
-                setDataFn = getFns(datatype, setDataFns),
+            setDataFn = getFns(datatype, setDataFns),
 
-                collectionItem, dataItem, modeItem;
+            collectionItem, dataItem, modeItem;
 
             data = data || option.localData;
+
+            !!filterData && (data = filterData(data));
 
             len = data.length;
 
@@ -658,27 +640,31 @@
 
     dataAdapter.addMethodFn('ajax', function(option, page, dataAdapter) {
 
-        var This = this;
+        var ajaxParam = option.ajax;
 
-        $.ajax(this._beforeAjax(page)).done(function(data) {
+        ajaxParam = option.ajaxParam(ajaxParam, page) || ajaxParam;
 
-            this._dataToCollection(option.getAjaxData(data));
+        option.beforeAjax();
+
+        $.ajax(ajaxParam).done(function(data) {
+
+            this._dataToCollection(data);
 
             option.loadComplete(this._getCollection(true));
 
         }).fail(function(data) {
 
-            option.loadComplete(data);
+            $.error("ajax error");
 
         }).always(function() {
 
-            This._afterAjax();
+            option.afterAjax();
 
         });
 
     });
 
-    dataAdapter.addSetDataFn('array *', function(item, mode) {
+    dataAdapter.addSetDataFn('object *', function(item, mode) {
 
         return item[mode.name];
 

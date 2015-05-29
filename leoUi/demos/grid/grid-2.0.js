@@ -32,7 +32,7 @@ leoUiLoad.config({
 
 })
 
-leoUiLoad.require('leoUi-grid-2.0,leoUi,leoUiGrid,ready', function($) {
+leoUiLoad.require('leoUi-dataAdapter,leoUi-grid-2.0,leoUi,leoUiGrid,ready', function($) {
 
     var tableModel = [{
 
@@ -342,13 +342,51 @@ leoUiLoad.require('leoUi-grid-2.0,leoUi,leoUiGrid,ready', function($) {
             "email": "",
             "address": "",
             "first": "0"
-        }];
+        }],option = {
+            localData:data,
+            datatype: "array",
+            mode: [{
+                name: 'id',
+                type: 'number',
+                validator:"required number"
+            }, {
+                name: 'contact',
+                type: 'number',
+                validator:["required", "string"]
+            }, {
+                name: 'mobile',
+                type: 'number',
+                validator:function(value){
+
+                    if(value === 1){
+
+                        return true
+
+                    }else{
+
+                        return '不为1';
+
+                    }
+
+                }
+            }, {
+                name: 'phone',
+                type: 'number',
+                validator:[["required", "required"], ["number", "不是数字"]]
+            }, {
+                name: 'address',
+                type: 'string'
+            }],
+
+            loadComplete:function(data){
+
+                console.log(data)
+            }
+        }, dataAdapter = $.leoTools.dataAdapter(option);
 
     $grid = $('.grid-wrap').leoGrid({
 
-        dataType: 'data',
-
-        gridData: data,
+        source: dataAdapter,
 
         isPage: true,
 

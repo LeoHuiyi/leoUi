@@ -195,6 +195,7 @@ leoUiLoad.require('leoUi-dataAdapter, ready', function($) {
             "first": "0"
         }],
             datatype: "array",
+            method:"locat",
             mode: [{
                 name: 'id',
                 type: 'number',

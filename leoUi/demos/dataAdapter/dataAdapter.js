@@ -169,6 +169,20 @@ leoUiLoad.require('leoUi-dataAdapter, ready', function($) {
 
         dataAdapter = $.leoTools.dataAdapter(option).dataBind();
 
+        $.leoTools.dataAdapter.addValidatorFn('number', function(val, info) {
+
+            if(typeof val === 'number'){
+
+                return true;
+
+            }else{
+
+                return '不是这里的数字！！';
+
+            }
+
+        });
+
         var data =  $.leoTools.dataAdapter({
             localData:[{
             "id": "123123211312",

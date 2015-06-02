@@ -29,6 +29,8 @@
 
         DataWrapper,
 
+        leoToosDataAdapt,
+
         rnotwhite = (/\S+/g),
 
         setDataFns = {},
@@ -42,12 +44,6 @@
         splice = Array.prototype.splice,
 
         dataAdapterSettings = {
-
-            isPage: true,
-
-            pageNum: 20, //每一页条数
-
-            currentPage: 1,
 
             datatype: 'object',//object,array
 
@@ -65,7 +61,7 @@
 
             },
 
-            ajaxParam: function(ajax, currentPage) {},
+            ajaxParam: function(ajax, data) {},
 
             beforeAjax: function() {},
 
@@ -120,7 +116,7 @@
 
         }
 
-        this.option = $.extend({}, dataAdapterSettings, option);
+        this.setOption(option);
 
         this._init();
 
@@ -138,57 +134,33 @@
 
             }
 
-            if (option.isPage) {
-
-                this.currentPage = option.currentPage;
-
-            }
-
         },
 
-        _getLocalPagerInfo: function(page, collection) {
+        setOption:function(option){
 
-            var totalItems = collection.length,
+            if(!$.isPlainObject(option))return;
 
-                option = this.option,
-
-                pageNum = option.pageNum,
-
-                fristItem, fristItems,
-
-                totalpages = Math.ceil(totalItems / pageNum);
-
-            if (page >= 1 && page <= totalpages) {
-
-                fristItem = pageNum * (page - 1);
-
-                lastItem = fristItem + pageNum;
-
-                return collection.slice(fristItem, lastItem);
-
-            } else {
-
-                return [];
-
-            }
-
-        },
-
-        dataBind: function(page) {
-
-            this._getData(page);
+            this.option = $.extend({}, dataAdapterSettings, this.option || {}, option);
 
             return this;
 
         },
 
-        _getData: function(page) {
+        dataBind: function(data) {
+
+            this._getData(data);
+
+            return this;
+
+        },
+
+        _getData: function(data) {
 
             var option = this.option,
 
                 methodFn = getFns(option.method, methodFns);
 
-            methodFn.call(this, option, page || this.currentPage, this);
+            methodFn.call(this, option, data || {}, this);
 
             return this;
 
@@ -560,7 +532,13 @@
 
     });
 
-    $.extend(dataAdapter, {
+    leoToosDataAdapt = leoTools.dataAdapter = function(option) {
+
+        return new dataAdapter(option);
+
+    }
+
+    $.extend(leoToosDataAdapt, {
 
         addMethodFn: addToFns(methodFns),
 
@@ -572,13 +550,13 @@
 
     });
 
-    dataAdapter.addValidatorFn('*', function(val) {
+    leoToosDataAdapt.addValidatorFn('*', function(val) {
 
         return true;
 
     });
 
-    dataAdapter.addValidatorFn('required', function(val, info) {
+    leoToosDataAdapt.addValidatorFn('required', function(val, info) {
 
         if(typeof val !== 'undefined'){
 
@@ -592,7 +570,7 @@
 
     });
 
-    dataAdapter.addValidatorFn('number', function(val, info) {
+    leoToosDataAdapt.addValidatorFn('number', function(val, info) {
 
         if(typeof val === 'number'){
 
@@ -606,7 +584,7 @@
 
     });
 
-    dataAdapter.addValidatorFn('string', function(val, info) {
+    leoToosDataAdapt.addValidatorFn('string', function(val, info) {
 
         if(typeof val === 'string'){
 
@@ -620,29 +598,19 @@
 
     });
 
-    dataAdapter.addMethodFn('local *', function(option, page, dataAdapter) {
+    leoToosDataAdapt.addMethodFn('local *', function(option, data, dataAdapter) {
 
         this._dataToCollection();
 
-        if (option.isPage) {
-
-            option.loadComplete(this._getLocalPagerInfo(page, this._getCollection(true)));
-
-            this.currentPage = page;
-
-        } else {
-
-            option.loadComplete(this._getCollection(true));
-
-        }
+        option.loadComplete(this._getCollection(true));
 
     });
 
-    dataAdapter.addMethodFn('ajax', function(option, page, dataAdapter) {
+    leoToosDataAdapt.addMethodFn('ajax', function(option, data, dataAdapter) {
 
         var ajaxParam = option.ajax;
 
-        ajaxParam = option.ajaxParam(ajaxParam, page) || ajaxParam;
+        ajaxParam = option.ajaxParam(ajaxParam, data) || ajaxParam;
 
         option.beforeAjax();
 
@@ -664,13 +632,13 @@
 
     });
 
-    dataAdapter.addSetDataFn('object *', function(item, mode) {
+    leoToosDataAdapt.addSetDataFn('object *', function(item, mode) {
 
         return item[mode.name];
 
     });
 
-    dataAdapter.addFormatDateFn('string', function(value) {
+    leoToosDataAdapt.addFormatDateFn('string', function(value) {
 
         !value && (value = '');
 
@@ -678,29 +646,23 @@
 
     });
 
-    dataAdapter.addFormatDateFn('number', function(value) {
+    leoToosDataAdapt.addFormatDateFn('number', function(value) {
 
         return +value || 0;
 
     });
 
-    dataAdapter.addFormatDateFn('bool', function(value) {
+    leoToosDataAdapt.addFormatDateFn('bool', function(value) {
 
         return !!value;
 
     });
 
-    dataAdapter.addFormatDateFn('*', function(value) {
+    leoToosDataAdapt.addFormatDateFn('*', function(value) {
 
         return value;
 
     });
-
-    leoTools.dataAdapter = function(option) {
-
-        return new dataAdapter(option);
-
-    }
 
     var MAX_ARRAY_INDEX = Math.pow(2, 53) - 1,
 

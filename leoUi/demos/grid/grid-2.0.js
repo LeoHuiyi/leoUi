@@ -60,7 +60,7 @@ leoUiLoad.require('leoUi-dataAdapter,leoUi-grid-2.0,leoUi,leoUiGrid,ready', func
 
         }, {
 
-            id: 'contact',
+            dataKey: 'contact',
 
             theadName: '联系人',
 
@@ -90,7 +90,7 @@ leoUiLoad.require('leoUi-dataAdapter,leoUi-grid-2.0,leoUi,leoUiGrid,ready', func
 
         }, {
 
-            id: 'mobile',
+            dataKey: 'mobile',
 
             theadName: '手机',
 
@@ -112,7 +112,7 @@ leoUiLoad.require('leoUi-dataAdapter,leoUi-grid-2.0,leoUi,leoUiGrid,ready', func
 
         }, {
 
-            id: 'im',
+            dataKey: 'im',
 
             theadName: 'QQ',
 
@@ -134,7 +134,7 @@ leoUiLoad.require('leoUi-dataAdapter,leoUi-grid-2.0,leoUi,leoUiGrid,ready', func
 
         }, {
 
-            id: 'weixin',
+            dataKey: 'weixin',
 
             theadName: '微信',
 
@@ -156,7 +156,7 @@ leoUiLoad.require('leoUi-dataAdapter,leoUi-grid-2.0,leoUi,leoUiGrid,ready', func
 
         }, {
 
-            id: 'skype',
+            dataKey: 'skype',
 
             theadName: 'skype',
 
@@ -178,7 +178,7 @@ leoUiLoad.require('leoUi-dataAdapter,leoUi-grid-2.0,leoUi,leoUiGrid,ready', func
 
         }, {
 
-            id: 'email',
+            dataKey: 'email',
 
             theadName: 'email',
 
@@ -200,7 +200,7 @@ leoUiLoad.require('leoUi-dataAdapter,leoUi-grid-2.0,leoUi,leoUiGrid,ready', func
 
         }, {
 
-            id: 'phone',
+            dataKey: 'phone',
 
             theadName: '座机',
 
@@ -222,7 +222,7 @@ leoUiLoad.require('leoUi-dataAdapter,leoUi-grid-2.0,leoUi,leoUiGrid,ready', func
 
         }, {
 
-            id: 'address',
+            dataKey: 'address',
 
             sortable: true,
 
@@ -244,7 +244,7 @@ leoUiLoad.require('leoUi-dataAdapter,leoUi-grid-2.0,leoUi,leoUiGrid,ready', func
 
         }, {
 
-            id: 'first',
+            dataKey: 'first',
 
             theadName: '首要联系人',
 
@@ -261,8 +261,6 @@ leoUiLoad.require('leoUi-dataAdapter,leoUi-grid-2.0,leoUi,leoUiGrid,ready', func
             tdTemplate:'{{if +arg1 === 1}}是{{else}}否{{/if}}'
 
         }, {
-
-            id: 'operate',
 
             width: 100,
 
@@ -376,12 +374,7 @@ leoUiLoad.require('leoUi-dataAdapter,leoUi-grid-2.0,leoUi,leoUiGrid,ready', func
             }, {
                 name: 'address',
                 type: 'string'
-            }],
-
-            loadComplete:function(data){
-
-                console.log(data)
-            }
+            }]
         }, dataAdapter = $.leoTools.dataAdapter(option);
 
     $grid = $('.grid-wrap').leoGrid({

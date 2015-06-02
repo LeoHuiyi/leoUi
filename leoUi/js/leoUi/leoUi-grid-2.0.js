@@ -187,7 +187,7 @@
 
             gridBodySizeRowTemplate:'<tr id="{{sizeRowid}}" style="height:0">{{each tableModels as value index}}<td id="{{value.thId + sizeRowTdIdPostfix}}" style="height:0;width:0"></td>{{/each}}</tr>',
 
-            gridBodyTdTemplate:'{{each tableModels as value index}}<td id="{{trId+tdIdPostfix+value.id}}" {{if value.tdStyle}}style="{{value.tdStyle}};"{{/if}} {{if value.tdClass}}class="{{value.tdClass}};"{{/if}}>{{if value.tdTemplate}}{{#value.tdTemplate | getHtml:data[index]}}{{else}}{{if value.checkBoxId}}<input type="checkbox" {{if data[index]}}checked{{/if}}>{{else}}{{if data[index]}}{{data[index]}}{{else}}{{" "}}{{/if}}{{/if}}{{/if}}</td>{{/each}}'
+            gridBodyTdTemplate:'{{each tableModels as value index}}<td id="{{trId+tdIdPostfix+index}}" {{if value.tdStyle}}style="{{value.tdStyle}};"{{/if}} {{if value.tdClass}}class="{{value.tdClass}};"{{/if}}>{{if value.tdTemplate}}{{#value.tdTemplate | getHtml:data[value.dataKey]}}{{else}}{{if value.checkBoxId}}<input type="checkbox" {{if data[value.dataKey]}}checked{{/if}}>{{else}}{{data[value.dataKey]}}{{/if}}{{/if}}</td>{{/each}}'
 
         },
 
@@ -267,17 +267,45 @@
 
         },
 
+        _getLocalPagerInfo: function(page, collection) {
+
+            var totalItems = collection.length,
+
+                option = this.option,
+
+                pageNum = option.pageNum,
+
+                fristItem, fristItems,
+
+                totalpages = Math.ceil(totalItems / pageNum);
+
+            if (page >= 1 && page <= totalpages) {
+
+                fristItem = pageNum * (page - 1);
+
+                lastItem = fristItem + pageNum;
+
+                return collection.slice(fristItem, lastItem);
+
+            } else {
+
+                return [];
+
+            }
+
+        },
+
         _storeInit:function(){
 
             var This = this;
 
-            this.store = this._store({
+            this.source = this.options.source;
 
-                localData: this.options.gridData,
+            this.source.setOption({
 
-                mode:this.tableOption.tableModels,
+                loadComplete:function(data){
 
-                getCollection:function(data){
+                    console.log(data)
 
                     This._renderGridBodyTbody(data);
 
@@ -289,7 +317,7 @@
 
                 }
 
-            }).triggerGetCollection();
+            }).dataBind();
 
         },
 
@@ -301,15 +329,15 @@
 
             tableModels = this.tableOption.tableModels,
 
+            trIdPostfix = this._getGridIds().trIdPostfix,
+
             leoGrid = this.leoGrid, tdIdPostfix = this.gridIds.tdIdPostfix;
 
             for(; i < len; i++){
 
                 obj = data[i];
 
-                console.log(obj)
-
-                trId = leoGrid + obj.index;
+                trId = trIdPostfix + i;
 
                 str += '<tr id="'+ trId +'" class="leoUi-widget-content jqgrow leoUi-row-ltr" tabindex="-1">';
 
@@ -383,17 +411,19 @@
 
             for (; i < opTableModelsLen; i++) {
 
-                tableModels.push(this._getTableModel(opTableModels[i]));
+                tableModels.push(this._getTableModel(opTableModels[i], i));
 
             };
 
         },
 
-        _getTableModel:function(opModel){
+        _getTableModel:function(opModel, index){
 
-            var model = $.extend({}, this.options.tableModelDefault, opModel, {
+            var thIdPostfix = this._getGridIds().thIdPostfix,
 
-                thId:this.leoGrid + ( opModel.id || opModel.boxType )
+            model = $.extend({}, this.options.tableModelDefault, opModel, {
+
+                thId: thIdPostfix + index
 
             }), cellOuterWidth = model.width + model.cellLayout,
 
@@ -450,6 +480,10 @@
                 load_grid: leoGrid + 'load_grid',
 
                 gview_grid: leoGrid + 'gview_grid',
+
+                thIdPostfix: leoGrid + 'th_',
+
+                trIdPostfix: leoGrid + 'tr_',
 
                 rs_mgrid: leoGrid + 'rs_mgrid',
 
@@ -666,12 +700,6 @@
                 This.$gridHeadDiv.scrollLeft($(this).scrollLeft());
 
             });
-
-        },
-
-        _store:function(option){
-
-            
 
         }
 

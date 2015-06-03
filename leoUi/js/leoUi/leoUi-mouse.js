@@ -6,6 +6,14 @@
 * @author     leo
 +-------------------------------------------------------------------
 */
+/*!
+ * jQuery UI Mouse @VERSION
+ * http://jqueryui.com
+ *
+ * Copyright jQuery Foundation and other contributors
+ * Released under the MIT license.
+ * http://jquery.org/license
+ */
 ;(function(factory) {
 
     if (typeof define === "function" && define.amd) {
@@ -24,7 +32,7 @@
 
     var mouseHandled = false;
 
-    $( document ).mouseup( function() {
+    $( document ).on( "mouseup", function() {
 
         mouseHandled = false;
 
@@ -170,9 +178,11 @@
 
             this._mouseDownEvent = event;
 
-            var This = this,btnIsLeft = ( event.which === 1 ),
+            var This = this, btnIsLeft = ( event.which === 1 ),
 
-            elIsCancel = ( typeof this.options.cancel === "string" && event.target.nodeName ? $( event.target ).closest( this.options.cancel ).length : false );
+            options = this.options,
+
+            elIsCancel = ( typeof options.cancel === "string" && event.target.nodeName ? $( event.target ).closest( options.cancel ).length : false );
 
             if( !btnIsLeft || elIsCancel || !this._mouseCapture(event) ){
 
@@ -180,7 +190,7 @@
 
             }
 
-            this.mouseDelayMet = !this.options.delay;
+            this.mouseDelayMet = !options.delay;
 
             if( !this.mouseDelayMet ){
 
@@ -188,7 +198,7 @@
 
                     This.mouseDelayMet = true;
 
-                }, this.options.delay);
+                }, options.delay);
 
             }
 
@@ -242,13 +252,13 @@
 
         _mouseMove: function(event) {
 
-            if ( this._mouseMoved ) {
+            if (this._mouseMoved) {
 
                 if ($.leoTools.ie && ( !document.documentMode || document.documentMode < 9 ) && !event.button) {
 
                     return this._mouseUp(event);
 
-                } else if ( !event.which ) {
+                } else if (!event.which) {
 
                     return this._mouseUp(event);
 
@@ -256,13 +266,13 @@
 
             }
 
-            if ( event.which || event.button ) {
+            if (event.which || event.button) {
 
                 this._mouseMoved = true;
 
             }
 
-            if( this._mouseStarted ){
+            if(this._mouseStarted){
 
                 this._mouseDrag(event);
 
@@ -274,7 +284,7 @@
 
                 this._mouseStarted = (this._mouseStart(this._mouseDownEvent, event) !== false);
 
-                ( this._mouseStarted ? this._mouseDrag(event) : this._mouseUp(event) );
+                (this._mouseStarted ? this._mouseDrag(event) : this._mouseUp(event));
 
             }
 
@@ -292,11 +302,11 @@
 
             this.isSetCapture && this._mouseDownEvent.target.releaseCapture();
 
-            if ( this._mouseStarted ) {
+            if (this._mouseStarted) {
 
                 this._mouseStarted = false;
 
-                if ( event.target === this._mouseDownEvent.target ) {
+                if (event.target === this._mouseDownEvent.target) {
 
                     $.data( event.target, this.dataId + ".preventClickEvent", true );
 

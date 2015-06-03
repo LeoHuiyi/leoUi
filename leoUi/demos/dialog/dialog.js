@@ -178,7 +178,7 @@ leoUiLoad.require('leoUi-dialog,leoUi-mask,base,leoUi,ready', function($) {
 
         showAnimation: function(callBack) {
 
-            this.show(500, callBack);
+            this.show( { effect: "clip", duration: "slow", complete: callBack } );
 
         },
 

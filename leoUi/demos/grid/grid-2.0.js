@@ -323,7 +323,7 @@ leoUiLoad.require('leoUi-dataAdapter,leoUi-grid-2.0,leoUi,leoUiGrid,ready', func
             "contact": "23423432",
             "mobile": "3243232",
             "phone": "0",
-            "im": "0",
+            "im": "12312321",
             "weixin": "",
             "skype": "",
             "email": "",
@@ -335,9 +335,9 @@ leoUiLoad.require('leoUi-dataAdapter,leoUi-grid-2.0,leoUi,leoUiGrid,ready', func
             "mobile": "2332",
             "phone": "0",
             "im": "0",
-            "weixin": "",
+            "weixin": "1231321",
             "skype": "",
-            "email": "",
+            "email": "12321",
             "address": "",
             "first": "0"
         }],option = {
@@ -352,6 +352,22 @@ leoUiLoad.require('leoUi-dataAdapter,leoUi-grid-2.0,leoUi,leoUiGrid,ready', func
                 type: 'number',
                 validator:["required", "string"]
             }, {
+                name: 'email',
+                type: 'number'
+
+            }, {
+                name: 'skype',
+                type: 'number'
+
+            },{
+                name: 'im',
+                type: 'number'
+
+            },{
+                name: 'weixin',
+                type: 'number'
+
+            },{
                 name: 'mobile',
                 type: 'number',
                 validator:function(value){

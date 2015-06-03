@@ -554,7 +554,7 @@
 
                 init:function(leoUi){
 
-                    var This = this,time;
+                    var This = this, time;
 
                     this.getlinksLR();
 

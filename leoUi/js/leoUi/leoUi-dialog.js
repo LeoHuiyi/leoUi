@@ -241,7 +241,7 @@
 
 
 
-            },//dialog关闭完成回调，clickCallBackName：okCallBack, cancelCallBack, closeCallBack。（arguments: target, clickCallBackName）
+            }//dialog关闭完成回调，clickCallBackName：okCallBack, cancelCallBack, closeCallBack。（arguments: target, clickCallBackName）
 
         },
 

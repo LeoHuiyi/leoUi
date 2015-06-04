@@ -634,21 +634,27 @@
 
                     if( this.slideIsShow === false ){ return }
 
-                    var linksLR = this.linksLR,left,right,offsetLeft;
+                    var linksLR = this.linksLR, left, right,
 
-                    $li = $li || this.$ul.find(this.selectedClass);
+                    offsetLeft, alignRightW;
+
+                    $li = $li || this.$ul.find(this.selectedClass),
 
                     offsetLeft = $li.offset().left;
 
-                    if( ( left = linksLR.left - offsetLeft ) >= 0 ){
+                    if( ( left = linksLR.left - offsetLeft ) > 0 ){
 
-                        if(left === 0)return;
+                        if((alignRightW = this.linksLR.right - left - this.$wrap.offset().left - this.$wrap.outerWidth()) > 0){
 
-                        this.sildeAnimate( '+=' + left, 200 );
+                            this.sildeAnimate( '+=' + (alignRightW += left), 200 );
 
-                    }else if( ( right = offsetLeft + $li.outerWidth() - linksLR.right ) >= 0 ){
+                        }else{
 
-                        if(right === 0)return;
+                            this.sildeAnimate( '+=' + left, 200 );
+
+                        }
+
+                    }else if( ( right = offsetLeft + $li.outerWidth() - linksLR.right ) > 0 ){
 
                         this.isAlignRight === true ? this.$ul.css( 'left', '-=' + right ) : this.sildeAnimate( '-=' + right, 200 );
 
@@ -926,7 +932,7 @@
 
                         }else{
 
-                            this.alignRight();
+                            this.activeTab();
 
                         }
 

@@ -49,6 +49,8 @@
 
             method: 'local', //local,ajax
 
+            pageMethod:'local', //local,ajax
+
             localData: [],
 
             mode: [],
@@ -60,6 +62,12 @@
                 type: "GET"
 
             },
+
+            isPage: true,
+
+            pageSize: 20,
+
+            firstPage: 1,
 
             ajaxParam: function(ajax, data) {},
 
@@ -118,6 +126,8 @@
 
         this.setOption(option);
 
+        this.option.isPage && (this.currentPage = this.option.currentPage || 1);
+
         this._init();
 
     }
@@ -136,6 +146,131 @@
 
         },
 
+        getOption:function(){
+
+            return $.extend({}, this.option);
+
+        },
+
+        getCurrentPage:function(){
+
+            return this.currentPage || 0;
+
+        },
+
+        getPageData:function(page){
+
+            var option = this.option, pageInfo, data = {};
+
+            if(option.isPage){
+
+                typeof page === 'undefined' && (page = this.currentPage);
+
+                page = page >> 0;
+
+                if(option.pageMethod === 'local'){
+
+                    pageInfo = this._getLocalPageInfo(page);
+
+                    if(pageInfo.isPageInfo){
+
+                        data.pageData = this._getLocalPageData(pageInfo);
+
+                        data.pageInfo = pageInfo;
+
+                        this.currentPage = page;
+
+                    }
+
+                }else if(option.pageMethod === 'ajax'){
+
+                    this._getData({page: page});
+
+                }
+
+
+            }
+
+            return data;
+
+        },
+
+        getLocalPageInfo:function(){
+
+            return _getLocalPageInfo();
+
+        },
+
+        _getLocalPageInfo: function(page, collection) {
+
+            if(!this.option.isPage)return;
+
+            var totalItems = (collection ? collection : this._getCollection()).length,
+
+            op = this.option, pageSize = op.pageSize,
+
+            fristItem, isLastPage, lastItem, pageInfo, totalpages;
+
+            !page && (page = this.currentPage);
+
+            if(totalItems === 0 || page < 1 || page > (totalpages = Math.ceil(totalItems / pageSize))){
+
+                return {}
+
+            }else{
+
+                fristItem = pageSize * (page - 1);
+
+                isLastPage = totalpages === page;
+
+                lastItem = fristItem + isLastPage ? totalItems % pageSize : pageSize;
+
+                return {
+
+                    isPageInfo: true,
+
+                    fristPage: 1,
+
+                    isFristPage: page === 1,
+
+                    lastPage: totalpages,
+
+                    isLastPage: isLastPage,
+
+                    totalpages: totalpages,
+
+                    currentPage: page,
+
+                    fristItem: fristItem,
+
+                    lastItem: lastItem,
+
+                    currentItems: lastItem - fristItem
+
+                }
+
+            }
+
+        },
+
+        _getLocalPageData:function(pageInfo, collection){
+
+            if(!this.option.isPage)return;
+
+            if(pageInfo && pageInfo.isPageInfo){
+
+                !collection && (collection = this._getCollection());
+
+                return collection.slice(pageInfo.fristItem, pageInfo.lastItem);
+
+            }else{
+
+                return [];
+
+            }
+
+        },
+
         setOption:function(option){
 
             if(!$.isPlainObject(option))return;
@@ -146,9 +281,9 @@
 
         },
 
-        dataBind: function(data) {
+        dataBind: function() {
 
-            this._getData(data);
+            this._getData();
 
             return this;
 
@@ -480,6 +615,12 @@
 
         },
 
+        dataWrapper:function(data){
+
+            return new DataWrapper(data);
+
+        },
+
         _validator:function(val, validators){
 
             var i = 0, len = validators.length, validator,
@@ -602,15 +743,13 @@
 
         this._dataToCollection();
 
-        option.loadComplete(this._getCollection(true));
+        option.loadComplete.call(this, this._getCollection(true));
 
     });
 
-    leoToosDataAdapt.addMethodFn('ajax', function(option, data, dataAdapter) {
+    leoToosDataAdapt.addMethodFn('ajax', function(option, arg, dataAdapter) {
 
-        var ajaxParam = option.ajax;
-
-        ajaxParam = option.ajaxParam(ajaxParam, data) || ajaxParam;
+        var ajaxParam = option.ajaxParam(option, arg) || ajaxParam;
 
         option.beforeAjax();
 
@@ -618,7 +757,13 @@
 
             this._dataToCollection(data);
 
-            option.loadComplete(this._getCollection(true));
+            option.loadComplete.call(this, this._getCollection(true));
+
+            if(option.isPage && option.pageMethod === 'ajax'){
+
+                dataAdapter.currentPage = arg.page;
+
+            }
 
         }).fail(function(data) {
 
@@ -724,9 +869,9 @@
 
         },
 
-        getData: function() {
+        getData: function(clone) {
 
-            return $.extend(true, [], this.data);
+            return !clone ? this.data : $.extend(true, [], this.data);
 
         },
 

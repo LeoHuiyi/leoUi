@@ -139,6 +139,8 @@
 
             isPage:true,//是否要分页功能
 
+            pageType:'local',//local,ajax
+
             rowNum:20,//每一页条数
 
             rowList:[20,30,50],//每一页可选条数
@@ -267,13 +269,13 @@
 
         },
 
-        _getLocalPagerInfo: function(page, collection) {
+        _getLocalPageData: function(page, collection) {
 
             var totalItems = collection.length,
 
-                option = this.option,
+                op = this.options,
 
-                pageNum = option.pageNum,
+                pageNum = op.pageNum,
 
                 fristItem, fristItems,
 
@@ -295,29 +297,88 @@
 
         },
 
+        _getLocalPageInfo:function(){
+
+
+
+
+        },
+
+        _storeGetLocalPage:function(){
+
+            var op = this.options, pageType = op.pageType;
+
+            if(pageType === "local"){
+
+
+
+
+            }else if(pageType === "ajax"){
+
+
+
+
+            }
+
+        },
+
+        _getStoreData:function(){
+
+            this.renderGridBody();
+
+            if(this.options.isPage === true){
+
+                this._storeGetLocalPager();
+
+            }else{
+
+                this._renderGridBody();
+
+            }
+
+        },
+
+        renderGridBody:function(data){
+
+            this._renderGridBodyTbody(data || this.records.getData(true));
+
+            this._setTableHeight();
+
+            this._setTableWidth();
+
+            this._resizeCountWidth();
+
+        },
+
+        _loadComplete:function(data, dataWrapper){
+
+            this.records = dataWrapper(data);
+
+            this._getStoreData();
+
+        },
+
         _storeInit:function(){
 
             var This = this;
 
-            this.source = this.options.source;
+            this.source = this.options.source.setOption({
 
-            this.source.setOption({
+                loadComplete: function(data){
 
-                loadComplete:function(data){
-
-                    console.log(data)
-
-                    This._renderGridBodyTbody(data);
-
-                    This._setTableHeight();
-
-                    This._setTableWidth();
-
-                    This._resizeCountWidth();
+                    This._loadComplete(data, this.dataWrapper);
 
                 }
 
-            }).dataBind();
+            });
+
+            this._storeDataBind();
+
+        },
+
+        _storeDataBind:function(){
+
+            this.source.dataBind();
 
         },
 

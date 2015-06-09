@@ -169,6 +169,8 @@ leoUiLoad.require('leoUi-dataAdapter, ready', function($) {
 
         dataAdapter = $.leoTools.dataAdapter(option).dataBind();
 
+        console.log(dataAdapter.getPageData());
+
         $.leoTools.dataAdapter.addValidatorFn('number', function(val, info) {
 
             if(typeof val === 'number'){

@@ -103,6 +103,7 @@ leoUiLoad.require('leoUi-dataAdapter, ready', function($) {
         }],
         option = {
             localData:data,
+            pageSize:2,
             datatype: "array",
             mode: [{
                 name: 'id',
@@ -169,7 +170,7 @@ leoUiLoad.require('leoUi-dataAdapter, ready', function($) {
 
         dataAdapter = $.leoTools.dataAdapter(option).dataBind();
 
-        console.log(dataAdapter.getPageData());
+        console.log(dataAdapter.getPageData(1),dataAdapter.getPageData(2),dataAdapter.getPageData(3),dataAdapter.getPageData(4));
 
         $.leoTools.dataAdapter.addValidatorFn('number', function(val, info) {
 

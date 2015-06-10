@@ -207,11 +207,9 @@
 
             var totalItems = (collection ? collection : this._getCollection()).length,
 
-            op = this.option, pageSize = op.pageSize,
+            op = this.option, pageSize = op.pageSize, remainder,
 
             fristItem, isLastPage, lastItem, pageInfo, totalpages;
-
-            !page && (page = this.currentPage);
 
             if(totalItems === 0 || page < 1 || page > (totalpages = Math.ceil(totalItems / pageSize))){
 
@@ -223,7 +221,7 @@
 
                 isLastPage = totalpages === page;
 
-                lastItem = fristItem + isLastPage ? totalItems % pageSize : pageSize;
+                lastItem = fristItem + (isLastPage ? (remainder = totalItems % pageSize) === 0 ? pageSize : remainder : pageSize);
 
                 return {
 
@@ -244,6 +242,10 @@
                     fristItem: fristItem,
 
                     lastItem: lastItem,
+
+                    fristItemShow: fristItem + 1,
+
+                    lastItemShow: lastItem,
 
                     currentItems: lastItem - fristItem
 

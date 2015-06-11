@@ -57,7 +57,7 @@
 
             ajax: {
 
-                url: 'leoui.com',
+                url: 'leUi.com',
 
                 type: "GET"
 
@@ -67,9 +67,11 @@
 
             pageSize: 20,
 
-            firstPage: 1,
+            currentPage: 1,
 
             ajaxParam: function(ajax, data) {},
+
+            loadPageComplete:function(data){},
 
             beforeAjax: function() {},
 
@@ -77,7 +79,9 @@
 
             filterData: null,//data
 
-            loadComplete: function(data) {}
+            loadComplete: function(data) {},
+
+            setAjaxPageInfo: null//data, page
 
         };
 
@@ -178,20 +182,67 @@
 
                         data.pageInfo = pageInfo;
 
-                        this.currentPage = page;
+                        this._loadPageComplete(data, page);
 
                     }
 
                 }else if(option.pageMethod === 'ajax'){
 
-                    this._getData({page: page});
+                    this._getData({page: page}, 'ajax');
 
                 }
 
-
             }
 
-            return data;
+        },
+
+        _loadPageComplete:function(data, page){
+
+            this.currentPage = page;
+
+            this.option.loadPageComplete.call(this, data);
+
+        },
+
+        _loadComplete:function(arg, data){
+
+            var collection, pageObj, option = this.option, page;
+
+            this._dataToCollection(data);
+
+            collection = this._getCollection(true);
+
+            if((page = arg.page)){
+
+                if(option.setAjaxPageInfo){
+
+                    pageObj = option.setAjaxPageInfo(collection, page);
+
+                }
+
+                if(!pageObj){
+
+                    pageObj = {
+
+                        pageData: collection,
+
+                        pageInfo: {
+
+                            currentPage: page
+
+                        }
+
+                    }
+
+                }
+
+                this._loadPageComplete(pageObj, page);
+
+            }else{
+
+                option.loadComplete.call(this, collection);
+
+            }
 
         },
 
@@ -291,11 +342,11 @@
 
         },
 
-        _getData: function(data) {
+        _getData: function(data, method) {
 
             var option = this.option,
 
-                methodFn = getFns(option.method, methodFns);
+                methodFn = getFns(method || option.method, methodFns);
 
             methodFn.call(this, option, data || {}, this);
 
@@ -323,7 +374,7 @@
 
             data = data || option.localData;
 
-            !!filterData && (data = filterData(data));
+            !!filterData && (data = filterData(data) || []);
 
             len = data.length;
 
@@ -741,39 +792,29 @@
 
     });
 
-    leoToosDataAdapt.addMethodFn('local *', function(option, data, dataAdapter) {
+    leoToosDataAdapt.addMethodFn('local *', function(option, arg, dataAdapter) {
 
-        this._dataToCollection();
-
-        option.loadComplete.call(this, this._getCollection(true));
+        this._loadComplete(arg);
 
     });
 
     leoToosDataAdapt.addMethodFn('ajax', function(option, arg, dataAdapter) {
 
-        var ajaxParam = option.ajaxParam(option, arg) || ajaxParam;
+        var ajaxParam = option.ajaxParam(option, arg) || option.ajax;
 
         option.beforeAjax();
 
-        $.ajax(ajaxParam).done(function(data) {
+        dataAdapter.ajax = $.ajax(ajaxParam).done(function(data) {
 
-            this._dataToCollection(data);
-
-            option.loadComplete.call(this, this._getCollection(true));
-
-            if(option.isPage && option.pageMethod === 'ajax'){
-
-                dataAdapter.currentPage = arg.page;
-
-            }
+            dataAdapter._loadComplete(arg, data);
 
         }).fail(function(data) {
 
             $.error("ajax error");
 
-        }).always(function() {
+        }).always(function(data) {
 
-            option.afterAjax();
+            option.afterAjax(data);
 
         });
 

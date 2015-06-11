@@ -343,6 +343,12 @@ leoUiLoad.require('leoUi-dataAdapter,leoUi-grid-2.0,leoUi,leoUiGrid,ready', func
         }],option = {
             localData:data,
             datatype: "array",
+            isPage: true,
+
+            pageSize: 2,
+
+            currentPage: 1,
+            pageMethod:'local', //local,ajax
             mode: [{
                 name: 'id',
                 type: 'number',
@@ -397,13 +403,9 @@ leoUiLoad.require('leoUi-dataAdapter,leoUi-grid-2.0,leoUi,leoUiGrid,ready', func
 
         source: dataAdapter,
 
-        isPage: true,
-
         tableModel: tableModel,
 
-        trIdKey: 'id',
-
-        rowNum: 2,
+        showPage:true,
 
         rowList: [2,30,50],
 

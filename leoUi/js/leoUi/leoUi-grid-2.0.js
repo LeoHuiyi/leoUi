@@ -223,6 +223,10 @@
 
             this.leoGrid = $.leoTools.getId('Grid') + '_';
 
+            this.records = [];
+
+            this.pageInfo = {};
+
         },
 
         _setTemplate:function(){
@@ -269,75 +273,6 @@
 
         },
 
-        _getLocalPageData: function(page, collection) {
-
-            var totalItems = collection.length,
-
-                op = this.options,
-
-                pageNum = op.pageNum,
-
-                fristItem, fristItems,
-
-                totalpages = Math.ceil(totalItems / pageNum);
-
-            if (page >= 1 && page <= totalpages) {
-
-                fristItem = pageNum * (page - 1);
-
-                lastItem = fristItem + pageNum;
-
-                return collection.slice(fristItem, lastItem);
-
-            } else {
-
-                return [];
-
-            }
-
-        },
-
-        _getLocalPageInfo:function(){
-
-
-
-
-        },
-
-        _storeGetLocalPage:function(){
-
-            var op = this.options, pageType = op.pageType;
-
-            if(pageType === "local"){
-
-
-
-
-            }else if(pageType === "ajax"){
-
-
-
-
-            }
-
-        },
-
-        _getStoreData:function(){
-
-            this.renderGridBody();
-
-            if(this.options.isPage === true){
-
-                this._storeGetLocalPager();
-
-            }else{
-
-                this._renderGridBody();
-
-            }
-
-        },
-
         renderGridBody:function(data){
 
             this._renderGridBodyTbody(data || this.records.getData(true));
@@ -352,9 +287,27 @@
 
         _loadComplete:function(data, dataWrapper){
 
-            this.records = dataWrapper(data);
+            if(this.source.option.isPage){
 
-            this._getStoreData();
+                this.source.getPageData();
+
+                return;
+
+            }
+
+            this.records = this.source.dataWrapper(data);
+
+            this.renderGridBody();
+
+        },
+
+        _loadPageComplete:function(data, dataWrapper){
+
+            this.records = this.source.dataWrapper(data.pageData);
+
+            this.pageInfo = data.pageInfo || {};
+
+            this.renderGridBody();
 
         },
 
@@ -366,7 +319,13 @@
 
                 loadComplete: function(data){
 
-                    This._loadComplete(data, this.dataWrapper);
+                    This._loadComplete(data);
+
+                },
+
+                loadPageComplete: function(data){
+
+                    This._loadPageComplete(data);
 
                 }
 
@@ -376,9 +335,60 @@
 
         },
 
+        setPage:function(page){
+
+            var source = this.source, sourceOp = source.option;
+
+            if(sourceOp.isPage){
+
+                if(sourceOp.pageMethod === 'ajax'){
+
+                    source.getPageData();
+
+                }else if(sourceOp.pageMethod === 'local'){
+
+                    page = this._setLocalPage(page);
+
+                    source.getPageData();
+
+                }
+
+            }
+
+        },
+
+        _setLocalPage:function(page){
+
+            var pageInfo = this.pageInfo;
+
+            page = page >> 0;
+
+            if(pageInfo)
+
+
+        },
+
         _storeDataBind:function(){
 
-            this.source.dataBind();
+            var source = this.source, sourceOp = source.option;
+
+            if(sourceOp.isPage){
+
+                if(sourceOp.pageMethod === 'ajax'){
+
+                    source.getPageData();
+
+                }else if(sourceOp.pageMethod === 'local'){
+
+                    source.dataBind();
+
+                }
+
+            }else{
+
+                source.dataBind();
+
+            }
 
         },
 

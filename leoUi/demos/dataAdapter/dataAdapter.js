@@ -102,9 +102,11 @@ leoUiLoad.require('leoUi-dataAdapter, ready', function($) {
             "first": "0"
         }],
         option = {
+            method:'local',
             localData:data,
             pageSize:2,
             datatype: "array",
+            pageMethod:'local',
             mode: [{
                 name: 'id',
                 type: 'number',
@@ -138,9 +140,33 @@ leoUiLoad.require('leoUi-dataAdapter, ready', function($) {
                 type: 'string'
             }],
 
+            filterData:function(data){
+
+                return data;
+
+            },
+
+            setAjaxPageInfo:function(data, page){
+
+                console.log(page)
+
+            },
+
             loadComplete:function(data){
 
+                this.getPageData(1);
+
+                this.getPageData(2);
+
+                this.getPageData(3);
+
+                this.getPageData(4);
+            },
+
+            loadPageComplete:function(data){
+
                 console.log(data)
+
             }
         }, dataAdapter;
 
@@ -170,7 +196,13 @@ leoUiLoad.require('leoUi-dataAdapter, ready', function($) {
 
         dataAdapter = $.leoTools.dataAdapter(option).dataBind();
 
-        console.log(dataAdapter.getPageData(1),dataAdapter.getPageData(2),dataAdapter.getPageData(3),dataAdapter.getPageData(4));
+        // dataAdapter.getPageData(1);
+
+        // dataAdapter.getPageData(2);
+
+        // dataAdapter.getPageData(3);
+
+        // dataAdapter.getPageData(4);
 
         $.leoTools.dataAdapter.addValidatorFn('number', function(val, info) {
 

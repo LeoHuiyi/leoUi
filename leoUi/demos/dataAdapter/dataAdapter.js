@@ -102,11 +102,14 @@ leoUiLoad.require('leoUi-dataAdapter, ready', function($) {
             "first": "0"
         }],
         option = {
-            method:'local',
+            method:'lcoal',
             localData:data,
             pageSize:2,
+            ajax:{
+                url:'http://192.168.1.108/virbanks2015/api.asp?action=getserveritem&gcode=do'
+            },
             datatype: "array",
-            pageMethod:'local',
+            pageMethod:'ajax',
             mode: [{
                 name: 'id',
                 type: 'number',
@@ -154,13 +157,13 @@ leoUiLoad.require('leoUi-dataAdapter, ready', function($) {
 
             loadComplete:function(data){
 
-                this.getPageData(1);
+                // this.getPageData(1);
 
-                this.getPageData(2);
+                // this.getPageData(2);
 
-                this.getPageData(3);
+                // this.getPageData(3);
 
-                this.getPageData(4);
+                // this.getPageData(4);
             },
 
             loadPageComplete:function(data){
@@ -194,9 +197,25 @@ leoUiLoad.require('leoUi-dataAdapter, ready', function($) {
 
         }).getRow(2).getData())
 
-        dataAdapter = $.leoTools.dataAdapter(option).dataBind();
+        dataAdapter = $.leoTools.dataAdapter(option);
 
-        // dataAdapter.getPageData(1);
+        dataAdapter.getData().done(function(data){
+
+            console.log(data)
+
+        });
+
+        dataAdapter.getPageData(1).done(function(data){
+
+            console.log('done')
+            console.log(data)
+
+        }).fail(function(data){
+
+            console.log('fail')
+            console.log(data)
+
+        });
 
         // dataAdapter.getPageData(2);
 
@@ -282,7 +301,9 @@ leoUiLoad.require('leoUi-dataAdapter, ready', function($) {
 
                 console.log(data)
             }
-        }).dataBind();
+        });
+
+        data.getData();
 
         console.log(dataAdapter.updateRow({
             "id": "121212121",

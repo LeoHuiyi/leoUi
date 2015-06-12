@@ -258,6 +258,22 @@ leoUiLoad.require('leoUi-dataAdapter,leoUi-grid-2.0,leoUi,leoUiGrid,ready', func
 
             resize: true,
 
+            renderCell: function(val) {
+
+                if (val === 1) {
+
+                    val = '是';
+
+                } else {
+
+                    val = '否';
+
+                }
+
+                return val;
+
+            },
+
             tdTemplate:'{{if +arg1 === 1}}是{{else}}否{{/if}}'
 
         }, {
@@ -269,6 +285,12 @@ leoUiLoad.require('leoUi-dataAdapter,leoUi-grid-2.0,leoUi,leoUiGrid,ready', func
             resize: true,
 
             minWidth: 100,
+
+            renderCell: function(val) {
+
+                return '<a class="teamEditBtn" href="javascript:;">修改</a><span>|</span><a class="dataDelBtn" href="javascript:;">删除</a>';
+
+            },
 
             tdTemplate:'<a class="teamEditBtn" href="javascript:;">修改</a><span>|</span><a class="dataDelBtn" href="javascript:;">删除</a>'
 
@@ -344,9 +366,11 @@ leoUiLoad.require('leoUi-dataAdapter,leoUi-grid-2.0,leoUi,leoUiGrid,ready', func
             localData:data,
             datatype: "array",
             isPage: true,
-
-            pageSize: 2,
-
+            pageSize: 50,
+            method:'ajax',
+            ajax:{
+                url:'http://192.168.1.108/virbanks2015/api.asp?action=getserveritem&gcode=do'
+            },
             currentPage: 1,
             pageMethod:'local', //local,ajax
             mode: [{
@@ -396,6 +420,10 @@ leoUiLoad.require('leoUi-dataAdapter,leoUi-grid-2.0,leoUi,leoUiGrid,ready', func
             }, {
                 name: 'address',
                 type: 'string'
+            },{
+                name: 'first',
+                type: 'number',
+                validator:"required number"
             }]
         }, dataAdapter = $.leoTools.dataAdapter(option);
 
@@ -428,5 +456,12 @@ leoUiLoad.require('leoUi-dataAdapter,leoUi-grid-2.0,leoUi,leoUiGrid,ready', func
         }
 
     });
+    var i = 0;
+    $('#btn').on('click', function(event) {
+        event.preventDefault();
+        $grid.leoGrid('setPage', i++);
+    });
+
+    
 
 });

@@ -164,7 +164,7 @@
 
         getPageData:function(page){
 
-            var option = this.option, pageInfo, data = {};
+            var option = this.option, pageInfo, data = {}, This = this;
 
             if(option.isPage){
 
@@ -182,17 +182,55 @@
 
                         data.pageInfo = pageInfo;
 
-                        this._loadPageComplete(data, page);
-
                     }
+
+                    return $.Deferred().resolve(this._loadPageComplete(data, page));
 
                 }else if(option.pageMethod === 'ajax'){
 
-                    this._getData({page: page}, 'ajax');
+                    return this._getData({page: page}, 'ajax').then(function(data){
+
+                        return This._loadPageComplete(This._getAjaxPageInfo(data, page), page);
+
+                    });
 
                 }
 
             }
+
+        },
+
+        _getAjaxPageInfo:function(data, page){
+
+            var pageObj, option = this.option;
+
+            this._dataToCollection(data);
+
+            data = this._getCollection(true);
+
+            if(option.setAjaxPageInfo){
+
+                pageObj = option.setAjaxPageInfo(data, page);
+
+            }
+
+            if(!pageObj){
+
+                pageObj = {
+
+                    pageData: data,
+
+                    pageInfo: {
+
+                        currentPage: page
+
+                    }
+
+                }
+
+            }
+
+            return pageObj;
 
         },
 
@@ -202,47 +240,21 @@
 
             this.option.loadPageComplete.call(this, data);
 
+            return data;
+
         },
 
-        _loadComplete:function(arg, data){
+        _loadComplete:function(data){
 
-            var collection, pageObj, option = this.option, page;
+            var collection;
 
             this._dataToCollection(data);
 
             collection = this._getCollection(true);
 
-            if((page = arg.page)){
+            this.option.loadComplete.call(this, collection);
 
-                if(option.setAjaxPageInfo){
-
-                    pageObj = option.setAjaxPageInfo(collection, page);
-
-                }
-
-                if(!pageObj){
-
-                    pageObj = {
-
-                        pageData: collection,
-
-                        pageInfo: {
-
-                            currentPage: page
-
-                        }
-
-                    }
-
-                }
-
-                this._loadPageComplete(pageObj, page);
-
-            }else{
-
-                option.loadComplete.call(this, collection);
-
-            }
+            return collection;
 
         },
 
@@ -256,7 +268,7 @@
 
             if(!this.option.isPage)return;
 
-            var totalItems = (collection ? collection : this._getCollection()).length,
+            var totalItems = (typeof collection === 'undefined' ? this._getCollection() : collection).length,
 
             op = this.option, pageSize = op.pageSize, remainder,
 
@@ -334,11 +346,15 @@
 
         },
 
-        dataBind: function() {
+        getData: function() {
 
-            this._getData();
+            var This = this;
 
-            return this;
+            return this._getData().then(function(data){
+
+                return This._loadComplete(data);
+
+            });
 
         },
 
@@ -346,11 +362,9 @@
 
             var option = this.option,
 
-                methodFn = getFns(method || option.method, methodFns);
+            methodFn = getFns(method || option.method, methodFns);
 
-            methodFn.call(this, option, data || {}, this);
-
-            return this;
+            return methodFn.call(this, option, data || {}, this) || this;
 
         },
 
@@ -794,7 +808,7 @@
 
     leoToosDataAdapt.addMethodFn('local *', function(option, arg, dataAdapter) {
 
-        this._loadComplete(arg);
+        return $.Deferred().resolve();
 
     });
 
@@ -804,15 +818,7 @@
 
         option.beforeAjax();
 
-        dataAdapter.ajax = $.ajax(ajaxParam).done(function(data) {
-
-            dataAdapter._loadComplete(arg, data);
-
-        }).fail(function(data) {
-
-            $.error("ajax error");
-
-        }).always(function(data) {
+        return dataAdapter.ajax = $.ajax(ajaxParam).always(function(data) {
 
             option.afterAjax(data);
 

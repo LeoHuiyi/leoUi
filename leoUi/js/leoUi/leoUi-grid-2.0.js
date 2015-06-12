@@ -181,15 +181,7 @@
 
             gridTemplate:'<div id="{{leoUi_grid}}" class="leoUi-jqgrid leoUi-widget leoUi-widget-content leoUi-corner-all"><div id="{{lui_grid}}" class="leoUi-widget-overlay jqgrid-overlay"></div><div id="{{load_grid}}" class="loading leoUi-state-default leoUi-state-active">读取中...</div><div class="leoUi-jqgrid-view" id="{{gview_grid}}"><div class="leoUi-state-default leoUi-jqgrid-hdiv"><div class="leoUi-jqgrid-hbox"></div></div><div class="leoUi-jqgrid-bdiv"><div class="leoUi-jqgrid-hbox-inner" style="position:relative;"></div></div></div><div id="{{rs_mgrid}}" class="leoUi-jqgrid-resize-mark" ></div></div>',
 
-            gridHeadTemplate:'<table class="leoUi-jqgrid-htable" cellspacing="0" cellpadding="0" border="0"><thead><tr class="leoUi-jqgrid-labels"></tr></thead></table>',
-
-            gridHeadThTemplate:'{{each tableModels as value index}}<th id = "{{value.thId}}" class="leoUi-state-default leoUi-th-column leoUi-th-ltr {{if value.thClass}}{{value.thClass}}{{/if}}" style="{{if value.thStyle}}{{value.thStyle}};{{/if}} {{if value.width}}width:{{value.width}}{{/if}}">{{if value.resize}}<span class="leoUi-jqgrid-resize leoUi-jqgrid-resize-ltr">&nbsp;</span>{{/if}}{{if value.sortable}}<div class="leoUi-jqgrid-sortable">{{else}}<div>{{/if}}{{if value.checkBoxId}}<input type="checkbox" id="{{value.checkBoxId}}"{{if value.isCheck}}checked{{/if}}>{{/if}}{{if value.thTemplate}}{{#value.thTemplate | getHtml:value}}{{else}}{{value.theadName}}{{/if}}{{if value.sortable}}<span class="leoUi-sort-ndb leoUi-sort"><span class="leoUi-sort-top"></span><span class="leoUi-sort-bottom"></span></span>{{/if}}</div></th>{{/each}}',
-
-            gridBodyTemplate:'<table class="leoUi-jqgrid-btable" cellspacing="0" cellpadding="0" border="0"></table>',
-
-            gridBodySizeRowTemplate:'<tr id="{{sizeRowid}}" style="height:0">{{each tableModels as value index}}<td id="{{value.thId + sizeRowTdIdPostfix}}" style="height:0;width:0"></td>{{/each}}</tr>',
-
-            gridBodyTdTemplate:'{{each tableModels as value index}}<td id="{{trId+tdIdPostfix+index}}" {{if value.tdStyle}}style="{{value.tdStyle}};"{{/if}} {{if value.tdClass}}class="{{value.tdClass}};"{{/if}}>{{if value.tdTemplate}}{{#value.tdTemplate | getHtml:data[value.dataKey]}}{{else}}{{if value.checkBoxId}}<input type="checkbox" {{if data[value.dataKey]}}checked{{/if}}>{{else}}{{data[value.dataKey]}}{{/if}}{{/if}}</td>{{/each}}'
+            gridHeadThTemplate:'{{each tableModels as value index}}<th id = "{{value.thId}}" class="leoUi-state-default leoUi-th-column leoUi-th-ltr {{if value.thClass}}{{value.thClass}}{{/if}}" style="{{if value.thStyle}}{{value.thStyle}};{{/if}} {{if value.width}}width:{{value.width}}{{/if}}">{{if value.resize}}<span class="leoUi-jqgrid-resize leoUi-jqgrid-resize-ltr">&nbsp;</span>{{/if}}{{if value.sortable}}<div class="leoUi-jqgrid-sortable">{{else}}<div>{{/if}}{{if value.checkBoxId}}<input type="checkbox" id="{{value.checkBoxId}}"{{if value.isCheck}}checked{{/if}}>{{/if}}{{if value.thTemplate}}{{#value.thTemplate | getHtml:value}}{{else}}{{value.theadName}}{{/if}}{{if value.sortable}}<span class="leoUi-sort-ndb leoUi-sort"><span class="leoUi-sort-top"></span><span class="leoUi-sort-bottom"></span></span>{{/if}}</div></th>{{/each}}'
 
         },
 
@@ -275,7 +267,7 @@
 
         renderGridBody:function(data){
 
-            this._renderGridBodyTbody(data || this.records.getData(true));
+            this._renderGridBodyTbody(data || this.records.getData());
 
             this._setTableHeight();
 
@@ -285,15 +277,7 @@
 
         },
 
-        _loadComplete:function(data, dataWrapper){
-
-            if(this.source.option.isPage){
-
-                this.source.getPageData();
-
-                return;
-
-            }
+        _loadComplete:function(data){
 
             this.records = this.source.dataWrapper(data);
 
@@ -301,7 +285,7 @@
 
         },
 
-        _loadPageComplete:function(data, dataWrapper){
+        _loadPageComplete:function(data){
 
             this.records = this.source.dataWrapper(data.pageData);
 
@@ -315,21 +299,7 @@
 
             var This = this;
 
-            this.source = this.options.source.setOption({
-
-                loadComplete: function(data){
-
-                    This._loadComplete(data);
-
-                },
-
-                loadPageComplete: function(data){
-
-                    This._loadPageComplete(data);
-
-                }
-
-            });
+            this.source = this.options.source;
 
             this._storeDataBind();
 
@@ -343,13 +313,13 @@
 
                 if(sourceOp.pageMethod === 'ajax'){
 
-                    source.getPageData();
+                    source.getPageData(page);
 
                 }else if(sourceOp.pageMethod === 'local'){
 
                     page = this._setLocalPage(page);
 
-                    source.getPageData();
+                    page !== false && source.getPageData(page).done($.proxy(this._loadPageComplete, this));
 
                 }
 
@@ -363,30 +333,43 @@
 
             page = page >> 0;
 
-            if(pageInfo)
+            if(page >= pageInfo.fristPage && page <= pageInfo.lastPage){
 
+                return page;
+
+            }else{
+
+                return false;
+
+            }
 
         },
 
         _storeDataBind:function(){
 
-            var source = this.source, sourceOp = source.option;
+            var source = this.source, sourceOp = source.option,
+
+            proxy = $.proxy;
 
             if(sourceOp.isPage){
 
                 if(sourceOp.pageMethod === 'ajax'){
 
-                    source.getPageData();
+                    source.getPageData().done(proxy(this._loadPageComplete, this));
 
                 }else if(sourceOp.pageMethod === 'local'){
 
-                    source.dataBind();
+                    source.getData().then(function(){
+
+                        return source.getPageData();
+
+                    }).done(proxy(this._loadPageComplete, this));
 
                 }
 
             }else{
 
-                source.dataBind();
+                source.getData().done(proxy(this._loadComplete, this));
 
             }
 
@@ -436,27 +419,73 @@
 
         _renderGridBodyTd:function(tdData){
 
-            this.gridBodyTdCompile = this.gridBodyTdCompile || this.template.compile(this.options.gridBodyTdTemplate);
+            var tableModels = tdData.tableModels, i = 0, str = '',
 
-            return this.gridBodyTdCompile(tdData);
+            data = tdData.data, trId = tdData.trId, tableModel,
+
+            tdIdPostfix = tdData.tdIdPostfix, len = tableModels.length;
+
+            for (; i < len; i++) {
+
+                tableModel = tableModels[i];
+
+                str += '<td id="' + trId + tdIdPostfix + i +'" ';
+
+                if(tableModel.tdStyle){
+
+                    str += 'style="' + tableModel.tdStyle + ';" ';
+
+                }
+
+                if(tableModel.tdClass){
+
+                    str += 'class="' + tableModel.tdClass + ';"';
+
+                }
+
+                str += '>';
+
+                if(typeof tableModel.renderCell === 'function'){
+
+                    str += tableModel.renderCell(data[tableModel.dataKey]);
+
+                }else if(tableModel.checkBoxId){
+
+                    str += '<input type="checkbox" ';
+
+                    if(data[tableModel.dataKey]){
+
+                        str += 'checked';
+
+                    }
+
+                    str += '>';
+
+                }else{
+
+                    str += data[tableModel.dataKey];
+
+                }
+
+                str += '</td>';
+
+            }
+
+            return str;
 
         },
 
         _renderGridHead:function(){
 
-            this.gridHeadCompile = this.gridHeadCompile || this.template.compile(this.options.gridHeadTemplate);
-
-            this.$gridHeadTable = $(this.gridHeadCompile(this.tableOption)).find('tr').html(this._renderGridHeadTh()).end().appendTo(this.$gridHeadDiv.find('div.leoUi-jqgrid-hbox'));
+            this.$gridHeadTable = $('<table class="leoUi-jqgrid-htable" cellspacing="0" cellpadding="0" border="0"><thead><tr class="leoUi-jqgrid-labels"></tr></thead></table>').find('tr').html(this._renderGridHeadTh()).end().appendTo(this.$gridHeadDiv.find('div.leoUi-jqgrid-hbox'));
 
         },
 
         _renderGridBody:function(){
 
-            this.gridBodyCompile = this.gridBodyCompile || this.template.compile(this.options.gridBodyTemplate);
-
             this._renderBodySizeTr();
 
-            this.$gridBodyTable = $(this.gridBodyCompile(this.tableOption)).appendTo(this.$gridBodyDiv.find('div.leoUi-jqgrid-hbox-inner'));
+            this.$gridBodyTable = $('<table class="leoUi-jqgrid-btable" cellspacing="0" cellpadding="0" border="0"></table>').appendTo(this.$gridBodyDiv.find('div.leoUi-jqgrid-hbox-inner'));
 
         },
 
@@ -534,7 +563,23 @@
 
         _renderBodySizeTr:function(){
 
-            this.gridBodySizeTrHtml = this.gridBodySizeTrHtml || this.template.compile(this.options.gridBodySizeRowTemplate)({sizeRowid: this.gridIds.sizeRowid, sizeRowTdIdPostfix: this.gridIds.sizeRowTdIdPostfix, tableModels: this.tableOption.tableModels});
+            var tableModels = this.tableOption.tableModels,
+
+            sizeRowTdIdPostfix = this.gridIds.sizeRowTdIdPostfix,
+
+            len = tableModels.length, tableModel, i = 0,
+
+            str = '<tr id="' + this.gridIds.sizeRowid + '" style="height:0">';
+
+            for (; i < len; i++) {
+
+                str += '<td id="' + tableModels[i].thId + sizeRowTdIdPostfix + '" style="height:0;width:0"></td>'
+
+            }
+
+            this.gridBodySizeTrHtml = str;
+
+            // this.gridBodySizeTrHtml = this.gridBodySizeTrHtml || this.template.compile(this.options.gridBodySizeRowTemplate)({sizeRowid: this.gridIds.sizeRowid, sizeRowTdIdPostfix: this.gridIds.sizeRowTdIdPostfix, tableModels: this.tableOption.tableModels});
 
         },
 

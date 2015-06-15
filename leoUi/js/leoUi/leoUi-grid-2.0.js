@@ -12,7 +12,7 @@
     if (typeof define === "function" && define.amd) {
 
         // AMD. Register as an anonymous module.
-        define(["leoUi-tools", "template"], factory);
+        define(["leoUi-tools"], factory);
 
     } else {
 
@@ -103,49 +103,17 @@
 
             },
 
-            dataType:'ajax',//ajax,data
-
-            gridData:[],//grid的数据
-
-            ajax:{
-
-                url:'leoui.com',
-
-                type: "POST",
-
-                dataType:'json',
-
-                offsetKey:'offset',//分页offsetkey
-
-                lengthKey:'length',//分页长度key
-
-                teamsCountKey:'teams_count',//数据总条数
-
-                teamsKey:'teams',//总数据(为false时直接用data)
-
-                data:{}
-
-            },
-
             rowDataKeys:false,
 
-            isFooter:true,
+            footerShow:true,
+
+            rowList:[20,30,50],//每一页可选条数
 
             cellEdit:false,//是否可编辑单元格
 
             minRow:0,//至少一条数据
 
             defaulTrId: 0,//默认trid
-
-            isPage:true,//是否要分页功能
-
-            pageType:'local',//local,ajax
-
-            rowNum:20,//每一页条数
-
-            rowList:[20,30,50],//每一页可选条数
-
-            currentPage:1,//当前选中的页面 (按照人们日常习惯,非计算机常识,是从1开始)
 
             height:500,//设置表格的高度(可用函数返回值)
 
@@ -177,11 +145,7 @@
 
             clickTdCallback:$.noop,//点击bodyTableTD回调
 
-            scrollWidth:20,
-
-            gridTemplate:'<div id="{{leoUi_grid}}" class="leoUi-jqgrid leoUi-widget leoUi-widget-content leoUi-corner-all"><div id="{{lui_grid}}" class="leoUi-widget-overlay jqgrid-overlay"></div><div id="{{load_grid}}" class="loading leoUi-state-default leoUi-state-active">读取中...</div><div class="leoUi-jqgrid-view" id="{{gview_grid}}"><div class="leoUi-state-default leoUi-jqgrid-hdiv"><div class="leoUi-jqgrid-hbox"></div></div><div class="leoUi-jqgrid-bdiv"><div class="leoUi-jqgrid-hbox-inner" style="position:relative;"></div></div></div><div id="{{rs_mgrid}}" class="leoUi-jqgrid-resize-mark" ></div></div>',
-
-            gridHeadThTemplate:'{{each tableModels as value index}}<th id = "{{value.thId}}" class="leoUi-state-default leoUi-th-column leoUi-th-ltr {{if value.thClass}}{{value.thClass}}{{/if}}" style="{{if value.thStyle}}{{value.thStyle}};{{/if}} {{if value.width}}width:{{value.width}}{{/if}}">{{if value.resize}}<span class="leoUi-jqgrid-resize leoUi-jqgrid-resize-ltr">&nbsp;</span>{{/if}}{{if value.sortable}}<div class="leoUi-jqgrid-sortable">{{else}}<div>{{/if}}{{if value.checkBoxId}}<input type="checkbox" id="{{value.checkBoxId}}"{{if value.isCheck}}checked{{/if}}>{{/if}}{{if value.thTemplate}}{{#value.thTemplate | getHtml:value}}{{else}}{{value.theadName}}{{/if}}{{if value.sortable}}<span class="leoUi-sort-ndb leoUi-sort"><span class="leoUi-sort-top"></span><span class="leoUi-sort-bottom"></span></span>{{/if}}</div></th>{{/each}}'
+            scrollWidth:20
 
         },
 
@@ -189,7 +153,7 @@
 
             this._initVar();
 
-            this._setTemplate();
+            this._setGridIds();
 
             this._createGridBox();
 
@@ -221,28 +185,6 @@
 
         },
 
-        _setTemplate:function(){
-
-            this.template = template;
-
-            template.helper('getHtml', function(tmp) {
-
-                var arg = Array.prototype.slice.call(arguments), data = {};
-
-                arg.shift(), i = 0, len = arg.length, dataName = 'arg';
-
-                for(; i < len; i++){
-
-                    data[dataName + (i + 1)] = arg[i];
-
-                }
-
-                return template.compile(tmp)(data);
-
-            });
-
-        },
-
         _createGridBox:function(){
 
             this.$gridBox = $(this._renderGrid());
@@ -254,6 +196,8 @@
             this._renderGridHead();
 
             this._renderGridBody();
+
+            this._renderGridFooter();
 
             this._getChangeCellPercent();
 
@@ -383,7 +327,7 @@
 
             tableModels = this.tableOption.tableModels,
 
-            trIdPostfix = this._getGridIds().trIdPostfix,
+            trIdPostfix = this.gridIds.trIdPostfix,
 
             leoGrid = this.leoGrid, tdIdPostfix = this.gridIds.tdIdPostfix;
 
@@ -417,13 +361,21 @@
 
         },
 
+        _htmlEncode:function(value){
+
+            return !value ? value : String(value).replace(/&/g, "&amp;").replace(/\"/g, "&quot;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+
+        },
+
         _renderGridBodyTd:function(tdData){
 
             var tableModels = tdData.tableModels, i = 0, str = '',
 
             data = tdData.data, trId = tdData.trId, tableModel,
 
-            tdIdPostfix = tdData.tdIdPostfix, len = tableModels.length;
+            tdIdPostfix = tdData.tdIdPostfix, len = tableModels.length,
+
+            htmlEncode = this._htmlEncode;
 
             for (; i < len; i++) {
 
@@ -459,11 +411,11 @@
 
                     }
 
-                    str += '>';
+                    str += '/>';
 
                 }else{
 
-                    str += data[tableModel.dataKey];
+                    str += htmlEncode(data[tableModel.dataKey]);
 
                 }
 
@@ -489,13 +441,166 @@
 
         },
 
+        _setGridFooterIds:function(){
+
+            var leoGrid = this.leoGrid;
+
+            this.gridIds = this.gridIds || {};
+
+            $.extend(this.gridIds, {
+
+                footerIds:{
+
+                    footer: leoGrid + 'footer',
+
+                    footer_left: leoGrid + 'footer_left',
+
+                    footer_center: leoGrid + 'footer_center',
+
+                    footer_right: leoGrid + 'footer_right',
+
+                    first_page: leoGrid + 'first_page',
+
+                    prev_page: leoGrid + 'prev_page',
+
+                    set_page_input: leoGrid + 'set_page_input',
+
+                    now_page: leoGrid + 'now_page',
+
+                    next_page: leoGrid + 'next_page',
+
+                    last_page: leoGrid + 'last_page',
+
+                    get_perPages_select: leoGrid + 'get_perPages_select',
+
+                    page_right_info: leoGrid + 'page_right_info'
+
+                }
+
+
+            });
+
+        },
+
+        _renderGridFooter:function(){
+
+            if(!this.options.footerShow)return;
+
+            this._setGridFooterIds();
+
+            var footerIds = this.gridIds.footerIds;
+
+            this.$footer = $('<div id="' + footerIds.footer + '" class="leoUi-state-default leoUi-jqgrid-pager leoUi-corner-bottom"><div class="leoUi-pager-control"><table cellspacing="0" cellpadding="0" border="0" role="row" style="width:100%;table-layout:fixed;height:100%;" class="leoUi-pg-table"><tbody><tr><td align="left" id="' + footerIds.footer_left + '"></td><td align="center" style="white-space: pre; width: 276px;" id="' + footerIds.footer_center + '"></td><td align="right" id="'+ footerIds.footer_right + '"></td></td></tr></tbody></table></div></div>').appendTo(this.$gridBox.find('#' + this.gridIds.gview_grid));
+
+        },
+
+        _renderGridFooterLeft:function(){
+
+            var gridFooter, first_page, prev_page, set_page_input,
+
+            now_page, next_page, last_page, get_perPages_select
+
+            '<table cellspacing="0" cellpadding="0" border="0" class="leoUi-pg-table" style="table-layout:auto;" id="'+ leoGrid +'page_center_table"><tbody><tr><td class="leoUi-pg-button leoUi-corner-all leoUi-state-disabled" id="'+ leoGrid +'first_page" style="'+fPageStyle+'"><span class="leoUi-icon leoUi-icon-seek-first"></span></td><td class="leoUi-pg-button leoUi-corner-all leoUi-state-disabled" id="'+ leoGrid +'prev_page" style="'+fPageStyle+'"><span class="leoUi-icon leoUi-icon-seek-prev"></span></td><td style="width: 4px; cursor: default;" class="leoUi-pg-button leoUi-state-disabled"><span class="leoUi-separator"></span></td><td><input id="'+ leoGrid +'set_page_input" type="text" role="textbox" value="1" maxlength="7" size="2" class="leoUi-pg-input"><span style="margin:0 4px 0 8px">共</span><span id="'+ leoGrid +'sp_1_page">0</span><span style="margin:0 4px">页</span></td><td style="width: 4px; cursor: default;" class="leoUi-pg-button leoUi-state-disabled"><span class="leoUi-separator"></span></td><td class="leoUi-pg-button leoUi-corner-all leoUi-state-disabled" id="'+ leoGrid +'next_page" style="'+LPageStyle+'"><span class="leoUi-icon leoUi-icon-seek-next"></span></td><td class="leoUi-pg-button leoUi-corner-all leoUi-state-disabled" id="'+ leoGrid +'last_page" style="'+LPageStyle+'"><span class="leoUi-icon leoUi-icon-seek-end"></span></td><td><select  id="'+ leoGrid +'get_perPages_select" class="leoUi-pg-selbox">';
+
+
+        },
+
         _renderGridHeadTh:function(){
 
             this._getTableModels();
 
-            this.gridHeadThCompile = this.gridHeadThCompile || this.template.compile(this.options.gridHeadThTemplate);
+            var tableModels = this.tableOption.tableModels,
 
-            return this.gridHeadThCompile(this.tableOption);
+            i = 0, len = tableModels.length, tableModel, str = '';
+
+            for(; i < len; i++){
+
+                tableModel = tableModels[i];
+
+                str += '<th id = "' + tableModel.thId + '" class="leoUi-state-default leoUi-th-column leoUi-th-ltr';
+
+                if(tableModel.thClass){
+
+                    str += ' ' + tableModel.thClass;
+
+                }
+
+                str += '"';
+
+                if(tableModel.thStyle){
+
+                    str += ' style = "' + tableModel.thStyle + ';';
+
+                    if(tableModel.width){
+
+                        str += ' width:' + tableModel.width;
+
+                    }
+
+                }else if(tableModel.width){
+
+
+                    str += ' style = "width:' + tableModel.width + ';';
+
+                }
+
+                str += '">';
+
+                if(tableModel.resize){
+
+                    str += '<span class="leoUi-jqgrid-resize leoUi-jqgrid-resize-ltr">&nbsp;</span>';
+
+                }
+
+                if(tableModel.sortable){
+
+                    str += '<div class="leoUi-jqgrid-sortable">';
+
+                }else{
+
+                    str +='<div>';
+
+                }
+
+                if(tableModel.checkBoxId){
+
+                    str += '<input type="checkbox" id="' + tableModel.checkBoxId + '"';
+
+                    if(tableModel.isCheck){
+
+                        str += ' checked'
+
+                    }
+
+                    str += '/>';
+
+                }
+
+                if(typeof tableModel.renderThCell === 'function'){
+
+                    str += tableModel.renderThCell(tableModel.theadName);
+
+                }else{
+
+                    str += tableModel.theadName;
+
+                }
+
+                if(tableModel.sortable){
+
+                    str += '<span class="leoUi-sort-ndb leoUi-sort"><span class="leoUi-sort-top"></span><span class="leoUi-sort-bottom"></span></span>';
+
+                }else{
+
+                    str += '</div>';
+
+                }
+
+                str += '</th>';
+
+            }
+
+            return str;
 
         },
 
@@ -519,7 +624,7 @@
 
         _getTableModel:function(opModel, index){
 
-            var thIdPostfix = this._getGridIds().thIdPostfix,
+            var thIdPostfix = this.gridIds.thIdPostfix,
 
             model = $.extend({}, this.options.tableModelDefault, opModel, {
 
@@ -555,9 +660,9 @@
 
         _renderGrid:function(){
 
-            this.gridCompile = this.gridCompile || this.template.compile(this.options.gridTemplate);
+            var gridIds = this.gridIds, str = '';
 
-            return this.gridCompile(this._getGridIds());
+            return str += '<div id="' + gridIds.leoUi_grid + '" class="leoUi-jqgrid leoUi-widget leoUi-widget-content leoUi-corner-all"><div id="' + gridIds.lui_grid + '" class="leoUi-widget-overlay jqgrid-overlay"></div><div id="' + gridIds.load_grid + '" class="loading leoUi-state-default leoUi-state-active">读取中...</div><div class="leoUi-jqgrid-view" id="' + gridIds.gview_grid + '"><div class="leoUi-state-default leoUi-jqgrid-hdiv"><div class="leoUi-jqgrid-hbox"></div></div><div class="leoUi-jqgrid-bdiv"><div class="leoUi-jqgrid-hbox-inner" style="position:relative;"></div></div></div><div id="' + gridIds.rs_mgrid + '" class="leoUi-jqgrid-resize-mark" ></div></div>';
 
         },
 
@@ -579,11 +684,9 @@
 
             this.gridBodySizeTrHtml = str;
 
-            // this.gridBodySizeTrHtml = this.gridBodySizeTrHtml || this.template.compile(this.options.gridBodySizeRowTemplate)({sizeRowid: this.gridIds.sizeRowid, sizeRowTdIdPostfix: this.gridIds.sizeRowTdIdPostfix, tableModels: this.tableOption.tableModels});
-
         },
 
-        _getGridIds:function(){
+        _setGridIds:function(){
 
             var  leoGrid = this.leoGrid;
 
@@ -807,7 +910,7 @@
 
                     This._resizeCountWidth();
 
-                }, 16);
+                }, 50);
 
             })._on(this.$gridBodyDiv, 'scroll', function(event){
 

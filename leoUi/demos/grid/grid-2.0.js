@@ -84,9 +84,12 @@ leoUiLoad.require('leoUi-dataAdapter,leoUi-grid-2.0,leoUi,leoUiGrid,ready', func
 
             },
 
-            thTemplate:'<div style="color:red">{{arg1.theadName}}</div>',
+            renderThCell: function(val) {
 
-            tdTemplate:'<div style="color:red">{{arg1}}</div>'
+                return '<a class="teamEditBtn" href="javascript:;">修改</a><span>|</span><a class="dataDelBtn" href="javascript:;">删除</a>';
+
+            }
+
 
         }, {
 
@@ -272,9 +275,7 @@ leoUiLoad.require('leoUi-dataAdapter,leoUi-grid-2.0,leoUi,leoUiGrid,ready', func
 
                 return val;
 
-            },
-
-            tdTemplate:'{{if +arg1 === 1}}是{{else}}否{{/if}}'
+            }
 
         }, {
 
@@ -290,9 +291,7 @@ leoUiLoad.require('leoUi-dataAdapter,leoUi-grid-2.0,leoUi,leoUiGrid,ready', func
 
                 return '<a class="teamEditBtn" href="javascript:;">修改</a><span>|</span><a class="dataDelBtn" href="javascript:;">删除</a>';
 
-            },
-
-            tdTemplate:'<a class="teamEditBtn" href="javascript:;">修改</a><span>|</span><a class="dataDelBtn" href="javascript:;">删除</a>'
+            }
 
         }], $grid,
 
@@ -310,7 +309,7 @@ leoUiLoad.require('leoUi-dataAdapter,leoUi-grid-2.0,leoUi,leoUiGrid,ready', func
         }, {
             "id": "105",
             "contact": "23423",
-            "mobile": "23432",
+            "mobile": "0",
             "phone": "0",
             "im": "0",
             "weixin": "",
@@ -360,14 +359,14 @@ leoUiLoad.require('leoUi-dataAdapter,leoUi-grid-2.0,leoUi,leoUiGrid,ready', func
             "weixin": "1231321",
             "skype": "",
             "email": "12321",
-            "address": "",
+            "address": "http://www.baidu.com",
             "first": "0"
         }],option = {
             localData:data,
             datatype: "array",
             isPage: true,
             pageSize: 50,
-            method:'ajax',
+            method:'local',
             ajax:{
                 url:'http://192.168.1.108/virbanks2015/api.asp?action=getserveritem&gcode=do'
             },

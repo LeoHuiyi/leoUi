@@ -365,7 +365,7 @@ leoUiLoad.require('leoUi-dataAdapter,leoUi-grid-2.0,leoUi,leoUiGrid,ready', func
             localData:data,
             datatype: "array",
             isPage: true,
-            pageSize: 50,
+            pageSize: 4,
             method:'local',
             ajax:{
                 url:'http://192.168.1.108/virbanks2015/api.asp?action=getserveritem&gcode=do'
@@ -434,7 +434,7 @@ leoUiLoad.require('leoUi-dataAdapter,leoUi-grid-2.0,leoUi,leoUiGrid,ready', func
 
         showPage:true,
 
-        rowList: [2,30,50],
+        rowList: [20,30,50],
 
         resizeHeight: true,
 
@@ -444,7 +444,11 @@ leoUiLoad.require('leoUi-dataAdapter,leoUi-grid-2.0,leoUi,leoUiGrid,ready', func
 
         },
 
-        height: '100%',
+        height: function($grid) {
+
+            return $grid.height();
+
+        },
 
         resizeWidth: true,
 

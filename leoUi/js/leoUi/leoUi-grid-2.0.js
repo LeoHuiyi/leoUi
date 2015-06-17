@@ -183,29 +183,35 @@
 
             this.pageInfo = {};
 
+            this.tableCache = {};
+
         },
 
         _createGridBox:function(){
 
-            this.$gridBox = $(this._renderGrid());
+            var tableCache = this.tableCache;
 
-            this.$gridHeadDiv = this.$gridBox.find('div.leoUi-jqgrid-hdiv');
+            tableCache.$gridBox = $(this._renderGrid());
 
-            this.$gridBodyDiv = this.$gridBox.find('div.leoUi-jqgrid-bdiv');
+            tableCache.$gridHeadDiv = tableCache.$gridBox.find('div.leoUi-jqgrid-hdiv');
+
+            tableCache.$gridBodyDiv = tableCache.$gridBox.find('div.leoUi-jqgrid-bdiv');
 
             this._renderGridHead();
 
             this._renderGridBody();
 
+            this._storeInit();
+
             this._renderGridFooter();
 
             this._getChangeCellPercent();
 
-            this.$gridBox.appendTo(this.$target);
-
-            this._storeInit();
+            tableCache.$gridBox.appendTo(this.$target);
 
             this._addEvent();
+
+            this._storeDataBind();
 
         },
 
@@ -237,6 +243,8 @@
 
             this.renderGridBody();
 
+            this._changeFooterCenter();
+
         },
 
         _storeInit:function(){
@@ -244,8 +252,6 @@
             var This = this;
 
             this.source = this.options.source;
-
-            this._storeDataBind();
 
         },
 
@@ -257,7 +263,7 @@
 
                 if(sourceOp.pageMethod === 'ajax'){
 
-                    source.getPageData(page);
+                    source.getPageData(page).done($.proxy(this._loadPageComplete, this));
 
                 }else if(sourceOp.pageMethod === 'local'){
 
@@ -273,9 +279,35 @@
 
         _setLocalPage:function(page){
 
-            var pageInfo = this.pageInfo;
+            var pageInfo = this.pageInfo,
 
-            page = page >> 0;
+            currentPage = this.source.currentPage;
+
+            if(page === 'firstPage'){
+
+                page = 1;
+
+            }else if(page === 'lastPage'){
+
+                page = pageInfo.lastPage;
+
+            }else if(page === 'nextPage'){
+
+                page = currentPage + 1;
+
+            }else if(page === 'prevPage'){
+
+                page = currentPage - 1;
+
+            }else if(page === 'now'){
+
+                page = currentPage;
+
+            }else{
+
+                page = page >> 0;
+
+            }
 
             if(page >= pageInfo.fristPage && page <= pageInfo.lastPage){
 
@@ -357,7 +389,7 @@
 
             str += '</tbody>';
 
-            this.$gridBodyTable.html(str);
+            this.tableCache.$gridBodyTable.html(str);
 
         },
 
@@ -429,7 +461,7 @@
 
         _renderGridHead:function(){
 
-            this.$gridHeadTable = $('<table class="leoUi-jqgrid-htable" cellspacing="0" cellpadding="0" border="0"><thead><tr class="leoUi-jqgrid-labels"></tr></thead></table>').find('tr').html(this._renderGridHeadTh()).end().appendTo(this.$gridHeadDiv.find('div.leoUi-jqgrid-hbox'));
+            this.tableCache.$gridHeadTable = $('<table class="leoUi-jqgrid-htable" cellspacing="0" cellpadding="0" border="0"><thead><tr class="leoUi-jqgrid-labels"></tr></thead></table>').find('tr').html(this._renderGridHeadTh()).end().appendTo(this.tableCache.$gridHeadDiv.find('div.leoUi-jqgrid-hbox'));
 
         },
 
@@ -437,7 +469,7 @@
 
             this._renderBodySizeTr();
 
-            this.$gridBodyTable = $('<table class="leoUi-jqgrid-btable" cellspacing="0" cellpadding="0" border="0"></table>').appendTo(this.$gridBodyDiv.find('div.leoUi-jqgrid-hbox-inner'));
+            this.tableCache.$gridBodyTable = $('<table class="leoUi-jqgrid-btable" cellspacing="0" cellpadding="0" border="0"></table>').appendTo(this.tableCache.$gridBodyDiv.find('div.leoUi-jqgrid-hbox-inner'));
 
         },
 
@@ -488,20 +520,157 @@
 
             this._setGridFooterIds();
 
-            var footerIds = this.gridIds.footerIds;
+            var footerIds = this.gridIds.footerIds,
 
-            this.$footer = $('<div id="' + footerIds.footer + '" class="leoUi-state-default leoUi-jqgrid-pager leoUi-corner-bottom"><div class="leoUi-pager-control"><table cellspacing="0" cellpadding="0" border="0" role="row" style="width:100%;table-layout:fixed;height:100%;" class="leoUi-pg-table"><tbody><tr><td align="left" id="' + footerIds.footer_left + '"></td><td align="center" style="white-space: pre; width: 276px;" id="' + footerIds.footer_center + '"></td><td align="right" id="'+ footerIds.footer_right + '"></td></td></tr></tbody></table></div></div>').appendTo(this.$gridBox.find('#' + this.gridIds.gview_grid));
+            tableCache = this.tableCache;
+
+            tableCache.$footer = $('<div id="' + footerIds.footer + '" class="leoUi-state-default leoUi-jqgrid-pager leoUi-corner-bottom"><div class="leoUi-pager-control"><table cellspacing="0" cellpadding="0" border="0" role="row" style="width:100%;table-layout:fixed;height:100%;" class="leoUi-pg-table"><tbody><tr><td align="left" id="' + footerIds.footer_left + '"></td><td align="center" style="white-space: pre; width: 276px;" id="' + footerIds.footer_center + '"></td><td align="right" id="'+ footerIds.footer_right + '"></td></td></tr></tbody></table></div></div>').appendTo(tableCache.$gridBox.find('#' + this.gridIds.gview_grid));
+
+            tableCache.$pageLeft = tableCache.$footer.find('#' + footerIds.footer_left);
+
+            tableCache.$pageCenter= tableCache.$footer.find('#' + footerIds.footer_center);
+
+            tableCache.$pageRight = tableCache.$footer.find('#' + footerIds.footer_right);
+
+            this._renderGridFooterCenter();
+
+            this._renderGridFooterRight();
 
         },
 
-        _renderGridFooterLeft:function(){
+        _renderGridFooterCenter:function(){
 
-            var gridFooter, first_page, prev_page, set_page_input,
+            if(!this.options.footerShow || !this.source.option.isPage)return;
 
-            now_page, next_page, last_page, get_perPages_select
+            var tableCache = this.tableCache, centerStr,
 
-            '<table cellspacing="0" cellpadding="0" border="0" class="leoUi-pg-table" style="table-layout:auto;" id="'+ leoGrid +'page_center_table"><tbody><tr><td class="leoUi-pg-button leoUi-corner-all leoUi-state-disabled" id="'+ leoGrid +'first_page" style="'+fPageStyle+'"><span class="leoUi-icon leoUi-icon-seek-first"></span></td><td class="leoUi-pg-button leoUi-corner-all leoUi-state-disabled" id="'+ leoGrid +'prev_page" style="'+fPageStyle+'"><span class="leoUi-icon leoUi-icon-seek-prev"></span></td><td style="width: 4px; cursor: default;" class="leoUi-pg-button leoUi-state-disabled"><span class="leoUi-separator"></span></td><td><input id="'+ leoGrid +'set_page_input" type="text" role="textbox" value="1" maxlength="7" size="2" class="leoUi-pg-input"><span style="margin:0 4px 0 8px">共</span><span id="'+ leoGrid +'sp_1_page">0</span><span style="margin:0 4px">页</span></td><td style="width: 4px; cursor: default;" class="leoUi-pg-button leoUi-state-disabled"><span class="leoUi-separator"></span></td><td class="leoUi-pg-button leoUi-corner-all leoUi-state-disabled" id="'+ leoGrid +'next_page" style="'+LPageStyle+'"><span class="leoUi-icon leoUi-icon-seek-next"></span></td><td class="leoUi-pg-button leoUi-corner-all leoUi-state-disabled" id="'+ leoGrid +'last_page" style="'+LPageStyle+'"><span class="leoUi-icon leoUi-icon-seek-end"></span></td><td><select  id="'+ leoGrid +'get_perPages_select" class="leoUi-pg-selbox">';
+            rowList = this.options.rowList, i = 0,
 
+            footerIds = this.gridIds.footerIds,
+
+            length = rowList.length, $pageCenter = tableCache.$pageCenter;
+
+            centerStr = '<table cellspacing="0" cellpadding="0" border="0" class="leoUi-pg-table" style="table-layout:auto;"><tbody><tr><td class="leoUi-pg-button leoUi-corner-all leoUi-state-disabled" id="'+ footerIds.first_page +'"><span class="leoUi-icon leoUi-icon-seek-first"></span></td><td class="leoUi-pg-button leoUi-corner-all leoUi-state-disabled" id="'+ footerIds.prev_page +'"><span class="leoUi-icon leoUi-icon-seek-prev"></span></td><td style="width: 4px; cursor: default;" class="leoUi-pg-button leoUi-state-disabled"><span class="leoUi-separator"></span></td><td><input id="'+ footerIds.set_page_input +'" type="text" role="textbox" value="1" maxlength="7" size="2" class="leoUi-pg-input"><span style="margin:0 4px 0 8px">共</span><span id="'+ footerIds.now_page +'">1</span><span style="margin:0 4px">页</span></td><td style="width: 4px; cursor: default;" class="leoUi-pg-button leoUi-state-disabled"><span class="leoUi-separator"></span></td><td class="leoUi-pg-button leoUi-corner-all leoUi-state-disabled" id="'+ footerIds.next_page +'"><span class="leoUi-icon leoUi-icon-seek-next"></span></td><td class="leoUi-pg-button leoUi-corner-all leoUi-state-disabled" id="'+ footerIds.last_page +'"><span class="leoUi-icon leoUi-icon-seek-end"></span></td><td><select  id="'+ footerIds.get_perPages_select +'" class="leoUi-pg-selbox">';
+
+            for( ; i < length; i++ ){
+
+                centerStr += '<option value="'+rowList[i]+'">'+rowList[i]+'</option>';
+
+            }
+
+            centerStr += '</select></td></tr></tbody></table>';
+
+            tableCache.$pageCenterTable = $(centerStr).hide().appendTo($pageCenter);
+
+            tableCache.$firstPage = $pageCenter.find('#' + footerIds.first_page);
+
+            tableCache.$prevPage = $pageCenter.find('#' + footerIds.prev_page);
+
+            tableCache.$nextPage = $pageCenter.find('#' + footerIds.next_page);
+
+            tableCache.$lastPage = $pageCenter.find('#' + footerIds.last_page);
+
+            tableCache.$allPage = $pageCenter.find('#' + footerIds.now_page);
+
+            tableCache.$setPageInput = $pageCenter.find('#' + footerIds.set_page_input);
+
+            this._initFooterCenterEvent();
+
+        },
+
+        _renderGridFooterRight:function(){
+
+            if(!this.options.footerShow)return;
+
+            this.tableCache.$pageRightInfo = $('<div id="'+ this.gridIds.footerIds.page_right_info +'" class="leoUi-paging-info" style="text-align:right">无数据显示</div>').appendTo(this.tableCache.$pageRight);
+
+        },
+
+        _changeFooterRight:function(){
+
+            !!this.tableCache.$pageRightInfo && this.tableCache.$pageRightInfo.html(this.pageInfo.fristItemShow + ' - ' + this.pageInfo.lastItemShow + '&nbsp;&nbsp;共' + this.pageInfo.currentItems + '条')
+
+        },
+
+        _changeFooterCenter:function(){
+
+            if(!this.options.footerShow || !this.source.option.isPage)return;
+
+            var fPageStyle, LPageStyle, tableCache = this.tableCache,
+
+            pageInfo = this.pageInfo;
+
+            pageInfo.isFristPage === true ? fPageStyle = 'default' : fPageStyle = 'pointer';
+
+            pageInfo.isLastPage === true ? LPageStyle = 'default' : LPageStyle = 'pointer';
+
+            tableCache.$prevPage.css('cursor', fPageStyle);
+
+            tableCache.$firstPage.css('cursor', fPageStyle);
+
+            tableCache.$nextPage.css('cursor', LPageStyle);
+
+            tableCache.$lastPage.css('cursor', LPageStyle);
+
+            tableCache.$allPage.text(pageInfo.totalpages);
+
+            tableCache.$setPageInput.val(pageInfo.currentPage);
+
+            tableCache.$pageCenterTable.show();
+
+            this._changeFooterRight();
+
+        },
+
+        _initFooterCenterEvent:function(){
+
+            var This = this, tableCache = this.tableCache,
+
+            footerIds = this.gridIds.footerIds,
+
+            source = this.source;
+
+            this._on(tableCache.$pageCenter, 'click', 'td', function(event){
+
+                event.preventDefault();
+
+                if($(this).css('cursor') === 'default'){
+
+                    return;
+
+                }
+
+                if(this.id === footerIds.first_page){
+
+                    This.setPage('firstPage');
+
+                }else if(this.id === footerIds.prev_page){
+
+                    This.setPage('prevPage');
+
+                }else if(this.id === footerIds.next_page){
+
+                    This.setPage('nextPage');
+
+                }else if(this.id === footerIds.next_page){
+
+                    This.setPage('lastPage');
+
+                }
+
+            } )._on(tableCache.$pageCenter.find('#' + footerIds.get_perPages_select), 'change', function(event){
+
+                event.preventDefault();
+
+                source.setOption({pageSize: $(this).val()});
+
+                This.setPage('now');
+
+            } )._on(tableCache.$setPageInput, 'keydown', function(event){
+
+                event.keyCode === 13 && This.setPage($(this).val());
+
+            } );
 
         },
 
@@ -742,27 +911,17 @@
 
             if(tableWidth === false){return;}
 
-            $.isFunction( tableWidth ) === true && ( tableWidth = tableWidth(this.$target));
-
-            tableWidth = tableWidth + '';
+            $.isFunction( tableWidth ) && ( tableWidth = tableWidth(this.$target));
 
             this._resizeTableIsScroll() && (scrollWidth = this.options.scrollWidth);
 
-            if(tableWidth.indexOf('%') === -1){
-
-                this.tableSize.width = this.$gridBox.setOuterWidth(tableWidth).width() - scrollWidth;
-
-            }else{
-
-                this.tableSize.width = this.$gridBox.width(tableWidth).width() - scrollWidth;
-
-            }
+            this.tableSize.width = this.tableCache.$gridBox.setOuterWidth(tableWidth).width() - scrollWidth;
 
         },
 
         _resizeTableIsScroll:function(){
 
-            return this.$gridBodyDiv.height() < this.$gridBodyTable.outerHeight();
+            return this.tableCache.$gridBodyDiv.height() < this.tableCache.$gridBodyTable.outerHeight();
 
         },
 
@@ -792,25 +951,15 @@
 
             if(tableHeight === false){return;}
 
-            $.isFunction(tableHeight) === true && (tableHeight = tableHeight());
+            $.isFunction(tableHeight) && (tableHeight = tableHeight(this.$target));
 
-            tableHeight = tableHeight + '';
-
-            if(tableHeight.indexOf('%') === -1){
-
-                this.$gridBodyDiv.height(this.$gridBox.setOuterHeight(num).height() - this._getHdivAndPagerHeight());
-
-            }else{
-
-                this.$gridBodyDiv.height(this.$gridBox.height(tableHeight).height() - this._getHdivAndPagerHeight());
-
-            }
+            this.tableCache.$gridBodyDiv.height(this.tableCache.$gridBox.setOuterHeight(tableHeight).height() - this._getHdivAndPagerHeight());
 
         },
 
         _getHdivAndPagerHeight:function(){
 
-            return this.$gridHeadDiv.outerHeight() + (this.$footer && this.$footer.outerHeight() || 0);
+            return this.tableCache.$gridHeadDiv.outerHeight() + (this.tableCache.$footer && this.tableCache.$footer.outerHeight() || 0);
 
         },
 
@@ -824,6 +973,8 @@
 
             i = cellSize.length, cellSizeObj,
 
+            tableCache = this.tableCache,
+
             gridIds = this.gridIds, sizeRowid = gridIds.sizeRowid,
 
             changeCellLen = tableSize.changeCellLen,
@@ -832,9 +983,9 @@
 
             oldCellOuterWidth = 0, cellOuterWidth = 0,
 
-            $gridBodyResizeRow = this.$gridBodyTable.find('#' + sizeRowid),
+            $gridBodyResizeRow = tableCache.$gridBodyTable.find('#' + sizeRowid),
 
-            $gridHeadResizeRow = this.$gridHeadResizeRow || this.$gridHeadTable.find('tr.leoUi-jqgrid-labels'),
+            $gridHeadResizeRow = tableCache.$gridHeadResizeRow || tableCache.$gridHeadTable.find('tr.leoUi-jqgrid-labels'),
 
             tableWidth = tableSize.width,
 
@@ -884,9 +1035,9 @@
 
             }
 
-            this.$gridBodyTable.width(tableWidth);
+            tableCache.$gridBodyTable.width(tableWidth);
 
-            this.$gridHeadTable.width(tableWidth);
+            tableCache.$gridHeadTable.width(tableWidth);
 
             tableSize.width = tableWidth;
 
@@ -912,11 +1063,11 @@
 
                 }, 50);
 
-            })._on(this.$gridBodyDiv, 'scroll', function(event){
+            })._on(this.tableCache.$gridBodyDiv, 'scroll', function(event){
 
                 event.preventDefault();
 
-                This.$gridHeadDiv.scrollLeft($(this).scrollLeft());
+                this.tableCache.$gridHeadDiv.scrollLeft($(this).scrollLeft());
 
             });
 

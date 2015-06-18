@@ -202,11 +202,11 @@
 
         _getAjaxPageInfo:function(data, page){
 
-            var pageObj, option = this.option;
+            var pageObj, option = this.option, collection;
 
             this._dataToCollection(data);
 
-            data = this._getCollection(true);
+            collection = this._getCollection(true);
 
             if(option.setAjaxPageInfo){
 
@@ -218,7 +218,7 @@
 
                 pageObj = {
 
-                    pageData: data,
+                    pageData: collection,
 
                     pageInfo: {
 
@@ -236,7 +236,7 @@
 
         _loadPageComplete:function(data, page){
 
-            this.currentPage = page;
+            this.currentPage = (data.pageInfo && data.pageInfo.currentPage) || page;
 
             this.option.loadPageComplete.call(this, data);
 
@@ -284,7 +284,7 @@
 
                 isLastPage = totalpages === page;
 
-                lastItem = fristItem + (isLastPage ? (remainder = totalItems % pageSize) === 0 ? pageSize : remainder : pageSize);
+                lastItem = fristItem + (+(isLastPage ? (remainder = totalItems % pageSize) === 0 ? pageSize : remainder : pageSize));
 
                 return {
 
@@ -388,7 +388,7 @@
 
             data = data || option.localData;
 
-            !!filterData && (data = filterData(data) || []);
+            !!filterData && (data = filterData(data, option) || []);
 
             len = data.length;
 

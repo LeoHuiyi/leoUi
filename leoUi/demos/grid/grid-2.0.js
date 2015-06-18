@@ -86,7 +86,7 @@ leoUiLoad.require('leoUi-dataAdapter,leoUi-grid-2.0,leoUi,leoUiGrid,ready', func
 
             renderThCell: function(val) {
 
-                return '<a class="teamEditBtn" href="javascript:;">修改</a><span>|</span><a class="dataDelBtn" href="javascript:;">删除</a>';
+                return val;
 
             }
 
@@ -289,7 +289,13 @@ leoUiLoad.require('leoUi-dataAdapter,leoUi-grid-2.0,leoUi,leoUiGrid,ready', func
 
             renderCell: function(val) {
 
-                return '<a class="teamEditBtn" href="javascript:;">修改</a><span>|</span><a class="dataDelBtn" href="javascript:;">删除</a>';
+                return {
+
+                    html:'<a class="teamEditBtn" href="javascript:;">修改</a><span>|</span><a class="dataDelBtn" href="javascript:;">删除</a>',
+
+                    title:'asdfsdfsd'
+
+                }
 
             }
 
@@ -365,24 +371,78 @@ leoUiLoad.require('leoUi-dataAdapter,leoUi-grid-2.0,leoUi,leoUiGrid,ready', func
             localData:data,
             datatype: "array",
             isPage: true,
-            pageSize: 4,
-            method:'local',
+            pageSize: 100,
+            method:'ajax',
+            setAjaxPageInfo:function(data, page){
+
+                return data;
+
+            },
+            ajaxParam:function(option, data){
+
+                if(option.pageMethod === 'local'){
+
+                    return $.extend({}, option.ajax, {
+
+                        data:{
+
+                            pageSize: 100,
+
+                            page: 1
+
+                        }
+
+                    });
+
+                }else{
+
+                    return $.extend({}, option.ajax, {
+
+                        data:{
+
+                            pageSize: option.pageSize,
+
+                            page: data.page
+
+                        }
+
+                    });
+
+                }
+
+            },
+            filterData:function(data, option){
+
+                if(option.method === 'local'){
+
+                    return data;
+
+                }
+
+                if(option.pageMethod === 'local'){
+
+                    return data.pageData;
+
+                }
+
+            },
             ajax:{
-                url:'http://192.168.1.108/virbanks2015/api.asp?action=getserveritem&gcode=do'
+                url:'http://127.0.0.1:1337/',
+                dataType :'json'
             },
             currentPage: 1,
-            pageMethod:'local', //local,ajax
+            pageMethod:'ajax', //local,ajax
             mode: [{
                 name: 'id',
                 type: 'number',
                 validator:"required number"
             }, {
                 name: 'contact',
-                type: 'number',
+                type: 'string',
                 validator:["required", "string"]
             }, {
                 name: 'email',
-                type: 'number'
+                type: 'string'
 
             }, {
                 name: 'skype',
@@ -434,7 +494,7 @@ leoUiLoad.require('leoUi-dataAdapter,leoUi-grid-2.0,leoUi,leoUiGrid,ready', func
 
         showPage:true,
 
-        rowList: [20,30,50],
+        rowList: [20,30,100],
 
         resizeHeight: true,
 

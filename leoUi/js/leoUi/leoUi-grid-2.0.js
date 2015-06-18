@@ -197,6 +197,10 @@
 
             tableCache.$gridBodyDiv = tableCache.$gridBox.find('div.leoUi-jqgrid-bdiv');
 
+            tableCache.$gridOverlay = tableCache.$gridBox.find('#' + this.gridIds.overlay_grid);
+
+            tableCache.$gridLoad = tableCache.$gridBox.find('#' + this.gridIds.load_grid);
+
             this._renderGridHead();
 
             this._renderGridBody();
@@ -208,6 +212,8 @@
             this._getChangeCellPercent();
 
             tableCache.$gridBox.appendTo(this.$target);
+
+            this._setTableHeight();
 
             this._addEvent();
 
@@ -233,6 +239,8 @@
 
             this.renderGridBody();
 
+            this.loadHide();
+
         },
 
         _loadPageComplete:function(data){
@@ -244,6 +252,8 @@
             this.renderGridBody();
 
             this._changeFooterCenter();
+
+            this.loadHide();
 
         },
 
@@ -261,15 +271,15 @@
 
             if(sourceOp.isPage){
 
-                if(sourceOp.pageMethod === 'ajax'){
+                page = this._setPage(page);
+
+                if(page !== false){
+
+                    this.loadShow();
+
+                    !!source.ajax && source.ajax.abort();
 
                     source.getPageData(page).done($.proxy(this._loadPageComplete, this));
-
-                }else if(sourceOp.pageMethod === 'local'){
-
-                    page = this._setLocalPage(page);
-
-                    page !== false && source.getPageData(page).done($.proxy(this._loadPageComplete, this));
 
                 }
 
@@ -277,7 +287,7 @@
 
         },
 
-        _setLocalPage:function(page){
+        _setPage:function(page){
 
             var pageInfo = this.pageInfo,
 
@@ -309,7 +319,7 @@
 
             }
 
-            if(page >= pageInfo.fristPage && page <= pageInfo.lastPage){
+            if(page >= 1 && (pageInfo.isLastPage === 'none' || page <= pageInfo.lastPage)){
 
                 return page;
 
@@ -321,11 +331,29 @@
 
         },
 
+        loadShow:function(notOverlay){
+
+            !notOverlay && this.tableCache.$gridOverlay.show();
+
+            this.tableCache.$gridLoad.show();
+
+        },
+
+        loadHide:function(){
+
+            this.tableCache.$gridOverlay.hide();
+
+            this.tableCache.$gridLoad.hide();
+
+        },
+
         _storeDataBind:function(){
 
             var source = this.source, sourceOp = source.option,
 
             proxy = $.proxy;
+
+            this.loadShow();
 
             if(sourceOp.isPage){
 
@@ -407,11 +435,39 @@
 
             tdIdPostfix = tdData.tdIdPostfix, len = tableModels.length,
 
-            htmlEncode = this._htmlEncode;
+            htmlEncode = this._htmlEncode, value, title;
 
             for (; i < len; i++) {
 
                 tableModel = tableModels[i];
+
+                title = undefined;
+
+                value = undefined;
+
+                if(typeof tableModel.renderCell === 'function'){
+
+                    value = tableModel.renderCell(data[tableModel.dataKey]);
+
+                    if(typeof value === 'object'){
+
+                        if(typeof value.title === 'string'){
+
+                            title = value.title;
+
+                        }
+
+                        value = value.html || '';
+
+                    }
+
+                }else if(!tableModel.checkBoxId){
+
+                    value = htmlEncode(data[tableModel.dataKey]);
+
+                    title = value;
+
+                }
 
                 str += '<td id="' + trId + tdIdPostfix + i +'" ';
 
@@ -427,13 +483,15 @@
 
                 }
 
+                if(typeof title !== 'undefined'){
+
+                    str += ' title =' + title;
+
+                }
+
                 str += '>';
 
-                if(typeof tableModel.renderCell === 'function'){
-
-                    str += tableModel.renderCell(data[tableModel.dataKey]);
-
-                }else if(tableModel.checkBoxId){
+                if(tableModel.checkBoxId){
 
                     str += '<input type="checkbox" ';
 
@@ -447,7 +505,7 @@
 
                 }else{
 
-                    str += htmlEncode(data[tableModel.dataKey]);
+                    str += value;
 
                 }
 
@@ -652,25 +710,25 @@
 
                     This.setPage('nextPage');
 
-                }else if(this.id === footerIds.next_page){
+                }else if(this.id === footerIds.last_page){
 
                     This.setPage('lastPage');
 
                 }
 
-            } )._on(tableCache.$pageCenter.find('#' + footerIds.get_perPages_select), 'change', function(event){
+            })._on(tableCache.$pageCenter.find('#' + footerIds.get_perPages_select), 'change', function(event){
 
                 event.preventDefault();
 
                 source.setOption({pageSize: $(this).val()});
 
-                This.setPage('now');
+                This.setPage('firstPage');
 
-            } )._on(tableCache.$setPageInput, 'keydown', function(event){
+            })._on(tableCache.$setPageInput, 'keydown', function(event){
 
                 event.keyCode === 13 && This.setPage($(this).val());
 
-            } );
+            });
 
         },
 
@@ -831,7 +889,7 @@
 
             var gridIds = this.gridIds, str = '';
 
-            return str += '<div id="' + gridIds.leoUi_grid + '" class="leoUi-jqgrid leoUi-widget leoUi-widget-content leoUi-corner-all"><div id="' + gridIds.lui_grid + '" class="leoUi-widget-overlay jqgrid-overlay"></div><div id="' + gridIds.load_grid + '" class="loading leoUi-state-default leoUi-state-active">读取中...</div><div class="leoUi-jqgrid-view" id="' + gridIds.gview_grid + '"><div class="leoUi-state-default leoUi-jqgrid-hdiv"><div class="leoUi-jqgrid-hbox"></div></div><div class="leoUi-jqgrid-bdiv"><div class="leoUi-jqgrid-hbox-inner" style="position:relative;"></div></div></div><div id="' + gridIds.rs_mgrid + '" class="leoUi-jqgrid-resize-mark" ></div></div>';
+            return str += '<div id="' + gridIds.leoUi_grid + '" class="leoUi-jqgrid leoUi-widget leoUi-widget-content leoUi-corner-all"><div id="' + gridIds.overlay_grid + '" class="leoUi-widget-overlay jqgrid-overlay"></div><div id="' + gridIds.load_grid + '" class="loading leoUi-state-default leoUi-state-active">读取中...</div><div class="leoUi-jqgrid-view" id="' + gridIds.gview_grid + '"><div class="leoUi-state-default leoUi-jqgrid-hdiv"><div class="leoUi-jqgrid-hbox"></div></div><div class="leoUi-jqgrid-bdiv"><div class="leoUi-jqgrid-hbox-inner" style="position:relative;"></div></div></div><div id="' + gridIds.rs_mgrid + '" class="leoUi-jqgrid-resize-mark" ></div></div>';
 
         },
 
@@ -863,7 +921,7 @@
 
                 leoUi_grid: leoGrid + 'leoUi_grid',
 
-                lui_grid: leoGrid + 'lui_grid',
+                overlay_grid: leoGrid + 'overlay_grid',
 
                 load_grid: leoGrid + 'load_grid',
 
@@ -1045,7 +1103,11 @@
 
         _addEvent:function(){
 
-            var time,This = this;
+            var time,This = this,
+
+            $gridHeadDiv = this.tableCache.$gridHeadDiv,
+
+            lastGridHeadDivLeft = $gridHeadDiv.scrollLeft();
 
             this._on(this.window, 'resize', function(event){
 
@@ -1063,11 +1125,19 @@
 
                 }, 50);
 
-            })._on(this.tableCache.$gridBodyDiv, 'scroll', function(event){
+            })._on(this.tableCache.$gridBodyDiv, 'scroll', function(event, delta, deltaX, deltaY){
 
                 event.preventDefault();
 
-                this.tableCache.$gridHeadDiv.scrollLeft($(this).scrollLeft());
+                var left = $(this).scrollLeft();
+
+                if(left !== lastGridHeadDivLeft){
+
+                    $gridHeadDiv.scrollLeft(left);
+
+                    lastGridHeadDivLeft = left;
+
+                }
 
             });
 

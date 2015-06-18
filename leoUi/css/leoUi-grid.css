@@ -1,40 +1,47 @@
 @charset "UTF-8";
-
 .leoUi-widget-content {
     color: #555;
     border: 0 none;
     border-color: #ddd;
     background: #fff 50% 50% repeat-x
 }
+
 .leoUi-widget {
     font-size: 12px;
     font-family: tahoma, arial, 宋体
 }
+
 .leoUi-corner-all {
     border-radius: 0
 }
+
 .leoUi-state-default {
     background: #f5f5f5;
     border: 1px solid #d6dee3;
     color: #555
 }
+
 .leoUi-jqgrid {
     color: #555;
     border: 1px solid;
     border-color: #d6dee3;
     position: relative
 }
+
 .leoUi-jqgrid-btable .red {
     color: #F00
 }
+
 .leoUi-jqgrid a {
     color: #555;
     text-decoration: underline
 }
+
 .leoUi-jqgrid a:hover {
     color: #000;
     text-decoration: underline
 }
+
 .leoUi-jqgrid .leoUi-jqgrid-view {
     position: relative;
     left: 0;
@@ -42,6 +49,7 @@
     padding: 0;
     font-size: 12px
 }
+
 .leoUi-jqgrid .leoUi-jqgrid-titlebar {
     padding: .3em .2em .2em .3em;
     position: relative;
@@ -49,10 +57,12 @@
     border-right: 0 none;
     border-top: 0 none
 }
+
 .leoUi-jqgrid .leoUi-jqgrid-title {
     float: left;
     margin: .1em 0 .2em
 }
+
 .leoUi-jqgrid .leoUi-jqgrid-titlebar-close {
     position: absolute;
     top: 50%;
@@ -61,13 +71,16 @@
     padding: 1px;
     height: 18px
 }
+
 .leoUi-jqgrid .leoUi-jqgrid-titlebar-close span {
     display: block;
     margin: 1px
 }
+
 .leoUi-jqgrid .leoUi-jqgrid-titlebar-close:hover {
     padding: 0
 }
+
 .leoUi-jqgrid .leoUi-jqgrid-hdiv {
     position: relative;
     margin: 0;
@@ -77,29 +90,36 @@
     border-top: 0 none;
     border-right: 0 none
 }
+
 .leoUi-jqgrid .leoUi-jqgrid-hbox {
     float: left;
     padding-right: 20px
 }
+
 .leoUi-jqgrid .leoUi-jqgrid-htable {
     table-layout: fixed;
     margin: 0
 }
+
 .leoUi-jqgrid .leoUi-jqgrid-htable th {
     height: 36px;
     padding: 0 2px 0 2px
 }
+
 .leoUi-jqgrid .leoUi-jqgrid-htable th div {
     overflow: hidden;
     position: relative;
     height: 20px
 }
+
 .leoUi-jqgrid .leoUi-jqgrid-htable th div small {
     font-weight: normal;
     border-bottom: 1px dotted #888;
     cursor: pointer
 }
-.leoUi-th-column, .leoUi-jqgrid .leoUi-jqgrid-htable th.leoUi-th-column {
+
+.leoUi-th-column,
+.leoUi-jqgrid .leoUi-jqgrid-htable th.leoUi-th-column {
     overflow: hidden;
     white-space: nowrap;
     text-align: center;
@@ -107,26 +127,35 @@
     border-bottom: 0 none;
     font-weight: bold
 }
+
 .leoUi-jqgrid .leoUi-jqgrid-htable .leoUi-th-column-header {
     font-weight: bold
 }
-.leoUi-th-ltr, .leoUi-jqgrid .leoUi-jqgrid-htable th.leoUi-th-ltr {
+
+.leoUi-th-ltr,
+.leoUi-jqgrid .leoUi-jqgrid-htable th.leoUi-th-ltr {
     border-left: 0 none
 }
-.leoUi-th-rtl, .leoUi-jqgrid .leoUi-jqgrid-htable th.leoUi-th-rtl {
+
+.leoUi-th-rtl,
+.leoUi-jqgrid .leoUi-jqgrid-htable th.leoUi-th-rtl {
     border-right: 0 none
 }
+
 .leoUi-first-th-ltr {
     border-right: 1px solid
 }
+
 .leoUi-first-th-rtl {
     border-left: 1px solid
 }
+
 .leoUi-jqgrid .leoUi-th-div-ie {
     white-space: nowrap;
     zoom: 1;
     height: 17px
 }
+
 .leoUi-jqgrid .leoUi-jqgrid-resize {
     height: 20px!important;
     position: relative;
@@ -134,43 +163,53 @@
     display: inline;
     overflow: hidden
 }
+
 .leoUi-jqgrid .leoUi-grid-ico-sort {
     overflow: hidden;
     position: absolute;
     display: inline;
     cursor: pointer!important
 }
+
 .leoUi-jqgrid .leoUi-icon-asc {
     margin-top: -1px;
     height: 12px
 }
+
 .leoUi-jqgrid .leoUi-icon-desc {
     margin-top: 5px;
     height: 12px
 }
+
 .leoUi-jqgrid .leoUi-i-asc {
     margin-top: 0;
     height: 16px
 }
+
 .leoUi-jqgrid .leoUi-i-desc {
     margin-top: 0;
     margin-left: 13px;
     height: 16px
 }
+
 .leoUi-jqgrid .leoUi-jqgrid-sortable {
     cursor: pointer
 }
+
 .leoUi-jqgrid tr.leoUi-search-toolbar th {
     border-top-width: 1px!important;
     border-top-color: inherit!important;
     border-top-style: ridge!important
 }
+
 tr.leoUi-search-toolbar input {
     margin: 1px 0 0 0
 }
+
 tr.leoUi-search-toolbar select {
     margin: 1px 0 0 0
 }
+
 .leoUi-jqgrid .leoUi-jqgrid-bdiv {
     position: relative;
     margin: 0;
@@ -178,17 +217,21 @@ tr.leoUi-search-toolbar select {
     overflow: auto;
     text-align: left
 }
+
 .leoUi-jqgrid .leoUi-jqgrid-btable {
     table-layout: fixed;
     margin: 0;
     outline-style: none
 }
+
 .leoUi-jqgrid tr.jqgrow {
     outline-style: none
 }
+
 .leoUi-jqgrid tr.jqgroup {
     outline-style: none
 }
+
 .leoUi-jqgrid tr.jqgrow td {
     font-weight: normal;
     overflow: hidden;
@@ -199,17 +242,21 @@ tr.leoUi-search-toolbar select {
     border-bottom-color: #d6dee3;
     border-bottom-style: solid
 }
+
 .leoUi-jqgrid tr.fb td {
     font-weight: bold
 }
+
 .leoUi-jqgrid tr.jqgrow td .cbox {
     *margin: 0 0 0 -3px
 }
+
 .leoUi-jqgrid tr.jqgfirstrow td {
     padding: 0 2px 0 2px;
     border-right-width: 1px;
     border-right-style: solid
 }
+
 .leoUi-jqgrid tr.jqgroup td {
     font-weight: normal;
     overflow: hidden;
@@ -220,6 +267,7 @@ tr.leoUi-search-toolbar select {
     border-bottom-color: inherit;
     border-bottom-style: solid
 }
+
 .leoUi-jqgrid tr.jqfoot td {
     font-weight: bold;
     overflow: hidden;
@@ -230,23 +278,27 @@ tr.leoUi-search-toolbar select {
     border-bottom-color: inherit;
     border-bottom-style: solid
 }
+
 .leoUi-jqgrid tr.leoUi-row-ltr td {
     text-align: left;
     border-right-width: 1px;
     border-right-color: #d6dee3;
     border-right-style: solid
 }
+
 .leoUi-jqgrid tr.leoUi-row-rtl td {
     text-align: right;
     border-left-width: 1px;
     border-left-color: inherit;
     border-left-style: solid
 }
+
 .leoUi-jqgrid td.jqgrid-rownum {
     padding: 0 2px 0 2px;
     margin: 0;
     border: 0 none
 }
+
 .leoUi-jqgrid .leoUi-jqgrid-resize-mark {
     width: 2px;
     left: 0;
@@ -261,6 +313,7 @@ tr.leoUi-search-toolbar select {
     border: 0 none;
     z-index: 99999
 }
+
 .leoUi-jqgrid .leoUi-jqgrid-sdiv {
     position: relative;
     margin: 0;
@@ -271,10 +324,12 @@ tr.leoUi-search-toolbar select {
     border-top: 1px solid #ddd;
     border-right: 0 none
 }
+
 .leoUi-jqgrid .leoUi-jqgrid-ftable {
     table-layout: fixed;
     margin-bottom: 0
 }
+
 .leoUi-jqgrid tr.footrow td {
     font-weight: bold;
     overflow: hidden;
@@ -282,18 +337,21 @@ tr.leoUi-search-toolbar select {
     height: 36px;
     padding: 0 2px 0 2px
 }
+
 .leoUi-jqgrid tr.footrow-ltr td {
     text-align: left;
     border-right-width: 1px;
     border-right-color: inherit;
     border-right-style: solid
 }
+
 .leoUi-jqgrid tr.footrow-rtl td {
     text-align: right;
     border-left-width: 1px;
     border-left-color: inherit;
     border-left-style: solid
 }
+
 .leoUi-jqgrid .leoUi-jqgrid-pager {
     border-left: 0 none!important;
     border-right: 0 none!important;
@@ -305,72 +363,89 @@ tr.leoUi-search-toolbar select {
     white-space: nowrap;
     overflow: hidden
 }
+
 .leoUi-jqgrid .leoUi-pager-control {
     position: relative
 }
+
 .leoUi-jqgrid .leoUi-pg-table {
     position: relative;
     width: auto;
     margin: 0
 }
+
 .leoUi-jqgrid .leoUi-pg-table td {
     font-weight: normal;
     vertical-align: middle;
     height: 30px
 }
+
 .leoUi-jqgrid .leoUi-pg-button {
     height: 19px!important
 }
+
 .leoUi-jqgrid .leoUi-pg-button span {
     display: block;
     margin: 1px 4px;
     float: left
 }
+
 .leoUi-jqgrid .leoUi-pg-button:hover {
     padding: 0
 }
+
 .leoUi-jqgrid .leoUi-pg-input {
     margin: 0;
     border: 1px solid #DDD;
     padding: 1px;
     line-height: 1
 }
+
 .leoUi-jqgrid .leoUi-pg-selbox {
     border: 1px solid #DDD;
     padding: 1px;
     display: block;
     margin: 0
 }
+
 .leoUi-jqgrid .leoUi-separator {
     height: 18px;
     margin: 1px;
     float: right
 }
+
 .leoUi-jqgrid .leoUi-paging-info {
     font-weight: normal;
     height: 23px;
     margin-top: 3px;
     margin-right: 6px
 }
+
 .leoUi-jqgrid .leoUi-jqgrid-pager .leoUi-pg-div {
     padding: 1px 0;
     float: left;
     position: relative
 }
+
 .leoUi-jqgrid .leoUi-jqgrid-pager .leoUi-pg-button {
     cursor: pointer
 }
+
 .leoUi-jqgrid .leoUi-jqgrid-pager .leoUi-pg-div span.leoUi-icon {
     float: left;
     margin: 0 2px
 }
-.leoUi-jqgrid td input, .leoUi-jqgrid td select .leoUi-jqgrid td textarea {
+
+.leoUi-jqgrid td input,
+.leoUi-jqgrid td select .leoUi-jqgrid td textarea {
     margin: 0
 }
+
 .leoUi-jqgrid td textarea {
     width: auto;
     height: auto
 }
+
 .leoUi-jqgrid .leoUi-jqgrid-toppager {
     border-left: 0 none!important;
     border-right: 0 none!important;
@@ -382,29 +457,36 @@ tr.leoUi-search-toolbar select {
     white-space: nowrap;
     overflow: hidden
 }
+
 .leoUi-jqgrid .leoUi-jqgrid-toppager .leoUi-pg-div {
     padding: 1px 0;
     float: left;
     position: relative
 }
+
 .leoUi-jqgrid .leoUi-jqgrid-toppager .leoUi-pg-button {
     cursor: pointer
 }
+
 .leoUi-jqgrid .leoUi-jqgrid-toppager .leoUi-pg-div span.leoUi-icon {
     float: left;
     margin: 0 2px
 }
+
 .leoUi-jqgrid .leoUi-jqgrid-btable .leoUi-sgcollapsed span {
     display: block
 }
+
 .leoUi-jqgrid .leoUi-subgrid {
     margin: 0;
     padding: 0;
     width: 100%
 }
+
 .leoUi-jqgrid .leoUi-subgrid table {
     table-layout: fixed
 }
+
 .leoUi-jqgrid .leoUi-subgrid tr.leoUi-subtblcell td {
     height: 18px;
     border-right-width: 1px;
@@ -414,15 +496,19 @@ tr.leoUi-search-toolbar select {
     border-bottom-color: inherit;
     border-bottom-style: solid
 }
+
 .leoUi-jqgrid .leoUi-subgrid td.subgrid-data {
     border-top: 0 none!important
 }
+
 .leoUi-jqgrid .leoUi-subgrid td.subgrid-cell {
     border-width: 0 0 1px 0
 }
+
 .leoUi-jqgrid .leoUi-th-subgrid {
     height: 20px
 }
+
 .leoUi-jqgrid .loading {
     position: absolute;
     top: 45%;
@@ -437,14 +523,28 @@ tr.leoUi-search-toolbar select {
     font-size: 14px;
     background: url(../img/loading.gif) no-repeat scroll 8px center #fff
 }
+
 .leoUi-jqgrid .jqgrid-overlay {
     display: none;
     z-index: 100
 }
+
+.leoUi-widget-overlay {
+    background: #aaaaaa;
+    opacity: .3;
+    filter: Alpha(Opacity=30);
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+
 * html .jqgrid-overlay {
     width: expression(this.parentNode.offsetWidth+'px');
     height: expression(this.parentNode.offsetHeight+'px')
 }
+
 * .jqgrid-overlay iframe {
     position: absolute;
     top: 0;
@@ -453,16 +553,20 @@ tr.leoUi-search-toolbar select {
     width: expression(this.parentNode.offsetWidth+'px');
     height: expression(this.parentNode.offsetHeight+'px')
 }
+
 .leoUi-jqgrid .leoUi-userdata {
     border-left: 0 none;
     border-right: 0 none;
     height: 21px;
     overflow: hidden
 }
-.leoUi-jqgrid .selected-row, div.leoUi-jqgrid .selected-row td {
+
+.leoUi-jqgrid .selected-row,
+div.leoUi-jqgrid .selected-row td {
     font-style: normal;
     border-left: 0 none
 }
+
 .leoUi-jqgrid .tree-wrap {
     float: left;
     position: relative;
@@ -470,27 +574,32 @@ tr.leoUi-search-toolbar select {
     white-space: nowrap;
     overflow: hidden
 }
+
 .leoUi-jqgrid .tree-minus {
     position: absolute;
     height: 18px;
     width: 18px;
     overflow: hidden
 }
+
 .leoUi-jqgrid .tree-plus {
     position: absolute;
     height: 18px;
     width: 18px;
     overflow: hidden
 }
+
 .leoUi-jqgrid .tree-leaf {
     position: absolute;
     height: 18px;
     width: 18px;
     overflow: hidden
 }
+
 .leoUi-jqgrid .treeclick {
     cursor: pointer
 }
+
 * iframe.jqm {
     position: absolute;
     top: 0;
@@ -499,78 +608,98 @@ tr.leoUi-search-toolbar select {
     width: expression(this.parentNode.offsetWidth+'px');
     height: expression(this.parentNode.offsetHeight+'px')
 }
+
 .leoUi-jqgrid-dnd tr td {
     border-right-width: 1px;
     border-right-color: inherit;
     border-right-style: solid;
     height: 20px
 }
+
 .leoUi-jqgrid .leoUi-jqgrid-title-rtl {
     float: right;
     margin: .1em 0 .2em
 }
+
 .leoUi-jqgrid .leoUi-jqgrid-hbox-rtl {
     float: right;
     padding-left: 20px
 }
+
 .leoUi-jqgrid .leoUi-jqgrid-resize-ltr {
     float: right;
     margin: -2px -2px -2px 0
 }
+
 .leoUi-jqgrid .leoUi-jqgrid-resize-rtl {
     float: left;
     margin: -2px 0 -1px -3px
 }
+
 .leoUi-jqgrid .leoUi-sort-rtl {
     left: 0
 }
+
 .leoUi-jqgrid .tree-wrap-ltr {
     float: left
 }
+
 .leoUi-jqgrid .tree-wrap-rtl {
     float: right
 }
+
 .leoUi-jqgrid .leoUi-ellipsis {
     text-overflow: ellipsis
 }
+
 .leoUi-search-menu {
     position: absolute;
     padding: 2px 5px
 }
+
 .leoUi-jqgrid .leoUi-search-table {
     padding: 0;
     border: 0 none;
     height: 20px;
     width: 100%
 }
+
 .leoUi-jqgrid .leoUi-search-table .leoUi-search-oper {
     width: 20px
 }
-.leoUi-jqgrid .leoUi-search-table .leoUi-search-input>input, .leoUi-jqgrid .leoUi-search-table .leoUi-search-input>select {
+
+.leoUi-jqgrid .leoUi-search-table .leoUi-search-input>input,
+.leoUi-jqgrid .leoUi-search-table .leoUi-search-input>select {
     display: block;
     -moz-box-sizing: border-box;
     -webkit-box-sizing: border-box;
     box-sizing: border-box
 }
+
 .leoUi-jqgrid-bdiv .leoUi-priority-secondary {
     background: #f9f9f9
 }
+
 .leoUi-jqgrid-bdiv .leoUi-state-hover {
     background: #e6f3f8;
     color: #000
 }
+
 .leoUi-jqgrid-bdiv .leoUi-state-highlight {
     background: #a7ddf1;
     color: #555;
     border: 0
 }
+
 .leoUi-jqgrid-pager .leoUi-state-hover {
     background: 0;
     border: 0
 }
+
 .leoUi-jqgrid-bdiv .leoUi-state-hover a {
     text-decoration: underline
 }
+
 .leoUi-jqgrid-bdiv .textbox {
     width: 100%;
     border: 1px solid #d6dee3;
@@ -579,9 +708,11 @@ tr.leoUi-search-toolbar select {
     margin: -1px -5px;
     padding: 6px 4px
 }
+
 .leoUi-jqgrid-bdiv .textbox:focus {
     border: 1px solid #2ca1b3
 }
+
 .leoUi-jqgrid .leoUi-jqgrid-bdiv .line {
     overflow: hidden;
     zoom: 1;
@@ -592,139 +723,252 @@ tr.leoUi-search-toolbar select {
     background: #e2e2e2;
     position: relative
 }
+
 .leoUi-icon {
     background-repeat: no-repeat;
     display: block;
     overflow: hidden;
     text-indent: -99999px;
 }
+
 .leoUi-icon {
     height: 16px;
     width: 16px;
 }
-.leoUi-icon, .leoUi-widget-content .leoUi-icon {
+
+.leoUi-icon,
+.leoUi-widget-content .leoUi-icon {
     background-image: url("../img/leoUi-icons.png");
 }
+
 .leoUi-state-default .leoUi-icon {
     background-image: url("../img/leoUi-icons.png");
 }
-.leoUi-state-hover .leoUi-icon, .leoUi-state-focus .leoUi-icon {
+
+.leoUi-state-hover .leoUi-icon,
+.leoUi-state-focus .leoUi-icon {
     background-image: url("../img/leoUi-icons.png");
 }
+
 .leoUi-icon-seek-next {
     background-position: 0 -16px;
 }
+
 .leoUi-icon-seek-prev {
     background-position: -16px -16px;
 }
+
 .leoUi-icon-seek-end {
     background-position: -32px -16px;
 }
+
 .leoUi-icon-seek-first {
     background-position: -48px -16px;
 }
+
 .leoUi-icon-trash {
     background-position: -64px -16px;
 }
+
 .leoUi-icon-plus {
     background-position: -80px -16px;
 }
+
 .leoUi-icon-search {
     background-position: -96px -16px;
 }
+
 .leoUi-icon-pencil {
     background-position: -112px -16px;
 }
+
 .leoUi-icon-arrowthickstop-1-s {
     background-position: -128px -16px;
 }
+
 .leoUi-icon-copy {
     background-position: -144px -16px;
 }
+
 .leoUi-icon-triangle-1-s {
     background-position: -160px -16px;
 }
+
 .leoUi-icon-folder-open {
     background-position: -175px -16px;
 }
+
 .leoUi-icon-pic {
     background-position: -190px -16px;
 }
+
 .leoUi-state-default .leoUi-icon-seek-next {
     background-position: 0 0;
 }
+
 .leoUi-state-default .leoUi-icon-seek-prev {
     background-position: -16px 0;
 }
+
 .leoUi-state-default .leoUi-icon-seek-end {
     background-position: -32px 0;
 }
+
 .leoUi-state-default .leoUi-icon-seek-first {
     background-position: -48px 0;
 }
+
 .leoUi-state-default .leoUi-icon-trash {
     background-position: -64px 0;
 }
+
 .leoUi-state-default .leoUi-icon-plus {
     background-position: -80px 0;
 }
+
 .leoUi-state-default .leoUi-icon-search {
     background-position: -96px 0;
 }
+
 .leoUi-state-default .leoUi-icon-pencil {
     background-position: -112px 0;
 }
+
 .leoUi-state-default .leoUi-icon-arrowthickstop-1-s {
     background-position: -128px 0;
 }
+
 .leoUi-state-default .leoUi-icon-copy {
     background-position: -144px 0;
 }
+
 .leoUi-state-default .leoUi-icon-triangle-1-s {
     background-position: -160px 0;
 }
+
 .leoUi-state-default .leoUi-icon-pic {
     background-position: -190px 0;
 }
+
 .leoUi-state-hover .leoUi-icon-seek-next {
     background-position: 0 -16px;
 }
+
 .leoUi-state-hover .leoUi-icon-seek-prev {
     background-position: -16px -16px;
 }
+
 .leoUi-state-hover .leoUi-icon-seek-end {
     background-position: -32px -16px;
 }
+
 .leoUi-state-hover .leoUi-icon-seek-first {
     background-position: -48px -16px;
 }
+
 .leoUi-state-hover .leoUi-icon-trash {
     background-position: -64px -16px;
 }
+
 .leoUi-state-hover .leoUi-icon-plus {
     background-position: -80px -16px;
 }
+
 .leoUi-state-hover .leoUi-icon-search {
     background-position: -96px -16px;
 }
+
 .leoUi-state-hover .leoUi-icon-pencil {
     background-position: -112px -16px;
 }
+
 .leoUi-state-hover .leoUi-icon-arrowthickstop-1-s {
     background-position: -128px -16px;
 }
+
 .leoUi-state-hover .leoUi-icon-copy {
     background-position: -144px -16px;
 }
+
 .leoUi-state-hover .leoUi-icon-triangle-1-s {
     background-position: -160px -16px;
 }
+
 .leoUi-state-hover .leoUi-icon-pic {
     background-position: -190px -16px;
 }
-.leoUi-sort-asc, .leoUi-sort-desc, .leoUi-sort-ndb { width: 16px; height: 16px; line-height: 1; vertical-align: middle; display: -moz-inline-stack; display: inline-block; vertical-align: middle; *vertical-align: auto; zoom: 1; *display: inline; position: relative; cursor: pointer; }
-.leoUi-sort-asc span,.leoUi-sort-desc span,.leoUi-sort-ndb span { position: absolute; top: 0px; left: 4px; }
-.leoUi-sort-ndb .leoUi-sort-top, .leoUi-sort-desc .leoUi-sort-top { width: 0; height: 0; line-height: 0; font-size: 0; border-top: 0 none; border-right: 6px dashed transparent; border-bottom: 6px solid #cccccc; border-left: 6px dashed transparent; top: 0px; }
-.leoUi-sort-asc .leoUi-sort-top { width: 0; height: 0; line-height: 0; font-size: 0; border-top: 0 none; border-right: 6px dashed transparent; border-bottom: 6px solid black; border-left: 6px dashed transparent; top: 0px; }
-.leoUi-sort-ndb .leoUi-sort-bottom, .leoUi-sort-asc .leoUi-sort-bottom { width: 0; height: 0; line-height: 0; font-size: 0; border-top: 6px solid #cccccc; border-right: 6px dashed transparent; border-bottom: 0; border-left: 6px dashed transparent; top: 8px; }
-.leoUi-sort-desc .leoUi-sort-bottom { width: 0; height: 0; line-height: 0; font-size: 0; border-top: 6px solid black; border-right: 6px dashed transparent; border-bottom: 0; border-left: 6px dashed transparent; top: 8px; }
+
+.leoUi-sort-asc,
+.leoUi-sort-desc,
+.leoUi-sort-ndb {
+    width: 16px;
+    height: 16px;
+    line-height: 1;
+    vertical-align: middle;
+    display: -moz-inline-stack;
+    display: inline-block;
+    vertical-align: middle;
+    *vertical-align: auto;
+    zoom: 1;
+    *display: inline;
+    position: relative;
+    cursor: pointer;
+}
+
+.leoUi-sort-asc span,
+.leoUi-sort-desc span,
+.leoUi-sort-ndb span {
+    position: absolute;
+    top: 0px;
+    left: 4px;
+}
+
+.leoUi-sort-ndb .leoUi-sort-top,
+.leoUi-sort-desc .leoUi-sort-top {
+    width: 0;
+    height: 0;
+    line-height: 0;
+    font-size: 0;
+    border-top: 0 none;
+    border-right: 6px dashed transparent;
+    border-bottom: 6px solid #cccccc;
+    border-left: 6px dashed transparent;
+    top: 0px;
+}
+
+.leoUi-sort-asc .leoUi-sort-top {
+    width: 0;
+    height: 0;
+    line-height: 0;
+    font-size: 0;
+    border-top: 0 none;
+    border-right: 6px dashed transparent;
+    border-bottom: 6px solid black;
+    border-left: 6px dashed transparent;
+    top: 0px;
+}
+
+.leoUi-sort-ndb .leoUi-sort-bottom,
+.leoUi-sort-asc .leoUi-sort-bottom {
+    width: 0;
+    height: 0;
+    line-height: 0;
+    font-size: 0;
+    border-top: 6px solid #cccccc;
+    border-right: 6px dashed transparent;
+    border-bottom: 0;
+    border-left: 6px dashed transparent;
+    top: 8px;
+}
+
+.leoUi-sort-desc .leoUi-sort-bottom {
+    width: 0;
+    height: 0;
+    line-height: 0;
+    font-size: 0;
+    border-top: 6px solid black;
+    border-right: 6px dashed transparent;
+    border-bottom: 0;
+    border-left: 6px dashed transparent;
+    top: 8px;
+}

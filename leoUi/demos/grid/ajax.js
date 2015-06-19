@@ -4,13 +4,17 @@ http.createServer(function(req, res) {
 
 	res.writeHead(200, {'Access-Control-Allow-Origin': '*'});
 
-	var query = url.parse(req.url, true).query, data, len,
+	var query = url.parse(req.url, true).query,
 
-	pageSize = query.pageSize, page = query.page, totalpages = 20,
+	pageSize = query.pageSize, page = query.page,
+
+	data, len, totalItems = 1000, totalpages, fristItem, lastItem,
 
 	contact = ["Andrew", "Nancy", "Shelley", "Regina", "Yoshi", "Antoni", "Mayumi", "Ian", "Peter", "Lars", "Petra", "Martin", "Sven", "Elio", "Beate", "Cheryl", "Michael", "Guylene"],
 
-	address = ['广东省广州市越秀区中山六路109', '广东省广州市越秀区中山六路101号', ' 广东省广州市越秀区中山六路97号', '广东省广州市越秀区中山六路23号', '广东省广州市越秀区中山六路89号', '广东省广州市越秀区中山一路95号', '广东省广州市越秀区中山六路9212号', '广东省广州市中山六路95号', '广东省广州市越秀区中山六路935号', '广东省广州市越秀区中山六路95号', '广东省广州市95号', '广东省广州市越秀区中山六路235号'];
+	address = ['广东省广州市越秀区中山六路109', '广东省广州市越秀区中山六路101号', ' 广东省广州市越秀区中山六路97号', '广东省广州市越秀区中山六路23号', '广东省广州市越秀区中山六路89号', '广东省广州市越秀区中山一路95号', '广东省广州市越秀区中山六路9212号', '广东省广州市中山六路95号', '广东省广州市越秀区中山六路935号', '广东省广州市越秀区中山六路95号', '广东省广州市95号', '广东省广州市越秀区中山六路235号'],
+
+	phone = ['159', '158', '157', '156', '189', '188', '187', '185'];
 
 	function random(min, max) {
 
@@ -26,19 +30,19 @@ http.createServer(function(req, res) {
 
     };
 
-	function setData(pageSize, page){
+	function setData(fristItem, lastItem){
 
-		var i = 0, data = [], id = (page - 1) * pageSize;
+		var i = 0, data = [];
 
-		for (; i < pageSize; i++) {
+		for (; i < (lastItem - fristItem); i++) {
 
 	        var row = {
 
-	        	id: id,
+	        	id: fristItem++,
 
 	        	contact: contact[Math.floor(Math.random() * contact.length)],
 
-	        	mobile: random(100000000, 999999999),
+	        	mobile: phone[Math.floor(Math.random() * phone.length)] + random(10000000, 99999999),
 
 	        	im: random(10000000, 999999999999),
 
@@ -52,9 +56,9 @@ http.createServer(function(req, res) {
 
 	        	address: address[Math.floor(Math.random() * address.length)],
 
-	        }
+	        	first: random(0, 1)
 
-	        id++;
+	        }
 
 	        data.push(row);
 
@@ -66,9 +70,19 @@ http.createServer(function(req, res) {
 
 	page = page >> 0;
 
+	pageSize = pageSize >> 0;
+
+	totalpages = Math.ceil(totalItems / pageSize);
+
 	page > totalpages && (page = totalpages);
 
-	data = setData(pageSize, page);
+	fristItem = (page - 1) * pageSize;
+
+	lastItem = fristItem + pageSize;
+
+	lastItem > totalItems && (lastItem = totalItems);
+
+	data = setData(fristItem, lastItem);
 
 	len = data.length;
 
@@ -80,11 +94,11 @@ http.createServer(function(req, res) {
 
 			currentPage: page,
 
-			fristItemShow: data[0].id + 1,
+			fristItemShow: fristItem + 1,
 
-			lastItemShow: data[len - 1].id + 1,
+			lastItemShow: lastItem,
 
-			currentItems: len * totalpages,
+			currentItems: totalItems,
 
 			isFristPage: page === 1,
 

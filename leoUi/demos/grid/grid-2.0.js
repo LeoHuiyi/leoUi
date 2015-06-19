@@ -64,9 +64,9 @@ leoUiLoad.require('leoUi-dataAdapter,leoUi-grid-2.0,leoUi,leoUiGrid,ready', func
 
             theadName: '联系人',
 
-            width: 133,
+            width: 50,
 
-            minWidth: 100,
+            minWidth: 50,
 
             sortable: true,
 
@@ -185,7 +185,7 @@ leoUiLoad.require('leoUi-dataAdapter,leoUi-grid-2.0,leoUi,leoUiGrid,ready', func
 
             theadName: 'email',
 
-            width: 100,
+            width: 150,
 
             minWidth: 50,
 
@@ -233,7 +233,7 @@ leoUiLoad.require('leoUi-dataAdapter,leoUi-grid-2.0,leoUi,leoUiGrid,ready', func
 
             resize: true,
 
-            width: 122,
+            width: 200,
 
             minWidth: 100,
 
@@ -251,9 +251,9 @@ leoUiLoad.require('leoUi-dataAdapter,leoUi-grid-2.0,leoUi,leoUiGrid,ready', func
 
             theadName: '首要联系人',
 
-            width: 100,
+            width: 50,
 
-            minWidth: 100,
+            minWidth: 50,
 
             sortable: true,
 
@@ -371,7 +371,7 @@ leoUiLoad.require('leoUi-dataAdapter,leoUi-grid-2.0,leoUi,leoUiGrid,ready', func
             localData:data,
             datatype: "array",
             isPage: true,
-            pageSize: 100,
+            pageSize: 21,
             method:'ajax',
             setAjaxPageInfo:function(data, page){
 

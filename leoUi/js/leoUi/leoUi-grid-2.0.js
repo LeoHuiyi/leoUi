@@ -117,11 +117,7 @@
 
             height:500,//设置表格的高度(可用函数返回值)
 
-            resizeHeight:false,//是否在改变尺寸时调节高度
-
             width:500,//设置表格的宽度(可用函数返回值)
-
-            resizeWidth:false,//是否在改变尺寸时调节宽度
 
             beforeAjaxMegCallback:$.noop,//ajax之前信息回调(init, changePager, getEditRowInfo, getEditTypeOption, getEditCellInfo)
 
@@ -167,7 +163,13 @@
 
                 width:0,
 
-                isScroll:false,
+                tableWidth:0,
+
+                tableOuterWidth:0,
+
+                tbaleHeight:0,
+
+                lastIsScroll:'first',
 
                 fixedOuterWidth:0,
 
@@ -225,11 +227,7 @@
 
             this._renderGridBodyTbody(data || this.records.getData());
 
-            this._setTableHeight();
-
-            this._setTableWidth();
-
-            this._resizeCountWidth();
+            this.refreshTable();
 
         },
 
@@ -381,15 +379,21 @@
 
         _renderGridBodyTbody:function(data){
 
-            var i = 0, len = data.length, obj, trId,
-
-            str = '<tbody>' + this.gridBodySizeTrHtml,
+            var i = 0, len = data.length, obj, trId, str = '',
 
             tableModels = this.tableOption.tableModels,
 
             trIdPostfix = this.gridIds.trIdPostfix,
 
+            tableCache = this.tableCache,
+
             leoGrid = this.leoGrid, tdIdPostfix = this.gridIds.tdIdPostfix;
+
+            if(!tableCache.$gridBodyTableTbody){
+
+                str += '<tbody>' + this.gridBodySizeTrHtml;
+
+            }
 
             for(; i < len; i++){
 
@@ -415,9 +419,19 @@
 
             }
 
-            str += '</tbody>';
+            if(!tableCache.$gridBodyTableTbody){
 
-            this.tableCache.$gridBodyTable.html(str);
+                str += '</tbody>';
+
+                tableCache.$gridBodyTable.html(tableCache.$gridBodyTableTbody = $(str));
+
+                tableCache.$gridBodyResizeRow = tableCache.$gridBodyTable.find('#' + this.gridIds.sizeRowid);
+
+            }else{
+
+                tableCache.$gridBodyTableTbody.find('tr').not(tableCache.$gridBodyResizeRow).remove().end().end().append(str);
+
+            }
 
         },
 
@@ -963,17 +977,61 @@
 
         },
 
+        refreshTable:function(){
+
+            this._setTableHeight();
+
+            this._setTableWidth();
+
+        },
+
         _setTableWidth:function(){
 
-            var tableWidth = this.options.width, scrollWidth = 0;
+            var newTableWidth = this.options.width, scrollWidth = 0,
 
-            if(tableWidth === false){return;}
+            tableOuterWidth, isChange = false, tableSize = this.tableSize,
 
-            $.isFunction( tableWidth ) && ( tableWidth = tableWidth(this.$target));
+            scrollChange;
 
-            this._resizeTableIsScroll() && (scrollWidth = this.options.scrollWidth);
+            if(newTableWidth === false){return;}
 
-            this.tableSize.width = this.tableCache.$gridBox.setOuterWidth(tableWidth).width() - scrollWidth;
+            $.isFunction(newTableWidth) && (newTableWidth = newTableWidth(this.$target));
+
+            if(tableSize.tableWidth !== newTableWidth){
+
+                tableOuterWidth = this.tableCache.$gridBox.setOuterWidth(newTableWidth).width();
+
+                tableSize.tableWidth = newTableWidth;
+
+                tableSize.tableOuterWidth = tableOuterWidth;
+
+                isChange = true;
+
+            }else{
+
+                tableOuterWidth = tableSize.tableOuterWidth;
+
+            };
+
+            scrollChange = this._isScrollChange();
+
+            if(isChange || scrollChange.isScrollChange){
+
+                scrollChange.isScroll && (scrollWidth = this.options.scrollWidth);
+
+                tableOuterWidth = tableOuterWidth - scrollWidth;
+
+                isChange = true;
+
+            }
+
+            if(isChange){
+
+                tableSize.width = tableOuterWidth;
+
+                this._resizeCountWidth();
+
+            }
 
         },
 
@@ -985,19 +1043,47 @@
 
         _isScrollChange:function(){
 
-            if(this.tableSize.changeCellLen === 0)return;
+            var tableSize = this.tableSize, isScroll;
 
-            var isScroll = this._resizeTableIsScroll();
+            if(tableSize.changeCellLen === 0)return;
 
-            if(this.tableSize.isScroll === isScroll){
+            isScroll = this._resizeTableIsScroll();
 
-                return false;
+            if(tableSize.lastIsScroll === 'first'){
+
+                tableSize.lastIsScroll = isScroll;
+
+                return {
+
+                    isScrollChange: true,
+
+                    isScroll: isScroll
+
+                };
+
+            }
+
+            if(tableSize.lastIsScroll === isScroll){
+
+                return {
+
+                    isScrollChange: false,
+
+                    isScroll: isScroll
+
+                };
 
             }else{
 
-                this.tableSize.isScroll = isScroll;
+                tableSize.lastIsScroll = isScroll;
 
-                return true;
+                return {
+
+                    isScrollChange: true,
+
+                    isScroll: isScroll
+
+                };
 
             }
 
@@ -1011,7 +1097,13 @@
 
             $.isFunction(tableHeight) && (tableHeight = tableHeight(this.$target));
 
-            this.tableCache.$gridBodyDiv.height(this.tableCache.$gridBox.setOuterHeight(tableHeight).height() - this._getHdivAndPagerHeight());
+            if(this.tableSize.tableHeight !== tableHeight){
+
+                this.tableCache.$gridBodyDiv.height(this.tableCache.$gridBox.setOuterHeight(tableHeight).height() - this._getHdivAndPagerHeight());
+
+                this.tableSize.tableHeight = tableHeight;
+
+            }
 
         },
 
@@ -1041,7 +1133,7 @@
 
             oldCellOuterWidth = 0, cellOuterWidth = 0,
 
-            $gridBodyResizeRow = tableCache.$gridBodyTable.find('#' + sizeRowid),
+            $gridBodyResizeRow = tableCache.$gridBodyResizeRow || tableCache.$gridBodyTable.find('#' + sizeRowid),
 
             $gridHeadResizeRow = tableCache.$gridHeadResizeRow || tableCache.$gridHeadTable.find('tr.leoUi-jqgrid-labels'),
 
@@ -1117,15 +1209,11 @@
 
                 time = setTimeout(function(){
 
-                    This._setTableHeight();
-
-                    This._setTableWidth();
-
-                    This._resizeCountWidth();
+                    This.refreshTable();
 
                 }, 50);
 
-            })._on(this.tableCache.$gridBodyDiv, 'scroll', function(event, delta, deltaX, deltaY){
+            })._on(this.tableCache.$gridBodyDiv, 'scroll', function(event){
 
                 event.preventDefault();
 

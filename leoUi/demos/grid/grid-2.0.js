@@ -40,19 +40,15 @@ leoUiLoad.require('leoUi-dataAdapter,leoUi-grid-2.0,leoUi,leoUiGrid,ready', func
 
             width: 70,
 
+            selectTr:'1,2',
+
             align: "center",
-
-            id: 'isCheck',
-
-            isCheck: true,
 
             thStyle:'background-color:#fff',
 
             thClass:'leo aaaa',
 
             fixed: true,
-
-            type: 'boolean',
 
             tdClass:'leo aaaa',
 

@@ -47,8 +47,6 @@
 
             disabledEvent:false,//是否禁用事件
 
-            isHover:true,//是否移入变色
-
             hoverClass:'leoUi-state-hover',//移入添加的类名称
 
             evenClass:'leoUi-priority-secondary',//为表身的偶数行添加一个类名，以实现斑马线效果。false 没有
@@ -103,6 +101,8 @@
 
             },
 
+            getId: 'id',
+
             rowDataKeys:false,
 
             footerShow:true,
@@ -141,7 +141,7 @@
 
             clickTdCallback:$.noop,//点击bodyTableTD回调
 
-            scrollWidth:20
+            scrollWidth:17
 
         },
 
@@ -187,6 +187,8 @@
 
             this.tableCache = {};
 
+            this.tableData = {};
+
         },
 
         _createGridBox:function(){
@@ -213,11 +215,11 @@
 
             this._getChangeCellPercent();
 
+            this._addEvent();
+
             tableCache.$gridBox.appendTo(this.$target);
 
             this._setTableHeight();
-
-            this._addEvent();
 
             this._storeDataBind();
 
@@ -385,9 +387,11 @@
 
             trIdPostfix = this.gridIds.trIdPostfix,
 
-            tableCache = this.tableCache,
+            tableCache = this.tableCache, leoGrid = this.leoGrid,
 
-            leoGrid = this.leoGrid, tdIdPostfix = this.gridIds.tdIdPostfix;
+            evenClass = this.options.evenClass,
+
+            tdIdPostfix = this.gridIds.tdIdPostfix;
 
             if(!tableCache.$gridBodyTableTbody){
 
@@ -401,7 +405,15 @@
 
                 trId = trIdPostfix + i;
 
-                str += '<tr id="'+ trId +'" class="leoUi-widget-content jqgrow leoUi-row-ltr" tabindex="-1">';
+                str += '<tr id="'+ trId +'" class="leoUi-widget-content jqgrow leoUi-row-ltr ';
+
+                if(evenClass && (i % 2 === 1)){
+
+                    str += evenClass;
+
+                }
+
+                str += '" tabindex="-1">';
 
                 str += this._renderGridBodyTd({
 
@@ -528,6 +540,22 @@
             }
 
             return str;
+
+        },
+
+        _renderCheckBoxTd:function(trId, tableModel){
+
+            var  tdIdPostfix = this.gridIds.tdIdPostfix,
+
+            str = '<input type="checkbox" ';
+
+            if(tableModel.selectTr){
+
+                str += 'checked';
+
+            }
+
+            str += '/>';
 
         },
 
@@ -805,15 +833,7 @@
 
                 if(tableModel.checkBoxId){
 
-                    str += '<input type="checkbox" id="' + tableModel.checkBoxId + '"';
-
-                    if(tableModel.isCheck){
-
-                        str += ' checked'
-
-                    }
-
-                    str += '/>';
+                    str += '<input type="checkbox" id="' + tableModel.checkBoxId + '" />';
 
                 }
 
@@ -875,7 +895,7 @@
 
             tableSize = this.tableSize;
 
-            opModel.boxType === "checkBox" && ( model.checkBoxId = model.thId + '_input' );
+            opModel.boxType === "checkBox" && (this.tableOption.boxType = model.checkBoxId = model.thId + '_input');
 
             if(model.fixed){
 
@@ -901,9 +921,9 @@
 
         _renderGrid:function(){
 
-            var gridIds = this.gridIds, str = '';
+            var gridIds = this.gridIds;
 
-            return str += '<div id="' + gridIds.leoUi_grid + '" class="leoUi-jqgrid leoUi-widget leoUi-widget-content leoUi-corner-all"><div id="' + gridIds.overlay_grid + '" class="leoUi-widget-overlay jqgrid-overlay"></div><div id="' + gridIds.load_grid + '" class="loading leoUi-state-default leoUi-state-active">读取中...</div><div class="leoUi-jqgrid-view" id="' + gridIds.gview_grid + '"><div class="leoUi-state-default leoUi-jqgrid-hdiv"><div class="leoUi-jqgrid-hbox"></div></div><div class="leoUi-jqgrid-bdiv"><div class="leoUi-jqgrid-hbox-inner" style="position:relative;"></div></div></div><div id="' + gridIds.rs_mgrid + '" class="leoUi-jqgrid-resize-mark" ></div></div>';
+            return '<div id="' + gridIds.leoUi_grid + '" class="leoUi-jqgrid leoUi-widget leoUi-widget-content leoUi-corner-all"><div id="' + gridIds.overlay_grid + '" class="leoUi-widget-overlay jqgrid-overlay"></div><div id="' + gridIds.load_grid + '" class="loading leoUi-state-default leoUi-state-active">读取中...</div><div class="leoUi-jqgrid-view" id="' + gridIds.gview_grid + '"><div class="leoUi-state-default leoUi-jqgrid-hdiv"><div class="leoUi-jqgrid-hbox"></div></div><div class="leoUi-jqgrid-bdiv"><div class="leoUi-jqgrid-hbox-inner" style="position:relative;"></div></div></div><div id="' + gridIds.rs_mgrid + '" class="leoUi-jqgrid-resize-mark" ></div></div>';
 
         },
 
@@ -1229,7 +1249,105 @@
 
             });
 
-        }
+            this._addMouseHover();
+
+        },
+
+        _addMouseHover:function(){
+
+            var hoverClass = this.options.hoverClass;
+
+            if(typeof hoverClass === 'string'){
+
+                this._on(this.tableCache.$gridBodyTable, 'mouseenter', 'tr', function(event){
+
+                    event.preventDefault();
+
+                    $(this).addClass(hoverClass);
+
+                })._on(this.tableCache.$gridBodyTable, 'mouseleave', 'tr', function(event){
+
+                    event.preventDefault();
+
+                    $(this).removeClass(hoverClass);
+
+                });
+
+            }
+
+        },
+
+        _createBoxCheckFn:function(){
+
+            var boxCheckType = this.options.boxCheckType;
+
+            if( boxCheckType === 'radio' ){
+
+                this._boxCheck = function(tr){
+
+                    var radioBoxRow = this.tableData.radioBoxRow,
+
+                    activeClass = this.options.activeClass,
+
+                    $tr = $(tr),radioBoxId = this.tableOption.radioBoxId;
+
+                    if( this.options.disabledCheck === false  ){
+
+                        if(radioBoxRow){
+
+                            $("#" + radioBoxRow).removeClass(activeClass).find('input[checkid="'+ radioBoxId +'"]').prop( 'checked', false );
+
+                        }
+
+                        !radioBoxId ? $tr.addClass(activeClass) : $tr.addClass(activeClass).find('input[checkid="'+ radioBoxId +'"]').prop( 'checked', true );
+
+                        this.tableData.radioBoxRow = tr.id;
+
+                    }
+
+                };
+
+            }else if( boxCheckType === 'multiple' ){
+
+                var This = this;
+
+                this._boxCheck = function(tr){
+
+                    if( this.options.disabledCheck === false  ){
+
+                        var $tr = $(tr),activeClass = this.options.activeClass;
+
+                        if( $tr.hasClass(activeClass) === true ){
+
+                            $tr.removeClass(activeClass);
+
+                            this._removeSelectRowArr(tr);
+
+                            this._boxCheckOff(tr);
+
+                        }else{
+
+                            $tr.addClass(activeClass);
+
+                            this._addSelectRowArr(tr);
+
+                            this._boxCheckOn(tr);
+
+                        }
+
+                    }
+
+                };
+
+                this._on( this.$thCheck = this.$thCheck || this.$headTable.find( '#' + this.tableOption.checkBoxId ), 'click.checkBox', function(event){
+
+                    This.boxAllCheck( event, this, true );
+
+                } );
+
+            }
+
+        },
 
     });
 

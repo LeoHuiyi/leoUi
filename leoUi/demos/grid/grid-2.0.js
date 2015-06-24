@@ -40,7 +40,11 @@ leoUiLoad.require('leoUi-dataAdapter,leoUi-grid-2.0,leoUi,leoUiGrid,ready', func
 
             width: 70,
 
-            selectTr:'1,2',
+            selectTr:function(tdData, tableModel){
+
+                if(tdData.data.id < 20)return true;
+
+            },
 
             align: "center",
 

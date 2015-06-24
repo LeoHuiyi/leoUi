@@ -189,6 +189,8 @@
 
             this.tableData = {};
 
+            this._reloadSelectRow();
+
         },
 
         _createGridBox:function(){
@@ -231,11 +233,15 @@
 
             this.refreshTable();
 
+            this._isAllCheckBoxSelected();
+
         },
 
         _loadComplete:function(data){
 
             this.records = this.source.dataWrapper(data);
+
+            this._reloadSelectRow();
 
             this.renderGridBody();
 
@@ -248,6 +254,8 @@
             this.records = this.source.dataWrapper(data.pageData);
 
             this.pageInfo = data.pageInfo || {};
+
+            this._reloadSelectRow();
 
             this.renderGridBody();
 
@@ -389,9 +397,11 @@
 
             tableCache = this.tableCache, leoGrid = this.leoGrid,
 
-            evenClass = this.options.evenClass,
+            evenClass = this.options.evenClass, renderGridBodyTd,
 
-            tdIdPostfix = this.gridIds.tdIdPostfix;
+            tdIdPostfix = this.gridIds.tdIdPostfix,
+
+            activeClass = this.options.activeClass;
 
             if(!tableCache.$gridBodyTableTbody){
 
@@ -405,17 +415,7 @@
 
                 trId = trIdPostfix + i;
 
-                str += '<tr id="'+ trId +'" class="leoUi-widget-content jqgrow leoUi-row-ltr ';
-
-                if(evenClass && (i % 2 === 1)){
-
-                    str += evenClass;
-
-                }
-
-                str += '" tabindex="-1">';
-
-                str += this._renderGridBodyTd({
+                renderGridBodyTd = this._renderGridBodyTd({
 
                     tableModels: tableModels,
 
@@ -423,9 +423,29 @@
 
                     trId: trId,
 
+                    trIndex: i,
+
                     tdIdPostfix: tdIdPostfix
 
                 });
+
+                str += '<tr id="'+ trId +'" class="leoUi-widget-content jqgrow leoUi-row-ltr ';
+
+                if(evenClass && (i % 2 === 1)){
+
+                    str += evenClass + ' ';
+
+                }
+
+                if(renderGridBodyTd.checked && activeClass){
+
+                    str += activeClass;
+
+                }
+
+                str += '" tabindex="-1">';
+
+                str += renderGridBodyTd.str;
 
                 str += '</tr>';
 
@@ -461,7 +481,9 @@
 
             tdIdPostfix = tdData.tdIdPostfix, len = tableModels.length,
 
-            htmlEncode = this._htmlEncode, value, title;
+            htmlEncode = this._htmlEncode, value,
+
+            title, checked, renderCheckBoxTd;
 
             for (; i < len; i++) {
 
@@ -487,7 +509,7 @@
 
                     }
 
-                }else if(!tableModel.checkBoxId){
+                }else if(!tableModel.isCheckBox){
 
                     value = htmlEncode(data[tableModel.dataKey]);
 
@@ -517,17 +539,13 @@
 
                 str += '>';
 
-                if(tableModel.checkBoxId){
+                if(tableModel.isCheckBox){
 
-                    str += '<input type="checkbox" ';
+                    renderCheckBoxTd = this._renderCheckBoxTd(tdData, tableModel);
 
-                    if(data[tableModel.dataKey]){
+                    str += renderCheckBoxTd.str;
 
-                        str += 'checked';
-
-                    }
-
-                    str += '/>';
+                    checked = renderCheckBoxTd.checked;
 
                 }else{
 
@@ -539,29 +557,254 @@
 
             }
 
-            return str;
+            return {str: str, checked: checked};
 
         },
 
-        _renderCheckBoxTd:function(trId, tableModel){
+        _renderCheckBoxTd:function(tdData, tableModel){
 
-            var  tdIdPostfix = this.gridIds.tdIdPostfix,
+            var trCheckBoxIdPostfix = this.gridIds.trCheckBoxIdPostfix,
 
-            str = '<input type="checkbox" ';
+            trId = tdData.trId, checked,
 
-            if(tableModel.selectTr){
+            str = '<input type="checkbox" id="' + trId + trCheckBoxIdPostfix + '" ',
+
+            selectTr = tableModel.selectTr;
+
+            if(selectTr === 'all' && this._initBoxCheckTrId(trId)){
 
                 str += 'checked';
+
+                checked = true;
+
+            }else if(selectTr === tdData.trIndex && this._initBoxCheckTrId(trId)){
+
+                str += 'checked';
+
+                checked = true;
+
+            }else if(this._inArray(selectTr, tdData.trIndex) && this._initBoxCheckTrId(trId)){
+
+                str += 'checked';
+
+                checked = true;
+
+            }else if($.isFunction(selectTr) && selectTr(tdData, tableModel) && this._initBoxCheckTrId(trId)){
+
+                str += 'checked';
+
+                checked = true;
 
             }
 
             str += '/>';
+
+            return {str: str, checked: checked};
+
+        },
+
+        _initBoxCheckTrId:function(trId){
+
+            var tableData = this.tableData;
+
+            if(this.tableOption.boxCheckType === 'multiple'){
+
+                tableData.selectRow.push(trId);
+
+                return true;
+
+            }else if(this.tableOption.boxCheckType === 'radio'){
+
+                if(typeof tableData.selectRow === 'undefined'){
+
+                    tableData.selectRow = trId;
+
+                    return true;
+
+                }else{
+
+                    return false;
+
+                }
+
+            }
+
+            return true;
+
+        },
+
+        _trBoxCheckOn:function(trId, notCheck){
+
+            if(!this.tableOption.boxCheckType || !trId)return;
+
+            $('#' + trId + this.gridIds.trCheckBoxIdPostfix).prop('checked', true );
+
+            !notCheck && this._isAllCheckBoxSelected();
+
+        },
+
+        _trBoxCheckOff:function(trId, notCheck){
+
+            if(!this.tableOption.boxCheckType || !trId)return;
+
+            $('#' + trId + this.gridIds.trCheckBoxIdPostfix).prop('checked', false);
+
+            !notCheck && this._isAllCheckBoxSelected();
+
+        },
+
+        multipleCheckBoxAllSelect:function(){
+
+            if(this.tableOption.boxCheckType !== 'multiple')return;
+
+            var activeClass = this.options.activeClass, This = this,
+
+            isAllChecked = this.tableCache.$multipleCheckBox.prop('checked');
+
+            this.tableCache.$gridBodyTable.find('tr').not('#' + this.gridIds.sizeRowid).each(function(index, el) {
+
+                var $tr = $(this), trId = this.id;
+
+                if(isAllChecked){
+
+                    !!activeClass && $tr.addClass(activeClass);
+
+                    This._trBoxCheckOn(trId, true);
+
+                    This._addMultipleSelectRowArr(trId);
+
+                }else{
+
+                    !!activeClass && $tr.removeClass(activeClass);
+
+                    This._trBoxCheckOff(trId, true);
+
+                    This._removeMultipleSelectRowArr(trId);
+
+                }
+
+            });
+
+        },
+
+        _isAllCheckBoxSelected:function(){
+
+            if(this.tableOption.boxCheckType === 'multiple'){
+
+                var length = this.tableData.selectRow.length,
+
+                $multipleCheckBox = this.tableCache.$multipleCheckBox;
+
+                if(length === 0){
+
+                    $multipleCheckBox.prop({'indeterminate': false, 'checked': false } );
+
+                }else if(length === this.records.length()){
+
+                    $multipleCheckBox.prop({'indeterminate': false, 'checked': true });
+
+                }else{
+
+                    $multipleCheckBox.prop({'indeterminate': true, 'checked': false });
+
+                }
+
+            }
+
+        },
+
+        _inArray:function(arr, index){
+
+            if($.isArray(arr)){
+
+                var i = arr.length;
+
+                while(i--){
+
+                    if(arr[i] === index)return true;
+
+                }
+
+
+            }
+
+            return false;
 
         },
 
         _renderGridHead:function(){
 
             this.tableCache.$gridHeadTable = $('<table class="leoUi-jqgrid-htable" cellspacing="0" cellpadding="0" border="0"><thead><tr class="leoUi-jqgrid-labels"></tr></thead></table>').find('tr').html(this._renderGridHeadTh()).end().appendTo(this.tableCache.$gridHeadDiv.find('div.leoUi-jqgrid-hbox'));
+
+            this._setMultipleCheckBoxCache();
+
+        },
+
+        _setMultipleCheckBoxCache:function(){
+
+            this.tableOption.boxCheckType === 'multiple' && (this.tableCache.$multipleCheckBox = this.tableCache.$gridHeadTable.find('#' + this.gridIds.multipleThCheckBoxId));
+
+        },
+
+        _reloadSelectRow:function(){
+
+            if(this.options.boxCheckType === 'multiple'){
+
+                this.tableData.selectRow = [];
+
+            }else if(this.options.boxCheckType === 'radio'){
+
+                this.tableData.selectRow = undefined;
+
+            }
+
+        },
+
+        _addMultipleSelectRowArr:function(trid){
+
+            if(this.options.boxCheckType === 'multiple' && trid){
+
+                var selectRow = this.tableData.selectRow;
+
+                !this._inArray(selectRow, trid) && selectRow.push(trid);
+
+            }
+
+        },
+
+        _inMultipleSelectRowArr:function(trid){
+
+            if(this.options.boxCheckType === 'multiple' && trid){
+
+                if(this._inArray(this.tableData.selectRow, trid))return true;
+
+            }
+
+            return false;
+
+        },
+
+        _removeMultipleSelectRowArr:function(trid){
+
+            if(this.options.boxCheckType === 'multiple' && trid){
+
+                var selectRow = this.tableData.selectRow,
+
+                i = selectRow.length;
+
+                while(i--){
+
+                    if(selectRow[i] === trid){
+
+                        selectRow.splice(i, 1);
+
+                        break;
+
+                    }
+
+                }
+
+            }
 
         },
 
@@ -780,7 +1023,9 @@
 
             var tableModels = this.tableOption.tableModels,
 
-            i = 0, len = tableModels.length, tableModel, str = '';
+            i = 0, len = tableModels.length, tableModel, str = '',
+
+            boxCheckType = this.options.boxCheckType;
 
             for(; i < len; i++){
 
@@ -831,9 +1076,20 @@
 
                 }
 
-                if(tableModel.checkBoxId){
+                if(tableModel.isCheckBox){
 
-                    str += '<input type="checkbox" id="' + tableModel.checkBoxId + '" />';
+                    if(boxCheckType === 'multiple'){
+
+                        str += '<input type="checkbox" id="' + this.gridIds.multipleThCheckBoxId + '" />';
+
+                        this.tableOption.boxCheckType = 'multiple';
+
+
+                    }else if(boxCheckType === 'radio'){
+
+                        this.tableOption.boxCheckType = 'radio';
+
+                    }
 
                 }
 
@@ -895,7 +1151,7 @@
 
             tableSize = this.tableSize;
 
-            opModel.boxType === "checkBox" && (this.tableOption.boxType = model.checkBoxId = model.thId + '_input');
+            opModel.boxType === "checkBox" && (model.isCheckBox = true);
 
             if(model.fixed){
 
@@ -971,7 +1227,11 @@
 
                 sizeRowTdIdPostfix: '_sizeRowTd',
 
-                tdIdPostfix: '_leoUiTd_'
+                tdIdPostfix: '_leoUiTd_',
+
+                trCheckBoxIdPostfix: '_leoUiTrCheckBox',
+
+                multipleThCheckBoxId: leoGrid + 'multipleThCheckBoxId'
 
             }
 
@@ -1221,6 +1481,8 @@
 
             lastGridHeadDivLeft = $gridHeadDiv.scrollLeft();
 
+            this._createBoxCheckFn();
+
             this._on(this.window, 'resize', function(event){
 
                 event.preventDefault();
@@ -1246,6 +1508,10 @@
                     lastGridHeadDivLeft = left;
 
                 }
+
+            })._on(this.tableCache.$gridBodyTable, 'click', 'tr', function(event){
+
+                This.options.clickTrCallback.call(this, event, this) !== false && !!This._boxCheck && This._boxCheck(this);
 
             });
 
@@ -1279,59 +1545,63 @@
 
         _createBoxCheckFn:function(){
 
-            var boxCheckType = this.options.boxCheckType;
+            var boxCheckType = this.options.boxCheckType, This;
 
-            if( boxCheckType === 'radio' ){
+            if(boxCheckType === 'radio'){
 
                 this._boxCheck = function(tr){
 
-                    var radioBoxRow = this.tableData.radioBoxRow,
+                    if(this.options.disabledCheck === false){
 
-                    activeClass = this.options.activeClass,
+                        var selectRow = this.tableData.selectRow,
 
-                    $tr = $(tr),radioBoxId = this.tableOption.radioBoxId;
+                        activeClass = this.options.activeClass,
 
-                    if( this.options.disabledCheck === false  ){
+                        trId = tr.id;
 
-                        if(radioBoxRow){
+                        if(selectRow){
 
-                            $("#" + radioBoxRow).removeClass(activeClass).find('input[checkid="'+ radioBoxId +'"]').prop( 'checked', false );
+                            !!activeClass && $("#" + selectRow).removeClass(activeClass);
+
+                            this._trBoxCheckOff(selectRow);
 
                         }
 
-                        !radioBoxId ? $tr.addClass(activeClass) : $tr.addClass(activeClass).find('input[checkid="'+ radioBoxId +'"]').prop( 'checked', true );
+                        !!activeClass && $(tr).addClass(activeClass);
 
-                        this.tableData.radioBoxRow = tr.id;
+                        this._trBoxCheckOn(trId);
+
+                        this.tableData.selectRow = trId;
 
                     }
 
                 };
 
-            }else if( boxCheckType === 'multiple' ){
-
-                var This = this;
+            }else if(boxCheckType === 'multiple'){
 
                 this._boxCheck = function(tr){
 
-                    if( this.options.disabledCheck === false  ){
+                    if(this.options.disabledCheck === false){
 
-                        var $tr = $(tr),activeClass = this.options.activeClass;
+                        var $tr = $(tr), trId = tr.id,
 
-                        if( $tr.hasClass(activeClass) === true ){
+                        activeClass = this.options.activeClass;
 
-                            $tr.removeClass(activeClass);
+                        if(this._inMultipleSelectRowArr(trId)){
 
-                            this._removeSelectRowArr(tr);
+                            !!activeClass && $tr.removeClass(activeClass);
 
-                            this._boxCheckOff(tr);
+                            this._removeMultipleSelectRowArr(trId);
+
+                            this._trBoxCheckOff(trId);
 
                         }else{
 
-                            $tr.addClass(activeClass);
+                            !!activeClass && $tr.addClass(activeClass);
 
-                            this._addSelectRowArr(tr);
+                            this._addMultipleSelectRowArr(trId);
 
-                            this._boxCheckOn(tr);
+                            this._trBoxCheckOn(trId);
 
                         }
 
@@ -1339,11 +1609,17 @@
 
                 };
 
-                this._on( this.$thCheck = this.$thCheck || this.$headTable.find( '#' + this.tableOption.checkBoxId ), 'click.checkBox', function(event){
+                if(this.tableCache.$multipleCheckBox){
 
-                    This.boxAllCheck( event, this, true );
+                    This = this;
 
-                } );
+                    this._on(this.tableCache.$multipleCheckBox, 'change', function(event){
+
+                        This.multipleCheckBoxAllSelect();
+
+                    });
+
+                }
 
             }
 

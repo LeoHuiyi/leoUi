@@ -894,6 +894,12 @@
 
     $.extend(DataWrapper.prototype, {
 
+        length: function(){
+
+            return this.data.length;
+
+        },
+
         getRow: function(first, last) {
 
             this.data = this.data.slice(first, last);

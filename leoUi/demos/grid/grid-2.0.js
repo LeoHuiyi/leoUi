@@ -40,12 +40,6 @@ leoUiLoad.require('leoUi-dataAdapter,leoUi-grid-2.0,leoUi,leoUiGrid,ready', func
 
             width: 70,
 
-            selectTr:function(tdData, tableModel){
-
-                if(tdData.data.id < 20)return true;
-
-            },
-
             align: "center",
 
             thStyle:'background-color:#fff',
@@ -498,6 +492,24 @@ leoUiLoad.require('leoUi-dataAdapter,leoUi-grid-2.0,leoUi,leoUiGrid,ready', func
 
         resizeHeight: true,
 
+        disabledCheck:false,//禁用选择
+
+        disabledEvent:false,//是否禁用事件
+
+        hoverClass:'leoUi-state-hover',//移入添加的类名称
+
+        evenClass:'leoUi-priority-secondary',//为表身的偶数行添加一个类名，以实现斑马线效果。false 没有
+
+        activeClass:'leoUi-state-highlight',//选中效果
+
+        boxCheckType:'multiple',//radio单选，multiple多选,false无
+
+        selectTr:function(tdData){
+
+            if(tdData.id < 20)return true;
+
+        },
+
         width: function($grid) {
 
             return $grid.width();
@@ -510,6 +522,12 @@ leoUiLoad.require('leoUi-dataAdapter,leoUi-grid-2.0,leoUi,leoUiGrid,ready', func
 
         },
 
+        getParam:function(data){
+
+            return data.id;
+
+        },
+
         resizeWidth: true,
 
         clickTdCallback: function(event, td, table) {
@@ -519,12 +537,14 @@ leoUiLoad.require('leoUi-dataAdapter,leoUi-grid-2.0,leoUi,leoUiGrid,ready', func
         }
 
     });
-    var i = 0;
+    var i = 0, flag = true;
     $('#btn').on('click', function(event) {
         event.preventDefault();
-        $grid.leoGrid('setPage', i++);
-    });
+        // $grid.leoGrid('setPage', i++);
+        // $grid.leoGrid('multipleCheckBoxAllSelect', $grid.leoGrid('getCheckBoxFlag') !== 'all', true);
+        flag = !flag;
 
-    
+        console.log($grid.leoGrid('getSelectRowsTrParam'));
+    });
 
 });

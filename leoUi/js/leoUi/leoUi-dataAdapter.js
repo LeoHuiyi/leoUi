@@ -130,6 +130,16 @@
 
         this.setOption(option);
 
+        this.sortCollection = {
+
+            status: 'desc',//asc, desc
+
+            sortCollection: null,
+
+            Collection: null
+
+        }
+
         this.option.isPage && (this.currentPage = this.option.currentPage || 1);
 
         this._init();
@@ -197,6 +207,24 @@
                 }
 
             }
+
+        },
+
+        _sortby:function(status){
+
+            var sortCollection = this.sortCollection;
+
+            !sortCollection.collection && (sortCollection.collection = this._getCollection());
+
+            if(!sortCollection.collection || sortCollection.status !== status){
+
+                !sortCollection.sortCollection && (sortCollection.sortCollection = this._getCollection(true));
+
+
+
+            }
+
+            return this.sortCollection.collection;
 
         },
 
@@ -882,7 +910,7 @@
 
             names = names.toLowerCase().match(rnotwhite) || [];
 
-            while ((name = names[i++])) {
+            while((name = names[i++])){
 
                 DataWrapper.prototype[name] = fn;
 
@@ -900,9 +928,17 @@
 
         },
 
-        getRow: function(first, last) {
+        getRow: function(index) {
 
-            this.data = this.data.slice(first, last);
+            this.data = this.data[index] || [];
+
+            return this;
+
+        },
+
+        getRows: function(first, last) {
+
+            this.data = this.data.slice(first, last) || [];
 
             return this;
 
@@ -910,11 +946,11 @@
 
         setData: function(data){
 
-            if (isArrayLike(data)) {
+            if(isArrayLike(data)){
 
                 this.data = $.extend(true, [], data);
 
-            } else {
+            }else{
 
                 this.data = [];
 
@@ -944,9 +980,9 @@
 
         },
 
-        findRow: function(predicate) {
+        findRow: function(predicate){
 
-            if ($.isFunction(predicate)) {
+            if($.isFunction(predicate)){
 
                 this.data = $.grep(this.data, predicate);
 
@@ -956,9 +992,9 @@
 
         },
 
-        map: function(predicate) {
+        map: function(predicate){
 
-            if ($.isFunction(predicate)) {
+            if($.isFunction(predicate)){
 
                 this.data = $.map(this.data, predicate);
 
@@ -968,9 +1004,9 @@
 
         },
 
-        sortBy: function(iteratee) {
+        sortBy: function(iteratee){
 
-            if ($.isFunction(iteratee)) {
+            if($.isFunction(iteratee)){
 
                 this.data.sort(iteratee);
 

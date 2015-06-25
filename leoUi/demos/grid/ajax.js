@@ -32,9 +32,9 @@ http.createServer(function(req, res) {
 
 	function setData(fristItem, lastItem){
 
-		var i = 0, data = [];
+		var i = 0, data = [], len = lastItem - fristItem;
 
-		for (; i < (lastItem - fristItem); i++) {
+		for (; i < len; i++) {
 
 	        var row = {
 

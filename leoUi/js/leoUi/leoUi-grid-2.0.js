@@ -39,10 +39,6 @@
 
             tableModel:[],//grid格式见例子
 
-            onlyInit:false,//只是初始化
-
-            trIdKey:'trid',//trIdKey
-
             disabledCheck:false,//禁用选择
 
             disabledEvent:false,//是否禁用事件
@@ -63,19 +59,19 @@
 
                 align:'center',//对齐方式
 
-                checkBoxId:'',//checkBoxId
-
-                radioBoxId:'',//radioBoxId
-
                 theadName:'',//对应的表头内容
 
-                className:false,//加上的class
+                tdClass:false,//加上的class
+
+                tdStyle:false,
+
+                thStyle:false,
+
+                thClass:false,
 
                 resize:false,//是否可调整宽度
 
                 sortable:false,//是否排序
-
-                checked:false,//是否选择
 
                 fixed:false,//是否固定
 
@@ -101,7 +97,7 @@
 
             },
 
-            getId: 'id',
+            getParam: 'id',
 
             rowDataKeys:false,
 
@@ -189,6 +185,8 @@
 
             this.tableData = {};
 
+            this.colsStatus = {};
+
             this._reloadSelectRow();
 
         },
@@ -270,6 +268,12 @@
             var This = this;
 
             this.source = this.options.source;
+
+        },
+
+        setDisabledEvent:function(flag){
+
+            this.options.disabledEvent = !!flag;
 
         },
 
@@ -397,7 +401,7 @@
 
             tableCache = this.tableCache, leoGrid = this.leoGrid,
 
-            evenClass = this.options.evenClass, renderGridBodyTd,
+            evenClass = this.options.evenClass, isSelectedTr,
 
             tdIdPostfix = this.gridIds.tdIdPostfix,
 
@@ -415,7 +419,25 @@
 
                 trId = trIdPostfix + i;
 
-                renderGridBodyTd = this._renderGridBodyTd({
+                isSelectedTr = this._isSelectedTr(i, obj, trId);
+
+                str += '<tr id="'+ trId +'" class="leoUi-widget-content jqgrow leoUi-row-ltr ';
+
+                if(evenClass && (i % 2 === 1)){
+
+                    str += evenClass + ' ';
+
+                }
+
+                if(isSelectedTr && activeClass){
+
+                    str += activeClass;
+
+                }
+
+                str += '" tabindex="-1">';
+
+                str += this._renderGridBodyTd({
 
                     tableModels: tableModels,
 
@@ -427,25 +449,7 @@
 
                     tdIdPostfix: tdIdPostfix
 
-                });
-
-                str += '<tr id="'+ trId +'" class="leoUi-widget-content jqgrow leoUi-row-ltr ';
-
-                if(evenClass && (i % 2 === 1)){
-
-                    str += evenClass + ' ';
-
-                }
-
-                if(renderGridBodyTd.checked && activeClass){
-
-                    str += activeClass;
-
-                }
-
-                str += '" tabindex="-1">';
-
-                str += renderGridBodyTd.str;
+                }, isSelectedTr);
 
                 str += '</tr>';
 
@@ -473,7 +477,7 @@
 
         },
 
-        _renderGridBodyTd:function(tdData){
+        _renderGridBodyTd:function(tdData, isSelectedTr){
 
             var tableModels = tdData.tableModels, i = 0, str = '',
 
@@ -481,9 +485,7 @@
 
             tdIdPostfix = tdData.tdIdPostfix, len = tableModels.length,
 
-            htmlEncode = this._htmlEncode, value,
-
-            title, checked, renderCheckBoxTd;
+            htmlEncode = this._htmlEncode, value, title;
 
             for (; i < len; i++) {
 
@@ -541,11 +543,7 @@
 
                 if(tableModel.isCheckBox){
 
-                    renderCheckBoxTd = this._renderCheckBoxTd(tdData, tableModel);
-
-                    str += renderCheckBoxTd.str;
-
-                    checked = renderCheckBoxTd.checked;
+                    str += this._renderCheckBoxTd(tdData, tableModel, isSelectedTr);
 
                 }else{
 
@@ -557,63 +555,71 @@
 
             }
 
-            return {str: str, checked: checked};
+            return str;
 
         },
 
-        _renderCheckBoxTd:function(tdData, tableModel){
+        _isSelectedTr:function(trIndex, tdData, trId){
+
+            var selectTr = this.options.selectTr;
+
+            if(selectTr === 'all'){
+
+                return true;
+
+            }else if(selectTr === trIndex && this._initBoxCheckTrId(trId)){
+
+                return true;
+
+            }else if(this._inArray(selectTr, trIndex) && this._initBoxCheckTrId(trId)){
+
+                return true;
+
+            }else if($.isFunction(selectTr) && selectTr(tdData) && this._initBoxCheckTrId(trId)){
+
+                return true;
+
+            }
+
+            return false;
+
+        },
+
+        _renderCheckBoxTd:function(tdData, tableModel ,isSelectedTr){
 
             var trCheckBoxIdPostfix = this.gridIds.trCheckBoxIdPostfix,
 
-            trId = tdData.trId, checked,
+            trId = tdData.trId,
 
             str = '<input type="checkbox" id="' + trId + trCheckBoxIdPostfix + '" ',
 
             selectTr = tableModel.selectTr;
 
-            if(selectTr === 'all' && this._initBoxCheckTrId(trId)){
+            if(isSelectedTr){
 
                 str += 'checked';
-
-                checked = true;
-
-            }else if(selectTr === tdData.trIndex && this._initBoxCheckTrId(trId)){
-
-                str += 'checked';
-
-                checked = true;
-
-            }else if(this._inArray(selectTr, tdData.trIndex) && this._initBoxCheckTrId(trId)){
-
-                str += 'checked';
-
-                checked = true;
-
-            }else if($.isFunction(selectTr) && selectTr(tdData, tableModel) && this._initBoxCheckTrId(trId)){
-
-                str += 'checked';
-
-                checked = true;
 
             }
 
             str += '/>';
 
-            return {str: str, checked: checked};
+            return str;
 
         },
 
         _initBoxCheckTrId:function(trId){
 
-            var tableData = this.tableData;
+            var tableData = this.tableData,
 
-            if(this.tableOption.boxCheckType === 'multiple'){
+            boxCheckType = this.options.boxCheckType;
+
+            if(boxCheckType === 'multiple'){
 
                 tableData.selectRow.push(trId);
 
                 return true;
 
-            }else if(this.tableOption.boxCheckType === 'radio'){
+            }else if(boxCheckType === 'radio'){
 
                 if(typeof tableData.selectRow === 'undefined'){
 
@@ -653,13 +659,13 @@
 
         },
 
-        multipleCheckBoxAllSelect:function(){
+        multipleCheckBoxAllSelect:function(isAllChecked, isAllCheckBoxSelected){
 
-            if(this.tableOption.boxCheckType !== 'multiple')return;
+            if(this.options.boxCheckType !== 'multiple')return;
 
-            var activeClass = this.options.activeClass, This = this,
+            var activeClass = this.options.activeClass, This = this;
 
-            isAllChecked = this.tableCache.$multipleCheckBox.prop('checked');
+            this.multipleSelectFlag;
 
             this.tableCache.$gridBodyTable.find('tr').not('#' + this.gridIds.sizeRowid).each(function(index, el) {
 
@@ -667,23 +673,53 @@
 
                 if(isAllChecked){
 
-                    !!activeClass && $tr.addClass(activeClass);
+                    if(!This._inMultipleSelectRowArr(trId)){
 
-                    This._trBoxCheckOn(trId, true);
+                        !!activeClass && $tr.addClass(activeClass);
 
-                    This._addMultipleSelectRowArr(trId);
+                        This._trBoxCheckOn(trId, true);
+
+                        This._addMultipleSelectRowArr(trId);
+
+                    }
 
                 }else{
 
-                    !!activeClass && $tr.removeClass(activeClass);
+                    if(This._inMultipleSelectRowArr(trId)){
 
-                    This._trBoxCheckOff(trId, true);
+                        !!activeClass && $tr.removeClass(activeClass);
 
-                    This._removeMultipleSelectRowArr(trId);
+                        This._trBoxCheckOff(trId, true);
+
+                        This._removeMultipleSelectRowArr(trId);
+
+                    }
 
                 }
 
             });
+
+            isAllCheckBoxSelected && this._isAllCheckBoxSelected();
+
+        },
+
+        getCheckBoxFlag:function(){
+
+            var length = this.tableData.selectRow.length;
+
+            if(length === 0){
+
+                return 'none';
+
+            }else if(length === this.records.length()){
+
+                return 'all';
+
+            }else{
+
+                return 'half';
+
+            }
 
         },
 
@@ -691,15 +727,15 @@
 
             if(this.tableOption.boxCheckType === 'multiple'){
 
-                var length = this.tableData.selectRow.length,
+                var flag = this.getCheckBoxFlag(),
 
                 $multipleCheckBox = this.tableCache.$multipleCheckBox;
 
-                if(length === 0){
+                if(flag === 'none'){
 
                     $multipleCheckBox.prop({'indeterminate': false, 'checked': false } );
 
-                }else if(length === this.records.length()){
+                }else if(flag === 'all'){
 
                     $multipleCheckBox.prop({'indeterminate': false, 'checked': true });
 
@@ -724,7 +760,6 @@
                     if(arr[i] === index)return true;
 
                 }
-
 
             }
 
@@ -769,6 +804,54 @@
                 !this._inArray(selectRow, trid) && selectRow.push(trid);
 
             }
+
+        },
+
+        getSelectRowsTrParam:function(){
+
+            var arr = [], selectRow, i;
+
+            if(this.options.boxCheckType){
+
+                selectRow = this.tableData.selectRow;
+
+                !$.isArray(selectRow) && (selectRow = [selectRow]);
+
+                i = selectRow.length;
+
+                while(i--){
+
+                    arr.push(this._getTrParam(selectRow[i]))
+
+                }
+
+            }
+
+            return arr;
+
+        },
+
+        _getTrParam:function(trid){
+
+            var getParam = this.options.getParam,
+
+            data = this.records.getData()[this._getTrIdIndex(trid)];
+
+            if($.isFunction(getParam)){
+
+                return getParam(data);
+
+            }else{
+
+                return data[getParam];
+
+            }
+
+        },
+
+        _getTrIdIndex:function(trId){
+
+            return trId.slice(this.gridIds.trIdPostfix.length);
 
         },
 
@@ -1133,13 +1216,13 @@
 
             for (; i < opTableModelsLen; i++) {
 
-                tableModels.push(this._getTableModel(opTableModels[i], i));
+                tableModels.push(this._setTableModel(opTableModels[i], i));
 
             };
 
         },
 
-        _getTableModel:function(opModel, index){
+        _setTableModel:function(opModel, index){
 
             var thIdPostfix = this.gridIds.thIdPostfix,
 
@@ -1152,6 +1235,8 @@
             tableSize = this.tableSize;
 
             opModel.boxType === "checkBox" && (model.isCheckBox = true);
+
+            opModel.sortable && (this.tableOption.isSort = true);
 
             if(model.fixed){
 
@@ -1475,7 +1560,7 @@
 
         _addEvent:function(){
 
-            var time,This = this,
+            var time, This = this, options = this.options,
 
             $gridHeadDiv = this.tableCache.$gridHeadDiv,
 
@@ -1509,13 +1594,15 @@
 
                 }
 
-            })._on(this.tableCache.$gridBodyTable, 'click', 'tr', function(event){
+            })._on(this.tableCache.$gridBodyTable, 'click.check', 'tr', function(event){
 
-                This.options.clickTrCallback.call(this, event, this) !== false && !!This._boxCheck && This._boxCheck(this);
+                options.clickTrCallback.call(this, event, this) !== false && !!This._boxCheck && This._boxCheck(this);
 
             });
 
             this._addMouseHover();
+
+            this._createSortTb();
 
         },
 
@@ -1609,19 +1696,120 @@
 
                 };
 
-                if(this.tableCache.$multipleCheckBox){
+                if(this.tableOption.boxCheckType === 'multiple' && this.tableCache.$multipleCheckBox){
 
                     This = this;
 
                     this._on(this.tableCache.$multipleCheckBox, 'change', function(event){
 
-                        This.multipleCheckBoxAllSelect();
+                        This.multipleCheckBoxAllSelect($(this).prop('checked'));
 
                     });
 
                 }
 
             }
+
+        },
+
+        _createSortTb:function(){
+
+            if(this.tableOption.isSort){
+
+                this._sortTbEvent();
+
+            }
+
+        },
+
+        _sortTbEvent:function(){
+
+            var This = this;
+
+            this._on(this.tableCache.$gridHeadTable, 'click.sort', 'div.leoUi-jqgrid-sortable', function(event){
+
+                This._sortTb(event, this.parentNode);
+
+            });
+
+        },
+
+        _getThIdIndex:function(thId){
+
+            return thId.slice(this.gridIds.thIdPostfix.length);
+
+        },
+
+        _getTableModel:function(thId){
+
+            return this.tableOption.tableModels[this._getThIdIndex(thId)];
+
+        },
+
+        _sortTb:function(event, th){
+
+            var $th = $(th), thId = th.id, status,
+
+            tableModel = this._getTableModel(thId),
+
+            localSort = tableModel.localSort, sortby = this._sortby,
+
+            formatSort = tableModel.formatSort || this._formatSort,
+
+            getSortVal = tableModel.getSortVal || this._getSortVal,
+
+            sortableType = $.trim(tableModel.sortableType).toLowerCase();
+
+            status = this.colsStatus[thId] = (this.colsStatus[thId] === undefined) ? 1 : this.colsStatus[thId] * -1;
+
+            console.log(tableModel)
+
+            this._setSortClass($th.find('span.leoUi-sort'), status);
+
+        },
+
+        _sortby:function(){
+
+            
+
+            
+        },
+
+        _setSortClass:function($span, status){
+
+            var lastSpan = this.colsStatus.lastSpan;
+
+            $span.removeClass('leoUi-sort-desc leoUi-sort-asc leoUi-sort-ndb');
+
+            if( status === 1 ){
+
+                $span.addClass('leoUi-sort-asc');
+
+            }else if( status === -1 ){
+
+                $span.addClass('leoUi-sort-desc');
+
+            }
+
+            if( !!lastSpan && lastSpan !== $span[0] ){
+
+                $(lastSpan).removeClass('leoUi-sort-desc leoUi-sort-asc leoUi-sort-ndb').addClass('leoUi-sort-ndb');
+
+            }
+
+            this.colsStatus.lastSpan = $span[0];
+
+        },
+
+        _restoreSortClass:function(){
+
+            if(!this.tableOption.isSort){return;}
+
+            var lastSpan = this.colsStatus.lastSpan;
+
+            !!lastSpan && $(lastSpan).removeClass('leoUi-sort-desc leoUi-sort-asc leoUi-sort-ndb').addClass('leoUi-sort-ndb');
+
+            this.colsStatus = {};
 
         },
 

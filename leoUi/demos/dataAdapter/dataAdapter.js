@@ -205,6 +205,8 @@ leoUiLoad.require('leoUi-dataAdapter, ready', function($) {
 
         });
 
+        dataAdapter.sortby('desc', 'contact', 'number');
+
         dataAdapter.getPageData(1).done(function(data){
 
             console.log('done')
@@ -305,48 +307,48 @@ leoUiLoad.require('leoUi-dataAdapter, ready', function($) {
 
         data.getData();
 
-        console.log(dataAdapter.updateRow({
-            "id": "121212121",
-            "contact": "2332423432432",
-            "mobile": "2332",
-            "phone": '',
-            "im": "0",
-            "weixin": "",
-            "skype": "",
-            "email": "",
-            "address": "asdasdsa",
-            "first": "0"
-        }));
+        // console.log(dataAdapter.updateRow({
+        //     "id": "121212121",
+        //     "contact": "2332423432432",
+        //     "mobile": "2332",
+        //     "phone": '',
+        //     "im": "0",
+        //     "weixin": "",
+        //     "skype": "",
+        //     "email": "",
+        //     "address": "asdasdsa",
+        //     "first": "0"
+        // }));
 
-        console.log(dataAdapter.updateCell("3333333"));
+        // console.log(dataAdapter.updateCell("3333333"));
 
-        dataAdapter.deleteRow();
+        // dataAdapter.deleteRow();
 
-        console.log(dataAdapter.appendRow({
-            "id": 11111111111,
-            "contact": "2332423432432",
-            "mobile": 1,
-            "phone": 12313213,
-            "im": "0",
-            "weixin": "",
-            "skype": "",
-            "email": "",
-            "address": "asdasdsa",
-            "first": "0"
-        },4))
+        // console.log(dataAdapter.appendRow({
+        //     "id": 11111111111,
+        //     "contact": "2332423432432",
+        //     "mobile": 1,
+        //     "phone": 12313213,
+        //     "im": "0",
+        //     "weixin": "",
+        //     "skype": "",
+        //     "email": "",
+        //     "address": "asdasdsa",
+        //     "first": "0"
+        // },4))
 
-        console.log(dataAdapter.prependRow({
-            "id": 3333333333333333,
-            "contact": "2332423432432",
-            "mobile": 1,
-            "phone": 12313213,
-            "im": "0",
-            "weixin": "",
-            "skype": "",
-            "email": "",
-            "address": "asdasdsa",
-            "first": "0"
-        },5))
+        // console.log(dataAdapter.prependRow({
+        //     "id": 3333333333333333,
+        //     "contact": "2332423432432",
+        //     "mobile": 1,
+        //     "phone": 12313213,
+        //     "im": "0",
+        //     "weixin": "",
+        //     "skype": "",
+        //     "email": "",
+        //     "address": "asdasdsa",
+        //     "first": "0"
+        // },5))
 
 
 });

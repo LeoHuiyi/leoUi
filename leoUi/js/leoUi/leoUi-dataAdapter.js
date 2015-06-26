@@ -37,9 +37,11 @@
 
         methodFns = {},
 
-        formatDateFns = {},
+        formatDataFns = {},
 
         validatorFns = {},
+
+        sortDataFns = {},
 
         splice = Array.prototype.splice,
 
@@ -124,19 +126,25 @@
 
         this._setCollection = function(data) {
 
-            return collection = data;
+            collection = data;
+
+            this.sort.sortCollection = $.extend(true, [], data);
+
+            this.sort.lastCollection = data;
+
+            return data;
 
         }
 
         this.setOption(option);
 
-        this.sortCollection = {
+        this.sort = {
 
-            status: 'desc',//asc, desc
+            status: 'normal',//asc, desc, normal
 
             sortCollection: null,
 
-            Collection: null
+            lastCollection: null
 
         }
 
@@ -210,21 +218,51 @@
 
         },
 
-        _sortby:function(status){
+        sortby:function(status, key, sortType){
 
-            var sortCollection = this.sortCollection;
+            var sort = this.sort, collection;
 
-            !sortCollection.collection && (sortCollection.collection = this._getCollection());
+            if(!sort.collection || sort.status !== status){
 
-            if(!sortCollection.collection || sortCollection.status !== status){
+                if(status === 'asc' || status === 'desc'){
 
-                !sortCollection.sortCollection && (sortCollection.sortCollection = this._getCollection(true));
+                    collection = this._sortby(sort.sortCollection, key, sortType, status);
 
+                }else if(status === 'normal'){
 
+                    collection = sort.lastCollection;
+
+                }
+
+                sort.status = status;
+
+                this._setCollection(collection);
 
             }
 
-            return this.sortCollection.collection;
+            return this;
+
+        },
+
+        _sortby:function(collection, key, sortType, status){
+
+            var sortFn = $.isFunction(sortType) ? sortType : getFns(sortType, sortDataFns);
+
+            collection.sort(function(a, b){
+
+                if(status === 'asc'){
+
+                    return sortFn(a[key], b[key]);
+
+                }else if(status === 'desc'){
+
+                    return sortFn(b[key], a[key]);
+
+                }
+
+            });
+
+            return collection;
 
         },
 
@@ -448,7 +486,7 @@
 
             if (typeof modeType === 'string') {
 
-                return getFns(modeType, formatDateFns)(value);
+                return getFns(modeType, formatDataFns)(value);
 
             }
 
@@ -780,9 +818,41 @@
 
         addSetDataFn: addToFns(setDataFns),
 
-        addFormatDateFn: addToFns(formatDateFns),
+        addFormatDataFn: addToFns(formatDataFns),
 
-        addValidatorFn: addToFns(validatorFns)
+        addValidatorFn: addToFns(validatorFns),
+
+        addSortData: addToFns(sortDataFns)
+
+    });
+
+    leoToosDataAdapt.addSortData('string', function(a, b) {
+
+        return a.localeCompare(b);
+
+    });
+
+    leoToosDataAdapt.addSortData('number', function(a, b) {
+
+        return a - b;
+
+    });
+
+    leoToosDataAdapt.addSortData('bool', function(a, b) {
+
+        return !!value;
+
+    });
+
+    leoToosDataAdapt.addSortData('date', function(a, b) {
+
+        return Date.parse(a.replace(/\-/g,'/')) - Date.parse(b.replace(/\-/g,'/'));
+
+    });
+
+    leoToosDataAdapt.addSortData('*', function(a, b) {
+
+        return value;
 
     });
 
@@ -860,7 +930,7 @@
 
     });
 
-    leoToosDataAdapt.addFormatDateFn('string', function(value) {
+    leoToosDataAdapt.addFormatDataFn('string', function(value) {
 
         !value && (value = '');
 
@@ -868,19 +938,19 @@
 
     });
 
-    leoToosDataAdapt.addFormatDateFn('number', function(value) {
+    leoToosDataAdapt.addFormatDataFn('number', function(value) {
 
         return +value || 0;
 
     });
 
-    leoToosDataAdapt.addFormatDateFn('bool', function(value) {
+    leoToosDataAdapt.addFormatDataFn('bool', function(value) {
 
         return !!value;
 
     });
 
-    leoToosDataAdapt.addFormatDateFn('*', function(value) {
+    leoToosDataAdapt.addFormatDataFn('*', function(value) {
 
         return value;
 

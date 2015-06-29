@@ -93,7 +93,7 @@
 
                 getSortVal:false,//自定义列的本地排序取值的规则
 
-                sortableType:'string'//自定义列的本地排序取值的类型
+                sortableType:false//自定义列的本地排序取值的类型
 
             },
 
@@ -185,7 +185,23 @@
 
             this.tableData = {};
 
-            this.colsStatus = {};
+            this.sort = {
+
+                lastSpan: null,
+
+                colsStatus: {},
+
+                status: {
+
+                    0: 'normal',
+
+                    1: 'asc',
+
+                    2: 'desc'
+
+                }
+
+            }
 
             this._reloadSelectRow();
 
@@ -242,6 +258,8 @@
             this._reloadSelectRow();
 
             this.renderGridBody();
+
+            this._setNoPageFooterRight();
 
             this.loadHide();
 
@@ -417,7 +435,7 @@
 
                 obj = data[i];
 
-                trId = trIdPostfix + i;
+                trId = trIdPostfix + obj.__id;
 
                 isSelectedTr = this._isSelectedTr(i, obj, trId);
 
@@ -560,6 +578,8 @@
         },
 
         _isSelectedTr:function(trIndex, tdData, trId){
+
+            if(!this.options.boxCheckType)return false;
 
             var selectTr = this.options.selectTr;
 
@@ -1012,9 +1032,33 @@
 
         },
 
-        _changeFooterRight:function(){
+        _setNoPageFooterRight:function(){
 
-            !!this.tableCache.$pageRightInfo && this.tableCache.$pageRightInfo.html(this.pageInfo.fristItemShow + ' - ' + this.pageInfo.lastItemShow + '&nbsp;&nbsp;共' + this.pageInfo.currentItems + '条')
+            var data = this.records.data;
+
+            this._changeFooterRight(1, data.length, data.length);
+
+        },
+
+        _changeFooterRight:function(fristItemShow, lastItemShow, currentItems){
+
+            if(this.tableCache.$pageRightInfo){
+
+                var html;
+
+                if(currentItems === 0){
+
+                    html = '无数据显示';
+
+                }else{
+
+                    html = fristItemShow + ' - ' + lastItemShow + '&nbsp;&nbsp;共' + currentItems + '条';
+
+                }
+
+                this.tableCache.$pageRightInfo.html(html);
+
+            }
 
         },
 
@@ -1044,7 +1088,7 @@
 
             tableCache.$pageCenterTable.show();
 
-            this._changeFooterRight();
+            this._changeFooterRight(pageInfo.fristItemShow, pageInfo.lastItemShow, pageInfo.currentItems);
 
         },
 
@@ -1748,56 +1792,61 @@
 
         _sortTb:function(event, th){
 
-            var $th = $(th), thId = th.id, status,
+            var $th = $(th), thId = th.id, status, sort = this.sort;
 
-            tableModel = this._getTableModel(thId),
+            sort.colsStatus[thId] === undefined && (sort.colsStatus[thId] = 1);
 
-            localSort = tableModel.localSort, sortby = this._sortby,
+            status = sort.status[(sort.colsStatus[thId]++ % 3)];
 
-            formatSort = tableModel.formatSort || this._formatSort,
-
-            getSortVal = tableModel.getSortVal || this._getSortVal,
-
-            sortableType = $.trim(tableModel.sortableType).toLowerCase();
-
-            status = this.colsStatus[thId] = (this.colsStatus[thId] === undefined) ? 1 : this.colsStatus[thId] * -1;
-
-            console.log(tableModel)
+            this._sortby(status, this._getTableModel(thId));
 
             this._setSortClass($th.find('span.leoUi-sort'), status);
 
         },
 
-        _sortby:function(){
+        _sortby:function(status, tableModel){
 
-            
+            this.source.localSortby(status, tableModel.dataKey, tableModel.sortableType);
 
-            
+            if(source.option.isPage){
+
+                this.setPage(1);
+
+            }else{
+
+                this._loadComplete(source._getCollection(true));
+
+            }
+
         },
 
         _setSortClass:function($span, status){
 
-            var lastSpan = this.colsStatus.lastSpan;
+            var lastSpan = this.sort.lastSpan;
 
             $span.removeClass('leoUi-sort-desc leoUi-sort-asc leoUi-sort-ndb');
 
-            if( status === 1 ){
+            if(status === 'asc'){
 
                 $span.addClass('leoUi-sort-asc');
 
-            }else if( status === -1 ){
+            }else if(status === 'desc'){
 
                 $span.addClass('leoUi-sort-desc');
 
+            }else if(status === 'normal'){
+
+                $span.addClass('leoUi-sort-ndb');
+
             }
 
-            if( !!lastSpan && lastSpan !== $span[0] ){
+            if(!!lastSpan && lastSpan !== $span[0]){
 
                 $(lastSpan).removeClass('leoUi-sort-desc leoUi-sort-asc leoUi-sort-ndb').addClass('leoUi-sort-ndb');
 
             }
 
-            this.colsStatus.lastSpan = $span[0];
+            this.sort.lastSpan = $span[0];
 
         },
 
@@ -1805,11 +1854,13 @@
 
             if(!this.tableOption.isSort){return;}
 
-            var lastSpan = this.colsStatus.lastSpan;
+            var lastSpan = this.sort.lastSpan;
 
             !!lastSpan && $(lastSpan).removeClass('leoUi-sort-desc leoUi-sort-asc leoUi-sort-ndb').addClass('leoUi-sort-ndb');
 
-            this.colsStatus = {};
+            this.sort.colsStatus = {};
+
+            this.sort.lastSpan = null;
 
         },
 

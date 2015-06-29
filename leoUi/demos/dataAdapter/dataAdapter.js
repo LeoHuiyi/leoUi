@@ -106,7 +106,40 @@ leoUiLoad.require('leoUi-dataAdapter, ready', function($) {
             localData:data,
             pageSize:2,
             ajax:{
-                url:'http://192.168.1.108/virbanks2015/api.asp?action=getserveritem&gcode=do'
+                url:'http://127.0.0.1:1337/'
+            },
+            ajaxParam:function(option, data){
+
+                if(option.pageMethod === 'local'){
+
+                    return $.extend({}, option.ajax, {
+
+                        data:{
+
+                            pageSize: 100,
+
+                            page: 1
+
+                        }
+
+                    });
+
+                }else{
+
+                    return $.extend({}, option.ajax, {
+
+                        data:{
+
+                            pageSize: option.pageSize,
+
+                            page: data.page
+
+                        }
+
+                    });
+
+                }
+
             },
             datatype: "array",
             pageMethod:'ajax',
@@ -205,7 +238,9 @@ leoUiLoad.require('leoUi-dataAdapter, ready', function($) {
 
         });
 
-        dataAdapter.sortby('desc', 'contact', 'number');
+        dataAdapter.localSortby('desc', 'id', 'number');
+
+        dataAdapter.localSortby('normal', 'id', 'number');
 
         dataAdapter.getPageData(1).done(function(data){
 

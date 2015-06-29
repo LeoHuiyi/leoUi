@@ -97,7 +97,19 @@ leoUiLoad.require('leoUi-dataAdapter,leoUi-grid-2.0,leoUi,leoUiGrid,ready', func
 
             sortable: true,
 
-            sortableType: 'string',
+            sortableType: function(a, b, status){
+
+                if(status === 'asc'){
+
+                    return a.mobile - b.mobile;
+
+                }else if(status === 'desc'){
+
+                    return b.mobile - a.mobile;
+
+                }
+
+            },
 
             resize: true,
 
@@ -119,8 +131,6 @@ leoUiLoad.require('leoUi-dataAdapter,leoUi-grid-2.0,leoUi,leoUiGrid,ready', func
 
             sortable: true,
 
-            sortableType: 'string',
-
             resize: true,
 
             edit: {
@@ -140,8 +150,6 @@ leoUiLoad.require('leoUi-dataAdapter,leoUi-grid-2.0,leoUi,leoUiGrid,ready', func
             minWidth: 50,
 
             sortable: true,
-
-            sortableType: 'string',
 
             resize: true,
 
@@ -163,8 +171,6 @@ leoUiLoad.require('leoUi-dataAdapter,leoUi-grid-2.0,leoUi,leoUiGrid,ready', func
 
             sortable: true,
 
-            sortableType: 'string',
-
             resize: true,
 
             edit: {
@@ -184,8 +190,6 @@ leoUiLoad.require('leoUi-dataAdapter,leoUi-grid-2.0,leoUi,leoUiGrid,ready', func
             minWidth: 50,
 
             sortable: true,
-
-            sortableType: 'string',
 
             resize: true,
 
@@ -207,8 +211,6 @@ leoUiLoad.require('leoUi-dataAdapter,leoUi-grid-2.0,leoUi,leoUiGrid,ready', func
 
             sortable: true,
 
-            sortableType: 'string',
-
             resize: true,
 
             edit: {
@@ -222,8 +224,6 @@ leoUiLoad.require('leoUi-dataAdapter,leoUi-grid-2.0,leoUi,leoUiGrid,ready', func
             dataKey: 'address',
 
             sortable: true,
-
-            sortableType: 'string',
 
             resize: true,
 
@@ -250,8 +250,6 @@ leoUiLoad.require('leoUi-dataAdapter,leoUi-grid-2.0,leoUi,leoUiGrid,ready', func
             minWidth: 50,
 
             sortable: true,
-
-            sortableType: 'string',
 
             resize: true,
 
@@ -425,7 +423,7 @@ leoUiLoad.require('leoUi-dataAdapter,leoUi-grid-2.0,leoUi,leoUiGrid,ready', func
                 dataType :'json'
             },
             currentPage: 1,
-            pageMethod:'ajax', //local,ajax
+            pageMethod:'local', //local,ajax
             mode: [{
                 name: 'id',
                 type: 'number',

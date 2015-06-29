@@ -126,13 +126,7 @@
 
         this._setCollection = function(data) {
 
-            collection = data;
-
-            this.sort.sortCollection = $.extend(true, [], data);
-
-            this.sort.lastCollection = data;
-
-            return data;
+            return collection = data;
 
         }
 
@@ -141,10 +135,6 @@
         this.sort = {
 
             status: 'normal',//asc, desc, normal
-
-            sortCollection: null,
-
-            lastCollection: null
 
         }
 
@@ -218,25 +208,25 @@
 
         },
 
-        sortby:function(status, key, sortType){
+        localSortby:function(status, key, sortType){
 
-            var sort = this.sort, collection;
+            var sort = this.sort;
 
-            if(!sort.collection || sort.status !== status){
+            if(key && sort.status !== status){
+
+                !sortType && (sortType = this._getMode(key).type);
 
                 if(status === 'asc' || status === 'desc'){
 
-                    collection = this._sortby(sort.sortCollection, key, sortType, status);
+                    this._sortby(this._getCollection(), key, sortType, status);
 
                 }else if(status === 'normal'){
 
-                    collection = sort.lastCollection;
+                    this._restoreSortCollection();
 
                 }
 
                 sort.status = status;
-
-                this._setCollection(collection);
 
             }
 
@@ -244,25 +234,61 @@
 
         },
 
-        _sortby:function(collection, key, sortType, status){
+        _restoreSortCollection:function(collection){
 
-            var sortFn = $.isFunction(sortType) ? sortType : getFns(sortType, sortDataFns);
+            var collection = this._getCollection();
 
             collection.sort(function(a, b){
 
-                if(status === 'asc'){
-
-                    return sortFn(a[key], b[key]);
-
-                }else if(status === 'desc'){
-
-                    return sortFn(b[key], a[key]);
-
-                }
+                return a.__id - b.__id;
 
             });
 
-            return collection;
+        },
+
+        _setSortId:function(collection){
+
+            var i = 0, len = collection.length;
+
+            for(; i < len; i++){
+
+                collection[i].__id = i;
+
+            }
+
+        },
+
+        _sortby:function(collection, key, sortType, status){
+
+            var sortFn;
+
+            if($.isFunction(sortType)){
+
+                collection.sort(function(a, b){
+
+                    return sortType(a, b, status);
+
+                });
+
+            }else{
+
+                sortFn = getFns(sortType, sortDataFns);
+
+                collection.sort(function(a, b){
+
+                    if(status === 'asc'){
+
+                        return sortFn(a[key], b[key]);
+
+                    }else if(status === 'desc'){
+
+                        return sortFn(b[key], a[key]);
+
+                    }
+
+                });
+
+            }
 
         },
 
@@ -474,6 +500,8 @@
 
                 }
 
+                collectionItem.__id = i;
+
                 collection.push(collectionItem);
 
             }
@@ -512,7 +540,7 @@
 
             if(typeof name === 'string'){
 
-                i = mode.length
+                i = mode.length;
 
                 while(i--){
 
@@ -852,7 +880,7 @@
 
     leoToosDataAdapt.addSortData('*', function(a, b) {
 
-        return value;
+        return true;
 
     });
 

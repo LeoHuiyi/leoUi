@@ -364,17 +364,18 @@ leoUiLoad.require('leoUi-dataAdapter,leoUi-grid-2.0,leoUi,leoUiGrid,ready', func
             datatype: "array",
             isPage: true,
             pageSize: 21,
-            method:'ajax',
             setAjaxPageInfo:function(data, page){
 
                 return data;
 
             },
-            ajaxParam:function(option, data){
+            ajaxParam:function(option, arg){
+
+                var ajaxParam;
 
                 if(option.pageMethod === 'local'){
 
-                    return $.extend({}, option.ajax, {
+                    ajaxParam = $.extend({}, option.ajax, {
 
                         data:{
 
@@ -388,19 +389,27 @@ leoUiLoad.require('leoUi-dataAdapter,leoUi-grid-2.0,leoUi,leoUiGrid,ready', func
 
                 }else{
 
-                    return $.extend({}, option.ajax, {
+                    ajaxParam = $.extend({}, option.ajax, {
 
                         data:{
 
                             pageSize: option.pageSize,
 
-                            page: data.page
+                            page: arg.page
 
                         }
 
                     });
 
                 }
+
+                if(arg.sortAjax && (arg.status !== 'normal')){
+
+                    $.extend(ajaxParam.data, {dataKey: arg.dataKey, status: arg.status});
+
+                }
+
+                return ajaxParam;
 
             },
             filterData:function(data, option){
@@ -423,6 +432,7 @@ leoUiLoad.require('leoUi-dataAdapter,leoUi-grid-2.0,leoUi,leoUiGrid,ready', func
                 dataType :'json'
             },
             currentPage: 1,
+            method:'ajax',
             pageMethod:'local', //local,ajax
             mode: [{
                 name: 'id',
@@ -483,6 +493,8 @@ leoUiLoad.require('leoUi-dataAdapter,leoUi-grid-2.0,leoUi,leoUiGrid,ready', func
         source: dataAdapter,
 
         tableModel: tableModel,
+
+        sortAjax:false,
 
         showPage:true,
 

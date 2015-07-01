@@ -79,8 +79,6 @@
 
                 minWidth:10,//最小宽度
 
-                dragMinWidth:10,//拖动最小宽度
-
                 renderCell:null,//为每一个单元格渲染内容
 
                 edit:false,//是否可以编辑
@@ -98,6 +96,8 @@
             },
 
             getParam: 'id',
+
+            sortAjax: false,//ajax排序
 
             rowDataKeys:false,
 
@@ -191,6 +191,8 @@
 
                 colsStatus: {},
 
+                info:{},
+
                 status: {
 
                     0: 'normal',
@@ -201,7 +203,9 @@
 
                 }
 
-            }
+            };
+
+            this.dargLine = {};
 
             this._reloadSelectRow();
 
@@ -309,7 +313,7 @@
 
                     !!source.ajax && source.ajax.abort();
 
-                    source.getPageData(page).done($.proxy(this._loadPageComplete, this));
+                    source.getPageData(page, this.sort.info).done($.proxy(this._loadPageComplete, this));
 
                 }
 
@@ -377,7 +381,7 @@
 
         },
 
-        _storeDataBind:function(){
+        _storeDataBind:function(page){
 
             var source = this.source, sourceOp = source.option,
 
@@ -389,11 +393,11 @@
 
                 if(sourceOp.pageMethod === 'ajax'){
 
-                    source.getPageData().done(proxy(this._loadPageComplete, this));
+                    source.getPageData(page, this.sort.info).done(proxy(this._loadPageComplete, this));
 
                 }else if(sourceOp.pageMethod === 'local'){
 
-                    source.getData().then(function(){
+                    source.getData(this.sort.info).then(function(){
 
                         return source.getPageData();
 
@@ -1266,6 +1270,32 @@
 
         },
 
+        _setTableSize:function(id, width){
+
+            var tableSize = this.tableSize,
+
+            cellSizes = tableSize.cellSize,
+
+            len = cellSizes.length, i = 0, cellSize, cellOuterWidth;
+
+            tableSize.width = 0;
+
+            for(; i < len; i++){
+
+                cellSize = cellSizes[i];
+
+                if(cellSize.id === id){
+
+                    cellSize.cellOuterWidth = cellSize.cellLayout + width;
+
+                }
+
+                tableSize.width += cellSize.cellOuterWidth;
+
+            }
+
+        },
+
         _setTableModel:function(opModel, index){
 
             var thIdPostfix = this.gridIds.thIdPostfix,
@@ -1281,6 +1311,8 @@
             opModel.boxType === "checkBox" && (model.isCheckBox = true);
 
             opModel.sortable && (this.tableOption.isSort = true);
+
+            opModel.resize && (this.tableOption.isResize = true);
 
             if(model.fixed){
 
@@ -1570,7 +1602,7 @@
 
                     }else{
 
-                        oldCellOuterWidth += cellOuterWidth =  Math.round( cellSizeObj.changePercent * changeWidth );
+                        oldCellOuterWidth += cellOuterWidth = Math.round( cellSizeObj.changePercent * changeWidth);
 
                         cellSizeObj.minWidth > (cellOuterWidth - cellSizeObj.cellLayout) && (tableWidth += cellSizeObj.minWidth - cellOuterWidth + cellSizeObj.cellLayout, cellOuterWidth = cellSizeObj.minWidth + cellSizeObj.cellLayout);
 
@@ -1647,6 +1679,8 @@
             this._addMouseHover();
 
             this._createSortTb();
+
+            this._createResizeTh();
 
         },
 
@@ -1806,15 +1840,29 @@
 
         _sortby:function(status, tableModel){
 
-            this.source.localSortby(status, tableModel.dataKey, tableModel.sortableType);
+            var source = this.source;
 
-            if(source.option.isPage){
+            if(this.options.sortAjax){
 
-                this.setPage(1);
+                this.sort.info = {status: status, dataKey: tableModel.dataKey, sortableType: tableModel.sortableType, sortAjax: true};
+
+                this._storeDataBind(1);
 
             }else{
 
-                this._loadComplete(source._getCollection(true));
+                this.sort.info = {status: status, dataKey: tableModel.dataKey, sortableType: tableModel.sortableType, sortAjax: false};
+
+                source.localSortby(status, tableModel.dataKey, tableModel.sortableType);
+
+                if(source.option.isPage){
+
+                    this.setPage(1);
+
+                }else{
+
+                    this._loadComplete(source._getCollection(true));
+
+                }
 
             }
 
@@ -1850,19 +1898,145 @@
 
         },
 
-        _restoreSortClass:function(){
+        _restoreSort:function(){
 
             if(!this.tableOption.isSort){return;}
 
-            var lastSpan = this.sort.lastSpan;
+            var lastSpan = this.sort.lastSpan, sort = this.sort;
 
             !!lastSpan && $(lastSpan).removeClass('leoUi-sort-desc leoUi-sort-asc leoUi-sort-ndb').addClass('leoUi-sort-ndb');
 
-            this.sort.colsStatus = {};
+            sort.colsStatus = {};
 
-            this.sort.lastSpan = null;
+            sort.info = {};
+
+            sort.lastSpan = null;
 
         },
+
+        _createResizeTh:function(){
+
+            if(this.tableOption.isResize === true){
+
+                this._resizeThEvent();
+
+                this.tableCache.$rsLine = this.tableCache.$rsLine || this.tableCache.$gridBox.find('#' + this.gridIds.rs_mgrid);
+
+            }
+
+        },
+
+        _textselect:function(bool) {
+
+            this[bool ? "_on" : "_off"](this.document, 'selectstart.darg', false);
+
+            this.document.css("-moz-user-select", bool ? "none" : "");
+
+            this.document[0].unselectable = bool ? "off" : "on";
+
+        },
+
+        _resizeThEvent:function(){
+
+            var This = this;
+
+            this._on(this.tableCache.$gridHeadTable, 'mousedown.dargLine', 'span.leoUi-jqgrid-resize', function(event){
+
+                This._resizeLineDragStart(event, this.parentNode);
+
+            });
+
+        },
+
+        _resizeLineDragStart:function(event,th){
+
+            var $th = $(th), This = this, firstLeft, baseLeft,
+
+            thId = th.id, dargLine, tableCache = this.tableCache,
+
+            lineHeight = tableCache.$gridHeadDiv.outerHeight() + tableCache.$gridBodyDiv.outerHeight();
+
+            dargLine = this.dargLine = {};
+
+            dargLine.width = $th.width();
+
+            dargLine.thId = thId;
+
+            dargLine.tableModel = this._getTableModel(thId);
+
+            tableCache.$rsLine.css({top: 0, left: firstLeft = (event.pageX - (this.dargLine.startLeft = tableCache.$gridBox.offset().left))}).height(lineHeight).show();
+
+            baseLeft = dargLine.baseLeft = firstLeft - dargLine.width;
+
+            dargLine.minLeft = baseLeft + dargLine.tableModel.minWidth;
+
+            this._textselect(true);
+
+            this._on(tableCache.$gridHeadDiv, 'mousemove.dargLine', function(event){
+
+                This._resizeLineDragMove(event);
+
+            });
+
+            this._on(this.document, 'mouseup.dargLine', function(event){
+
+                This._resizeLineDragStop(event);
+
+            });
+
+            event.preventDefault();
+
+            return true;
+
+        },
+
+        _resizeLineDragMove:function(event){
+
+            var dargLine = this.dargLine,
+
+            minLeft = dargLine.minLeft,left = event.pageX - dargLine.startLeft;
+
+            minLeft > left && (left = minLeft);
+
+            dargLine.left = left;
+
+            this.tableCache.$rsLine.css({top:0,left:left});
+
+            event.preventDefault();
+
+            return false;
+
+        },
+
+        _resizeLineDragStop:function(event){
+
+            var dargLine = this.dargLine;
+
+            this._off(this.tableCache.$gridHeadDiv, 'mousemove.dargLine');
+
+            this._off(this.document, 'mouseup.dargLine');
+
+            this.tableCache.$rsLine.hide();
+
+            this._setTdWidth(dargLine.left - dargLine.baseLeft, dargLine);
+
+            this._textselect(false);
+
+            this.dargLine = null;
+
+            this._getChangeCellPercent();
+
+            this._resizeCountWidth();
+
+            return false;
+
+        },
+
+        _setTdWidth:function(newTdWidth, dargLine){
+
+            this._setTableSize(dargLine.thId, newTdWidth);
+
+        }
 
     });
 

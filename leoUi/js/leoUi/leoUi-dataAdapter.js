@@ -134,7 +134,7 @@
 
         this.sort = {
 
-            status: 'normal',//asc, desc, normal
+            status: 'normal'//asc, desc, normal
 
         }
 
@@ -170,7 +170,7 @@
 
         },
 
-        getPageData:function(page){
+        getPageData:function(page, param){
 
             var option = this.option, pageInfo, data = {}, This = this;
 
@@ -196,7 +196,7 @@
 
                 }else if(option.pageMethod === 'ajax'){
 
-                    return this._getData({page: page}, 'ajax').then(function(data){
+                    return this._getData($.extend({page: page}, param), 'ajax').then(function(data){
 
                         return This._loadPageComplete(This._getAjaxPageInfo(data, page), page);
 
@@ -438,11 +438,11 @@
 
         },
 
-        getData: function() {
+        getData: function(data) {
 
             var This = this;
 
-            return this._getData().then(function(data){
+            return this._getData(data).then(function(data){
 
                 return This._loadComplete(data);
 

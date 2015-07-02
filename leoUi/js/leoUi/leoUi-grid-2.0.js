@@ -69,6 +69,8 @@
 
                 thClass:false,
 
+                editInit:false,
+
                 resize:false,//是否可调整宽度
 
                 sortable:false,//是否排序
@@ -79,17 +81,13 @@
 
                 minWidth:10,//最小宽度
 
+                dragMinWidth:10,//拖动最小宽度
+
                 renderCell:null,//为每一个单元格渲染内容
 
                 edit:false,//是否可以编辑
 
                 selectValId:false,//select类型的Id
-
-                localSort:false,//自定义列的本地排序规则
-
-                formatSort:false,//自定义列的本地排序格式化值的规则
-
-                getSortVal:false,//自定义列的本地排序取值的规则
 
                 sortableType:false//自定义列的本地排序取值的类型
 
@@ -205,7 +203,15 @@
 
             };
 
-            this.dargLine = {};
+            this.resize = {
+
+                isResize: false,
+
+                dargLine: null,
+
+                width: undefined
+
+            };
 
             this._reloadSelectRow();
 
@@ -1280,6 +1286,8 @@
 
             tableSize.width = 0;
 
+            tableSize.fixedOuterWidth = 0;
+
             for(; i < len; i++){
 
                 cellSize = cellSizes[i];
@@ -1288,7 +1296,11 @@
 
                     cellSize.cellOuterWidth = cellSize.cellLayout + width;
 
+                    cellSize.fixed = true;
+
                 }
+
+                cellSize.fixed && (tableSize.fixedOuterWidth += cellSize.cellOuterWidth)
 
                 tableSize.width += cellSize.cellOuterWidth;
 
@@ -1418,15 +1430,17 @@
 
         },
 
-        refreshTable:function(){
+        refreshTable:function(widthChange){
+
+            if(this.resize.isResize)return;
 
             this._setTableHeight();
 
-            this._setTableWidth();
+            this._setTableWidth(widthChange);
 
         },
 
-        _setTableWidth:function(){
+        _setTableWidth:function(change){
 
             var newTableWidth = this.options.width, scrollWidth = 0,
 
@@ -1438,7 +1452,7 @@
 
             $.isFunction(newTableWidth) && (newTableWidth = newTableWidth(this.$target));
 
-            if(tableSize.tableWidth !== newTableWidth){
+            if(tableSize.tableWidth !== newTableWidth || change){
 
                 tableOuterWidth = this.tableCache.$gridBox.setOuterWidth(newTableWidth).width();
 
@@ -1458,9 +1472,9 @@
 
             if(isChange || scrollChange.isScrollChange){
 
-                scrollChange.isScroll && (scrollWidth = this.options.scrollWidth);
+                scrollChange.isScroll && (scrollWidth = -this.options.scrollWidth);
 
-                tableOuterWidth = tableOuterWidth - scrollWidth;
+                tableOuterWidth = tableOuterWidth + scrollWidth;
 
                 isChange = true;
 
@@ -1576,7 +1590,7 @@
 
             $gridBodyResizeRow = tableCache.$gridBodyResizeRow || tableCache.$gridBodyTable.find('#' + sizeRowid),
 
-            $gridHeadResizeRow = tableCache.$gridHeadResizeRow || tableCache.$gridHeadTable.find('tr.leoUi-jqgrid-labels'),
+            $gridHeadResizeRow = tableCache.$gridHeadResizeRow || (tableCache.$gridHeadResizeRow = tableCache.$gridHeadTable.find('tr.leoUi-jqgrid-labels')),
 
             tableWidth = tableSize.width,
 
@@ -1652,7 +1666,7 @@
 
                 time = setTimeout(function(){
 
-                    This.refreshTable();
+                    This.refreshTable(This._restoreResize());
 
                 }, 50);
 
@@ -1673,6 +1687,12 @@
             })._on(this.tableCache.$gridBodyTable, 'click.check', 'tr', function(event){
 
                 options.clickTrCallback.call(this, event, this) !== false && !!This._boxCheck && This._boxCheck(this);
+
+            })._on(this.tableCache.$gridBodyTable, 'click', 'td', function(event){
+
+                This.options.clickTdCallback.call(this, event, this);
+
+                This.cellEdit(this);
 
             });
 
@@ -1818,9 +1838,9 @@
 
         },
 
-        _getTableModel:function(thId){
+        _getTableModel:function(index){
 
-            return this.tableOption.tableModels[this._getThIdIndex(thId)];
+            return this.tableOption.tableModels[index];
 
         },
 
@@ -1832,7 +1852,7 @@
 
             status = sort.status[(sort.colsStatus[thId]++ % 3)];
 
-            this._sortby(status, this._getTableModel(thId));
+            this._sortby(status, this._getTableModel(this._getThIdIndex(thId)));
 
             this._setSortClass($th.find('span.leoUi-sort'), status);
 
@@ -1956,19 +1976,19 @@
 
             lineHeight = tableCache.$gridHeadDiv.outerHeight() + tableCache.$gridBodyDiv.outerHeight();
 
-            dargLine = this.dargLine = {};
+            dargLine = this.resize.dargLine = {};
 
             dargLine.width = $th.width();
 
             dargLine.thId = thId;
 
-            dargLine.tableModel = this._getTableModel(thId);
+            dargLine.tableModel = this._getTableModel(this._getThIdIndex(thId));
 
-            tableCache.$rsLine.css({top: 0, left: firstLeft = (event.pageX - (this.dargLine.startLeft = tableCache.$gridBox.offset().left))}).height(lineHeight).show();
+            tableCache.$rsLine.css({top: 0, left: firstLeft = (event.pageX - (dargLine.startLeft = tableCache.$gridBox.offset().left))}).height(lineHeight).show();
 
             baseLeft = dargLine.baseLeft = firstLeft - dargLine.width;
 
-            dargLine.minLeft = baseLeft + dargLine.tableModel.minWidth;
+            dargLine.minLeft = baseLeft + dargLine.tableModel.dragMinWidth;
 
             this._textselect(true);
 
@@ -1992,7 +2012,7 @@
 
         _resizeLineDragMove:function(event){
 
-            var dargLine = this.dargLine,
+            var dargLine = this.resize.dargLine,
 
             minLeft = dargLine.minLeft,left = event.pageX - dargLine.startLeft;
 
@@ -2010,7 +2030,7 @@
 
         _resizeLineDragStop:function(event){
 
-            var dargLine = this.dargLine;
+            var dargLine = this.resize.dargLine;
 
             this._off(this.tableCache.$gridHeadDiv, 'mousemove.dargLine');
 
@@ -2022,11 +2042,9 @@
 
             this._textselect(false);
 
-            this.dargLine = null;
+            this.resize.dargLine = null;
 
-            this._getChangeCellPercent();
-
-            this._resizeCountWidth();
+            this.resize.isResize = true;
 
             return false;
 
@@ -2034,7 +2052,85 @@
 
         _setTdWidth:function(newTdWidth, dargLine){
 
-            this._setTableSize(dargLine.thId, newTdWidth);
+            var difWidth = newTdWidth - dargLine.width,
+
+            tableOption = this.tableOption, id = dargLine.thId,
+
+            tableWidth = (this.resize.width || this.tableSize.width) + difWidth;
+
+            $('#' + id).width(newTdWidth);
+
+            $('#' + id + this.gridIds.sizeRowTdIdPostfix).width(newTdWidth + dargLine.tableModel.cellLayout);
+
+            this.tableCache.$gridBodyTable.width(tableWidth);
+
+            this.tableCache.$gridHeadTable.width(tableWidth);
+
+            this.resize.width = tableWidth;
+
+        },
+
+        _restoreResize:function(){
+
+            var returnVal = (this.resize.isResize === true);
+
+            this.resize.width = undefined;
+
+            this.resize.isResize = false;
+
+            return returnVal;
+
+        },
+
+        _getTrIdIndex:function(trId){
+
+            return trId.slice(this.gridIds.trIdPostfix.length);
+
+        },
+
+        _getCellData:function(tdId){
+
+            var split = tdId.split(this.gridIds.tdIdPostfix),
+
+            tableModel = this._getTableModel(split[1]),
+
+            dataKey = tableModel.dataKey,
+
+            trIndex = this._getTrIdIndex(split[0]),
+
+            cellData = this.records.findRow(function(data){
+
+                return (data.__id == trIndex);
+
+            })[dataKey];
+
+            return {
+
+                tableModel: tableModel,
+
+                data: cellData
+
+            }
+
+        },
+
+        cellEdit:function(td){
+
+            var cellData = this._getCellData(td.id),
+
+            tableModel = cellData.tableModel, editInit;
+
+            if(tableModel.edit){
+
+                if((editInit = tableModel.editInit) && $.isFunction(editInit) && !editInit.__init){
+
+                    editInit(td, tableModel, cellData.data);
+
+                    editInit.__init = true;
+
+                }
+
+            }
 
         }
 

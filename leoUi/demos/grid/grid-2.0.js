@@ -72,9 +72,11 @@ leoUiLoad.require('leoUi-dataAdapter,leoUi-grid-2.0,leoUi,leoUiGrid,ready', func
 
             thClass:'leo aaaa',
 
-            edit: {
+            edit: true,
 
-                type: 'text'
+            editInit:function(td, tableModel, data){
+
+                console.log(td)
 
             },
 
@@ -364,9 +366,15 @@ leoUiLoad.require('leoUi-dataAdapter,leoUi-grid-2.0,leoUi,leoUiGrid,ready', func
             datatype: "array",
             isPage: true,
             pageSize: 21,
-            setAjaxPageInfo:function(data, page){
+            setAjaxPageInfo:function(collection, data){
 
-                return data;
+                return {
+
+                    pageData: collection,
+
+                    pageInfo: data.pageInfo
+
+                };
 
             },
             ajaxParam:function(option, arg){
@@ -414,17 +422,13 @@ leoUiLoad.require('leoUi-dataAdapter,leoUi-grid-2.0,leoUi,leoUiGrid,ready', func
             },
             filterData:function(data, option){
 
-                if(option.method === 'local'){
-
-                    return data;
-
-                }
-
-                if(option.pageMethod === 'local'){
+                if(option.method === 'ajax' || option.pageMethod === 'ajax'){
 
                     return data.pageData;
 
                 }
+
+                return data;
 
             },
             ajax:{
@@ -500,8 +504,6 @@ leoUiLoad.require('leoUi-dataAdapter,leoUi-grid-2.0,leoUi,leoUiGrid,ready', func
 
         rowList: [20,30,100],
 
-        resizeHeight: true,
-
         disabledCheck:false,//禁用选择
 
         disabledEvent:false,//是否禁用事件
@@ -537,8 +539,6 @@ leoUiLoad.require('leoUi-dataAdapter,leoUi-grid-2.0,leoUi,leoUiGrid,ready', func
             return data.id;
 
         },
-
-        resizeWidth: true,
 
         clickTdCallback: function(event, td, table) {
 

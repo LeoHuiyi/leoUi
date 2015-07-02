@@ -302,7 +302,7 @@
 
             if(option.setAjaxPageInfo){
 
-                pageObj = option.setAjaxPageInfo(data, page);
+                pageObj = option.setAjaxPageInfo(collection, data);
 
             }
 
@@ -1082,11 +1082,23 @@
 
             if($.isFunction(predicate)){
 
-                this.data = $.grep(this.data, predicate);
+                var data = this.data,
+
+                i = 0, len = data.length;
+
+                for(; i < len; i++){
+
+                    if(predicate(data[i])){
+
+                        return data[i];
+
+                    }
+
+                }
 
             }
 
-            return this;
+            return {};
 
         },
 

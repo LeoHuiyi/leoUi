@@ -74,18 +74,65 @@ leoUiLoad.require('leoUi-dataAdapter,leoUi-grid-2.0,leoUi,leoUiGrid,ready', func
 
             edit: true,
 
-            editInit:function(td, tableModel, data){
+            initEdit:function(td, tableModel, data){
 
                 console.log(td)
 
             },
 
-            renderThCell: function(val) {
+            beforeEdit:function(td, tableModel, data){
+
+                var $td = $(td);
+
+                $('<input type="text" style="width: 90%;" value="'+ data +'">').appendTo($td.empty()).select();
+
+            },
+
+            afterEdit:function(td, tableModel, data){
+
+                var $td = $(td);
+
+                $td.html(data);
+
+            },
+
+            getSaveCellVal:function(td, tableModel, data){
+
+                return $(td).find('input').val();
+
+            },
+
+            saveCell:function(td, validator, val, tableModel, data){
+
+                console.log(validator)
+
+                if(validator.passed){
+
+                    $(td).html(val);
+
+                    return true;
+
+                }else{
+
+                    $(td).find('input').css('border', '1px solid red')
+
+                }
+
+
+            },
+
+            validator:function(td, validatorCell, val){
+
+
+
+
+            },
+
+            renderThCell:function(val) {
 
                 return val;
 
             }
-
 
         }, {
 
@@ -254,6 +301,38 @@ leoUiLoad.require('leoUi-dataAdapter,leoUi-grid-2.0,leoUi,leoUiGrid,ready', func
             sortable: true,
 
             resize: true,
+
+            edit:true,
+
+            initEdit:function(td, tableModel, data){
+
+                console.log(td)
+
+            },
+
+            beforeEdit:function(td, tableModel, data){
+
+                var $td = $(td);
+
+                $('<select><option value="1">是</option><option value="0">否</option></select>').appendTo($td.empty()).find('option[value="'+data+'"]').attr('selected', true);
+
+            },
+
+            afterEdit:function(td, tableModel, data){
+
+                var $td = $(td);
+
+                $td.html(data);
+
+            },
+
+            saveCell:function(td, tableModel, data){
+
+                var $td = $(td);
+
+                $td.html(data);
+
+            },
 
             renderCell: function(val) {
 

@@ -213,6 +213,8 @@
 
             };
 
+            this.edit = {};
+
             this._reloadSelectRow();
 
         },
@@ -1654,6 +1656,8 @@
 
             $gridHeadDiv = this.tableCache.$gridHeadDiv,
 
+            $gridBodyTable = this.tableCache.$gridBodyTable,
+
             lastGridHeadDivLeft = $gridHeadDiv.scrollLeft();
 
             this._createBoxCheckFn();
@@ -1684,15 +1688,29 @@
 
                 }
 
-            })._on(this.tableCache.$gridBodyTable, 'click.check', 'tr', function(event){
+            })._on($gridBodyTable, 'click.check', 'tr', function(event){
 
                 options.clickTrCallback.call(this, event, this) !== false && !!This._boxCheck && This._boxCheck(this);
 
-            })._on(this.tableCache.$gridBodyTable, 'click', 'td', function(event){
+            })._on($gridBodyTable, 'click', 'td', function(event){
 
                 This.options.clickTdCallback.call(this, event, this);
 
-                This.cellEdit(this);
+                if(This.cellEdit(this)){
+
+                    event.stopPropagation();
+
+                }
+
+            })._on($gridBodyTable, 'keydown', 'td', function(event){
+
+                if (event.which === 13) {
+
+                    This.saveCell(this);
+
+                    return false;
+
+                }
 
             });
 
@@ -2106,6 +2124,8 @@
 
             return {
 
+                trIndex: trIndex,
+
                 tableModel: tableModel,
 
                 data: cellData
@@ -2114,19 +2134,146 @@
 
         },
 
-        cellEdit:function(td){
+        _cellBeforeEdit:function(td){
+
+            if(this.edit.editCell && this.edit.editCell.td === td)return true;
 
             var cellData = this._getCellData(td.id),
 
-            tableModel = cellData.tableModel, editInit;
+            tableModel = cellData.tableModel,
+
+            initEdit, beforeEdit, afterEdit;
 
             if(tableModel.edit){
 
-                if((editInit = tableModel.editInit) && $.isFunction(editInit) && !editInit.__init){
+                if($.isFunction(initEdit = tableModel.initEdit) && !initEdit.__init){
 
-                    editInit(td, tableModel, cellData.data);
+                    initEdit(td, tableModel, cellData.data);
 
-                    editInit.__init = true;
+                    initEdit.__init = true;
+
+                }
+
+                if($.isFunction(beforeEdit = tableModel.beforeEdit)){
+
+                    beforeEdit(td, tableModel, cellData.data);
+
+                }
+
+                this.edit.editCell = {cellData: cellData, td: td};
+
+                return true;
+
+            }
+
+        },
+
+        _cancelCellEdit:function(td){
+
+            if(this.edit.editCell){
+
+                var cellData = this.edit.editCell.cellData,
+
+                tableModel = cellData.tableModel,
+
+                data = cellData.data, value = '';
+
+                if($.isFunction(tableModel.renderCell)){
+
+                    value = tableModel.renderCell(data);
+
+                    if(typeof value === 'object'){
+
+                        value = value.html;
+
+                    }
+
+                }else{
+
+                    value = this._htmlEncode(data);
+
+                }
+
+                $(this.edit.editCell.td).html(value);
+
+
+            }
+
+        },
+
+        _cellAfterEdit:function(td){
+
+            if(this.edit.editCell && this.edit.editCell.td !== td){
+
+                this._cancelCellEdit(this.tableCache.editCell);
+
+                this.edit.editCell = null;
+
+            }
+
+        },
+
+        cellEdit:function(td){
+
+            this._cellAfterEdit(td);
+
+            return this._cellBeforeEdit(td);
+
+        },
+
+        _saveCell:function(td, cellData, val){
+
+            var tableModel = cellData.tableModel, saveCellVal,
+
+            source = this.source, validator, saveCell;
+
+            if($.isFunction(tableModel.validator)){
+
+                validator = tableModel.validator(td, source.validatorCell, val);
+
+            }
+
+            if(tableModel.validator !== false && !validator){
+
+                validator = source.updateCell(val, tableModel.dataKey, cellData.trIndex);
+
+            }
+
+            if($.isFunction(saveCell = tableModel.saveCell)){
+
+                saveCellVal = saveCell(td, validator, val, tableModel, cellData.data);
+
+            }else{
+
+
+
+            }
+
+            if(saveCellVal){
+
+                this.edit.editCell = null;
+
+            }
+
+        },
+
+        saveCell:function(td){
+
+            if(this.edit.editCell && this.edit.editCell.td === td){
+
+                var cellData = this.edit.editCell.cellData,
+
+                tableModel = cellData.tableModel, getSaveCellVal, value;
+
+                if(tableModel.edit){
+
+                    if($.isFunction(getSaveCellVal = tableModel.getSaveCellVal)){
+
+                        value = getSaveCellVal(td, tableModel, cellData.data);
+
+                        this._saveCell(this.edit.editCell.td, cellData, value);
+
+                    }
 
                 }
 

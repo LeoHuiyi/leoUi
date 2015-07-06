@@ -87,7 +87,15 @@
 
                 edit:false,//是否可以编辑
 
-                selectValId:false,//select类型的Id
+                initEdit:false,
+
+                beforeEdit:false,
+
+                getSaveCellVal:false,
+
+                saveCell:false,
+
+                validator:false,
 
                 sortableType:false//自定义列的本地排序取值的类型
 
@@ -1694,9 +1702,9 @@
 
             })._on($gridBodyTable, 'click', 'td', function(event){
 
-                This.options.clickTdCallback.call(this, event, this);
+                options.clickTdCallback.call(this, event, this);
 
-                if(This.cellEdit(this)){
+                if(options.cellEdit && This.cellEdit(this)){
 
                     event.stopPropagation();
 
@@ -2168,7 +2176,31 @@
 
         },
 
-        _cancelCellEdit:function(td){
+        _getCellHtml:function(renderCell, data){
+
+            var value;
+
+            if($.isFunction(renderCell)){
+
+                value = renderCell(data);
+
+                if(typeof value === 'object'){
+
+                    value = value.html || '';
+
+                }
+
+            }else{
+
+                value = this._htmlEncode(data);
+
+            }
+
+            return value;
+
+        },
+
+        _cancelCellEdit:function(){
 
             if(this.edit.editCell){
 
@@ -2176,26 +2208,9 @@
 
                 tableModel = cellData.tableModel,
 
-                data = cellData.data, value = '';
+                data = cellData.data;
 
-                if($.isFunction(tableModel.renderCell)){
-
-                    value = tableModel.renderCell(data);
-
-                    if(typeof value === 'object'){
-
-                        value = value.html;
-
-                    }
-
-                }else{
-
-                    value = this._htmlEncode(data);
-
-                }
-
-                $(this.edit.editCell.td).html(value);
-
+                $(this.edit.editCell.td).html(this._getCellHtml(tableModel.renderCell, data));
 
             }
 
@@ -2205,7 +2220,7 @@
 
             if(this.edit.editCell && this.edit.editCell.td !== td){
 
-                this._cancelCellEdit(this.tableCache.editCell);
+                this._cancelCellEdit();
 
                 this.edit.editCell = null;
 
@@ -2215,6 +2230,8 @@
 
         cellEdit:function(td){
 
+            if(!td)return;
+
             this._cellAfterEdit(td);
 
             return this._cellBeforeEdit(td);
@@ -2223,35 +2240,51 @@
 
         _saveCell:function(td, cellData, val){
 
-            var tableModel = cellData.tableModel, saveCellVal,
+            var tableModel = cellData.tableModel,
 
             source = this.source, validator, saveCell;
 
-            if($.isFunction(tableModel.validator)){
+            if(tableModel.validator === false){
 
-                validator = tableModel.validator(td, source.validatorCell, val);
+                validator = {passed: true};
 
-            }
+            }else if(tableModel.validator === true){
 
-            if(tableModel.validator !== false && !validator){
+                validator = source.validatorCell(val, tableModel.dataKey, cellData.trIndex);
 
-                validator = source.updateCell(val, tableModel.dataKey, cellData.trIndex);
+            }else if($.isFunction(tableModel.validator)){
+
+                validator = tableModel.validator(td, $.proxy(source.validatorCell, source), val, cellData);
 
             }
 
             if($.isFunction(saveCell = tableModel.saveCell)){
 
-                saveCellVal = saveCell(td, validator, val, tableModel, cellData.data);
+                saveCell(td, validator, val, tableModel, cellData.data, $.proxy(this._getCellHtml, this));
 
             }else{
 
+                if(validator.passed){
 
+                    $(td).html(this._getCellHtml(tableModel.renderCell, data));
+
+                }else{
+
+                    this._cancelCellEdit();
+
+                    this.edit.editCell = null;
+
+                }
 
             }
 
-            if(saveCellVal){
+            if(validator.passed){
 
                 this.edit.editCell = null;
+
+                source.updateCell(val, tableModel.dataKey, cellData.trIndex, true);
+
+                this.records = this.source.dataWrapper();
 
             }
 
@@ -2279,7 +2312,75 @@
 
             }
 
-        }
+        },
+
+        rowEdit:function(tr){
+
+            var rowData = this._getEditRowData(tr.id);
+
+            console.log(rowData)
+
+        },
+
+        saveRow:function(){
+
+
+
+
+
+        },
+
+        _cancelRowEdit:function(trId){
+
+            var rowData = this._getEditRowData(tr.id);
+
+
+
+        },
+
+        _getEditRowData:function(trId){
+
+            var tableModels = this.tableOption.tableModels,
+
+            i = 0, len = tableModels.length, tableModel,
+
+            trIndex = this._getTrIdIndex(trId),
+
+            rowRecord = this.records.findRow(function(data){
+
+                return (data.__id == trIndex);
+
+            }), rowDatas = [], rowEditData;
+
+            for(; i < len; i++){
+
+                tableModel = tableModels[i];
+
+                if(tableModel.edit){
+
+                    rowEditData = {};
+
+                    rowEditData.cellModel = tableModel;
+
+                    rowEditData.cellVal = rowRecord[tableModel.dataKey];
+
+                    rowDatas.push(rowEditData);
+
+                }
+
+            }
+
+            return {
+
+                rowEditData: rowDatas,
+
+                rowData: $.extend(true, {}, rowRecord),
+
+                trIndex: trIndex
+
+            }
+
+        },
 
     });
 

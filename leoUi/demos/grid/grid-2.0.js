@@ -88,29 +88,17 @@ leoUiLoad.require('leoUi-dataAdapter,leoUi-grid-2.0,leoUi,leoUiGrid,ready', func
 
             },
 
-            afterEdit:function(td, tableModel, data){
-
-                var $td = $(td);
-
-                $td.html(data);
-
-            },
-
             getSaveCellVal:function(td, tableModel, data){
 
                 return $(td).find('input').val();
 
             },
 
-            saveCell:function(td, validator, val, tableModel, data){
-
-                console.log(validator)
+            saveCell:function(td, validator, val, tableModel, data, getCellHtml){
 
                 if(validator.passed){
 
-                    $(td).html(val);
-
-                    return true;
+                    $(td).html(getCellHtml(tableModel.renderCell, val));
 
                 }else{
 
@@ -118,13 +106,11 @@ leoUiLoad.require('leoUi-dataAdapter,leoUi-grid-2.0,leoUi,leoUiGrid,ready', func
 
                 }
 
-
             },
 
-            validator:function(td, validatorCell, val){
+            validator:function(td, validatorCell, val, cellData){
 
-
-
+                return validatorCell(val, cellData.tableModel.dataKey, cellData.trIndex)
 
             },
 
@@ -160,13 +146,7 @@ leoUiLoad.require('leoUi-dataAdapter,leoUi-grid-2.0,leoUi,leoUiGrid,ready', func
 
             },
 
-            resize: true,
-
-            edit: {
-
-                type: 'text'
-
-            }
+            resize: true
 
         }, {
 
@@ -180,13 +160,7 @@ leoUiLoad.require('leoUi-dataAdapter,leoUi-grid-2.0,leoUi,leoUiGrid,ready', func
 
             sortable: true,
 
-            resize: true,
-
-            edit: {
-
-                type: 'text'
-
-            }
+            resize: true
 
         }, {
 
@@ -200,13 +174,7 @@ leoUiLoad.require('leoUi-dataAdapter,leoUi-grid-2.0,leoUi,leoUiGrid,ready', func
 
             sortable: true,
 
-            resize: true,
-
-            edit: {
-
-                type: 'text'
-
-            }
+            resize: true
 
         }, {
 
@@ -220,13 +188,7 @@ leoUiLoad.require('leoUi-dataAdapter,leoUi-grid-2.0,leoUi,leoUiGrid,ready', func
 
             sortable: true,
 
-            resize: true,
-
-            edit: {
-
-                type: 'text'
-
-            }
+            resize: true
 
         }, {
 
@@ -240,13 +202,7 @@ leoUiLoad.require('leoUi-dataAdapter,leoUi-grid-2.0,leoUi,leoUiGrid,ready', func
 
             sortable: true,
 
-            resize: true,
-
-            edit: {
-
-                type: 'text'
-
-            }
+            resize: true
 
         }, {
 
@@ -260,13 +216,7 @@ leoUiLoad.require('leoUi-dataAdapter,leoUi-grid-2.0,leoUi,leoUiGrid,ready', func
 
             sortable: true,
 
-            resize: true,
-
-            edit: {
-
-                type: 'text'
-
-            }
+            resize: true
 
         }, {
 
@@ -280,13 +230,7 @@ leoUiLoad.require('leoUi-dataAdapter,leoUi-grid-2.0,leoUi,leoUiGrid,ready', func
 
             minWidth: 100,
 
-            theadName: '地址',
-
-            edit: {
-
-                type: 'text'
-
-            }
+            theadName: '地址'
 
         }, {
 
@@ -318,21 +262,13 @@ leoUiLoad.require('leoUi-dataAdapter,leoUi-grid-2.0,leoUi,leoUiGrid,ready', func
 
             },
 
-            afterEdit:function(td, tableModel, data){
+            getSaveCellVal:function(td, tableModel, data){
 
-                var $td = $(td);
-
-                $td.html(data);
+                return +$(td).find('select').val();
 
             },
 
-            saveCell:function(td, tableModel, data){
-
-                var $td = $(td);
-
-                $td.html(data);
-
-            },
+            validator:true,
 
             renderCell: function(val) {
 
@@ -581,6 +517,8 @@ leoUiLoad.require('leoUi-dataAdapter,leoUi-grid-2.0,leoUi,leoUiGrid,ready', func
 
         showPage:true,
 
+        cellEdit:false,
+
         rowList: [20,30,100],
 
         disabledCheck:false,//禁用选择
@@ -619,9 +557,9 @@ leoUiLoad.require('leoUi-dataAdapter,leoUi-grid-2.0,leoUi,leoUiGrid,ready', func
 
         },
 
-        clickTdCallback: function(event, td, table) {
+        clickTrCallback: function(event, tr) {
 
-
+            $grid.leoGrid('rowEdit', tr);
 
         }
 

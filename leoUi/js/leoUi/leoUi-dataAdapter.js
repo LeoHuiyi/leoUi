@@ -246,7 +246,7 @@
 
         },
 
-        _setSortId:function(collection){
+        _setId:function(collection){
 
             var i = 0, len = collection.length;
 
@@ -662,13 +662,21 @@
 
         _prependRow:function(data, rowIndex){
 
-            this._getCollection().splice(rowIndex, 0, data);
+            var collection = this._getCollection();
+
+            collection.splice(rowIndex, 0, data);
+
+            this._setId(collection);
 
         },
 
         _appendRow:function(data, rowIndex){
 
-            this._getCollection().splice(rowIndex + 1, 0, data);
+            var collection = this._getCollection();
+
+            collection.splice(rowIndex + 1, 0, data);
+
+            this._setId(collection);
 
         },
 
@@ -744,7 +752,11 @@
 
         _updateRow:function(data, rowIndex){
 
-            this._getCollection().splice(rowIndex, 1, data);
+            var collection = this._getCollection();
+
+            collection.splice(rowIndex, 1, data);
+
+            this._setId(collection);
 
         },
 
@@ -778,7 +790,7 @@
 
         dataWrapper:function(data){
 
-            return new DataWrapper(data);
+            return new DataWrapper(data || this._getCollection());
 
         },
 

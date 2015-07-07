@@ -113,6 +113,8 @@
 
             cellEdit:false,//是否可编辑单元格
 
+            beforeRowEdit:$.noop,
+
             minRow:0,//至少一条数据
 
             defaulTrId: 0,//默认trid
@@ -221,7 +223,9 @@
 
             };
 
-            this.edit = {};
+            this.editCell = null;
+
+            this.editRow = null;
 
             this._reloadSelectRow();
 
@@ -2144,7 +2148,7 @@
 
         _cellBeforeEdit:function(td){
 
-            if(this.edit.editCell && this.edit.editCell.td === td)return true;
+            if(this.editCell && this.editCell.td === td)return true;
 
             var cellData = this._getCellData(td.id),
 
@@ -2168,7 +2172,7 @@
 
                 }
 
-                this.edit.editCell = {cellData: cellData, td: td};
+                this.editCell = {cellData: cellData, td: td};
 
                 return true;
 
@@ -2202,15 +2206,15 @@
 
         _cancelCellEdit:function(){
 
-            if(this.edit.editCell){
+            if(this.editCell){
 
-                var cellData = this.edit.editCell.cellData,
+                var cellData = this.editCell.cellData,
 
                 tableModel = cellData.tableModel,
 
                 data = cellData.data;
 
-                $(this.edit.editCell.td).html(this._getCellHtml(tableModel.renderCell, data));
+                $(this.editCell.td).html(this._getCellHtml(tableModel.renderCell, data));
 
             }
 
@@ -2218,11 +2222,11 @@
 
         _cellAfterEdit:function(td){
 
-            if(this.edit.editCell && this.edit.editCell.td !== td){
+            if(this.editCell && this.editCell.td !== td){
 
                 this._cancelCellEdit();
 
-                this.edit.editCell = null;
+                this.editCell = null;
 
             }
 
@@ -2272,7 +2276,7 @@
 
                     this._cancelCellEdit();
 
-                    this.edit.editCell = null;
+                    this.editCell = null;
 
                 }
 
@@ -2280,7 +2284,7 @@
 
             if(validator.passed){
 
-                this.edit.editCell = null;
+                this.editCell = null;
 
                 source.updateCell(val, tableModel.dataKey, cellData.trIndex, true);
 
@@ -2292,9 +2296,9 @@
 
         saveCell:function(td){
 
-            if(this.edit.editCell && this.edit.editCell.td === td){
+            if(this.editCell && this.editCell.td === td){
 
-                var cellData = this.edit.editCell.cellData,
+                var cellData = this.editCell.cellData,
 
                 tableModel = cellData.tableModel, getSaveCellVal, value;
 
@@ -2304,7 +2308,7 @@
 
                         value = getSaveCellVal(td, tableModel, cellData.data);
 
-                        this._saveCell(this.edit.editCell.td, cellData, value);
+                        this._saveCell(this.editCell.td, cellData, value);
 
                     }
 
@@ -2316,25 +2320,88 @@
 
         rowEdit:function(tr){
 
-            var rowData = this._getEditRowData(tr.id);
+            if(!tr || this.editRow)return false;
 
-            console.log(rowData)
+            var rowData = this._getEditRowData(tr.id), editRow;
 
-        },
+            editRow = this.editRow = {rowData: rowData, tr: tr};
 
-        saveRow:function(){
-
-
-
-
+            this.options.beforeRowEdit(editRow);
 
         },
 
-        _cancelRowEdit:function(trId){
+        saveRow:function(data, validatorFn){
 
-            var rowData = this._getEditRowData(tr.id);
+            if(!data || !this.editRow)return;
 
+            var source = this.source, rowData = this.editRow.rowData,
 
+            validator = {};
+
+            if(validatorFn === false){
+
+                validator.passed = true;
+
+            }else if($.isFunction(validatorFn)){
+
+                validator = validatorFn($.proxy(source.validatorRow, source), this.editRow);
+
+            }
+
+            if(typeof validator.passed === 'undefined'){
+
+                validator = source.validatorRow(data, rowData.trIndex)
+
+            }
+
+            if(validator.passed){
+
+                source.updateRow(data, rowData.trIndex, true);
+
+                this._saveRow(data, rowData);
+
+                this.editRow = null;
+            }
+
+        },
+
+        _saveRow:function(data, rowData){
+
+            var rowEditDatas = rowData.rowEditData, rowEditData,
+
+            len = rowEditDatas.length, i = 0;
+
+            for(; i < len; i++){
+
+                rowEditData = rowEditDatas[i];
+
+                $('#' + rowEditData.cellId).html(this._getCellHtml(rowEditData.cellModel.renderCell, data[rowEditData.cellModel.dataKey]));
+
+            }
+
+        },
+
+        cancelRowEdit:function(){
+
+            if(this.editRow){
+
+                var rowData = this.editRow.rowData, tr = this.editRow.tr,
+
+                rowEditDatas = rowData.rowEditData, rowEditData,
+
+                len = rowEditDatas.length, i = 0;
+
+                for(; i < len; i++){
+
+                    rowEditData = rowEditDatas[i];
+
+                    $('#' + rowEditData.cellId).html(this._getCellHtml(rowEditData.cellModel.renderCell, rowEditData.cellVall));
+
+                }
+
+                this.editRow = null;
+
+            }
 
         },
 
@@ -2345,6 +2412,8 @@
             i = 0, len = tableModels.length, tableModel,
 
             trIndex = this._getTrIdIndex(trId),
+
+            tdIdPostfix = this.gridIds.tdIdPostfix,
 
             rowRecord = this.records.findRow(function(data){
 
@@ -2362,6 +2431,8 @@
 
                     rowEditData.cellModel = tableModel;
 
+                    rowEditData.cellId = trId + tdIdPostfix + i;
+
                     rowEditData.cellVal = rowRecord[tableModel.dataKey];
 
                     rowDatas.push(rowEditData);
@@ -2374,7 +2445,7 @@
 
                 rowEditData: rowDatas,
 
-                rowData: $.extend(true, {}, rowRecord),
+                rowRecord: $.extend(true, {}, rowRecord),
 
                 trIndex: trIndex
 

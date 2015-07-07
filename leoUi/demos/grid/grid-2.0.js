@@ -482,7 +482,7 @@ leoUiLoad.require('leoUi-dataAdapter,leoUi-grid-2.0,leoUi,leoUiGrid,ready', func
                 type: 'number',
                 validator:function(value){
 
-                    if(value === 1){
+                    if(value){
 
                         return true
 
@@ -559,7 +559,19 @@ leoUiLoad.require('leoUi-dataAdapter,leoUi-grid-2.0,leoUi,leoUiGrid,ready', func
 
         clickTrCallback: function(event, tr) {
 
-            $grid.leoGrid('rowEdit', tr);
+            if(!$grid.leoGrid('rowEdit', tr)){
+
+                $grid.leoGrid('cancelRowEdit');
+
+            };
+
+        },
+
+        beforeRowEdit:function(editRow){
+
+            var rowData = editRow.rowData, tr = editRow.tr;
+
+            $grid.leoGrid('saveRow', rowData.rowRecord, false);
 
         }
 

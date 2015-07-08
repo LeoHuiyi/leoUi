@@ -377,7 +377,7 @@ leoUiLoad.require('leoUi-dataAdapter,leoUi-grid-2.0,leoUi,leoUiGrid,ready', func
             "address": "http://www.baidu.com",
             "first": "0"
         }],option = {
-            localData:data,
+            localData: data,
             datatype: "array",
             isPage: true,
             pageSize: 21,
@@ -437,7 +437,7 @@ leoUiLoad.require('leoUi-dataAdapter,leoUi-grid-2.0,leoUi,leoUiGrid,ready', func
             },
             filterData:function(data, option){
 
-                if(option.method === 'ajax' || option.pageMethod === 'ajax'){
+                if(data.pageData){
 
                     return data.pageData;
 
@@ -515,9 +515,9 @@ leoUiLoad.require('leoUi-dataAdapter,leoUi-grid-2.0,leoUi,leoUiGrid,ready', func
 
         sortAjax:false,
 
-        showPage:true,
+        footerShow:true,
 
-        cellEdit:false,
+        cellEdit:true,
 
         rowList: [20,30,100],
 
@@ -553,25 +553,29 @@ leoUiLoad.require('leoUi-dataAdapter,leoUi-grid-2.0,leoUi,leoUiGrid,ready', func
 
         getParam:function(data){
 
-            return data.id;
+            return data && data.id;
 
         },
 
         clickTrCallback: function(event, tr) {
 
-            if(!$grid.leoGrid('rowEdit', tr)){
+            // if(!$grid.leoGrid('rowEdit', tr)){
 
-                $grid.leoGrid('cancelRowEdit');
+            //     $grid.leoGrid('cancelRowEdit');
 
-            };
+            // };
 
         },
 
         beforeRowEdit:function(editRow){
 
-            var rowData = editRow.rowData, tr = editRow.tr;
+            // var rowData = editRow.rowData, tr = editRow.tr;
 
-            $grid.leoGrid('saveRow', rowData.rowRecord, false);
+            // $grid.leoGrid('saveRow', rowData.rowRecord, function(validatorRow, editRow){
+
+            //     return {passed: true};
+
+            // });
 
         }
 
@@ -584,6 +588,19 @@ leoUiLoad.require('leoUi-dataAdapter,leoUi-grid-2.0,leoUi,leoUiGrid,ready', func
         flag = !flag;
 
         console.log($grid.leoGrid('getSelectRowsTrParam'));
+
+        // console.log($grid.leoGrid('getRecords'));
+    });
+
+    $('#input').on('keydown', function(event) {
+
+        if(event.which === 13){
+
+            var val = $(this).val();
+
+            $grid.leoGrid('search', val);
+
+        }
     });
 
 });

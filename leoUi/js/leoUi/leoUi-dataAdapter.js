@@ -43,6 +43,8 @@
 
         sortDataFns = {},
 
+        searchDataFns = {},
+
         splice = Array.prototype.splice,
 
         dataAdapterSettings = {
@@ -62,6 +64,20 @@
                 url: 'leUi.com',
 
                 type: "GET"
+
+            },
+
+            search: {
+
+                rword: /[^, ]+/g,
+
+                keys: 'all',
+
+                searchDataFnName: 'equal',
+
+                keysLogic: 'or',//and, or
+
+                valsLogic: 'or'//and, or
 
             },
 
@@ -161,6 +177,16 @@
         getOption:function(){
 
             return $.extend({}, this.option);
+
+        },
+
+        setCurrentPage:function(page){
+
+            if(page >= 0){
+
+                this.currentPage = page;
+
+            }
 
         },
 
@@ -842,6 +868,164 @@
 
             return true;
 
+        },
+
+        _getModes:function(){
+
+            var mode = this.option.mode, arr = [],
+
+            i = 0, len = mode.length;
+
+            for(; i < len; i++){
+
+                arr.push(mode[i].name);
+
+            }
+
+            return arr;
+
+        },
+
+        _getSearchValsArr:function(vals, rword){
+
+            var arr = [], reObj = {};
+
+            vals.replace(rword, function(name){
+
+                if(!reObj[name]){
+
+                    arr.push(name);
+
+                    reObj[name] = true;
+
+                }
+
+            });
+
+            return arr;
+
+        },
+
+        search:function(val){
+
+            var collection = this._getCollection(), row,
+
+            i = 0, len = collection.length, searchRow = [],
+
+            search = this.option.search,
+
+            vals = this._getSearchValsArr(val, search.rword),
+
+            searchDataFn = this._getSearchDataFns(search.searchDataFnName);
+
+            for(; i < len; i++){
+
+                row = collection[i];
+
+                console.log(row)
+
+                this._searchKey(vals, row, searchDataFn) && searchRow.push(row);
+
+            }
+
+            console.log(searchRow)
+
+        },
+
+        _searchKey:function(vals, row, searchDataFn){
+
+            var i, search = this.option.search,
+
+            keys = search.keys,
+
+            keysLogic = search.keysLogic,
+
+            valsLogic = search.valsLogic,
+
+            flag, searchDataVal;
+
+            if(keys === 'all'){
+
+                keys = this._getModes();
+
+            }
+
+            i = keys.length;
+
+            while(i--){
+
+                searchDataVal = this._searchData(vals, row[keys[i]], searchDataFn, valsLogic);
+
+                console.log(searchDataVal)
+
+                if(keysLogic === 'or'){
+
+                    if(searchDataVal){
+
+                        return true;
+
+                    }
+
+                    flag = false;
+
+                }else if(keysLogic === 'and'){
+
+                    if(!searchDataVal){
+
+                        return false;
+
+                    }
+
+                    flag = true;
+
+                }
+
+            }
+
+            return flag;
+
+        },
+
+        _searchData:function(vals, data, searchDataFn, valsLogic){
+
+            var i = vals.length, val, flag;
+
+            while(i--){
+
+                val = vals[i];
+
+                if(valsLogic === 'or'){
+
+                    if(searchDataFn(val, data)){
+
+                        return true;
+
+                    }
+
+                    flag = false;
+
+                }else if(valsLogic === 'and'){
+
+                    if(!searchDataFn(val, data)){
+
+                        return false;
+
+                    }
+
+                    flag = true;
+
+                }
+
+            }
+
+            return flag;
+
+        },
+
+        _getSearchDataFns:function(method){
+
+            return getFns(method, searchDataFns);
+
         }
 
     });
@@ -862,7 +1046,15 @@
 
         addValidatorFn: addToFns(validatorFns),
 
-        addSortData: addToFns(sortDataFns)
+        addSortData: addToFns(sortDataFns),
+
+        addSearchData: addToFns(searchDataFns)
+
+    });
+
+    leoToosDataAdapt.addSearchData('equal *', function(val, data) {
+
+        return val === data;
 
     });
 
@@ -1040,17 +1232,13 @@
 
         getRow: function(index) {
 
-            this.data = this.data[index] || [];
-
-            return this;
+            return this.data[index];
 
         },
 
         getRows: function(first, last) {
 
-            this.data = this.data.slice(first, last) || [];
-
-            return this;
+            return this.data.slice(first, last) || [];
 
         },
 
@@ -1084,9 +1272,7 @@
 
         splice: function() {
 
-            splice.apply(this.data, arguments);
-
-            return this;
+            return splice.apply($.extend(true, [], this.data), arguments);
 
         },
 
@@ -1118,11 +1304,9 @@
 
             if($.isFunction(predicate)){
 
-                this.data = $.map(this.data, predicate);
+                return $.map(this.data, predicate);
 
             }
-
-            return this;
 
         },
 
@@ -1130,11 +1314,9 @@
 
             if($.isFunction(iteratee)){
 
-                this.data.sort(iteratee);
+                return $.extend(true, [], this.data).sort(iteratee);
 
             }
-
-            return this;
 
         }
 

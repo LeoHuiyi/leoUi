@@ -821,13 +821,13 @@
 
     },{
 
-        filter: function( array, term ) {
+        filter: function(array, term) {
 
-            var matcher = new RegExp( $.leoTools.escapeRegex( term ), "i" );
+            var matcher = new RegExp($.leoTools.escapeRegex(term), "i");
 
-            return $.grep( array, function( value ) {
+            return $.grep(array, function(value){
 
-                return matcher.test( value.value || value.label || value );
+                return matcher.test(value.value || value.label || value);
 
             });
 

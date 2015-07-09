@@ -101,9 +101,11 @@
 
             },
 
-            getParam: 'id',
+            getParam:'id',
 
-            sortAjax: false,//ajax排序
+            sortAjax:false,//ajax排序
+
+            searchAjax:false,
 
             rowDataKeys:false,
 
@@ -187,7 +189,7 @@
 
                 colsStatus: {},
 
-                info:{},
+                info: {},
 
                 status: {
 
@@ -200,6 +202,8 @@
                 }
 
             };
+
+            this.searchInfo = {};
 
             this.resize = {
 
@@ -214,6 +218,8 @@
             this.editCell = null;
 
             this.editRow = null;
+
+            this.ajaxParam = {},
 
             this._reloadSelectRow();
 
@@ -325,7 +331,7 @@
 
                     !this.options.sortAjax && (sourceOp.pageMethod ==='ajax') && this._restoreSort();
 
-                    source.getPageData(page, this.sort.info).done($.proxy(this._loadPageComplete, this));
+                    source.getPageData(page, this.ajaxParam).done($.proxy(this._loadPageComplete, this));
 
                 }
 
@@ -405,11 +411,11 @@
 
                 if(sourceOp.pageMethod === 'ajax'){
 
-                    source.getPageData(page, this.sort.info).done(proxy(this._loadPageComplete, this));
+                    source.getPageData(page, this.ajaxParam).done(proxy(this._loadPageComplete, this));
 
                 }else if(sourceOp.pageMethod === 'local'){
 
-                    source.getData(this.sort.info).then(function(){
+                    source.getData(this.ajaxParam).then(function(){
 
                         source.setCurrentPage(page);
 
@@ -1146,13 +1152,13 @@
 
             tableCache.$lastPage.css('cursor', LPageStyle);
 
-            tableCache.$allPage.text(pageInfo.totalpages);
+            tableCache.$allPage.text(pageInfo.totalpages || 0);
 
-            tableCache.$setPageInput.val(pageInfo.currentPage);
+            tableCache.$setPageInput.val(pageInfo.currentPage || 0);
 
             tableCache.$pageCenterTable.show();
 
-            this._changeFooterRight(pageInfo.fristItemShow, pageInfo.lastItemShow, pageInfo.currentItems);
+            this._changeFooterRight(pageInfo.fristItemShow, pageInfo.lastItemShow, pageInfo.currentItems || 0);
 
         },
 
@@ -1928,25 +1934,35 @@
 
         },
 
+        _setAjaxParam:function(ajaxParam){
+
+            $.extend(this.ajaxParam, ajaxParam);
+
+        },
+
         _sortby:function(status, tableModel){
 
-            var source = this.source;
+            var source = this.source, sort = this.sort;
 
             if(this.options.sortAjax){
 
-                this.sort.info = {status: status, dataKey: tableModel.dataKey, sortableType: tableModel.sortableType, sortAjax: true};
+                status !== 'reload' && (sort.info = {status: status, dataKey: tableModel.dataKey, sortableType: tableModel.sortableType, sortAjax: true});
+
+                this._setAjaxParam({sortInfo: sort.info});
 
                 this._storeDataBind(1);
 
             }else{
 
-                this.sort.info = {status: status, dataKey: tableModel.dataKey, sortableType: tableModel.sortableType, sortAjax: false};
+                status !== 'reload' && (sort.info = {status: status, dataKey: tableModel.dataKey, sortableType: tableModel.sortableType, sortAjax: false});
 
-                source.localSortby(status, tableModel.dataKey, tableModel.sortableType);
+                this._setAjaxParam({sortInfo: sort.info});
+
+                source.localSortby(status, sort.info.status, sort.info.sortableType);
 
                 if(source.option.isPage && source.option.pageMethod === 'local'){
 
-                    this.setPage(1);
+                    source.getPageData(1, sort.info).done($.proxy(this._loadPageComplete, this));
 
                 }else{
 
@@ -2513,9 +2529,73 @@
 
         },
 
-        search:function(val, option){
+        search:function(val, fn){
 
-            this.source.search(val);
+            var source = this.source, sourceOp = source.option;
+
+            if(this.options.searchAjax){
+
+                this.searchInfo = {val: val, option: sourceOp.search,searchAjax: true, type: 'search'};
+
+                this._setAjaxParam({searchInfo: this.searchInfo});
+
+                this._storeDataBind(1);
+
+            }else{
+
+                this.searchInfo = {val: val, option: sourceOp.search, searchAjax: false, type: 'search'};
+
+                this._setAjaxParam({searchInfo: this.searchInfo});
+
+                source.localSearch(val, fn);
+
+                if(sourceOp.isPage && sourceOp.pageMethod === 'local'){
+
+                    source.getPageData(1).done($.proxy(this._loadPageComplete, this));
+
+                }else{
+
+                    this._loadComplete(source._getCollection(true), !sourceOp.isPage, true);
+
+                }
+
+            }
+
+        },
+
+        searchReset:function(){
+
+            var source = this.source, sourceOp = source.option;
+
+            if(this.options.searchAjax){
+
+                this.searchInfo = {option: sourceOp.search, searchAjax: true, type: 'reset'};
+
+                this._setAjaxParam({searchInfo: this.searchInfo});
+
+                this._storeDataBind(1);
+
+            }else{
+
+                this.searchInfo = {option: sourceOp.search, searchAjax: false, type: 'reset'};
+
+                this._setAjaxParam({searchInfo: this.searchInfo});
+
+                source.localSearchReset();
+
+                this._sortby('reload');
+
+                if(sourceOp.isPage && sourceOp.pageMethod === 'local'){
+
+                    source.getPageData(1).done($.proxy(this._loadPageComplete, this));
+
+                }else{
+
+                    this._loadComplete(source._getCollection(true), !sourceOp.isPage, true);
+
+                }
+
+            }
 
         },
 

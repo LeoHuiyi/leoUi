@@ -8,7 +8,7 @@ http.createServer(function(req, res) {
 
 	pageSize = query.pageSize, page = query.page,
 
-	data, len, totalItems = 1000, totalpages, fristItem, lastItem,
+	data, len, totalItems = 200, totalpages, fristItem, lastItem,
 
 	contact = ["Andrew", "Nancy", "Shelley", "Regina", "Yoshi", "Antoni", "Mayumi", "Ian", "Peter", "Lars", "Petra", "Martin", "Sven", "Elio", "Beate", "Cheryl", "Michael", "Guylene"],
 

@@ -73,9 +73,7 @@
 
                 keys: 'all',
 
-                searchDataFnName: 'equal',
-
-                keysLogic: 'or',//and, or
+                searchDataFnName: 'in',
 
                 valsLogic: 'or'//and, or
 
@@ -140,7 +138,9 @@
 
         }
 
-        this._setCollection = function(data) {
+        this._setCollection = function(data, noBackup) {
+
+            !noBackup && (this.backupCollection = data);
 
             return collection = data;
 
@@ -240,6 +240,12 @@
 
             if(key && sort.status !== status){
 
+                if(status === 'reload'){
+
+                    status = sort.status;
+
+                }
+
                 !sortType && (sortType = this._getMode(key).type);
 
                 if(status === 'asc' || status === 'desc'){
@@ -269,6 +275,8 @@
                 return a.__id - b.__id;
 
             });
+
+            console.log(111)
 
         },
 
@@ -870,15 +878,25 @@
 
         },
 
-        _getModes:function(){
+        _getModeNames:function(type){
 
-            var mode = this.option.mode, arr = [],
+            var mode = this.option.mode, arr,
 
             i = 0, len = mode.length;
 
+            type === 'object' ? arr = {} : arr = [];
+
             for(; i < len; i++){
 
-                arr.push(mode[i].name);
+                if(type === 'object'){
+
+                    arr[mode[i].name] = true;
+
+                }else{
+
+                    arr.push(mode[i].name);
+
+                }
 
             }
 
@@ -906,77 +924,126 @@
 
         },
 
-        search:function(val){
+        _getSearchKeysArr:function(keys){
+
+            var modeNames, rword, key, arr, reObj;
+
+            if(keys === 'all'){
+
+                return this._getModeNames();
+
+            }
+
+            if(keys.length === 0)return [];
+
+            if(typeof keys === 'string'){
+
+                keys = keys.split(/(?:,| )/);
+
+            }
+
+            modeNames = this._getModeNames('object');
+
+            i = keys.length;
+
+            arr = [];
+
+            reObj = {};
+
+            while(i--){
+
+                key = keys[i];
+
+                if(modeNames[key] && !reObj[key]){
+
+                    arr.push(key);
+
+                    reObj[key] = true;
+
+                }
+
+
+            }
+
+            return arr;
+
+        },
+
+        localSearchReset:function(){
+
+            this._setCollection(this.backupCollection, true);
+
+            return this;
+
+        },
+
+        localSearch:function(val, fn){
 
             var collection = this._getCollection(), row,
 
-            i = 0, len = collection.length, searchRow = [],
+            i = 0, len = collection.length, searchCollection = [],
 
             search = this.option.search,
 
             vals = this._getSearchValsArr(val, search.rword),
 
+            keys = this._getSearchKeysArr(search.keys),
+
             searchDataFn = this._getSearchDataFns(search.searchDataFnName);
 
-            for(; i < len; i++){
+            if($.isFunction(fn)){
 
-                row = collection[i];
+                searchCollection = fn(vals, keys, collection, searchDataFn, option);
 
-                console.log(row)
+            }else{
 
-                this._searchKey(vals, row, searchDataFn) && searchRow.push(row);
+                for(; i < len; i++){
+
+                    row = collection[i];
+
+                    this._searchKey(vals, keys, row, searchDataFn) && searchCollection.push(row);
+
+                }
 
             }
 
-            console.log(searchRow)
+            this._setCollection(searchCollection, true);
+
+            return this;
 
         },
 
-        _searchKey:function(vals, row, searchDataFn){
+        _searchKey:function(vals, keys, row, searchDataFn){
 
             var i, search = this.option.search,
 
-            keys = search.keys,
-
-            keysLogic = search.keysLogic,
-
             valsLogic = search.valsLogic,
 
-            flag, searchDataVal;
+            searchVals = vals, searchValsLen = vals.length,
 
-            if(keys === 'all'){
-
-                keys = this._getModes();
-
-            }
+            flag = false, searchDataVal;
 
             i = keys.length;
 
             while(i--){
 
-                searchDataVal = this._searchData(vals, row[keys[i]], searchDataFn, valsLogic);
+                searchVals = this._searchData(searchVals, row[keys[i]], searchDataFn, valsLogic);
 
-                console.log(searchDataVal)
+                if(valsLogic === 'or'){
 
-                if(keysLogic === 'or'){
-
-                    if(searchDataVal){
+                    if(searchValsLen > searchVals.length){
 
                         return true;
 
                     }
 
-                    flag = false;
+                }else if(valsLogic === 'and'){
 
-                }else if(keysLogic === 'and'){
+                    if(searchVals.length === 0){
 
-                    if(!searchDataVal){
-
-                        return false;
+                        return true;
 
                     }
-
-                    flag = true;
 
                 }
 
@@ -988,37 +1055,15 @@
 
         _searchData:function(vals, data, searchDataFn, valsLogic){
 
-            var i = vals.length, val, flag;
+            var i = vals.length, arr = [];
 
             while(i--){
 
-                val = vals[i];
-
-                if(valsLogic === 'or'){
-
-                    if(searchDataFn(val, data)){
-
-                        return true;
-
-                    }
-
-                    flag = false;
-
-                }else if(valsLogic === 'and'){
-
-                    if(!searchDataFn(val, data)){
-
-                        return false;
-
-                    }
-
-                    flag = true;
-
-                }
+                !searchDataFn(vals[i], data) && arr.push(vals[i]);
 
             }
 
-            return flag;
+            return arr;
 
         },
 
@@ -1055,6 +1100,12 @@
     leoToosDataAdapt.addSearchData('equal *', function(val, data) {
 
         return val === data;
+
+    });
+
+    leoToosDataAdapt.addSearchData('in', function(val, data) {
+
+        return String(data).indexOf(val) > -1;
 
     });
 

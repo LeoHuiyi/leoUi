@@ -394,7 +394,7 @@ leoUiLoad.require('leoUi-dataAdapter,leoUi-grid-2.0,leoUi,leoUiGrid,ready', func
             },
             ajaxParam:function(option, arg){
 
-                var ajaxParam;
+                var ajaxParam, sortInfo = arg.sortInfo, searchInfo = arg.searchInfo;
 
                 if(option.pageMethod === 'local'){
 
@@ -426,9 +426,15 @@ leoUiLoad.require('leoUi-dataAdapter,leoUi-grid-2.0,leoUi,leoUiGrid,ready', func
 
                 }
 
-                if(arg.sortAjax && (arg.status !== 'normal')){
+                if(sortInfo && sortInfo.sortAjax && (sortInfo.status !== 'normal')){
 
-                    $.extend(ajaxParam.data, {dataKey: arg.dataKey, status: arg.status});
+                    $.extend(ajaxParam.data, {dataKey: sortInfo.dataKey, status: sortInfo.status});
+
+                }
+
+                if(searchInfo && searchInfo.searchAjax && searchInfo.type === 'search'){
+
+                    $.extend(ajaxParam.data, {val: searchInfo.val, type: searchInfo.type});
 
                 }
 
@@ -449,6 +455,17 @@ leoUiLoad.require('leoUi-dataAdapter,leoUi-grid-2.0,leoUi,leoUiGrid,ready', func
             ajax:{
                 url:'http://127.0.0.1:1337/',
                 dataType :'json'
+            },
+            search: {
+
+                rword: /[^, ]+/g,
+
+                keys: 'all',
+
+                searchDataFnName: 'in',
+
+                valsLogic: 'or'//and, or
+
             },
             currentPage: 1,
             method:'ajax',
@@ -514,6 +531,8 @@ leoUiLoad.require('leoUi-dataAdapter,leoUi-grid-2.0,leoUi,leoUiGrid,ready', func
         tableModel: tableModel,
 
         sortAjax:false,
+
+        searchAjax:false,
 
         footerShow:true,
 
@@ -587,7 +606,9 @@ leoUiLoad.require('leoUi-dataAdapter,leoUi-grid-2.0,leoUi,leoUiGrid,ready', func
         // $grid.leoGrid('multipleCheckBoxAllSelect', $grid.leoGrid('getCheckBoxFlag') !== 'all', true);
         flag = !flag;
 
-        console.log($grid.leoGrid('getSelectRowsTrParam'));
+        // console.log($grid.leoGrid('getSelectRowsTrParam'));
+
+        $grid.leoGrid('searchReset');
 
         // console.log($grid.leoGrid('getRecords'));
     });

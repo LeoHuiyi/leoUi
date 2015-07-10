@@ -276,8 +276,6 @@
 
             });
 
-            console.log(111)
-
         },
 
         _setId:function(collection){

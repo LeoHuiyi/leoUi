@@ -103,6 +103,8 @@
 
             getParam:'id',
 
+            virtualScroling:false,
+
             sortAjax:false,//ajax排序
 
             searchAjax:false,
@@ -238,6 +240,10 @@
             tableCache.$gridOverlay = tableCache.$gridBox.find('#' + this.gridIds.overlay_grid);
 
             tableCache.$gridLoad = tableCache.$gridBox.find('#' + this.gridIds.load_grid);
+
+            tableCache.$gridStyle = tableCache.$gridBox.find('#' + this.gridIds.grid_style);
+
+            this._getTableModels();
 
             this._renderGridHead();
 
@@ -427,7 +433,7 @@
 
             }else{
 
-                source.getData().done(proxy(this._loadComplete, this));
+                source.getData(this.ajaxParam).done(proxy(this._loadComplete, this));
 
             }
 
@@ -439,19 +445,19 @@
 
             tableModels = this.tableOption.tableModels,
 
-            trIdPostfix = this.gridIds.trIdPostfix,
+            gridIds = this.gridIds, trIdPostfix = gridIds.trIdPostfix,
 
             tableCache = this.tableCache, leoGrid = this.leoGrid,
 
             evenClass = this.options.evenClass, isSelectedTr,
 
-            tdIdPostfix = this.gridIds.tdIdPostfix,
+            tdIdPostfix = gridIds.tdIdPostfix,
 
             activeClass = this.options.activeClass;
 
             if(!tableCache.$gridBodyTableTbody){
 
-                str += '<tbody>' + this.gridBodySizeTrHtml;
+                str += '<tbody>' + this._renderSizeCell('td', gridIds.sizeBodyRowid);
 
             }
 
@@ -505,7 +511,7 @@
 
                 tableCache.$gridBodyTable.html(tableCache.$gridBodyTableTbody = $(str));
 
-                tableCache.$gridBodyResizeRow = tableCache.$gridBodyTable.find('#' + this.gridIds.sizeRowid);
+                tableCache.$gridBodyResizeRow = tableCache.$gridBodyTable.find('#' + gridIds.sizeBodyRowid);
 
             }else{
 
@@ -745,7 +751,7 @@
 
             this.multipleSelectFlag;
 
-            this.tableCache.$gridBodyTable.find('tr').not('#' + this.gridIds.sizeRowid).each(function(index, el) {
+            this.tableCache.$gridBodyTable.find('tr').not('#' + this.gridIds.sizeBodyRowid).each(function(index, el) {
 
                 var $tr = $(this), trId = this.id;
 
@@ -849,7 +855,7 @@
 
         _renderGridHead:function(){
 
-            this.tableCache.$gridHeadTable = $('<table class="leoUi-jqgrid-htable" cellspacing="0" cellpadding="0" border="0"><thead><tr class="leoUi-jqgrid-labels"></tr></thead></table>').find('tr').html(this._renderGridHeadTh()).end().appendTo(this.tableCache.$gridHeadDiv.find('div.leoUi-jqgrid-hbox'));
+            this.tableCache.$gridHeadTable = $('<table class="leoUi-jqgrid-htable" cellspacing="0" cellpadding="0" border="0"><thead>' + this._renderGridHeadTr() + '</thead></table>').appendTo(this.tableCache.$gridHeadDiv.find('div.leoUi-jqgrid-hbox'));
 
             this._setMultipleCheckBoxCache();
 
@@ -982,8 +988,6 @@
         },
 
         _renderGridBody:function(){
-
-            this._renderBodySizeTr();
 
             this.tableCache.$gridBodyTable = $('<table class="leoUi-jqgrid-btable" cellspacing="0" cellpadding="0" border="0"></table>').appendTo(this.tableCache.$gridBodyDiv.find('div.leoUi-jqgrid-hbox-inner'));
 
@@ -1214,9 +1218,17 @@
 
         },
 
-        _renderGridHeadTh:function(){
+        _renderGridHeadTr:function(){
 
-            this._getTableModels();
+            var str = this._renderSizeCell('th', this.gridIds.sizeHeadRowid);
+
+            str += '<tr class="leoUi-jqgrid-labels">' + this._renderGridHeadTh() + '</tr>';
+
+            return str;
+
+        },
+
+        _renderGridHeadTh:function(){
 
             var tableModels = this.tableOption.tableModels,
 
@@ -1240,22 +1252,11 @@
 
                 if(tableModel.thStyle){
 
-                    str += ' style = "' + tableModel.thStyle + ';';
-
-                    if(tableModel.width){
-
-                        str += ' width:' + tableModel.width;
-
-                    }
-
-                }else if(tableModel.width){
-
-
-                    str += ' style = "width:' + tableModel.width + ';';
+                    str += ' style = "' + tableModel.thStyle + ';"';
 
                 }
 
-                str += '">';
+                str += '>';
 
                 if(tableModel.resize){
 
@@ -1372,9 +1373,13 @@
 
             var thIdPostfix = this.gridIds.thIdPostfix,
 
+            sizeCellPostfix = this.gridIds.sizeCellPostfix,
+
             model = $.extend({}, this.options.tableModelDefault, opModel, {
 
-                thId: thIdPostfix + index
+                thId: thIdPostfix + index,
+
+                sizeCellName: sizeCellPostfix + index
 
             }), cellOuterWidth = model.width + model.cellLayout,
 
@@ -1390,13 +1395,13 @@
 
                 tableSize.fixedOuterWidth += cellOuterWidth;
 
-                tableSize.cellSize.push({id: model.thId, minWidth: model.minWidth, cellOuterWidth: cellOuterWidth, fixed: true, cellLayout: model.cellLayout});
+                tableSize.cellSize.push({sizeCellName: model.sizeCellName, id: model.thId, minWidth: model.minWidth, cellOuterWidth: cellOuterWidth, fixed: true, cellLayout: model.cellLayout});
 
             }else{
 
                 tableSize.changeCellLen += 1;
 
-                tableSize.cellSize.push({id: model.thId, minWidth: model.minWidth, cellOuterWidth: cellOuterWidth, fixed: false, cellLayout: model.cellLayout});
+                tableSize.cellSize.push({sizeCellName: model.sizeCellName, id: model.thId, minWidth: model.minWidth, cellOuterWidth: cellOuterWidth, fixed: false, cellLayout: model.cellLayout});
 
             }
 
@@ -1412,27 +1417,25 @@
 
             var gridIds = this.gridIds;
 
-            return '<div id="' + gridIds.leoUi_grid + '" class="leoUi-jqgrid leoUi-widget leoUi-widget-content leoUi-corner-all"><div id="' + gridIds.overlay_grid + '" class="leoUi-widget-overlay jqgrid-overlay"></div><div id="' + gridIds.load_grid + '" class="loading leoUi-state-default leoUi-state-active">读取中...</div><div class="leoUi-jqgrid-view" id="' + gridIds.gview_grid + '"><div class="leoUi-state-default leoUi-jqgrid-hdiv"><div class="leoUi-jqgrid-hbox"></div></div><div class="leoUi-jqgrid-bdiv"><div class="leoUi-jqgrid-hbox-inner" style="position:relative;"></div></div></div><div id="' + gridIds.rs_mgrid + '" class="leoUi-jqgrid-resize-mark" ></div></div>';
+            return '<div id="' + gridIds.leoUi_grid + '" class="leoUi-jqgrid leoUi-widget leoUi-widget-content leoUi-corner-all"><style type="text/css" id="' + gridIds.grid_style + '"></style><div id="' + gridIds.overlay_grid + '" class="leoUi-widget-overlay jqgrid-overlay"></div><div id="' + gridIds.load_grid + '" class="loading leoUi-state-default leoUi-state-active">读取中...</div><div class="leoUi-jqgrid-view" id="' + gridIds.gview_grid + '"><div class="leoUi-state-default leoUi-jqgrid-hdiv"><div class="leoUi-jqgrid-hbox"></div></div><div class="leoUi-jqgrid-bdiv"><div class="leoUi-jqgrid-hbox-inner" style="position:relative;"></div></div></div><div id="' + gridIds.rs_mgrid + '" class="leoUi-jqgrid-resize-mark" ></div></div>';
 
         },
 
-        _renderBodySizeTr:function(){
+        _renderSizeCell:function(nodeName, trId){
 
             var tableModels = this.tableOption.tableModels,
 
-            sizeRowTdIdPostfix = this.gridIds.sizeRowTdIdPostfix,
-
             len = tableModels.length, tableModel, i = 0,
 
-            str = '<tr id="' + this.gridIds.sizeRowid + '" style="height:0">';
+            str = '<tr id="' + trId + '" style="height:0">';
 
             for (; i < len; i++) {
 
-                str += '<td id="' + tableModels[i].thId + sizeRowTdIdPostfix + '" style="height:0;width:0"></td>'
+                str += '<' + nodeName + ' class="' + tableModels[i].sizeCellName +'" style="height:0;padding:0;border-width:0;"></td>'
 
             }
 
-            this.gridBodySizeTrHtml = str;
+            return str;
 
         },
 
@@ -1450,13 +1453,19 @@
 
                 gview_grid: leoGrid + 'gview_grid',
 
+                grid_style: leoGrid + 'grid_style',
+
                 thIdPostfix: leoGrid + 'th_',
 
                 trIdPostfix: leoGrid + 'tr_',
 
                 rs_mgrid: leoGrid + 'rs_mgrid',
 
-                sizeRowid: leoGrid + 'sizeRowid',
+                sizeHeadRowid: leoGrid + 'sizeHeadRowid',
+
+                sizeBodyRowid: leoGrid + 'sizeBodyRowid',
+
+                sizeCellPostfix: leoGrid + 'sizeCell_',
 
                 sizeRowTdIdPostfix: '_sizeRowTd',
 
@@ -1628,6 +1637,38 @@
 
         },
 
+        _setGridStyle:function(cssText){
+
+            var $gridStyle = this.tableCache.$gridStyle;
+
+            if ($gridStyle[0].styleSheet) {
+
+                $gridStyle[0].styleSheet.cssText = cssText;
+
+            } else {
+
+                $gridStyle.html(cssText);
+
+            }
+
+        },
+
+        _getGridStyle:function(){
+
+            var $gridStyle = this.tableCache.$gridStyle, cssText;
+
+            if ($gridStyle[0].styleSheet) {
+
+                return $gridStyle[0].styleSheet.cssText;
+
+            } else {
+
+                return $gridStyle.text();
+
+            }
+
+        },
+
         _resizeCountWidth:function(){
 
             if(this.tableSize.changeCellLen === 0)return;
@@ -1640,17 +1681,9 @@
 
             tableCache = this.tableCache,
 
-            gridIds = this.gridIds, sizeRowid = gridIds.sizeRowid,
-
             changeCellLen = tableSize.changeCellLen,
 
-            sizeRowTdIdPostfix = gridIds.sizeRowTdIdPostfix,
-
-            oldCellOuterWidth = 0, cellOuterWidth = 0,
-
-            $gridBodyResizeRow = tableCache.$gridBodyResizeRow || tableCache.$gridBodyTable.find('#' + sizeRowid),
-
-            $gridHeadResizeRow = tableCache.$gridHeadResizeRow || (tableCache.$gridHeadResizeRow = tableCache.$gridHeadTable.find('tr.leoUi-jqgrid-labels')),
+            oldCellOuterWidth = 0, cellOuterWidth = 0, cssText = '',
 
             tableWidth = tableSize.width,
 
@@ -1670,9 +1703,7 @@
 
                         cellSizeObj.cellOuterWidth = cellOuterWidth;
 
-                        $gridHeadResizeRow.children('#' + cellSizeObj.id).setOuterWidth(cellOuterWidth);
-
-                        $gridBodyResizeRow.children('#' + cellSizeObj.id + sizeRowTdIdPostfix).width(cellOuterWidth);
+                        cssText += '.' + cellSizeObj.sizeCellName + '{width:' + cellOuterWidth + 'px;} ';
 
                     }else{
 
@@ -1682,9 +1713,7 @@
 
                         cellSizeObj.cellOuterWidth = cellOuterWidth;
 
-                        $gridHeadResizeRow.children('#' + cellSizeObj.id).setOuterWidth(cellOuterWidth);
-
-                        $gridBodyResizeRow.children('#' + cellSizeObj.id + sizeRowTdIdPostfix).width(cellOuterWidth);
+                        cssText += '.' + cellSizeObj.sizeCellName + '{width:' + cellOuterWidth + 'px;} ';
 
                     }
 
@@ -1692,13 +1721,13 @@
 
                 }else{
 
-                    $gridHeadResizeRow.children('#' + cellSizeObj.id).setOuterWidth(cellSizeObj.cellOuterWidth);
-
-                    $gridBodyResizeRow.children('#' + cellSizeObj.id + sizeRowTdIdPostfix).width(cellSizeObj.cellOuterWidth);
+                    cssText += '.' + cellSizeObj.sizeCellName + '{width:' + cellSizeObj.cellOuterWidth + 'px;} ';
 
                 }
 
             }
+
+            this._setGridStyle(cssText);
 
             tableCache.$gridBodyTable.width(tableWidth);
 
@@ -1958,7 +1987,7 @@
 
                 this._setAjaxParam({sortInfo: sort.info});
 
-                source.localSortby(status, sort.info.status, sort.info.sortableType);
+                source.localSortby(status, sort.info.dataKey, sort.info.sortableType);
 
                 if(source.option.isPage && source.option.pageMethod === 'local'){
 
@@ -2136,17 +2165,27 @@
 
         },
 
+        _setCssText:function(cssText, sizeCellName, width){
+
+            cssText = cssText.replace(new RegExp(sizeCellName + '[^\}]*'), function(name){
+
+                return sizeCellName + '{width:' + width + 'px';
+
+            });
+
+            return cssText;
+
+        },
+
         _setTdWidth:function(newTdWidth, dargLine){
 
-            var difWidth = newTdWidth - dargLine.width,
+            var difWidth = newTdWidth - dargLine.width - dargLine.tableModel.cellLayout,
 
-            tableOption = this.tableOption, id = dargLine.thId,
+            tableOption = this.tableOption,
 
             tableWidth = (this.resize.width || this.tableSize.width) + difWidth;
 
-            $('#' + id).width(newTdWidth);
-
-            $('#' + id + this.gridIds.sizeRowTdIdPostfix).width(newTdWidth + dargLine.tableModel.cellLayout);
+            this._setGridStyle(this._setCssText(this._getGridStyle(), dargLine.tableModel.sizeCellName, newTdWidth));
 
             this.tableCache.$gridBodyTable.width(tableWidth);
 
@@ -2555,7 +2594,7 @@
 
                 }else{
 
-                    this._loadComplete(source._getCollection(true), !sourceOp.isPage, true);
+                    this._loadComplete(source._getCollection(true), false, true);
 
                 }
 
@@ -2591,13 +2630,13 @@
 
                 }else{
 
-                    this._loadComplete(source._getCollection(true), !sourceOp.isPage, true);
+                    this._loadComplete(source._getCollection(true), false, true);
 
                 }
 
             }
 
-        },
+        }
 
     });
 

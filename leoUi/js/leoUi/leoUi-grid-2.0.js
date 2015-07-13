@@ -103,7 +103,7 @@
 
             getParam:'id',
 
-            virtualScroling:false,
+            virtualScroll:false,
 
             sortAjax:false,//ajax排序
 
@@ -179,11 +179,7 @@
 
             this.tableCache = {};
 
-            this.select = {
-
-                init: false
-
-            };
+            this.select = {};
 
             this.sort = {
 
@@ -221,7 +217,7 @@
 
             this.editRow = null;
 
-            this.ajaxParam = {},
+            this.ajaxParam = {};
 
             this._reloadSelectRow();
 
@@ -277,11 +273,9 @@
 
         },
 
-        _loadComplete:function(data, noChangePage, noSelectResetInit){
+        _loadComplete:function(data, noChangePage){
 
             this.records = this.source.dataWrapper(data);
-
-            !noSelectResetInit && this._selectResetInit();
 
             this.renderGridBody();
 
@@ -297,7 +291,7 @@
 
             this.pageInfo = data.pageInfo || {};
 
-            this._selectResetInit();
+            this._reloadMultipleSelectRowCurrentLen();
 
             this.renderGridBody();
 
@@ -461,8 +455,6 @@
 
             }
 
-            !this.select.init && this._reloadSelectRow();
-
             for(; i < len; i++){
 
                 obj = data[i];
@@ -518,8 +510,6 @@
                 tableCache.$gridBodyTableTbody.find('tr').not(tableCache.$gridBodyResizeRow).remove().end().end().append(str);
 
             }
-
-            this.select.init = true;
 
         },
 
@@ -613,45 +603,56 @@
 
         _isSelectedTr:function(trIndex, tdData, trId){
 
-            if(!this.options.boxCheckType)return false;
+            var select, selectTr,
 
-            if(!this.select.init){
+            boxCheckType = this.options.boxCheckType;
 
-                var selectTr = this.options.selectTr;
+            if(!boxCheckType)return false;
 
-                if(selectTr === 'all'){
+            selectTr = this.options.selectTr;
+
+            if(boxCheckType === 'multiple'){
+
+                select = this.select;
+
+                if(typeof select[trId] === 'undefined'){
+
+                    if(selectTr === 'all' || selectTr === trIndex || this._inArray(selectTr, trIndex) || ($.isFunction(selectTr) && selectTr(tdData))){
+
+                        select[trId] = true;
+
+                        select.currentLen += 1;
+
+                        return true;
+
+                    }else{
+
+                        select[trId] = false;
+
+                        return false;
+
+                    }
+
+                }else if(select[trId]){
+
+                    select.currentLen += 1;
 
                     return true;
 
-                }else if(selectTr === trIndex && this._initBoxCheckTrId(trId)){
+                }else{
 
-                    return true;
-
-                }else if(this._inArray(selectTr, trIndex) && this._initBoxCheckTrId(trId)){
-
-                    return true;
-
-                }else if($.isFunction(selectTr) && selectTr(tdData) && this._initBoxCheckTrId(trId)){
-
-                    return true;
+                    return false;
 
                 }
 
-                return false;
 
-            }else{
+            }else if(boxCheckType === 'radio'){
 
-                var selectRow = this.select.selectRow,
+                if(typeof this.select === 'undefined'){
 
-                boxCheckType = this.options.boxCheckType;
+                    if(selectTr === trIndex || ($.isFunction(selectTr) && selectTr(tdData))){
 
-                if(boxCheckType === 'multiple'){
-
-                    return this._inArray(selectRow, trId);
-
-                }else if(boxCheckType === 'radio'){
-
-                    if(selectRow === trId){
+                        this.select = trId;
 
                         return true;
 
@@ -661,11 +662,19 @@
 
                     }
 
+                }else if(this.select === trId){
+
+                    return true;
+
+                }else{
+
+                    return false;
+
                 }
 
-                return false;
-
             }
+
+            return false;
 
         },
 
@@ -688,38 +697,6 @@
             str += '/>';
 
             return str;
-
-        },
-
-        _initBoxCheckTrId:function(trId){
-
-            var select = this.select,
-
-            boxCheckType = this.options.boxCheckType;
-
-            if(boxCheckType === 'multiple'){
-
-                select.selectRow.push(trId);
-
-                return true;
-
-            }else if(boxCheckType === 'radio'){
-
-                if(typeof select.selectRow === 'undefined'){
-
-                    select.selectRow = trId;
-
-                    return true;
-
-                }else{
-
-                    return false;
-
-                }
-
-            }
-
-            return true;
 
         },
 
@@ -789,13 +766,13 @@
 
         getCheckBoxFlag:function(){
 
-            var length = this.select.selectRow.length;
+            var currentLen = this.select.currentLen;
 
-            if(length === 0){
+            if(currentLen === 0){
 
                 return 'none';
 
-            }else if(length === this.records.length()){
+            }else if(currentLen === this.records.length()){
 
                 return 'all';
 
@@ -867,25 +844,29 @@
 
         },
 
-        _selectResetInit:function(){
+        _reloadSelectRow:function(){
 
-            if(this.options.boxCheckType){
+            if(this.options.boxCheckType === 'multiple'){
 
-                this.select.init = false;
+                this.select = {
+
+                    currentLen: 0
+
+                };
+
+            }else if(this.options.boxCheckType === 'radio'){
+
+                this.select = undefined;
 
             }
 
         },
 
-        _reloadSelectRow:function(){
+        _reloadMultipleSelectRowCurrentLen:function(){
 
             if(this.options.boxCheckType === 'multiple'){
 
-                this.select.selectRow = [];
-
-            }else if(this.options.boxCheckType === 'radio'){
-
-                this.select.selectRow = undefined;
+                this.select.currentLen = 0;
 
             }
 
@@ -895,9 +876,9 @@
 
             if(this.options.boxCheckType === 'multiple' && trid){
 
-                var selectRow = this.select.selectRow;
+                this.select[trid] = true;
 
-                !this._inArray(selectRow, trid) && selectRow.push(trid);
+                this.select.currentLen += 1;
 
             }
 
@@ -905,25 +886,37 @@
 
         getSelectRowsTrParam:function(){
 
-            var arr = [], selectRow, i;
+            var arr, select, prop, trParam,
 
-            if(this.options.boxCheckType){
+            boxCheckType = this.options.boxCheckType;
 
-                selectRow = this.select.selectRow;
+            if(boxCheckType){
 
-                !$.isArray(selectRow) && (selectRow = [selectRow]);
+                select = this.select;
 
-                i = selectRow.length;
+                if(boxCheckType === 'multiple'){
 
-                while(i--){
+                    arr = [];
 
-                    arr.push(this._getTrParam(selectRow[i]))
+                    for(prop in select){
+
+                        if(select[prop] === true){
+
+                            (trParam = this._getTrParam(prop)) && arr.push(trParam);
+
+                        }
+
+                    }
+
+                    return arr;
+
+                }else if(boxCheckType === 'radio'){
+
+                    return this._getTrParam(select);
 
                 }
 
             }
-
-            return arr;
 
         },
 
@@ -931,15 +924,17 @@
 
             var getParam = this.options.getParam,
 
-            data = this._getRecord(this._getTrIdIndex(trId));
+            trIdIndex = this._getTrIdIndex(trId),
+
+            data = this.source._getRecord(trIdIndex);
 
             if($.isFunction(getParam)){
 
-                return getParam(data);
+                return getParam(data, trIdIndex);
 
             }else{
 
-                return data[getParam];
+                return (data && data[getParam]) || trIdIndex;
 
             }
 
@@ -947,7 +942,7 @@
 
         _getTrIdIndex:function(trId){
 
-            return trId.slice(this.gridIds.trIdPostfix.length);
+            return +trId.slice(this.gridIds.trIdPostfix.length);
 
         },
 
@@ -955,7 +950,7 @@
 
             if(this.options.boxCheckType === 'multiple' && trid){
 
-                if(this._inArray(this.select.selectRow, trid))return true;
+                if(this.select[trid])return true;
 
             }
 
@@ -967,21 +962,9 @@
 
             if(this.options.boxCheckType === 'multiple' && trid){
 
-                var selectRow = this.select.selectRow,
+                this.select[trid] = false;
 
-                i = selectRow.length;
-
-                while(i--){
-
-                    if(selectRow[i] === trid){
-
-                        selectRow.splice(i, 1);
-
-                        break;
-
-                    }
-
-                }
+                this.select.currentLen -= 1;
 
             }
 
@@ -1843,17 +1826,17 @@
 
                     if(this.options.disabledCheck === false){
 
-                        var selectRow = this.select.selectRow,
+                        var select = this.select,
 
                         activeClass = this.options.activeClass,
 
                         trId = tr.id;
 
-                        if(selectRow){
+                        if(select){
 
-                            !!activeClass && $("#" + selectRow).removeClass(activeClass);
+                            !!activeClass && $("#" + select).removeClass(activeClass);
 
-                            this._trBoxCheckOff(selectRow);
+                            this._trBoxCheckOff(select);
 
                         }
 
@@ -1861,7 +1844,7 @@
 
                         this._trBoxCheckOn(trId);
 
-                        this.select.selectRow = trId;
+                        this.select = trId;
 
                     }
 
@@ -1995,7 +1978,7 @@
 
                 }else{
 
-                    this._loadComplete(source._getCollection(true), !source.option.isPage, true);
+                    this._loadComplete(source._getCollection(true), !source.option.isPage);
 
                 }
 
@@ -2204,12 +2187,6 @@
             this.resize.isResize = false;
 
             return returnVal;
-
-        },
-
-        _getTrIdIndex:function(trId){
-
-            return trId.slice(this.gridIds.trIdPostfix.length);
 
         },
 
@@ -2510,7 +2487,7 @@
 
         _getRecord:function(trIndex){
 
-            if(trIndex){
+            if(trIndex >= 0){
 
                 return this.records.findRow(function(data){
 
@@ -2578,6 +2555,8 @@
 
                 this._setAjaxParam({searchInfo: this.searchInfo});
 
+                this._reloadSelectRow();
+
                 this._storeDataBind(1);
 
             }else{
@@ -2588,13 +2567,15 @@
 
                 source.localSearch(val, fn);
 
+                this._reloadSelectRow();
+
                 if(sourceOp.isPage && sourceOp.pageMethod === 'local'){
 
                     source.getPageData(1).done($.proxy(this._loadPageComplete, this));
 
                 }else{
 
-                    this._loadComplete(source._getCollection(true), false, true);
+                    this._loadComplete(source._getCollection(true), false);
 
                 }
 
@@ -2612,6 +2593,8 @@
 
                 this._setAjaxParam({searchInfo: this.searchInfo});
 
+                this._reloadSelectRow();
+
                 this._storeDataBind(1);
 
             }else{
@@ -2624,13 +2607,15 @@
 
                 this._sortby('reload');
 
+                this._reloadSelectRow();
+
                 if(sourceOp.isPage && sourceOp.pageMethod === 'local'){
 
                     source.getPageData(1).done($.proxy(this._loadPageComplete, this));
 
                 }else{
 
-                    this._loadComplete(source._getCollection(true), false, true);
+                    this._loadComplete(source._getCollection(true), false);
 
                 }
 

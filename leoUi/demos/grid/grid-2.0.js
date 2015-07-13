@@ -381,15 +381,9 @@ leoUiLoad.require('leoUi-dataAdapter,leoUi-grid-2.0,leoUi,leoUiGrid,ready', func
             datatype: "array",
             isPage: true,
             pageSize: 21,
-            setAjaxPageInfo:function(collection, data){
+            setAjaxPageInfo:function(data){
 
-                return {
-
-                    pageData: collection,
-
-                    pageInfo: data.pageInfo
-
-                };
+                return data.pageInfo;
 
             },
             ajaxParam:function(option, arg){
@@ -570,9 +564,9 @@ leoUiLoad.require('leoUi-dataAdapter,leoUi-grid-2.0,leoUi,leoUiGrid,ready', func
 
         },
 
-        getParam:function(data){
+        getParam:function(data, id){
 
-            return data && data.id;
+            return (data && data.id) || id;
 
         },
 
@@ -606,7 +600,7 @@ leoUiLoad.require('leoUi-dataAdapter,leoUi-grid-2.0,leoUi,leoUiGrid,ready', func
         // $grid.leoGrid('multipleCheckBoxAllSelect', $grid.leoGrid('getCheckBoxFlag') !== 'all', true);
         flag = !flag;
 
-        // console.log($grid.leoGrid('getSelectRowsTrParam'));
+        console.log($grid.leoGrid('getSelectRowsTrParam'));
 
         $grid.leoGrid('searchReset');
 

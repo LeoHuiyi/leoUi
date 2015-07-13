@@ -196,6 +196,28 @@
 
         },
 
+        _getRecord:function(id){
+
+            if(id >= 0){
+
+                var collection = this._getCollection();
+
+                i = collection.length;
+
+                while(i--){
+
+                    if(collection[i].__id == id){
+
+                        return $.extend({}, collection[i]);
+
+                    }
+
+                }
+
+            }
+
+        },
+
         getPageData:function(page, param){
 
             var option = this.option, pageInfo, data = {}, This = this;
@@ -217,6 +239,8 @@
                         data.pageInfo = pageInfo;
 
                     }
+
+                    this.currentPage = page;
 
                     return $.Deferred().resolve(this._loadPageComplete(data, page));
 
@@ -328,29 +352,29 @@
 
             var pageObj, option = this.option, collection;
 
-            this._dataToCollection(data);
-
             collection = this._getCollection(true);
 
             if(option.setAjaxPageInfo){
 
-                pageObj = option.setAjaxPageInfo(collection, data);
+                pageInfo = option.setAjaxPageInfo(data);
 
             }
 
-            if(!pageObj){
+            if(pageInfo.currentPage < 0 || typeof pageInfo.fristItemShow === 'undefined'){
 
-                pageObj = {
+                $.error('pageInfo不完整');
 
-                    pageData: collection,
+            }
 
-                    pageInfo: {
+            this.currentPage = pageInfo.currentPage;
 
-                        currentPage: page
+            this._dataToCollection(data, pageInfo);
 
-                    }
+            pageObj = {
 
-                }
+                pageData: this._getCollection(true),
+
+                pageInfo: pageInfo
 
             }
 
@@ -359,8 +383,6 @@
         },
 
         _loadPageComplete:function(data, page){
-
-            this.currentPage = (data.pageInfo && data.pageInfo.currentPage) || page;
 
             this.option.loadPageComplete.call(this, data);
 
@@ -492,7 +514,7 @@
 
         },
 
-        _dataToCollection: function(data) {
+        _dataToCollection: function(data, pageInfo) {
 
             var i = 0, len, j, modeLen, collection = [],
 
@@ -501,6 +523,8 @@
             filterData = option.filterData,
 
             mode = option.mode,
+
+            id = pageInfo ? pageInfo.fristItemShow - 1 : 0,
 
             modeLen = mode.length,
 
@@ -532,7 +556,7 @@
 
                 }
 
-                collectionItem.__id = i;
+                collectionItem.__id = id ++;
 
                 collection.push(collectionItem);
 

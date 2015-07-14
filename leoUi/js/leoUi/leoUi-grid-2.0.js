@@ -219,7 +219,9 @@
 
             this.ajaxParam = {};
 
-            this._reloadSelectRow();
+            this.virtualScroll = {};
+
+            this.reloadSelectRow();
 
         },
 
@@ -255,7 +257,7 @@
 
             tableCache.$gridBox.appendTo(this.$target);
 
-            this._setTableHeight();
+            this.refreshTable();
 
             this._storeDataBind();
 
@@ -263,7 +265,7 @@
 
         renderGridBody:function(data){
 
-            this._renderGridBodyTbody(data || this.records.getData());
+            this._renderVSGridBodyTbody(data || this.records.getData());
 
             this.refreshTable();
 
@@ -433,6 +435,232 @@
 
         },
 
+        _renderVSGridBodyTbody:function(){
+
+            var str = '', tableCache = this.tableCache,
+
+            gridIds = this.gridIds;
+
+            if(!tableCache.$gridBodyTableTbody){
+
+                str += '<tbody>' + this._renderSizeCell('td', gridIds.sizeBodyRowid);
+
+                str += '<tr id="'+ gridIds.emptyRow +'" class="leoUi-widget-content jqgrow leoUi-row-ltr"><td></td></tr>';
+
+                str += '</tbody>';
+
+                tableCache.$gridBodyTable.css({'visibility': 'hidden', 'position': 'absolute', 'top': '0', 'left': '0'}).html(tableCache.$gridBodyTableTbody = $(str));
+
+                tableCache.$gridBodyResizeRow = tableCache.$gridBodyTable.find('#' + gridIds.sizeBodyRowid);
+
+                this._getVSInitSize();
+
+            }
+
+            this._renderVSGridBodyView();
+
+        },
+
+        _getVSGridBodyHtml:function(data){
+
+            var i = 0, len = data.length, obj, trId, str = '',
+
+            tableModels = this.tableOption.tableModels,
+
+            gridIds = this.gridIds, trIdPostfix = gridIds.trIdPostfix,
+
+            tableCache = this.tableCache,
+
+            evenClass = this.options.evenClass, isSelectedTr,
+
+            tdIdPostfix = gridIds.tdIdPostfix,
+
+            activeClass = this.options.activeClass;
+
+            for(; i < len; i++){
+
+                obj = data[i];
+
+                trId = trIdPostfix + obj.__id;
+
+                isSelectedTr = this._isSelectedTr(i, obj, trId);
+
+                str += '<tr id="'+ trId +'" class="leoUi-widget-content jqgrow leoUi-row-ltr ';
+
+                if(evenClass && (i % 2 === 1)){
+
+                    str += evenClass + ' ';
+
+                }
+
+                if(isSelectedTr && activeClass){
+
+                    str += activeClass;
+
+                }
+
+                str += '" tabindex="-1">';
+
+                str += this._renderGridBodyTd({
+
+                    tableModels: tableModels,
+
+                    data: obj,
+
+                    trId: trId,
+
+                    trIndex: i,
+
+                    tdIdPostfix: tdIdPostfix
+
+                }, isSelectedTr);
+
+                str += '</tr>';
+
+            }
+
+            return str;
+
+        },
+
+        _renderVSGridBodyView:function(){
+
+            var DifData = this._getVSDifData(), html, tableCache;
+
+            if(DifData.changeLen > 0){
+
+                virtualScroll = this.virtualScroll;
+
+                tableCache = this.tableCache;
+
+                html = this._getVSGridBodyHtml(DifData.difRecords);
+
+                if(DifData.direction === 'down'){
+
+                    tableCache.$gridBodyTableTbody.find('tr').slice(1, DifData.changeLen).remove().end().end().append(html);
+
+                }else{
+
+                    tableCache.$gridBodyTableTbody.find('tr').slice(-DifData.changeLen, -1).remove().filter(tableCache.$gridBodyResizeRow).after(html);
+
+                }
+
+                tableCache.$gridBodyTable.css({'visibility': 'visible', 'top': virtualScroll.scrollTop});
+
+            }
+
+        },
+
+        _scrollVSEvent:function(){
+
+            if(this.options.virtualScroll){
+
+                var virtualScroll = this.virtualScroll,
+
+                scrollTop = this.tableCache.$gridBodyDiv.scrollTop();
+
+                if(scrollTop !== virtualScroll.scrollTop){
+
+                    this._renderVSGridBodyView();
+
+                    virtualScroll.scrollTop = scrollTop;
+
+                }
+
+            }
+
+        },
+
+        _getVSInitSize:function(){
+
+            var virtualScroll = this.virtualScroll,
+
+            tableCache = this.tableCache,
+
+            records = this.records,
+
+            $emptyRow = $('#' + this.gridIds.emptyRow);
+
+            virtualScroll.rowHeight = $emptyRow.outerHeight();
+
+            virtualScroll.vHeight = tableCache.$gridBodyDiv.height();
+
+            virtualScroll.rows = records.length();
+
+            virtualScroll.cHeight = virtualScroll.rows * virtualScroll.rowHeight;
+
+            virtualScroll.vRows = Math.ceil(virtualScroll.vHeight / virtualScroll.rowHeight) + 1;
+
+            tableCache.$gridBodyDivInner.height(virtualScroll.cHeight);
+
+            virtualScroll.scrollTop = tableCache.$gridBodyDiv.scrollTop();
+
+            $emptyRow.remove();
+
+        },
+
+        _getVSDifData:function(){
+
+            var virtualScroll = this.virtualScroll, changeLen,
+
+            fristItem, lastItem, oldVRowsArr, difRecords, direction,
+
+            scrollTop = virtualScroll.scrollTop;
+
+            fristItem = Math.floor(scrollTop / virtualScroll.rowHeight);
+
+            lastItem =  fristItem + virtualScroll.vRows;
+
+            lastItem > virtualScroll.rows && (lastItem = virtualScroll.rows);
+
+            !virtualScroll.vRowsArr && (virtualScroll.vRowsArr = [fristItem, fristItem]);
+
+            oldVRowsArr = virtualScroll.vRowsArr;
+
+            if(lastItem === oldVRowsArr[1]){
+
+                changeLen = 0;
+
+                direction = 'no';
+
+                difRecords = [];
+
+            }else if(lastItem > oldVRowsArr[1]){
+
+                direction = 'down';
+
+                changeLen = lastItem - oldVRowsArr[1];
+
+                changeLen > virtualScroll.vRows && (changeLen = virtualScroll.vRows);
+
+                difRecords = this.records.getRows(lastItem - changeLen, lastItem);
+
+            }else{
+
+                direction = 'up';
+
+                changeLen = fristItem - oldVRowsArr[0];
+
+                changeLen > virtualScroll.vRows && (changeLen = virtualScroll.vRows);
+
+                difRecords = this.records.getRows(fristItem, fristItem + changeLen);
+
+            }
+
+            virtualScroll.vRowsArr = [fristItem, lastItem];
+
+            return {
+
+                direction: direction,
+
+                changeLen: changeLen,
+
+                difRecords: difRecords
+
+            };
+
+        },
+
         _renderGridBodyTbody:function(data){
 
             var i = 0, len = data.length, obj, trId, str = '',
@@ -441,7 +669,7 @@
 
             gridIds = this.gridIds, trIdPostfix = gridIds.trIdPostfix,
 
-            tableCache = this.tableCache, leoGrid = this.leoGrid,
+            tableCache = this.tableCache,
 
             evenClass = this.options.evenClass, isSelectedTr,
 
@@ -844,7 +1072,7 @@
 
         },
 
-        _reloadSelectRow:function(){
+        reloadSelectRow:function(){
 
             if(this.options.boxCheckType === 'multiple'){
 
@@ -972,7 +1200,7 @@
 
         _renderGridBody:function(){
 
-            this.tableCache.$gridBodyTable = $('<table class="leoUi-jqgrid-btable" cellspacing="0" cellpadding="0" border="0"></table>').appendTo(this.tableCache.$gridBodyDiv.find('div.leoUi-jqgrid-hbox-inner'));
+            this.tableCache.$gridBodyTable = $('<table class="leoUi-jqgrid-btable" cellspacing="0" cellpadding="0" border="0"></table>').appendTo(this.tableCache.$gridBodyDivInner = this.tableCache.$gridBodyDiv.find('div.leoUi-jqgrid-hbox-inner'));
 
         },
 
@@ -1440,6 +1668,8 @@
 
                 thIdPostfix: leoGrid + 'th_',
 
+                emptyRow: leoGrid + 'emptyRow',
+
                 trIdPostfix: leoGrid + 'tr_',
 
                 rs_mgrid: leoGrid + 'rs_mgrid',
@@ -1544,7 +1774,7 @@
 
         _resizeTableIsScroll:function(){
 
-            return this.tableCache.$gridBodyDiv.height() < this.tableCache.$gridBodyTable.outerHeight();
+            return this.tableCache.$gridBodyDiv.height() < this.tableCache.$gridBodyDivInner.height();
 
         },
 
@@ -1757,6 +1987,8 @@
                     lastGridHeadDivLeft = left;
 
                 }
+
+                This._scrollVSEvent();
 
             })._on($gridBodyTable, 'click.check', 'tr', function(event){
 
@@ -2555,7 +2787,7 @@
 
                 this._setAjaxParam({searchInfo: this.searchInfo});
 
-                this._reloadSelectRow();
+                this.reloadSelectRow();
 
                 this._storeDataBind(1);
 
@@ -2567,7 +2799,7 @@
 
                 source.localSearch(val, fn);
 
-                this._reloadSelectRow();
+                this.reloadSelectRow();
 
                 if(sourceOp.isPage && sourceOp.pageMethod === 'local'){
 
@@ -2593,7 +2825,7 @@
 
                 this._setAjaxParam({searchInfo: this.searchInfo});
 
-                this._reloadSelectRow();
+                this.reloadSelectRow();
 
                 this._storeDataBind(1);
 
@@ -2607,7 +2839,7 @@
 
                 this._sortby('reload');
 
-                this._reloadSelectRow();
+                this.reloadSelectRow();
 
                 if(sourceOp.isPage && sourceOp.pageMethod === 'local'){
 

@@ -380,7 +380,7 @@ leoUiLoad.require('leoUi-dataAdapter,leoUi-grid-2.0,leoUi,leoUiGrid,ready', func
             localData: data,
             datatype: "array",
             isPage: true,
-            pageSize: 21,
+            pageSize: 100,
             setAjaxPageInfo:function(data){
 
                 return data.pageInfo;
@@ -531,6 +531,8 @@ leoUiLoad.require('leoUi-dataAdapter,leoUi-grid-2.0,leoUi,leoUiGrid,ready', func
         footerShow:true,
 
         cellEdit:true,
+
+        virtualScroll:true,
 
         rowList: [20,30,100],
 

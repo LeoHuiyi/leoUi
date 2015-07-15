@@ -453,11 +453,9 @@
 
                 tableCache.$gridBodyResizeRow = tableCache.$gridBodyTable.find('#' + gridIds.sizeBodyRowid);
 
-                this._getVSInitSize();
+                this._getVSInit();
 
             }
-
-            this._renderVSGridBodyView();
 
         },
 
@@ -525,29 +523,32 @@
 
         _renderVSGridBodyView:function(){
 
-            var DifData = this._getVSDifData(), html, tableCache;
+            var DifData = this._getVSDifData(), html, scrollTop,
 
-            if(DifData.changeLen > 0){
+            virtualScroll = this.virtualScroll,
 
-                virtualScroll = this.virtualScroll;
+            tableCache = this.tableCache;
 
-                tableCache = this.tableCache;
+            if(DifData.isChage){
 
                 html = this._getVSGridBodyHtml(DifData.difRecords);
 
-                if(DifData.direction === 'down'){
+                if(virtualScroll.direction === 'down'){
 
-                    tableCache.$gridBodyTableTbody.find('tr').slice(1, DifData.changeLen).remove().end().end().append(html);
+                    tableCache.$gridBodyTableTbody.find('tr').not(tableCache.$gridBodyResizeRow).slice(DifData.difSlice[0], DifData.difSlice[1]).remove().end().end().end().append(html);
+
 
                 }else{
 
-                    tableCache.$gridBodyTableTbody.find('tr').slice(-DifData.changeLen, -1).remove().filter(tableCache.$gridBodyResizeRow).after(html);
+                    tableCache.$gridBodyTableTbody.find('tr').not(tableCache.$gridBodyResizeRow).slice(DifData.difSlice[0]).remove().end().end().filter(tableCache.$gridBodyResizeRow).after(html);
 
                 }
 
-                tableCache.$gridBodyTable.css({'visibility': 'visible', 'top': virtualScroll.scrollTop});
-
             }
+
+            virtualScroll.scrollTop > virtualScroll.maxScrollTop ? scrollTop = virtualScroll.maxScrollTop : scrollTop = virtualScroll.scrollTop;
+
+            tableCache.$gridBodyTable.css({'visibility': 'visible', 'top': scrollTop});
 
         },
 
@@ -561,9 +562,11 @@
 
                 if(scrollTop !== virtualScroll.scrollTop){
 
-                    this._renderVSGridBodyView();
+                    scrollTop > virtualScroll.scrollTop ? virtualScroll.direction = 'down' : virtualScroll.direction = 'up';
 
                     virtualScroll.scrollTop = scrollTop;
+
+                    this._renderVSGridBodyView();
 
                 }
 
@@ -571,7 +574,7 @@
 
         },
 
-        _getVSInitSize:function(){
+        _getVSInit:function(){
 
             var virtualScroll = this.virtualScroll,
 
@@ -589,71 +592,115 @@
 
             virtualScroll.cHeight = virtualScroll.rows * virtualScroll.rowHeight;
 
-            virtualScroll.vRows = Math.ceil(virtualScroll.vHeight / virtualScroll.rowHeight) + 1;
+            virtualScroll.direction = 'none';
+
+            virtualScroll.vRows = Math.ceil(virtualScroll.vHeight / virtualScroll.rowHeight);
+
+            virtualScroll.addRows = 1;
 
             tableCache.$gridBodyDivInner.height(virtualScroll.cHeight);
 
-            virtualScroll.scrollTop = tableCache.$gridBodyDiv.scrollTop();
+            tableCache.$gridBodyDiv.scrollTop(0);
+
+            virtualScroll.scrollTop = 0;
+
+            virtualScroll.maxScrollTop = virtualScroll.cHeight - virtualScroll.vHeight;
 
             $emptyRow.remove();
+
+            this._renderVSGridBodyInitView();
+
+        },
+
+        _renderVSGridBodyInitView:function(){
+
+            var virtualScroll = this.virtualScroll,
+
+            fristItem = Math.floor(virtualScroll.scrollTop / virtualScroll.rowHeight),
+
+            lastItem =  fristItem + virtualScroll.vRows + virtualScroll.addRows,
+
+            tableCache = this.tableCache;
+
+            tableCache.$gridBodyTableTbody.find('tr').not(tableCache.$gridBodyResizeRow).end().end().append(this._getVSGridBodyHtml(this.records.getRows(fristItem, lastItem)));
+
+            tableCache.$gridBodyTable.css({'visibility': 'visible', 'top': virtualScroll.scrollTop});
+
+            virtualScroll.fristItem = fristItem;
+
+            virtualScroll.vRowsArr = [fristItem, lastItem];
 
         },
 
         _getVSDifData:function(){
 
-            var virtualScroll = this.virtualScroll, changeLen,
+            var virtualScroll = this.virtualScroll,
 
-            fristItem, lastItem, oldVRowsArr, difRecords, direction,
+            fristItem, lastItem, difRecords, difSlice,
 
-            scrollTop = virtualScroll.scrollTop;
+            oldVRowsArr = virtualScroll.vRowsArr,
 
-            fristItem = Math.floor(scrollTop / virtualScroll.rowHeight);
+            addRows = virtualScroll.addRows, difFristItem, difLastItem;
 
-            lastItem =  fristItem + virtualScroll.vRows;
+            if(fristItem >= virtualScroll.fristItem){
 
-            lastItem > virtualScroll.rows && (lastItem = virtualScroll.rows);
-
-            !virtualScroll.vRowsArr && (virtualScroll.vRowsArr = [fristItem, fristItem]);
-
-            oldVRowsArr = virtualScroll.vRowsArr;
-
-            if(lastItem === oldVRowsArr[1]){
-
-                changeLen = 0;
-
-                direction = 'no';
-
-                difRecords = [];
-
-            }else if(lastItem > oldVRowsArr[1]){
-
-                direction = 'down';
-
-                changeLen = lastItem - oldVRowsArr[1];
-
-                changeLen > virtualScroll.vRows && (changeLen = virtualScroll.vRows);
-
-                difRecords = this.records.getRows(lastItem - changeLen, lastItem);
-
-            }else{
-
-                direction = 'up';
-
-                changeLen = fristItem - oldVRowsArr[0];
-
-                changeLen > virtualScroll.vRows && (changeLen = virtualScroll.vRows);
-
-                difRecords = this.records.getRows(fristItem, fristItem + changeLen);
+                return {isChage: false};
 
             }
 
-            virtualScroll.vRowsArr = [fristItem, lastItem];
+            if(virtualScroll.direction === 'down'){
+
+                fristItem = Math.floor(virtualScroll.scrollTop / virtualScroll.rowHeight);
+
+                lastItem = fristItem + virtualScroll.vRows;
+
+                difFristItem = oldVRowsArr[1];
+
+                difLastItem = lastItem + addRows;
+
+                difRecords = this.records.getRows(difFristItem, difLastItem);
+
+                if(difRecords.length === 0){
+
+                    return {isChage: false};
+
+                }
+
+                difSlice = [0, difRecords.length];
+
+                virtualScroll.vRowsArr = [fristItem, difLastItem];
+
+            }else if(virtualScroll.direction === 'up'){
+
+                lastItem =  Math.floor((virtualScroll.scrollTop + virtualScroll.vHeight) / virtualScroll.rowHeight);
+
+                fristItem = lastItem - virtualScroll.vRows;
+
+                difFristItem = fristItem - addRows;
+
+                difLastItem = oldVRowsArr[0];
+
+                difRecords = this.records.getRows(difFristItem, difLastItem);
+
+                if(difRecords.length === 0){
+
+                    return {isChage: false};
+
+                }
+
+                difSlice = [-difRecords.length];
+
+                virtualScroll.vRowsArr = [difFristItem, lastItem];
+
+            }
+
+            virtualScroll.fristItem = fristItem;
 
             return {
 
-                direction: direction,
+                isChage: true,
 
-                changeLen: changeLen,
+                difSlice: difSlice,
 
                 difRecords: difRecords
 
@@ -1971,6 +2018,8 @@
                 time = setTimeout(function(){
 
                     This.refreshTable(This._restoreResize());
+
+                    time = null;
 
                 }, 50);
 

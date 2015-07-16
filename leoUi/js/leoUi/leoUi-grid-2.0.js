@@ -265,7 +265,7 @@
 
         renderGridBody:function(data){
 
-            this._renderVSGridBodyTbody(data || this.records.getData());
+            this.options.virtualScroll ? this._renderVSGridBodyTbody() : this._renderGridBodyTbody(data || this.records.getData());
 
             this.refreshTable();
 
@@ -437,6 +437,8 @@
 
         _renderVSGridBodyTbody:function(){
 
+            if(!this.options.virtualScroll){return;}
+
             var str = '', tableCache = this.tableCache,
 
             gridIds = this.gridIds;
@@ -445,17 +447,15 @@
 
                 str += '<tbody>' + this._renderSizeCell('td', gridIds.sizeBodyRowid);
 
-                str += '<tr id="'+ gridIds.emptyRow +'" class="leoUi-widget-content jqgrow leoUi-row-ltr"><td></td></tr>';
-
                 str += '</tbody>';
 
-                tableCache.$gridBodyTable.css({'visibility': 'hidden', 'position': 'absolute', 'top': '0', 'left': '0'}).html(tableCache.$gridBodyTableTbody = $(str));
+                tableCache.$gridBodyTable.css({'position': 'absolute', 'top': '0', 'left': '0'}).html(tableCache.$gridBodyTableTbody = $(str));
 
                 tableCache.$gridBodyResizeRow = tableCache.$gridBodyTable.find('#' + gridIds.sizeBodyRowid);
 
-                this._getVSInit();
-
             }
+
+            this._getVSInit();
 
         },
 
@@ -544,11 +544,11 @@
 
                 }
 
+                virtualScroll.scrollTop > virtualScroll.maxScrollTop ? scrollTop = virtualScroll.maxScrollTop : scrollTop = virtualScroll.scrollTop;
+
+                tableCache.$gridBodyTable.css({'visibility': 'visible', 'top': virtualScroll.tableScrollTop});
+
             }
-
-            virtualScroll.scrollTop > virtualScroll.maxScrollTop ? scrollTop = virtualScroll.maxScrollTop : scrollTop = virtualScroll.scrollTop;
-
-            tableCache.$gridBodyTable.css({'visibility': 'visible', 'top': scrollTop});
 
         },
 
@@ -574,17 +574,27 @@
 
         },
 
+        _setEmptyRow:function(){
+
+            var $emptyRow = $('<tr id="'+ this.gridIds.emptyRow +'" class="leoUi-widget-content jqgrow leoUi-row-ltr" style="visibility: hidden"><td></td></tr>').appendTo(this.tableCache.$gridBodyTableTbody);
+
+            this.virtualScroll.rowHeight = $emptyRow.outerHeight();
+
+            $emptyRow.remove();
+
+        },
+
         _getVSInit:function(){
+
+            if(!this.options.virtualScroll || !this.tableCache.$gridBodyTableTbody)return;
 
             var virtualScroll = this.virtualScroll,
 
             tableCache = this.tableCache,
 
-            records = this.records,
+            records = this.records;
 
-            $emptyRow = $('#' + this.gridIds.emptyRow);
-
-            virtualScroll.rowHeight = $emptyRow.outerHeight();
+            this._setEmptyRow();
 
             virtualScroll.vHeight = tableCache.$gridBodyDiv.height();
 
@@ -604,9 +614,9 @@
 
             virtualScroll.scrollTop = 0;
 
-            virtualScroll.maxScrollTop = virtualScroll.cHeight - virtualScroll.vHeight;
+            virtualScroll.tableScrollTop = 0;
 
-            $emptyRow.remove();
+            virtualScroll.maxScrollTop = virtualScroll.cHeight - virtualScroll.vHeight;
 
             this._renderVSGridBodyInitView();
 
@@ -622,13 +632,53 @@
 
             tableCache = this.tableCache;
 
-            tableCache.$gridBodyTableTbody.find('tr').not(tableCache.$gridBodyResizeRow).end().end().append(this._getVSGridBodyHtml(this.records.getRows(fristItem, lastItem)));
+            tableCache.$gridBodyTableTbody.find('tr').not(tableCache.$gridBodyResizeRow).remove().end().end().append(this._getVSGridBodyHtml(this.records.getRows(fristItem, lastItem)));
 
             tableCache.$gridBodyTable.css({'visibility': 'visible', 'top': virtualScroll.scrollTop});
 
-            virtualScroll.fristItem = fristItem;
+            virtualScroll.vRowsArr = [fristItem, lastItem - 1];
 
-            virtualScroll.vRowsArr = [fristItem, lastItem];
+        },
+
+        _getVSvRowsArr:function(){
+
+            var virtualScroll = this.virtualScroll,
+
+            vRows = virtualScroll.vRows, fristItem,
+
+            addRows = virtualScroll.addRows, lastItem,
+
+            maxlength = addRows + vRows, rows, difLen,
+
+            rowHeight = virtualScroll.rowHeight;
+
+            if(virtualScroll.direction === 'down'){
+
+                fristItem = Math.floor(virtualScroll.scrollTop / rowHeight);
+
+                lastItem = fristItem + maxlength - 1;
+
+            }else{
+
+                fristItem = Math.ceil(virtualScroll.scrollTop / rowHeight) - addRows;
+
+                fristItem < 0 && (fristItem = 0);
+
+                lastItem = fristItem + maxlength - 1;
+
+            }
+
+            rows = virtualScroll.rows - 1;
+
+            if((difLen = lastItem - rows) > 0){
+
+                fristItem -= difLen;
+
+                lastItem = rows;
+
+            }
+
+            return [fristItem, lastItem];
 
         },
 
@@ -636,13 +686,13 @@
 
             var virtualScroll = this.virtualScroll,
 
-            fristItem, lastItem, difRecords, difSlice,
+            difRecords, difSlice, scrollTop, difFristItem, difLastItem,
 
             oldVRowsArr = virtualScroll.vRowsArr,
 
-            addRows = virtualScroll.addRows, difFristItem, difLastItem;
+            vRowsArr = this._getVSvRowsArr();
 
-            if(fristItem >= virtualScroll.fristItem){
+            if((vRowsArr[0] === oldVRowsArr[0]) && (vRowsArr[1] === oldVRowsArr[1])){
 
                 return {isChage: false};
 
@@ -650,51 +700,49 @@
 
             if(virtualScroll.direction === 'down'){
 
-                fristItem = Math.floor(virtualScroll.scrollTop / virtualScroll.rowHeight);
+                if(oldVRowsArr[1] < vRowsArr[0]){
 
-                lastItem = fristItem + virtualScroll.vRows;
+                    difFristItem = vRowsArr[0];
 
-                difFristItem = oldVRowsArr[1];
+                }else{
 
-                difLastItem = lastItem + addRows;
-
-                difRecords = this.records.getRows(difFristItem, difLastItem);
-
-                if(difRecords.length === 0){
-
-                    return {isChage: false};
+                    difFristItem = oldVRowsArr[1] + 1;
 
                 }
+
+                difRecords = this.records.getRows(difFristItem, vRowsArr[1] + 1);
 
                 difSlice = [0, difRecords.length];
 
-                virtualScroll.vRowsArr = [fristItem, difLastItem];
+                scrollTop = (vRowsArr[1] - oldVRowsArr[1]) * virtualScroll.rowHeight;
+
+                virtualScroll.tableScrollTop += scrollTop;
+
+                virtualScroll.vRowsArr = vRowsArr;
 
             }else if(virtualScroll.direction === 'up'){
 
-                lastItem =  Math.floor((virtualScroll.scrollTop + virtualScroll.vHeight) / virtualScroll.rowHeight);
+                if(oldVRowsArr[0] > vRowsArr[1]){
 
-                fristItem = lastItem - virtualScroll.vRows;
+                    difLastItem = vRowsArr[1] + 1;
 
-                difFristItem = fristItem - addRows;
+                }else{
 
-                difLastItem = oldVRowsArr[0];
-
-                difRecords = this.records.getRows(difFristItem, difLastItem);
-
-                if(difRecords.length === 0){
-
-                    return {isChage: false};
+                    difLastItem = oldVRowsArr[0];
 
                 }
 
+                difRecords = this.records.getRows(vRowsArr[0], difLastItem);
+
                 difSlice = [-difRecords.length];
 
-                virtualScroll.vRowsArr = [difFristItem, lastItem];
+                scrollTop = (vRowsArr[0] - oldVRowsArr[0]) * virtualScroll.rowHeight;
+
+                virtualScroll.tableScrollTop += scrollTop;
+
+                virtualScroll.vRowsArr = vRowsArr;
 
             }
-
-            virtualScroll.fristItem = fristItem;
 
             return {
 
@@ -995,6 +1043,27 @@
 
         },
 
+        _multipleCheckBoxAllSelect:function(isAllChecked){
+
+            if(this.options.boxCheckType === 'multiple'){
+
+                var select = {}, data = this.records.data,
+
+                i = data.length, trIdPostfix = this.gridIds.trIdPostfix;
+
+                while(i--){
+
+                    isAllChecked ? select[trIdPostfix + data[i].__id] = true : select[trIdPostfix + data[i].__id] = false;
+
+
+                }
+
+                this.select = select;
+
+            }
+
+        },
+
         multipleCheckBoxAllSelect:function(isAllChecked, isAllCheckBoxSelected){
 
             if(this.options.boxCheckType !== 'multiple')return;
@@ -1015,8 +1084,6 @@
 
                         This._trBoxCheckOn(trId, true);
 
-                        This._addMultipleSelectRowArr(trId);
-
                     }
 
                 }else{
@@ -1027,13 +1094,13 @@
 
                         This._trBoxCheckOff(trId, true);
 
-                        This._removeMultipleSelectRowArr(trId);
-
                     }
 
                 }
 
             });
+
+            this._multipleCheckBoxAllSelect(isAllChecked);
 
             isAllCheckBoxSelected && this._isAllCheckBoxSelected();
 
@@ -1886,6 +1953,8 @@
                 this.tableCache.$gridBodyDiv.height(this.tableCache.$gridBox.setOuterHeight(tableHeight).height() - this._getHdivAndPagerHeight());
 
                 this.tableSize.tableHeight = tableHeight;
+
+                this._getVSInit();
 
             }
 

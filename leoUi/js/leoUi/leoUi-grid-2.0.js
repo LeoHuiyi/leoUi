@@ -57,8 +57,6 @@
 
                 type:'text',//类型
 
-                align:'center',//对齐方式
-
                 theadName:'',//对应的表头内容
 
                 tdClass:false,//加上的class
@@ -103,25 +101,21 @@
 
             getParam:'id',
 
-            virtualScroll:false,
+            virtualScroll:false,//是否使用虚拟滚动（大数据时使用）
+
+            virtualScrollAddRows:2,//虚拟滚动添加的条数
 
             sortAjax:false,//ajax排序
 
-            searchAjax:false,
+            searchAjax:false,//ajax搜索
 
-            rowDataKeys:false,
-
-            footerShow:true,
+            footerShow:true,//是否显示底边栏
 
             rowList:[20,30,50],//每一页可选条数
 
             cellEdit:false,//是否可编辑单元格
 
             beforeRowEdit:$.noop,
-
-            minRow:0,//至少一条数据
-
-            defaulTrId: 0,//默认trid
 
             height:500,//设置表格的高度(可用函数返回值)
 
@@ -264,6 +258,8 @@
         },
 
         renderGridBody:function(data){
+
+            this._setMultipleCheckBoxSelect();
 
             this.options.virtualScroll ? this._renderVSGridBodyTbody() : this._renderGridBodyTbody(data || this.records.getData());
 
@@ -459,6 +455,46 @@
 
         },
 
+        _setMultipleCheckBoxSelect:function(){
+
+            if(this.options.boxCheckType === 'multiple'){
+
+                var select = this.select, data = this.records.data,
+
+                i = data.length, trIdPostfix = this.gridIds.trIdPostfix,
+
+                trId, selectTr = this.options.selectTr;
+
+                while(i--){
+
+                    trId = trIdPostfix + data[i].__id;
+
+                    if(typeof select[trId] === 'undefined'){
+
+                        if(selectTr === 'all' || selectTr === i || this._inArray(selectTr, i) || ($.isFunction(selectTr) && selectTr(data[i]))){
+
+                            select[trId] = true;
+
+                            select.currentLen += 1;
+
+                        }else{
+
+                            select[trId] = false;
+
+                        }
+
+                    }else if(select[trId] === true){
+
+                        select.currentLen += 1;
+
+                    }
+
+                }
+
+            }
+
+        },
+
         _getVSGridBodyHtml:function(data){
 
             var i = 0, len = data.length, obj, trId, str = '',
@@ -523,15 +559,19 @@
 
         _renderVSGridBodyView:function(){
 
-            var DifData = this._getVSDifData(), html, scrollTop,
+            var DifData = this._getVSDifData(), html,
 
-            virtualScroll = this.virtualScroll,
-
-            tableCache = this.tableCache;
+            virtualScroll, tableCache;
 
             if(DifData.isChage){
 
+                tableCache = this.tableCache;
+
+                virtualScroll = this.virtualScroll
+
                 html = this._getVSGridBodyHtml(DifData.difRecords);
+
+                tableCache.$gridBodyTable.css({'visibility': 'visible', 'top': virtualScroll.tableScrollTop});
 
                 if(virtualScroll.direction === 'down'){
 
@@ -543,10 +583,6 @@
                     tableCache.$gridBodyTableTbody.find('tr').not(tableCache.$gridBodyResizeRow).slice(DifData.difSlice[0]).remove().end().end().filter(tableCache.$gridBodyResizeRow).after(html);
 
                 }
-
-                virtualScroll.scrollTop > virtualScroll.maxScrollTop ? scrollTop = virtualScroll.maxScrollTop : scrollTop = virtualScroll.scrollTop;
-
-                tableCache.$gridBodyTable.css({'visibility': 'visible', 'top': virtualScroll.tableScrollTop});
 
             }
 
@@ -592,7 +628,9 @@
 
             tableCache = this.tableCache,
 
-            records = this.records;
+            records = this.records,
+
+            virtualScrollAddRows = ~~this.options.virtualScrollAddRows;
 
             this._setEmptyRow();
 
@@ -606,7 +644,9 @@
 
             virtualScroll.vRows = Math.ceil(virtualScroll.vHeight / virtualScroll.rowHeight);
 
-            virtualScroll.addRows = 1;
+            virtualScrollAddRows < 1 && (virtualScrollAddRows = 1);
+
+            virtualScroll.addRows = virtualScrollAddRows;
 
             tableCache.$gridBodyDivInner.height(virtualScroll.cHeight);
 
@@ -634,7 +674,7 @@
 
             tableCache.$gridBodyTableTbody.find('tr').not(tableCache.$gridBodyResizeRow).remove().end().end().append(this._getVSGridBodyHtml(this.records.getRows(fristItem, lastItem)));
 
-            tableCache.$gridBodyTable.css({'visibility': 'visible', 'top': virtualScroll.scrollTop});
+            tableCache.$gridBodyTable.css({'visibility': 'visible', 'top': virtualScroll.tableScrollTop});
 
             virtualScroll.vRowsArr = [fristItem, lastItem - 1];
 
@@ -692,13 +732,19 @@
 
             vRowsArr = this._getVSvRowsArr();
 
-            if((vRowsArr[0] === oldVRowsArr[0]) && (vRowsArr[1] === oldVRowsArr[1])){
+            if(vRowsArr[0] === oldVRowsArr[0] && vRowsArr[1] === oldVRowsArr[1]){
 
                 return {isChage: false};
 
             }
 
             if(virtualScroll.direction === 'down'){
+
+                if(vRowsArr[0] < oldVRowsArr[0] + virtualScroll.addRows && vRowsArr[1] !== virtualScroll.rows - 1){
+
+                    return {isChage: false};
+
+                }
 
                 if(oldVRowsArr[1] < vRowsArr[0]){
 
@@ -721,6 +767,12 @@
                 virtualScroll.vRowsArr = vRowsArr;
 
             }else if(virtualScroll.direction === 'up'){
+
+                if(vRowsArr[1] > oldVRowsArr[1] - virtualScroll.addRows && vRowsArr[0] !== 0){
+
+                    return {isChage: false};
+
+                }
 
                 if(oldVRowsArr[0] > vRowsArr[1]){
 
@@ -938,27 +990,7 @@
 
                 select = this.select;
 
-                if(typeof select[trId] === 'undefined'){
-
-                    if(selectTr === 'all' || selectTr === trIndex || this._inArray(selectTr, trIndex) || ($.isFunction(selectTr) && selectTr(tdData))){
-
-                        select[trId] = true;
-
-                        select.currentLen += 1;
-
-                        return true;
-
-                    }else{
-
-                        select[trId] = false;
-
-                        return false;
-
-                    }
-
-                }else if(select[trId]){
-
-                    select.currentLen += 1;
+                if(select[trId]){
 
                     return true;
 
@@ -1047,7 +1079,7 @@
 
             if(this.options.boxCheckType === 'multiple'){
 
-                var select = {}, data = this.records.data,
+                var select = this.select, data = this.records.data,
 
                 i = data.length, trIdPostfix = this.gridIds.trIdPostfix;
 
@@ -1055,10 +1087,9 @@
 
                     isAllChecked ? select[trIdPostfix + data[i].__id] = true : select[trIdPostfix + data[i].__id] = false;
 
-
                 }
 
-                this.select = select;
+                isAllChecked ? select.currentLen = data.length : select.currentLen = 0;
 
             }
 
@@ -2500,7 +2531,7 @@
 
         _setCssText:function(cssText, sizeCellName, width){
 
-            cssText = cssText.replace(new RegExp(sizeCellName + '[^\}]*'), function(name){
+            cssText = cssText.replace(/[\s\uFEFF\xA0]/g, '').replace(new RegExp(sizeCellName + '\{[^\}]*'), function(name){
 
                 return sizeCellName + '{width:' + width + 'px';
 

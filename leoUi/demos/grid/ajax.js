@@ -8,7 +8,7 @@ http.createServer(function(req, res) {
 
 	pageSize = query.pageSize, page = query.page,
 
-	data, len, totalItems = 200, totalpages, fristItem, lastItem,
+	data, len, totalItems = 100000, totalpages, fristItem, lastItem,
 
 	contact = ["Andrew", "Nancy", "Shelley", "Regina", "Yoshi", "Antoni", "Mayumi", "Ian", "Peter", "Lars", "Petra", "Martin", "Sven", "Elio", "Beate", "Cheryl", "Michael", "Guylene"],
 
@@ -68,9 +68,11 @@ http.createServer(function(req, res) {
 
 	}
 
-	page = page >> 0;
+	page = ~~page;
 
-	pageSize = pageSize >> 0;
+	page < 1 && (page = 1);
+
+	pageSize = ~~pageSize;
 
 	totalpages = Math.ceil(totalItems / pageSize);
 

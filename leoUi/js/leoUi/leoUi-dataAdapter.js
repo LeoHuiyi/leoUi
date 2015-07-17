@@ -1221,7 +1221,7 @@
 
         option.beforeAjax();
 
-        return dataAdapter.ajax = $.ajax(ajaxParam).always(function(data) {
+        return dataAdapter.ajax = $.ajax(ajaxParam).always(function(data){
 
             option.afterAjax(data);
 

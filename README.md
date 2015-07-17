@@ -24,10 +24,20 @@ leoUi-tooltip.js：提示框，可自动调节位置，是提示框始终在屏�
 
 leoUi-Effects.js：jqueryUi特效，修改一些需求,
 
-leoUI-tree.js：自动折叠，拖放,
+leoUI-tree.js：树形插件（自动折叠，拖放,多选等）
 
 leoUi-iframeMessage.js：iframe直接通向工具
 
 leoUi-select.js：原生select模拟
 
-leoUi-grid.js：表格插件，高度定制，自动调节宽高等
+leoUi-grid.js：表格插件（支持各种定制）
+
+leoUi-imagePlayer.js: 轮播图插件(全屏，自动缩放，自调轮播个数等)
+
+leoUi-tabs.js:tab插件（支持拖拽，滚动等）
+
+leoUi--upload.js：支持html5、ajax2上传插件
+
+leoUi--datetimepicker.js:时间插件（支持小时到百年选择等）
+
+leoUi-grid-2.0.js：表格插件（2.0版本）把数据层抽出来--leoUi--dataAdapter(数据适配器)，新增虚拟滚动，支持大数据单页显示

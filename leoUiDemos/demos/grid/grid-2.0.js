@@ -462,7 +462,7 @@ leoUiLoad.require('leoUi-dataAdapter,leoUi-grid-2.0,leoUi,leoUiGrid,ready', func
 
             },
             currentPage: 1,
-            method:'ajax',
+            method:'local',
             pageMethod:'local', //local,ajax
             mode: [{
                 name: 'id',

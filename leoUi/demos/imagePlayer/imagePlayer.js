@@ -51,7 +51,7 @@ leoUiLoad.require('leoUi-imagePlayer,leoUi, ready', function($) {
     });
     $('#add').on('click', function(event) {
         event.preventDefault();
-        $('.images_lists').append('<li class="list" id="1123"><dl><dt class="photo"><a href="###"><img src="http://img5.cache.netease.com/photo/0003/2014-12-12/AD9DN1JD00AJ0003.jpg"></a></dt></dl></li>');
+        $('.images_lists').append('<li class="list" id="1123"><dl><dt class="photo"><a href="###"><img src="img/16.jpg"></a></dt></dl></li>');
     });
 });
 

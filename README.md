@@ -41,3 +41,9 @@ leoUi--upload.js：支持html5、ajax2上传插件
 leoUi--datetimepicker.js:时间插件（支持小时到百年选择等）
 
 leoUi-grid-2.0.js：表格插件（2.0版本）把数据层抽出来--leoUi--dataAdapter(数据适配器)，新增虚拟滚动，支持大数据单页显示
+
+
+
+# License
+
+MIT Licensed. Copyright (c) leoHuiyi 2015.
